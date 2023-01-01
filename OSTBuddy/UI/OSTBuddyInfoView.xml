@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<root>
+  <BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="OSTBuddyInfo" layout_borders="Rect(0,0,0,2)" max_size="Point(16000,-1)">
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Mongo demolish - enforcer uses mongo demolish." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Mongo slam - enforcer uses mongo slam." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Commands;" layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="/buddy - toggles start and stop." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="/buddy addpos - adds your position as a waypoint." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="NOTE: Disable AOE Taunts and buffing cycles." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Create a loop (Circle) with waypoints to outside tank. " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Enforcer will mongo at each waypoint stopping at the last," layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="When there is 0 mobs at the last waypoint" layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="it will wait the respawn delay in seconds before looping." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+  </BorderView>
+</root>

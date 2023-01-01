@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<root>
+  <BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="AttackBuddyInfo" layout_borders="Rect(0,0,0,2)" max_size="Point(16000,-1)">
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Attacks mobs that are either attacking the Team, Helpers or nothing." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Scanning any mobs within *Scan range." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Taunt - taunts mobs > Attack range." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Helpers - a list of names that are helping us." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Commands;" layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="/buddy - toggle on and off." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="*Set Attack Range lower than Scan Range." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="NOTE: Will not attack any mob that is being attacked by anyone outside the Team or Helpers." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="This is to prevent kill stealing." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="NOTE: If pet names are not the same name as their owner then add them to Helpers." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="This is to add the pet to our team." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+  </BorderView>
+</root>

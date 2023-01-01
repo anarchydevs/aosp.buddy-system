@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<root>
+  <BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="InfBuddyHelpView" layout_borders="Rect(0,0,0,2)" max_size="Point(16000,-1)">
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Merge - will merge with another team when toggled." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Double reward* - characters with double reward toggled will grab medium and when " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="that completes then grab hard, for reward from both." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Commands;" layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="/buddy - toggles start and stop." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="*Omni only, must set difficulty to hard." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Don't leave sync movement toggled." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+  </BorderView>
+</root>
