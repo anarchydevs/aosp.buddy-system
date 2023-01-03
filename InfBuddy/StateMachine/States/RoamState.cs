@@ -113,6 +113,13 @@ namespace InfBuddy
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
 
+            if (Time.NormalTime > InfBuddy._stateTimeOut + 210f)
+            {
+                InfBuddy._stateTimeOut = Time.NormalTime;
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(184.5f, 1.0f, 242.9f));
+                InfBuddy.NavMeshMovementController.AppendNavMeshDestination(new Vector3(181.3f, 1.0f, 245.6f));
+            }
+
             if (DynelManager.LocalPlayer.Profession == Profession.Trader || DynelManager.LocalPlayer.Profession == Profession.Bureaucrat)
                 HandleCharmScan();
 

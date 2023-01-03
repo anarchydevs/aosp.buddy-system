@@ -65,12 +65,19 @@ namespace AXPBuddy
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
                     && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
             {
-                if (!AXPBuddy._passedCorrectionPos)
+                if (!AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13CorrectionPos) < 10f)
-                        AXPBuddy._passedCorrectionPos = true;
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13FirstCorrectionPos) < 5f)
+                        AXPBuddy._passedFirstCorrectionPos = true;
                     else
-                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13CorrectionPos);
+                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13FirstCorrectionPos);
+                }
+                else if (AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
+                {
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13SecondCorrectionPos) < 5f)
+                        AXPBuddy._passedSecondCorrectionPos = true;
+                    else
+                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13SecondCorrectionPos);
                 }
                 else
                     AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);

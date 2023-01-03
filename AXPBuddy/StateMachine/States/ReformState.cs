@@ -48,7 +48,8 @@ namespace AXPBuddy
             Chat.WriteLine("ReformState::OnStateEnter");
 
             _reformStartedTime = Time.NormalTime;
-            AXPBuddy._passedCorrectionPos = false;
+            AXPBuddy._passedFirstCorrectionPos = false;
+            AXPBuddy._passedSecondCorrectionPos = false;
 
             if (AXPBuddy._settings["Merge"].AsBool() || DynelManager.LocalPlayer.Identity != AXPBuddy.Leader)
             {

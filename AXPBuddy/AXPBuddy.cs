@@ -32,7 +32,8 @@ namespace AXPBuddy
         public static bool Toggle = false;
         public static bool Sitting = false;
         public static bool _died = false;
-        public static bool _passedCorrectionPos = false;
+        public static bool _passedFirstCorrectionPos = false;
+        public static bool _passedSecondCorrectionPos = false;
 
         public static double _stateTimeOut;
         public static double _sitUpdateTimer;

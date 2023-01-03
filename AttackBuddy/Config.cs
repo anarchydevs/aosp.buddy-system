@@ -18,7 +18,7 @@ namespace AttackBuddy
         [JsonIgnore]
         public int AttackRange => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].AttackRange : 10;
         [JsonIgnore]
-        public int ScanRange => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].ScanRange : 11;
+        public int ScanRange => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].ScanRange : 10;
 
         public static Config Load(string path)
         {
