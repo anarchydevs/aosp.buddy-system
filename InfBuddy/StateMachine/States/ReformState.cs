@@ -11,7 +11,7 @@ namespace InfBuddy
     public class ReformState : IState
     {
         private const float ReformTimeout = 100;
-        private const float DisbandDelay = 15;
+        private const float DisbandDelay = 22;
 
         private double _reformStartedTime;
         private double _inviting;
@@ -29,7 +29,7 @@ namespace InfBuddy
             if (Extensions.TimedOut(_reformStartedTime, ReformTimeout))
                 return new MoveToQuestGiverState();
 
-            if (_phase == ReformPhase.Completed && Time.NormalTime > _reformStartedTime + DisbandDelay + 3f)
+            if (_phase == ReformPhase.Completed && Time.NormalTime > _reformStartedTime + DisbandDelay + 5f)
                 if (Team.Members.Count >= _teamCache.Count())
                     return new MoveToQuestGiverState();
 

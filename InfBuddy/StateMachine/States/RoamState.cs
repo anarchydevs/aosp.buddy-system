@@ -33,6 +33,13 @@ namespace InfBuddy
             if (Extensions.HasDied())
                 return new DiedState();
 
+            if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
+            {
+                InfBuddy._settings["Toggle"] = false;
+                InfBuddy.Toggle = false;
+                return new IdleState();
+            }
+
             if (Extensions.CanExit(_missionsLoaded))
                 return new ExitMissionState();
 
