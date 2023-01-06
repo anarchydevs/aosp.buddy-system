@@ -40,8 +40,6 @@ namespace InfBuddy
         {
             Chat.WriteLine("ExitMissionState::OnStateEnter");
 
-            InfBuddy._stateTimeOut = Time.NormalTime;
-
             int _time = 0;
 
             if (InfBuddy._settings["DoubleReward"].AsBool() && !InfBuddy.DoubleReward)
@@ -52,6 +50,8 @@ namespace InfBuddy
 
             Task.Delay(_time).ContinueWith(x =>
             {
+                InfBuddy._stateTimeOut = Time.NormalTime;
+
                 if (InfBuddy.ModeSelection.Leech == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 {
                     DynelManager.LocalPlayer.Position = Constants.LeechMissionExit;
@@ -74,7 +74,7 @@ namespace InfBuddy
 
         public void Tick()
         {
-            if (InfBuddy.NavMeshMovementController.IsNavigating && Time.NormalTime > InfBuddy._stateTimeOut + 40f)
+            if (Time.NormalTime > InfBuddy._stateTimeOut + 15f)
             {
                 InfBuddy._stateTimeOut = Time.NormalTime;
 

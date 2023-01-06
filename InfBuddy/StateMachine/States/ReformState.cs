@@ -11,7 +11,7 @@ namespace InfBuddy
     public class ReformState : IState
     {
         private const float ReformTimeout = 100;
-        private const float DisbandDelay = 22;
+        private const float DisbandDelay = 16;
 
         private double _reformStartedTime;
         private double _inviting;
@@ -26,11 +26,11 @@ namespace InfBuddy
             if (Extensions.HasDied())
                 return new DiedState();
 
-            if (Extensions.TimedOut(_reformStartedTime, ReformTimeout))
+            if (Extensions.TimedOut(_reformStartedTime, ReformTimeout + 3f))
                 return new MoveToQuestGiverState();
 
-            if (_phase == ReformPhase.Completed && Time.NormalTime > _reformStartedTime + DisbandDelay + 5f)
-                if (Team.Members.Count >= _teamCache.Count())
+            if (_phase == ReformPhase.Completed && Time.NormalTime > _reformStartedTime + DisbandDelay + 3f)
+                if (Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
                     return new MoveToQuestGiverState();
 
             return null;
@@ -79,8 +79,13 @@ namespace InfBuddy
 
             if (_phase == ReformPhase.Disbanding)
             {
-                if (Team.IsInTeam && (Time.NormalTime > _reformStartedTime + DisbandDelay
-                    || Time.NormalTime > _reformStartedTime + ReformTimeout))
+                if (Team.IsInTeam && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
+                {
+                    if (Time.NormalTime > _reformStartedTime + DisbandDelay)
+                        Team.Disband();
+                }
+
+                if (Team.IsInTeam && Time.NormalTime > _reformStartedTime + ReformTimeout)
                     Team.Disband();
 
                 if (!Team.IsInTeam)
@@ -93,7 +98,7 @@ namespace InfBuddy
 
             if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count() && Time.NormalTime > _inviting + 3f)
             {
-                foreach (SimpleChar player in DynelManager.Players.Where(c => !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
+                foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
                 {
                     if (_invitedList.Contains(player.Identity)) { continue; }
 
@@ -106,7 +111,10 @@ namespace InfBuddy
                 }
             }
 
-            if (_phase == ReformPhase.Inviting && Team.IsInTeam && _invitedList.Count() >= _teamCache.Count())
+            if (_phase == ReformPhase.Inviting
+                && Team.IsInTeam
+                && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count()
+                && _invitedList.Count() == _teamCache.Count())
             {
                 _phase = ReformPhase.Completed;
                 Chat.WriteLine("ReformPhase.Completed");
