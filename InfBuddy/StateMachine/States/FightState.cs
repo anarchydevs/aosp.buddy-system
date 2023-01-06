@@ -62,7 +62,7 @@ namespace InfBuddy
         {
             if (_target == null) { return; }
 
-            //REASON: Edge case for some reason randomly hitting a null reference, the SimpleChar is not null but the Accel is?
+            //REASON: Edge case for some reason randomly hitting a null reference, the SimpleChar is not null but the Accel and various others are.
             if (_target.Name == "NoName") { return; }
                 
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
