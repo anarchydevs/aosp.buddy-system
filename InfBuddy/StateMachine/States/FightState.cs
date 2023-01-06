@@ -62,8 +62,8 @@ namespace InfBuddy
         {
             if (_target == null) { return; }
 
-            //REASON: Edge case for attacking spirit?
-            if (_target.Name == "NoName") { return; }
+            //REASON: Edge case for some reason randomly hitting a null reference, the SimpleChar is not null but the Accel is?
+            if (_target.Name == "NoName" || Targeting.TargetChar?.Name == "Guardian Spirit of Purification") { return; }
                 
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
@@ -75,7 +75,9 @@ namespace InfBuddy
                 && !DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.Attack(_target);
 
-            if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+            if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
+                || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.Melee)
+                    || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.MartialArts))
                 Extensions.HandlePathing(_target);
 
             if (_target == null && Extensions.IsClear())
