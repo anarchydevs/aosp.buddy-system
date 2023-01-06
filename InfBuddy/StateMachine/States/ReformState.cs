@@ -11,7 +11,7 @@ namespace InfBuddy
     public class ReformState : IState
     {
         private const float ReformTimeout = 100;
-        private const float DisbandDelay = 16;
+        private const float DisbandDelay = 45;
 
         private double _reformStartedTime;
         private double _inviting;
