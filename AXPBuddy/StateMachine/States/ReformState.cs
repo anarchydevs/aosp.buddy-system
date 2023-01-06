@@ -36,7 +36,7 @@ namespace AXPBuddy
                     Team.ConvertToRaid();
                 }
 
-                if (Team.Members.Count >= _teamCache.Count())
+                if (Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
                     return new EnterSectorState();
             }
 
@@ -48,6 +48,7 @@ namespace AXPBuddy
             Chat.WriteLine("ReformState::OnStateEnter");
 
             _reformStartedTime = Time.NormalTime;
+
             AXPBuddy._passedFirstCorrectionPos = false;
             AXPBuddy._passedSecondCorrectionPos = false;
 
@@ -73,7 +74,7 @@ namespace AXPBuddy
 
             _init = false;
 
-            if (AXPBuddy._settings["Merge"].AsBool())
+            if (AXPBuddy._settings["Merge"].AsBool() || DynelManager.LocalPlayer.Identity != AXPBuddy.Leader)
                 Team.TeamRequest -= OnTeamRequest;
         }
 
@@ -87,16 +88,8 @@ namespace AXPBuddy
 
             if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count())
             {
-                foreach (SimpleChar player in DynelManager.Players.Where(c => !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
+                foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
                 {
-                    //if (_invitedList.Contains(player.Identity))
-                    //    continue;
-
-                    //Team.Invite(player.Identity);
-
-                    //_invitedList.Add(player.Identity);
-                    //Chat.WriteLine($"Inviting {player.Name}");
-
                     if (_invitedList.Contains(player.Identity)) { continue; }
 
                     _invitedList.Add(player.Identity);
@@ -108,7 +101,10 @@ namespace AXPBuddy
                 }
             }
 
-            if (_phase == ReformPhase.Inviting && Team.IsInTeam && _invitedList.Count() >= _teamCache.Count())
+            if (_phase == ReformPhase.Inviting
+                && Team.IsInTeam
+                && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count()
+                && _invitedList.Count() == _teamCache.Count())
             {
                 _phase = ReformPhase.Completed;
                 Chat.WriteLine("ReformPhase.Completed");

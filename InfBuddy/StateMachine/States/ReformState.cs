@@ -10,8 +10,8 @@ namespace InfBuddy
 {
     public class ReformState : IState
     {
-        private const float ReformTimeout = 100;
-        private const float DisbandDelay = 16;
+        private const float ReformTimeout = 70;
+        private const float DisbandDelay = 14;
 
         private double _reformStartedTime;
         private double _inviting;
@@ -62,7 +62,7 @@ namespace InfBuddy
             _invitedList.Clear();
             _teamCache.Clear();
 
-            if (InfBuddy._settings["Merge"].AsBool())
+            if (InfBuddy._settings["Merge"].AsBool() || DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
                 Team.TeamRequest -= OnTeamRequest;
         }
 
@@ -96,7 +96,7 @@ namespace InfBuddy
                 }
             }
 
-            if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count() && Time.NormalTime > _inviting + 3f)
+            if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count() && Time.NormalTime > _inviting + 4f)
             {
                 foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
                 {
