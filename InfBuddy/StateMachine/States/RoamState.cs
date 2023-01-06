@@ -74,7 +74,8 @@ namespace InfBuddy
                 .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
 
-            if (mob != null && !InfBuddy._namesToIgnore.Contains(mob.Name))
+            if (mob != null && !InfBuddy._namesToIgnore.Contains(mob.Name) 
+                && !Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any())
             {
                 _target = mob;
                 Chat.WriteLine($"Found target: {_target.Name}");
