@@ -63,7 +63,7 @@ namespace InfBuddy
             if (_target == null) { return; }
 
             //REASON: Edge case for some reason randomly hitting a null reference, the SimpleChar is not null but the Accel is?
-            if (_target.Name == "NoName" || Targeting.TargetChar?.Name == "Guardian Spirit of Purification") { return; }
+            if (_target.Name == "NoName") { return; }
                 
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
@@ -72,7 +72,7 @@ namespace InfBuddy
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
 
             if (_target?.IsInAttackRange() == true && !DynelManager.LocalPlayer.IsAttackPending
-                && !DynelManager.LocalPlayer.IsAttacking)
+                && !DynelManager.LocalPlayer.IsAttacking && _target.Name != "Guardian Spirit of Purification")
                 DynelManager.LocalPlayer.Attack(_target);
 
             if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
