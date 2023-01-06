@@ -61,14 +61,17 @@ namespace InfBuddy
         public void Tick()
         {
             if (_target == null) { return; }
+
+            //REASON: Edge case for attacking spirit?
+            if (_target.Name == "NoName") { return; }
                 
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
 
-            if (!_target.IsInLineOfSight)
-                InfBuddy.NavMeshMovementController.SetNavMeshDestination(_target.Position);
+            if (_target?.IsInLineOfSight == false)
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
 
-            if (_target.IsInAttackRange() && !DynelManager.LocalPlayer.IsAttackPending
+            if (_target?.IsInAttackRange() == true && !DynelManager.LocalPlayer.IsAttackPending
                 && !DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.Attack(_target);
 
