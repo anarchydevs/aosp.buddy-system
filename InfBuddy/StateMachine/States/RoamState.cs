@@ -74,7 +74,7 @@ namespace InfBuddy
                 .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
 
-            if (mob != null && !InfBuddy._namesToIgnore.Contains(mob.Name))
+            if (mob != null)
             {
                 _target = mob;
                 Chat.WriteLine($"Found target: {_target.Name}");
