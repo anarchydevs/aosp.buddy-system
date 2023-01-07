@@ -45,7 +45,7 @@ namespace InfBuddy
             if (InfBuddy._settings["DoubleReward"].AsBool() && !InfBuddy.DoubleReward)
                 _time = 1000;
             else
-                _time = 22000;
+                _time = 30000;
 
 
             Task.Delay(_time).ContinueWith(x =>
