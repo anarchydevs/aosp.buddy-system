@@ -169,6 +169,7 @@ namespace InfBuddy
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(2769.6f, 24.6f, 3319.9f));
                 InfBuddy.NavMeshMovementController.AppendNavMeshDestination(Constants.EntrancePos);
                 InfBuddy.NavMeshMovementController.AppendDestination(Constants.EntranceFinalPos);
+                _init = false;
             }
 
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId && !MovementController.Instance.IsNavigating
