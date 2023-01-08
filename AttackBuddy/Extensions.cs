@@ -112,8 +112,8 @@ namespace AttackBuddy
         public static bool ShouldStopAttack()
         {
             return DynelManager.LocalPlayer.FightingTarget?.MaxHealth >= 1000000 &&
-                    ((DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(253953) == true || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(205607) == true
-                    || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(NanoLine.ShovelBuffs) == true) || DynelManager.LocalPlayer.FightingTarget?.IsPlayer == true);
+                    (DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(253953) == true || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(205607) == true
+                    || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(NanoLine.ShovelBuffs) == true || DynelManager.LocalPlayer.FightingTarget?.IsPlayer == true);
         }
 
         public static bool ShouldTaunt(SimpleChar _target)

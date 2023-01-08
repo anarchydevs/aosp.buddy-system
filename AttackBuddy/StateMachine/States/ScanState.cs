@@ -68,6 +68,12 @@ namespace AttackBuddy
 
         public void Tick()
         {
+            if (Extensions.ShouldStopAttack())
+            {
+                DynelManager.LocalPlayer.StopAttack();
+                return;
+            }
+
             if (Extensions.GetLeader(AttackBuddy.Leader) != null)
             {
                 if (DynelManager.LocalPlayer.Profession == Profession.Trader || DynelManager.LocalPlayer.Profession == Profession.Bureaucrat)
