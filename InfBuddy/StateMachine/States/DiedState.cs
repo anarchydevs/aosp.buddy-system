@@ -54,20 +54,17 @@ namespace InfBuddy
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId && MovementController.Instance.IsNavigating
                 && DynelManager.LocalPlayer.HealthPercent >= 66)
             {
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.EntrancePos) <= 10f)
+                if (Team.Members.Where(c => c.Character != null).ToList().Count == Team.Members.Count)
                 {
-                    if (Team.Members.Where(c => c.Character != null).ToList().Count == Team.Members.Count)
-                    {
-                        InfBuddy.NavMeshMovementController.Halt();
-                        _pathedOnce = false;
-                        _usedKit = false;
+                    InfBuddy.NavMeshMovementController.Halt();
+                    _pathedOnce = false;
+                    _usedKit = false;
 
-                        foreach (Mission mission in Mission.List)
-                            if (mission.DisplayName.Contains("The Purification Ritual"))
-                                mission.Delete();
+                    foreach (Mission mission in Mission.List)
+                        if (mission.DisplayName.Contains("The Purification Ritual"))
+                            mission.Delete();
 
-                        return new ReformState();
-                    }
+                    return new ReformState();
                 }
             }
 
