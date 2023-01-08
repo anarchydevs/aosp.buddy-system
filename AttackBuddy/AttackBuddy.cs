@@ -321,6 +321,7 @@ namespace AttackBuddy
                         && !Constants._ignores.Contains(c.Name)
                         && c.Health > 0 && c.IsInLineOfSight
                         && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                        && !c.Buffs.Contains(302745)
                         && !c.Buffs.Contains(NanoLine.ShovelBuffs)
                         && c.MaxHealth >= 1000000)
                     .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
@@ -356,6 +357,7 @@ namespace AttackBuddy
                     .OrderByDescending(c => c.Name == "Corrupted Hiisi Berserker")
                     .OrderByDescending(c => c.Name == "Corrupted Xan-Cur")
                     .OrderByDescending(c => c.Name == "Corrupted Xan-Kuir")
+                    .OrderByDescending(c => c.Name == "Cultist Silencer")
                     .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
                     .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
                     .OrderByDescending(c => c.Name == "Alien Cocoon")

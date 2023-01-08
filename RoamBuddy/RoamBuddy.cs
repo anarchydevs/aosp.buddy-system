@@ -348,6 +348,7 @@ namespace RoamBuddy
                 .Where(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= ScanRange
                     && !Constants._ignores.Contains(c.Name)
                     && c.Health > 0 && c.IsInLineOfSight
+                    && !c.Buffs.Contains(302745)
                     && !c.Buffs.Contains(NanoLine.ShovelBuffs)
                     && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
                     && c.MaxHealth >= 1000000)

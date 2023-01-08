@@ -76,8 +76,16 @@ namespace InfBuddy
 
             if (mob != null)
             {
-                _target = mob;
-                Chat.WriteLine($"Found target: {_target.Name}");
+                if (Extensions.InCombat())
+                {
+                    _target = mob;
+                    Chat.WriteLine($"Found target: {_target.Name}");
+                }
+                else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any())
+                {
+                    _target = mob;
+                    Chat.WriteLine($"Found target: {_target.Name}");
+                }
             }
             else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
                 && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())

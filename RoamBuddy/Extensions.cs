@@ -94,10 +94,14 @@ namespace RoamBuddy
         }
         public static bool ShouldStopAttack()
         {
-            return DynelManager.LocalPlayer.FightingTarget != null && (DynelManager.LocalPlayer.FightingTarget.MaxHealth >= 1000000 &&
-                    (DynelManager.LocalPlayer.FightingTarget.Buffs.Contains(253953) || DynelManager.LocalPlayer.FightingTarget.Buffs.Contains(205607)
-                    || DynelManager.LocalPlayer.FightingTarget.Buffs.Contains(NanoLine.ShovelBuffs)) || DynelManager.LocalPlayer.FightingTarget.IsPlayer);
+            return DynelManager.LocalPlayer.FightingTarget?.MaxHealth >= 1000000
+                    && DynelManager.LocalPlayer.FightingTarget?.IsPlayer == true
+                    || (DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(253953) == true
+                    || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(205607) == true
+                    || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(NanoLine.ShovelBuffs) == true
+                    || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(302745) == true);
         }
+
 
         public static bool ShouldTaunt(SimpleChar _target)
         {
