@@ -66,7 +66,7 @@ namespace AttackBuddy
                 return;
 
             //_target.Buffs.contans(shovebuffs)
-            if (Extensions.ShouldStopAttack())
+            if (DynelManager.LocalPlayer.FightingTarget != null && Extensions.ShouldStopAttack())
             {
                 DynelManager.LocalPlayer.StopAttack();
                 return;
