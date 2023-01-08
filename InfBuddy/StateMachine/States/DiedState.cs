@@ -15,6 +15,8 @@ namespace InfBuddy
         private bool _pathedOnce = false;
         private bool _usedKit = false;
 
+        private bool _init = false;
+
         List<Vector3> _pathPandePlat = new List<Vector3>
         {
             new Vector3(172.9f, 25.6f, 62.3f),
@@ -91,6 +93,8 @@ namespace InfBuddy
         public void OnStateExit()
         {
             Chat.WriteLine("DiedState::OnStateExit");
+
+            _init = false;
         }
 
         public void Tick()
@@ -155,13 +159,27 @@ namespace InfBuddy
                 _pathedOnce = true;
             }
 
-            if (Playfield.ModelIdentity.Instance == Constants.InfernoId && !MovementController.Instance.IsNavigating
-                && DynelManager.LocalPlayer.HealthPercent >= 66)
+            if (Playfield.ModelIdentity.Instance == Constants.InfernoId && InfBuddy.NavMeshMovementController.IsNavigating
+                && Time.NormalTime > InfBuddy._stateTimeOut + 25f && _init)
             {
+                InfBuddy._stateTimeOut = Time.NormalTime;
+
+                InfBuddy.NavMeshMovementController.Halt();
+                //DynelManager.LocalPlayer.Position = new Vector3(DynelManager.LocalPlayer.Position.X, DynelManager.LocalPlayer.Position.Y, DynelManager.LocalPlayer.Position.Z - 4f);
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(2769.6f, 24.6f, 3319.9f));
+                InfBuddy.NavMeshMovementController.AppendNavMeshDestination(Constants.EntrancePos);
+                InfBuddy.NavMeshMovementController.AppendDestination(Constants.EntranceFinalPos);
+            }
+
+            if (Playfield.ModelIdentity.Instance == Constants.InfernoId && !MovementController.Instance.IsNavigating
+                && DynelManager.LocalPlayer.HealthPercent >= 66 && !_init)
+            {
+                InfBuddy._stateTimeOut = Time.NormalTime;
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.EntrancePos);
                 InfBuddy.NavMeshMovementController.AppendDestination(Constants.EntranceFinalPos);
                 _pathedOnce = false;
                 _usedKit = false;
+                _init = true;
             }
         }
     }
