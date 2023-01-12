@@ -18,6 +18,7 @@ namespace InfBuddy
         private double _fightStartTime;
 
         private static bool _missionsLoaded = false;
+        private static bool _initLOS = false;
 
         public FightState(SimpleChar target) : base(Constants.DefendPos, 3f, 1)
         {
@@ -50,12 +51,26 @@ namespace InfBuddy
 
             _fightStartTime = Time.NormalTime;
         }
-
         public void OnStateExit()
         {
             Chat.WriteLine("FightState::OnStateExit");
 
             _missionsLoaded = false;
+            _initLOS = false;
+        }
+        public void LineOfSightLogic()
+        {
+            if (_target?.IsInLineOfSight == false && !_initLOS)
+            {
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
+                _initLOS = true;
+            }
+            else if (_target?.IsInLineOfSight == true && _target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 4f
+                && InfBuddy.NavMeshMovementController.IsNavigating && _initLOS)
+            {
+                InfBuddy.NavMeshMovementController.Halt();
+                _initLOS = false;
+            }
         }
 
         public void Tick()
@@ -68,8 +83,7 @@ namespace InfBuddy
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
 
-            if (_target?.IsInLineOfSight == false)
-                InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
+            LineOfSightLogic();
 
             if (_target?.IsInAttackRange() == true && !DynelManager.LocalPlayer.IsAttackPending
                 && !DynelManager.LocalPlayer.IsAttacking && _target.Name != "Guardian Spirit of Purification")
@@ -77,11 +91,12 @@ namespace InfBuddy
 
             if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
                 || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.Melee)
-                    || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.MartialArts))
-                Extensions.HandlePathing(_target);
+                || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.MartialArts))
+                    Extensions.HandlePathing(_target);
 
-            if (_target == null && Extensions.IsClear())
-                HoldPosition();
+            //Do we need this? try rmove
+            //if (Extensions.IsClear())
+            //    HoldPosition();
         }
     }
 }
