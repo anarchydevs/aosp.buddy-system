@@ -54,7 +54,7 @@ namespace InfBuddy
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId && MovementController.Instance.IsNavigating
                 && DynelManager.LocalPlayer.HealthPercent >= 66)
             {
-                if (Team.Members.Where(c => c.Character != null).ToList().Count == Team.Members.Count)
+                if (Team.Members.Where(c => c.Character != null && c.Character.DistanceFrom(DynelManager.LocalPlayer) < 50f).ToList().Count == Team.Members.Count)
                 {
                     InfBuddy.NavMeshMovementController.Halt();
                     _pathedOnce = false;

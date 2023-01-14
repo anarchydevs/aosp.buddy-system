@@ -45,11 +45,11 @@ namespace AXPBuddy
             if (Team.IsInTeam)
             {
                 return DynelManager.Characters
-                    .Any(c => Team.Members.Select(m => m.Name).Contains(c.FightingTarget?.Name));
+                    .Any(c => c.FightingTarget != null && Team.Members.Select(m => m.Name).Contains(c.FightingTarget?.Name));
             }
 
             return DynelManager.Characters
-                    .Any(c => c.FightingTarget?.Name == DynelManager.LocalPlayer.Name);
+                    .Any(c => c.FightingTarget != null && c.FightingTarget?.Name == DynelManager.LocalPlayer.Name);
         }
 
         public static bool HasDied()
