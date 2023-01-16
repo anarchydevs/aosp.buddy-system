@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.Design;
 using AOSharp.Common.GameData;
+using AOSharp.Common.Unmanaged.Imports;
 
 namespace AttackBuddy
 {
@@ -96,7 +98,13 @@ namespace AttackBuddy
                     "Unicorn Security Administrator",
                     "Alien Heavy Patroller",
                     "Vergil Doppelganger",
-                    "Harbingers of Pestilence"
+                    "Harbingers of Pestilence",
+                    "Unicorn Commander",
+                    "Unicorn Specialist",
+                    "Unicorn Squadleader",
+                    "Male Lieutenant",
+                    "Female Lieutenant",
+                    "Omni-AF Urban Trooper"
         };
     }
 }
