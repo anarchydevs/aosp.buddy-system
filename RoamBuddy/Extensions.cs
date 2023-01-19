@@ -39,7 +39,7 @@ namespace RoamBuddy
                 if (target?.FightingTarget == null) { return true; }
 
                 if (target?.FightingTarget != null
-                    && (target?.FightingTarget == DynelManager.LocalPlayer
+                    && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name
                         || Team.Members.Any(c => c.Name == target?.FightingTarget?.Name))) { return true; }
 
                 if (target?.FightingTarget?.Name == "Guardian Spirit of Purification"
@@ -55,7 +55,7 @@ namespace RoamBuddy
                 if (target?.FightingTarget == null) { return true; }
 
                 if (target?.FightingTarget != null
-                    && (target?.FightingTarget == DynelManager.LocalPlayer
+                    && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name
                         || DynelManager.LocalPlayer.Pets.Any(c => target?.FightingTarget?.Name == c.Character?.Name))) { return true; }
 
                 if (target?.FightingTarget?.Name == "Guardian Spirit of Purification"

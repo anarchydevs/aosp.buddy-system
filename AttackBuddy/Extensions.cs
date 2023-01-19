@@ -39,7 +39,7 @@ namespace AttackBuddy
                 if (target?.FightingTarget == null) { return true; }
 
                 if (target?.FightingTarget != null 
-                    && (target?.FightingTarget == DynelManager.LocalPlayer 
+                    && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name 
                         || AttackBuddy._helpers.Contains(target?.FightingTarget.Name)
                         || Team.Members.Any(c => c.Name == target?.FightingTarget?.Name))) { return true; }
 
@@ -56,7 +56,7 @@ namespace AttackBuddy
                 if (target?.FightingTarget == null) { return true; }
 
                 if (target?.FightingTarget != null
-                    && (target?.FightingTarget == DynelManager.LocalPlayer
+                    && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name
                         || AttackBuddy._helpers.Contains(target?.FightingTarget.Name)
                         || DynelManager.LocalPlayer.Pets.Any(c => target?.FightingTarget?.Name == c.Character?.Name))) { return true; }
 
@@ -99,7 +99,7 @@ namespace AttackBuddy
         {
             return _target == null
                 || _target?.IsValid == false
-                || _target?.IsAlive == false
+                || _target?.Health == 0
                 || _target?.IsInLineOfSight == false;
         }
 

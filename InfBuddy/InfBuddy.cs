@@ -17,6 +17,8 @@ using AOSharp.Core.UI.Options;
 
 namespace InfBuddy
 {
+
+    //No bully please
     public class InfBuddy : AOPluginEntry
     {
         private StateMachine _stateMachine;
