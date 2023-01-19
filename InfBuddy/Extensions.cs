@@ -64,7 +64,8 @@ namespace InfBuddy
             return _target == null
                 || _target?.IsPet == true
                 || _target?.IsValid == false
-                || _target?.Health == 0;
+                || _target?.Health == 0
+                || _target?.Name == "Guardian Spirit of Purification";
         }
 
         public static CharacterWieldedWeapon GetWieldedWeapons(SimpleChar local) => (CharacterWieldedWeapon)local.GetStat(Stat.EquippedWeapons);
