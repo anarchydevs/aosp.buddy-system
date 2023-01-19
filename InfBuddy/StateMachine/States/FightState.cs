@@ -63,14 +63,14 @@ namespace InfBuddy
             if (_target?.IsInLineOfSight == false && !_initLOS)
             {
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
-                Chat.WriteLine($"_init on - target out of sight.");
+                //Chat.WriteLine($"_init on - target out of sight.");
                 _initLOS = true;
             }
             else if (_target?.IsInLineOfSight == true && _target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 4f
                 && InfBuddy.NavMeshMovementController.IsNavigating && _initLOS)
             {
                 InfBuddy.NavMeshMovementController.Halt();
-                Chat.WriteLine($"_init off - target in sight, halt.");
+                //Chat.WriteLine($"_init off - target in sight, halt.");
                 _initLOS = false;
             }
         }
