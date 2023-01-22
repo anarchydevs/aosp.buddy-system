@@ -61,7 +61,7 @@ namespace AXPBuddy
             else if (!Team.Members.Any(c => c.Character == null)
                     && !Team.Members.Where(c => c.Character != null
                        && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66
-                            || c.Character.Position.Distance2DFrom(DynelManager.LocalPlayer.Position) > 1.2f))
+                            || c.Character.Position.Distance2DFrom(DynelManager.LocalPlayer.Position) > 2f))
                        .Any()
                     && Spell.List.Any(c => c.IsReady)
                     && !Spell.HasPendingCast
@@ -144,7 +144,7 @@ namespace AXPBuddy
                                 && c.Identity == (Identity)AXPBuddy._leader?.FightingTarget?.Identity)
                             .FirstOrDefault(c => !Constants._ignores.Contains(c.Name));
 
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 2f
                             && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
                             AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
 
@@ -155,7 +155,7 @@ namespace AXPBuddy
                         }
                     }
                     else 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 2f
                         && Spell.List.Any(c => c.IsReady)
                         && !Spell.HasPendingCast
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())

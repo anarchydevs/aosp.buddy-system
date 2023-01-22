@@ -95,9 +95,10 @@ namespace AXPBuddy
 
                 AXPBuddy._leaderPos = (Vector3)AXPBuddy._leader?.Position;
 
-                if (DynelManager.LocalPlayer.Position.Distance2DFrom(AXPBuddy._leaderPos) > 1f 
+                if (DynelManager.LocalPlayer.Position.Distance2DFrom(AXPBuddy._leaderPos) > 2f 
                     && DynelManager.LocalPlayer.Position.Distance2DFrom(Constants.S13GoalPos) > 30f)
                     AXPBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(AXPBuddy._leaderPos.X, 67.7f, AXPBuddy._leaderPos.Z));
+
             }
         }
     }
