@@ -60,18 +60,18 @@ namespace AXPBuddy
             }
             else if (!Team.Members.Any(c => c.Character == null)
                     && !Team.Members.Where(c => c.Character != null
-                       && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66))
+                       && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66
+                            || c.Character.Position.Distance2DFrom(DynelManager.LocalPlayer.Position) > 1.2f))
                        .Any()
                     //Maybe remove
-                    && !Team.Members.Where(c => c.Character != null
-                       && c.Character.Position.Distance2DFrom(DynelManager.LocalPlayer.Position) > 1.5f)
-                       .Any()
                     && Spell.List.Any(c => c.IsReady)
                     && !Spell.HasPendingCast
                     //Stops toons left behind and moving when has cast pending
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
                     && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
             {
+
+                //Maybe don't need any of this now?
                 if (!AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
                 {
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13FirstCorrectionPos) < 5f)
