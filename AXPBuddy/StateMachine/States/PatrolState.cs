@@ -159,8 +159,7 @@ namespace AXPBuddy
                     else 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
                         //Maybe remove
-                        //Add array for other long cast combat debuffs
-                        && Spell.List.Where(c => c.Id != 154701).Any(c => c.IsReady)
+                        //&& Spell.List.Where(c => c.Id != 154701).Any(c => c.IsReady)
                         && !Spell.HasPendingCast
                         //
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
