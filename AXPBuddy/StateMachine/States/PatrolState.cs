@@ -50,6 +50,7 @@ namespace AXPBuddy
                     && c.IsInLineOfSight
                     && c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 28f)
                 .OrderBy(c => c.HealthPercent)
+                .ThenByDescending(c => c.MaxHealth)
                 .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                 .FirstOrDefault(c => !Constants._ignores.Contains(c.Name));
 
@@ -62,6 +63,10 @@ namespace AXPBuddy
                     && !Team.Members.Where(c => c.Character != null
                        && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66))
                        .Any()
+                    //Maybe remove
+                    && Spell.List.Any(c => c.IsReady)
+                    && !Spell.HasPendingCast
+                    //
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
                     && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
             {
@@ -148,6 +153,10 @@ namespace AXPBuddy
                     }
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
+                        //Maybe remove
+                        && Spell.List.Any(c => c.IsReady)
+                        && !Spell.HasPendingCast
+                        //
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
                         AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
                 }

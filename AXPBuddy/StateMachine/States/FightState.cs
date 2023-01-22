@@ -54,6 +54,7 @@ namespace AXPBuddy
             Chat.WriteLine("FightState::OnStateExit");
 
             _aggToolCounter = 0;
+            _attackTimeout = 0;
         }
 
         public void Tick()
@@ -121,9 +122,9 @@ namespace AXPBuddy
 
         public static void HandleTaunting(SimpleChar target)
         {
-            if (_aggToolCounter >= 4)
+            if (_aggToolCounter >= 2)
             {
-                //Reason: If we get stuck on a mob path to it incase it's stuck on failed nav path
+                //Reason: If we get stuck on a mob path to it
                 if (_attackTimeout >= 1)
                 {
                     AXPBuddy.NavMeshMovementController.SetDestination(target.Position);
@@ -134,20 +135,6 @@ namespace AXPBuddy
 
                 _attackTimeout++;
                 _aggToolCounter = 0;
-
-                //if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 17f)
-                //{
-                //    if (_attackTimeout >= 1)
-                //    {
-                //        AXPBuddy.NavMeshMovementController.SetDestination(_target.Position);
-                //        _attackTimeout = 0;
-                //        _aggToolCounter = 0;
-                //        return;
-                //    }
-
-                //    _attackTimeout++;
-                //    _aggToolCounter = 0;
-                //}
             }
             else if (Inventory.Find(83920, 83919, out Item aggroTool))
             {
