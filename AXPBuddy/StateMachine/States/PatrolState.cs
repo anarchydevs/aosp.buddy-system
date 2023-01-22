@@ -71,7 +71,6 @@ namespace AXPBuddy
                     && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
             {
 
-                //Maybe don't need any of this now?
                 if (!AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
                 {
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13FirstCorrectionPos) < 5f)
@@ -147,13 +146,17 @@ namespace AXPBuddy
                                 && c.Identity == (Identity)AXPBuddy._leader?.FightingTarget?.Identity)
                             .FirstOrDefault(c => !Constants._ignores.Contains(c.Name));
 
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
+                            && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
+                            AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
+
                         if (targetMob != null)
                         {
                             _target = targetMob;
                             Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
-
+                    else 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
                         //Maybe remove
                         && Spell.List.Any(c => c.IsReady)
