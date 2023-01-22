@@ -49,7 +49,7 @@ namespace AXPBuddy
                     && c.IsInLineOfSight
                     && c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 28f)
                 .OrderBy(c => c.HealthPercent)
-                .ThenByDescending(c => c.MaxHealth)
+                .ThenBy(c => c.MaxHealth)
                 .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                 .FirstOrDefault(c => !Constants._ignores.Contains(c.Name));
 
