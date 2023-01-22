@@ -58,6 +58,8 @@ namespace AXPBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning) { return; }
+
             if (DynelManager.LocalPlayer.Identity != AXPBuddy.Leader)
             {
                 if (AXPBuddy._leaderPos != Vector3.Zero && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f

@@ -86,6 +86,7 @@ namespace AXPBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning) { return; }
         }
     }
 }

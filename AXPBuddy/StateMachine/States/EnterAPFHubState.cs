@@ -39,6 +39,8 @@ namespace AXPBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning) { return; }
+
             Dynel Lever = DynelManager.AllDynels
                 .Where(c => c.Name == "A Lever"
                     && c.DistanceFrom(DynelManager.LocalPlayer) < 6f)

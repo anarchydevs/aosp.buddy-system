@@ -74,7 +74,8 @@ namespace InfBuddy
 
         public void Tick()
         {
-            if (Playfield.ModelIdentity.Instance != Constants.InfernoId) { return; }
+            if (Playfield.ModelIdentity.Instance != Constants.InfernoId
+                || Game.IsZoning) { return; }
 
             if (InfBuddy.NavMeshMovementController.IsNavigating
                 && Time.NormalTime > InfBuddy._stateTimeOut + 35f)

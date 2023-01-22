@@ -43,8 +43,7 @@ namespace AXPBuddy
 
         public void Tick()
         {
-            if (Game.IsZoning)
-                return;
+            if (Game.IsZoning) { return; }
 
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
                 && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
