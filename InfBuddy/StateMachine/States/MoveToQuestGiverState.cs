@@ -63,7 +63,7 @@ namespace InfBuddy
         public void Tick()
         {
             if (!Extensions.IsAtYutto() && InfBuddy.NavMeshMovementController.IsNavigating
-                && Time.NormalTime > InfBuddy._stateTimeOut + 30f)
+                && Time.NormalTime > InfBuddy._stateTimeOut + 40f)
             {
                 Vector3 randoPos = Constants.QuestGiverPos;
                 randoPos.AddRandomness((int)_entropy);
@@ -71,8 +71,9 @@ namespace InfBuddy
                 InfBuddy._stateTimeOut = Time.NormalTime;
 
                 InfBuddy.NavMeshMovementController.Halt();
-                DynelManager.LocalPlayer.Position = new Vector3(DynelManager.LocalPlayer.Position.X, DynelManager.LocalPlayer.Position.Y, DynelManager.LocalPlayer.Position.Z - 4f);
-                InfBuddy.NavMeshMovementController.SetNavMeshDestination(randoPos);
+                //DynelManager.LocalPlayer.Position = new Vector3(DynelManager.LocalPlayer.Position.X, DynelManager.LocalPlayer.Position.Y, DynelManager.LocalPlayer.Position.Z - 4f);
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(2743.0f, 24.6f, 3312.0f));
+                InfBuddy.NavMeshMovementController.AppendNavMeshDestination(randoPos);
             }
         }
     }
