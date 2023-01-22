@@ -63,10 +63,8 @@ namespace AXPBuddy
                        && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66
                             || c.Character.Position.Distance2DFrom(DynelManager.LocalPlayer.Position) > 1.2f))
                        .Any()
-                    //Maybe remove
                     && Spell.List.Any(c => c.IsReady)
                     && !Spell.HasPendingCast
-                    //Stops toons left behind and moving when has cast pending
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
                     && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
             {
@@ -158,10 +156,8 @@ namespace AXPBuddy
                     }
                     else 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
-                        //Maybe remove
                         && Spell.List.Any(c => c.IsReady)
                         && !Spell.HasPendingCast
-                        //
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
                         AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
                 }

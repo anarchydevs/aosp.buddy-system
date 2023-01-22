@@ -118,7 +118,48 @@ namespace AXPBuddy
                 }
             }
 
-            HandleScan();
+            if (DynelManager.LocalPlayer.Identity != AXPBuddy.Leader)
+            {
+                AXPBuddy._leader = Team.Members
+                    .Where(c => c.Character?.Health > 0
+                        && c.Character?.IsValid == true
+                        && c.IsLeader)
+                    .FirstOrDefault()?.Character;
+
+                if (AXPBuddy._leader != null)
+                {
+                    if (AXPBuddy._died)
+                        AXPBuddy._died = false;
+
+                    AXPBuddy._leaderPos = (Vector3)AXPBuddy._leader?.Position;
+
+                    if (AXPBuddy._leader?.FightingTarget != null)
+                    {
+                        SimpleChar targetMob = DynelManager.NPCs
+                            .Where(c => c.Health > 0
+                                && c.Identity == (Identity)AXPBuddy._leader?.FightingTarget?.Identity)
+                            .FirstOrDefault(c => !Constants._ignores.Contains(c.Name));
+
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
+                            && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
+                            AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
+
+                        if (targetMob != null)
+                        {
+                            _target = targetMob;
+                            Chat.WriteLine($"Found target: {_target.Name}");
+                        }
+                    }
+                    else
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
+                        && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
+                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
+                }
+                else
+                    HandleScan();
+            }
+            else
+                HandleScan();
         }
     }
 }
