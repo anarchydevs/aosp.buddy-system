@@ -159,7 +159,7 @@ namespace AXPBuddy
                     else 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
                         //Maybe remove
-                        //&& Spell.List.Where(c => c.Id != 154701).Any(c => c.IsReady)
+                        && Spell.List.Any(c => c.IsReady)
                         && !Spell.HasPendingCast
                         //
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
