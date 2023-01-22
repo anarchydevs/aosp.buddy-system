@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
-    //I like this template over the RoamState in InfBuddy (Same concept)
     public class PatrolState : IState
     {
         private SimpleChar _target;
@@ -64,9 +63,12 @@ namespace AXPBuddy
                        && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66))
                        .Any()
                     //Maybe remove
+                    && !Team.Members.Where(c => c.Character != null
+                       && c.Character.Position.Distance2DFrom(DynelManager.LocalPlayer.Position) > 1.5f)
+                       .Any()
                     && Spell.List.Any(c => c.IsReady)
                     && !Spell.HasPendingCast
-                    //
+                    //Stops toons left behind and moving when has cast pending
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
                     && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
             {
