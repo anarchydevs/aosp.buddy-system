@@ -72,7 +72,7 @@ namespace AXPBuddy
 
             if (_target == null) { return; }
 
-            if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 17f)
+            if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 19f)
             {
                 HandlePathing(_target);
 
