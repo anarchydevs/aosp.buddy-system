@@ -119,7 +119,7 @@ namespace AXPBuddy
 
         public static void HandleTaunting(SimpleChar target)
         {
-            if (_aggToolCounter >= 2)
+            if (_aggToolCounter >= 4)
             {
                 //Reason: If we get stuck on a mob path to it incase it's stuck on failed nav path
                 if (_attackTimeout >= 1)

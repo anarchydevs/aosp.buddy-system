@@ -90,7 +90,7 @@ namespace AXPBuddy
         public static Vector3 S13StartPos = new Vector3(150.7f, 36.4f, 42.0f);
         public static Vector3 S13GoalPos = new Vector3(170.3f, 6.2f, 486.1f); //170.3f, 6.2f, 486.1f           197f, 5.1f, 472f
         public static Vector3 S13FirstCorrectionPos = new Vector3(73.7f, 31.6f, 333.1f);
-        public static Vector3 S13SecondCorrectionPos = new Vector3(65.4f, 6.0f, 441.1f);
+        public static Vector3 S13SecondCorrectionPos = new Vector3(70.3f, 6.9f, 467.1f);
         public static Vector3 testpos = new Vector3(132.9f, 36.4f, 49.8f);
         public static Vector3 XanHubPos = new Vector3(585.4f, 0.0f, 740.2);
 
