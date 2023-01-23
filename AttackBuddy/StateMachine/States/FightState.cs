@@ -69,6 +69,7 @@ namespace AttackBuddy
             if (Extensions.ShouldStopAttack())
             {
                 DynelManager.LocalPlayer.StopAttack();
+                Chat.WriteLine($"Stopping attack.");
                 return;
             }
 
