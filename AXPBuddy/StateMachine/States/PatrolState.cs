@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
-    //I like this template over the RoamState in InfBuddy (Same concept)
     public class PatrolState : IState
     {
         private SimpleChar _target;
@@ -50,6 +49,7 @@ namespace AXPBuddy
                     && c.IsInLineOfSight
                     && c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 28f)
                 .OrderBy(c => c.HealthPercent)
+                .ThenBy(c => c.MaxHealth)
                 .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                 .FirstOrDefault(c => !Constants._ignores.Contains(c.Name));
 
@@ -60,11 +60,15 @@ namespace AXPBuddy
             }
             else if (!Team.Members.Any(c => c.Character == null)
                     && !Team.Members.Where(c => c.Character != null
-                       && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66))
+                       && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66
+                            || c.Character.Position.Distance2DFrom(DynelManager.LocalPlayer.Position) > 2f))
                        .Any()
+                    && Spell.List.Any(c => c.IsReady)
+                    && !Spell.HasPendingCast
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
                     && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
             {
+
                 if (!AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
                 {
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13FirstCorrectionPos) < 5f)
@@ -140,14 +144,20 @@ namespace AXPBuddy
                                 && c.Identity == (Identity)AXPBuddy._leader?.FightingTarget?.Identity)
                             .FirstOrDefault(c => !Constants._ignores.Contains(c.Name));
 
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 2f
+                            && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
+                            AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
+
                         if (targetMob != null)
                         {
                             _target = targetMob;
                             Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
-
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f
+                    else 
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 2f
+                        && Spell.List.Any(c => c.IsReady)
+                        && !Spell.HasPendingCast
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
                         AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
                 }

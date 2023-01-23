@@ -80,6 +80,8 @@ namespace AXPBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning) { return; }
+
             if (_phase == ReformPhase.Disbanding && Time.NormalTime > _reformStartedTime + DisbandDelay)
             {
                 _phase = ReformPhase.Inviting;

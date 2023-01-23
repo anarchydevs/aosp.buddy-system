@@ -38,8 +38,8 @@ namespace AttackBuddy
             {
                 if (target?.FightingTarget == null) { return true; }
 
-                if (target?.FightingTarget != null 
-                    && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name 
+                if (target?.FightingTarget != null
+                    && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name
                         || AttackBuddy._helpers.Contains(target?.FightingTarget.Name)
                         || Team.Members.Any(c => c.Name == target?.FightingTarget?.Name))) { return true; }
 
@@ -111,12 +111,16 @@ namespace AttackBuddy
 
         public static bool ShouldStopAttack()
         {
-            return DynelManager.LocalPlayer.FightingTarget?.IsPlayer == true
-                    || (DynelManager.LocalPlayer.FightingTarget?.MaxHealth >= 1000000 
-                    && (DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(253953) == true 
-                    || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(205607) == true
-                    || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(NanoLine.ShovelBuffs) == true 
-                    || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(302745) == true));
+            if (DynelManager.LocalPlayer.FightingTarget == null
+                || DynelManager.LocalPlayer.IsAttacking
+                || DynelManager.LocalPlayer.IsAttackPending) { return false; }
+
+            if (DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(253953) == true
+                || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(NanoLine.ShovelBuffs) == true
+                || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(302745) == true
+                || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(205607) == true) { return true; }
+
+            return DynelManager.LocalPlayer.FightingTarget?.IsPlayer == true;
         }
 
         public static bool ShouldTaunt(SimpleChar _target)
