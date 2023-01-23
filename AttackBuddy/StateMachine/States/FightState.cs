@@ -66,7 +66,7 @@ namespace AttackBuddy
                 return;
 
             //_target.Buffs.contans(shovebuffs)
-            if (DynelManager.LocalPlayer.FightingTarget != null && Extensions.ShouldStopAttack())
+            if (Extensions.ShouldStopAttack())
             {
                 DynelManager.LocalPlayer.StopAttack();
                 return;
@@ -76,11 +76,18 @@ namespace AttackBuddy
             {
                 if (Extensions.CanAttack())
                 {
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= AttackBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
+                    if (_target.Buffs.Contains(253953) == false
+                        && _target.Buffs.Contains(NanoLine.ShovelBuffs) == false
+                        && _target.Buffs.Contains(302745) == false
+                        && _target.Buffs.Contains(205607) == false
+                        && _target.IsPlayer == false) 
                     {
-                        DynelManager.LocalPlayer.Attack(_target);
-                        Chat.WriteLine($"Attacking {_target.Name}.");
-                        _fightStartTime = Time.NormalTime;
+                        if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= AttackBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
+                        {
+                            DynelManager.LocalPlayer.Attack(_target);
+                            Chat.WriteLine($"Attacking {_target.Name}.");
+                            _fightStartTime = Time.NormalTime;
+                        }
                     }
                 }
                 else
