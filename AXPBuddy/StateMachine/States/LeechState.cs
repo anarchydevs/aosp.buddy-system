@@ -13,6 +13,9 @@ namespace AXPBuddy
     public class LeechState : IState
     {
         private static double _stuck;
+        private static double _timeOut;
+
+        private static bool _init = false;
 
         public IState GetNextState()
         {
@@ -95,7 +98,29 @@ namespace AXPBuddy
 
                 AXPBuddy._leaderPos = (Vector3)AXPBuddy._leader?.Position;
 
-                if (DynelManager.LocalPlayer.Position.Distance2DFrom(AXPBuddy._leaderPos) > 2f 
+                //Reason: Edge correction
+                if (AXPBuddy.NavMeshMovementController.IsNavigating)
+                {
+                    if (DynelManager.LocalPlayer.Position.Distance2DFrom(new Vector3(169.5f, 36.0f, 164.3f)) > 15f)
+                        _init = false;
+
+                    if (Time.NormalTime > _timeOut + 10f && _init)
+                    {
+                        AXPBuddy.NavMeshMovementController.Halt();
+                        DynelManager.LocalPlayer.Position = new Vector3(AXPBuddy._leaderPos.X, 67.7f, AXPBuddy._leaderPos.Z);
+                    }
+
+                    if (DynelManager.LocalPlayer.Position.Distance2DFrom(new Vector3(169.5f, 36.0f, 164.3f)) <= 15f)
+                    {
+                        if (!_init)
+                        {
+                            _init = true;
+                            _timeOut = Time.NormalTime;
+                        }
+                    }
+                }
+
+                if (DynelManager.LocalPlayer.Position.Distance2DFrom(AXPBuddy._leaderPos) > 2f
                     && DynelManager.LocalPlayer.Position.Distance2DFrom(Constants.S13GoalPos) > 30f)
                     AXPBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(AXPBuddy._leaderPos.X, 67.7f, AXPBuddy._leaderPos.Z));
 
