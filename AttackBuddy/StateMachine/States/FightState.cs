@@ -79,7 +79,6 @@ namespace AttackBuddy
                     if (_target.Buffs.Contains(253953) == false
                         && _target.Buffs.Contains(NanoLine.ShovelBuffs) == false
                         && _target.Buffs.Contains(302745) == false
-                        && _target.Buffs.Contains(205607) == false
                         && _target.IsPlayer == false) 
                     {
                         if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= AttackBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
