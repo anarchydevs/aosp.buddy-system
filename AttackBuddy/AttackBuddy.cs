@@ -321,7 +321,7 @@ namespace AttackBuddy
                         && !Constants._ignores.Contains(c.Name)
                         && c.Health > 0 && c.IsInLineOfSight
                         && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
-                        && !c.Buffs.Contains(302745)
+                        //&& !c.Buffs.Contains(302745)
                         && !c.Buffs.Contains(NanoLine.ShovelBuffs)
                         && c.MaxHealth >= 1000000)
                     .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
