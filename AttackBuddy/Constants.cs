@@ -96,6 +96,7 @@ namespace AttackBuddy
                     "Unicorn Security Administrator",
                     "Alien Heavy Patroller",
                     "Vergil Doppelganger",
+                    "Alien Seeker",
                     "Harbingers of Pestilence"
         };
     }
