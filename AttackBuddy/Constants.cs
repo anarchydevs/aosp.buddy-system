@@ -15,6 +15,7 @@ namespace AttackBuddy
                     "Unicorn Recon Agent Chittick",
                     "Representative of IPS",
                     "Transportation Officer Darren Plush",
+                    "Unicorn Recruiter",
                     "Unicorn Field Engineer",
                     "Buckethead Technodealer",
                     "Unicorn Commander Labbe",
