@@ -327,6 +327,8 @@ namespace AttackBuddy
                     .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
                     .OrderByDescending(c => c.Name == "Uklesh the Beguiling")
                     .OrderByDescending(c => c.Name == "Khalum the Weaver of Flesh")
+                    .OrderByDescending(c => c.Name == "Field Support  - Cha'Khaz")
+
                     .ToList();
 
                 _switchMob = DynelManager.NPCs
