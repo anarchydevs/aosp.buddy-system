@@ -12,6 +12,7 @@ namespace AttackBuddy
                     "Kyr'Ozch Guardian",
                     "Engorged Sacrificial Husks",
                     "Honor Guard - Ilari'Uri",
+                    "Unicorn Recon Agent Chittick",
                     "Representative of IPS",
                     "Transportation Officer Darren Plush",
                     "Unicorn Field Engineer",
