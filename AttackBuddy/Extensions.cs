@@ -116,8 +116,8 @@ namespace AttackBuddy
                 || DynelManager.LocalPlayer.IsAttackPending) { return false; }
 
             if (DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(253953) == true
-                || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(NanoLine.ShovelBuffs) == true
-                || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(302745) == true
+                //|| DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(NanoLine.ShovelBuffs) == true
+               // || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(302745) == true
                 || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(205607) == true) { return true; }
 
             return DynelManager.LocalPlayer.FightingTarget?.IsPlayer == true;
