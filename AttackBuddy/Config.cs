@@ -68,7 +68,7 @@ namespace AttackBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 0;
+        private int _ipcChannel = 4;
 
         //Breaking out auto-property
         public int IPCChannel
