@@ -11,7 +11,6 @@ namespace AttackBuddy
                     "Alien Fuel Tower",
                     "Kyr'Ozch Guardian",
                     "Engorged Sacrificial Husks",
-                    "Slum Spawn",
                     "Honor Guard - Ilari'Uri",
                     "Unicorn Recon Agent Chittick",
                     "Representative of IPS",
