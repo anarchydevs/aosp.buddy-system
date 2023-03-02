@@ -204,7 +204,7 @@ namespace InfBuddy
                     infoView.Clicked = InfoView;
                 }
 
-                if (!_settings["Toggle"].AsBool() && Toggle)
+                if (!_settings["Toggle"].AsBool() && Toggle)//
                 {
                     IPCChannel.Broadcast(new StopMessage());
                     Stop();
