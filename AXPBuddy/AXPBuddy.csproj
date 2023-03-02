@@ -108,6 +108,7 @@
     <None Include="NavMeshes\4368.navmesh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="NavMeshes\4696.navmesh" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
