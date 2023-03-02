@@ -136,7 +136,7 @@ namespace AXPBuddy
                 _attackTimeout++;
                 _aggToolCounter = 0;
             }
-            else if (Inventory.Find(83920, 83919, out Item aggroTool))
+            else if (Inventory.Find(83920, 83920, out Item aggroTool)) //Aggression Enhancer 
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
@@ -146,7 +146,7 @@ namespace AXPBuddy
                     return;
                 }
             }
-            else if (Inventory.Find(83919, 83919, out Item aggroMultiTool)) //TODO: Could be wrong
+            else if (Inventory.Find(83919, 83919, out Item aggroMultiTool)) //Aggression Multiplier
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
@@ -156,7 +156,34 @@ namespace AXPBuddy
                     return;
                 }
             }
-            else if (Inventory.Find(253186, 253186, out Item EmertoLow))
+            else if (Inventory.Find(152029, 152029, out Item JealousyTool)) //Aggression Enhancer (Jealousy Augmented) 
+            {
+                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
+                {
+                    JealousyTool.Use(target, true);
+                    _aggToolCounter++;
+                    return;
+                }
+            }
+            else if (Inventory.Find(152028, 152028, out Item JealousyMultiTool)) //Aggression Multiplier (Jealousy Augmented) 
+            {
+                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
+                {
+                    JealousyMultiTool.Use(target, true);
+                    _aggToolCounter++;
+                    return;
+                }
+            }
+            else if (Inventory.Find(244655, 244655, out Item scorpioTool)) //Scorpio's Aim of Anger
+            {
+                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
+                {
+                    scorpioTool.Use(target, true);
+                    _aggToolCounter++;
+                    return;
+                }
+            }
+            else if (Inventory.Find(253186, 253186, out Item EmertoLow))//Codex of the Insulting Emerto
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
@@ -166,7 +193,7 @@ namespace AXPBuddy
                     return;
                 }
             }
-            else if (Inventory.Find(253187, 253187, out Item EmertoHigh))
+            else if (Inventory.Find(253187, 253187, out Item EmertoHigh))//Codex of the Insulting Emerto
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
