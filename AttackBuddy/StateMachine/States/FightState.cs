@@ -193,7 +193,7 @@ namespace AttackBuddy
             {
                 if (Extensions.GetLeader(AttackBuddy.Leader) != null)
                 {
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > AttackBuddy.Config.CharSettings[Game.ClientInst].ScanRange)
+                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > AttackBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
                     {
                         if (Inventory.Find(83920, 83919, out Item aggroTool))
                         {
