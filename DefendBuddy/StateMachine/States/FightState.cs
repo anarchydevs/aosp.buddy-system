@@ -161,11 +161,11 @@ namespace DefendBuddy
                             //_ignoreTargetIdentity.Add(_target.Identity.Instance);
                             MovementController.Instance.SetDestination(_target.Position);
                         }
+
                         else if (Inventory.Find(83920, 83920, out Item aggroTool)) //Aggression Enhancer 
                         {
                             if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
-                                
                                 aggroTool.Use(_target, true);
                                 return;
                             }
