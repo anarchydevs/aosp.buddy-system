@@ -162,7 +162,7 @@ namespace RoamBuddy
                             //_ignoreTargetIdentity.Add(_target.Identity.Instance);
                             MovementController.Instance.SetDestination(_target.Position);
                         }
-                        else if (Inventory.Find(83920, 83920, out Item aggroTool)) //Aggression Enhancer 
+                        else if (Inventory.Find(83920, 83919, out Item aggroTool)) //Aggression Enhancer 
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {

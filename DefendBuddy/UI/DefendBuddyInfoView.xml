@@ -2,8 +2,8 @@
 <root>
   <BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="DefendBuddyInfo" layout_borders="Rect(0,0,0,2)" max_size="Point(16000,-1)">
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="Defend a position set. Scanning any mobs within *Scan range" layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="to then Taunt or Path." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Enable twice to set the defend position." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="(will fix later)." layout_borders="Rect(0,0,0,2)"/>
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
     <TextView value="Taunt - taunts mob, with a timeout to then path." layout_borders="Rect(0,0,0,2)"/>
     <TextView value="Path - paths to mob upto *Attack range." layout_borders="Rect(0,0,0,2)"/>
@@ -12,12 +12,10 @@
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
     <TextView value="Commands;" layout_borders="Rect(0,0,0,2)"/>
     <TextView value="/buddy - toggle on and off." layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="/buddy export name - save waypoints to the file name." layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="/buddy load name - load waypoints from the file name." layout_borders="Rect(0,0,0,2)"/>
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
     <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="*Set Attack Range lower than Scan Range." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="*Set Attack Range lower than Taunt Range to pull." layout_borders="Rect(0,0,0,2)"/>
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
   </BorderView>
 </root>

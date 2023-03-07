@@ -4,7 +4,7 @@
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
     <TextView value="Set waypoints to a list and navigates. Scanning any mobs within *Scan range. " layout_borders="Rect(0,0,0,2)"/>
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="Taunt - taunts mobs > Attack range, with a timeout to then path." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="Taunt - taunts mobs > Taunt range, with a timeout to then path." layout_borders="Rect(0,0,0,2)"/>
     <TextView value="Path - paths to mob upto *Attack range." layout_borders="Rect(0,0,0,2)"/>
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
     <TextView value="Export - save waypoints to the file name." layout_borders="Rect(0,0,0,2)"/>
@@ -19,7 +19,7 @@
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
     <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="*Set Attack Range lower than Scan Range." layout_borders="Rect(0,0,0,2)"/>
+    <TextView value="*Set Attack Range lower than Taunt Range." layout_borders="Rect(0,0,0,2)"/>
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
   </BorderView>
 </root>
