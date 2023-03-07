@@ -161,11 +161,13 @@ namespace DefendBuddy
                             //_ignoreTargetIdentity.Add(_target.Identity.Instance);
                             MovementController.Instance.SetDestination(_target.Position);
                         }
-                        else if (Inventory.Find(83920, 83920, out Item aggroTool)) //Aggression Enhancer 
+                        else if (Inventory.Find(83920, 83919, out Item aggroTool)) //Aggression Enhancer 
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
+                                
                                 aggroTool.Use(_target, true);
+                                _aggToolCounter++;
                                 return;
                             }
                         }
@@ -173,7 +175,9 @@ namespace DefendBuddy
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
+                                
                                 aggroMultiTool.Use(_target, true);
+                                _aggToolCounter++;
                                 return;
                             }
                         }
@@ -182,6 +186,7 @@ namespace DefendBuddy
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
                                 JealousyTool.Use(_target, true);
+                                _aggToolCounter++;
                                 return;
                             }
                         }
@@ -190,6 +195,7 @@ namespace DefendBuddy
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
                                 JealousyMultiTool.Use(_target, true);
+                                _aggToolCounter++;
                                 return;
                             }
                         }
@@ -198,6 +204,7 @@ namespace DefendBuddy
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
                                 scorpioTool.Use(_target, true);
+                                _aggToolCounter++;
                                 return;
                             }
                         }
@@ -205,7 +212,9 @@ namespace DefendBuddy
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
+                                
                                 EmertoLow.Use(_target, true);
+                                _aggToolCounter++;
                                 return;
                             }
                         }
@@ -213,7 +222,9 @@ namespace DefendBuddy
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
+                                
                                 EmertoHigh.Use(_target, true);
+                                _aggToolCounter++;
                                 return;
                             }
                         }

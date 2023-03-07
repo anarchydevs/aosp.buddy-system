@@ -195,7 +195,7 @@ namespace AttackBuddy
                 {
                     if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > AttackBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
                     {
-                        if (Inventory.Find(83920, 83920, out Item aggroTool)) //Aggression Enhancer 
+                        if (Inventory.Find(83920, 83919, out Item aggroTool)) //Aggression Enhancer 
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
