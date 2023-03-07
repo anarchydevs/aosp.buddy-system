@@ -92,7 +92,7 @@ namespace DefendBuddy
         {
             return DynelManager.LocalPlayer.FightingTarget?.IsPlayer == true
                     || (DynelManager.LocalPlayer.FightingTarget?.MaxHealth >= 1000000
-                    || (DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(253953) == true
+                    && (DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(253953) == true
                     || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(205607) == true
                     || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(NanoLine.ShovelBuffs) == true
                     || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(302745) == true));
@@ -102,9 +102,8 @@ namespace DefendBuddy
         public static bool ShouldTaunt(SimpleChar _target)
         {
             return _target?.IsInLineOfSight == true
-                && !DynelManager.LocalPlayer.IsMoving;
-                //&& !DynelManager.LocalPlayer.IsAttacking 
-                //&& !DynelManager.LocalPlayer.IsAttackPending;
+                && !DynelManager.LocalPlayer.IsMoving
+                && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending;
         }
 
         public static bool CanAttack()
