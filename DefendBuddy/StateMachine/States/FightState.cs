@@ -149,7 +149,7 @@ namespace DefendBuddy
             }
 
             if (Extensions.ShouldTaunt(_target)
-                && DefendBuddy.ModeSelection.Taunt == (DefendBuddy.ModeSelection)DefendBuddy._settings["ModeSelection"].AsInt32())
+                && DefendBuddy.ModeSelection.Taunt == (DefendBuddy.ModeSelection)DefendBuddy._settings["ModeSelection"].AsInt32()) 
             {
                 if (Extensions.GetLeader(DefendBuddy.Leader) != null)
                 {
@@ -163,8 +163,9 @@ namespace DefendBuddy
                         }
                         else if (Inventory.Find(83920, 83920, out Item aggroTool)) //Aggression Enhancer 
                         {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
+                            if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
+                                
                                 aggroTool.Use(_target, true);
                                 return;
                             }
