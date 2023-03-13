@@ -33,14 +33,12 @@ namespace InfBuddy
 
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
-        public static Identity _currentTarget = Identity.None;
 
         public static bool DoubleReward = false;
         private static bool Sitting = false;
 
         private static double _sitUpdateTimer;
         public static double _stateTimeOut;
-        private static double CorrectionPathTimer = 0;
 
         public static List<string> _namesToIgnore = new List<string>
         {
@@ -70,7 +68,6 @@ namespace InfBuddy
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Target, OnTargetMessage);
 
                 Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -81,12 +78,11 @@ namespace InfBuddy
                 _stateMachine = new StateMachine(new IdleState());
 
                 NpcDialog.AnswerListChanged += NpcDialog_AnswerListChanged;
-                Team.TeamRequest += OnTeamRequest;
                 Game.OnUpdate += OnUpdate;
 
-                _settings.AddVariable("ModeSelection", (int)ModeSelection.Normal);
-                _settings.AddVariable("FactionSelection", (int)FactionSelection.Neutral);
-                _settings.AddVariable("DifficultySelection", (int)DifficultySelection.Easy);
+                _settings.AddVariable("ModeSelection", (int)ModeSelection.Roam);
+                _settings.AddVariable("FactionSelection", (int)FactionSelection.Omni);
+                _settings.AddVariable("DifficultySelection", (int)DifficultySelection.Hard);
 
                 _settings.AddVariable("Toggle", false);
 
@@ -145,15 +141,6 @@ namespace InfBuddy
 
             NavMeshMovementController.Halt();
         }
-        private void OnTargetMessage(int sender, IPCMessage msg)
-        {
-            if (DynelManager.LocalPlayer.Identity == Leader)
-                return;
-
-            TargetMessage targetMsg = (TargetMessage)msg;
-
-            _currentTarget = targetMsg.Target;
-        }
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
@@ -173,8 +160,7 @@ namespace InfBuddy
 
         private void OnUpdate(object s, float deltaTime)
         {
-            if (Game.IsZoning)
-                return;
+            if (Game.IsZoning) { return; }
 
             _stateMachine.Tick();
 
@@ -204,7 +190,7 @@ namespace InfBuddy
                     infoView.Clicked = InfoView;
                 }
 
-                if (!_settings["Toggle"].AsBool() && Toggle)//
+                if (!_settings["Toggle"].AsBool() && Toggle)
                 {
                     IPCChannel.Broadcast(new StopMessage());
                     Stop();
@@ -277,19 +263,6 @@ namespace InfBuddy
                     }
                 }
             }
-        }
-
-        private void OnTeamRequest(object s, TeamRequestEventArgs e)
-        {
-            if (e.Requester != Leader)
-            {
-                if (Toggle)
-                    e.Ignore();
-
-                return;
-            }
-
-            e.Accept();
         }
 
         private void NpcDialog_AnswerListChanged(object s, Dictionary<int, string> options)

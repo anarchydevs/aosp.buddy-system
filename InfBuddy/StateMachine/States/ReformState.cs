@@ -11,7 +11,8 @@ namespace InfBuddy
     public class ReformState : IState
     {
         private const float ReformTimeout = 70;
-        private const float DisbandDelay = 14;
+        private const float DisbandDelay = 5;
+        private const float InviteDelay = 13;
 
         private double _reformStartedTime;
         private double _inviting;
@@ -20,17 +21,19 @@ namespace InfBuddy
 
         private static List<Identity> _teamCache = new List<Identity>();
         private static List<Identity> _invitedList = new List<Identity>();
+        private bool _init = false;
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 
-            if (Extensions.TimedOut(_reformStartedTime, ReformTimeout + 3f))
+            if (Team.IsInTeam && Extensions.TimedOut(_reformStartedTime, ReformTimeout + InviteDelay))
                 return new MoveToQuestGiverState();
 
-            if (_phase == ReformPhase.Completed && Time.NormalTime > _reformStartedTime + DisbandDelay + 3f)
-                if (Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
+            if (_phase == ReformPhase.Completed && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
                     return new MoveToQuestGiverState();
 
             return null;
@@ -42,7 +45,7 @@ namespace InfBuddy
 
             _reformStartedTime = Time.NormalTime;
 
-            if (InfBuddy._settings["Merge"].AsBool() || DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
+            if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader || InfBuddy._settings["Merge"].AsBool())
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
@@ -61,13 +64,16 @@ namespace InfBuddy
 
             _invitedList.Clear();
             _teamCache.Clear();
+            _init = false;
 
-            if (InfBuddy._settings["Merge"].AsBool() || DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
+            if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader || InfBuddy._settings["Merge"].AsBool())
                 Team.TeamRequest -= OnTeamRequest;
         }
 
         public void Tick()
         {
+            if (Game.IsZoning) { return; }
+
             if (Team.IsInTeam)
             {
                 foreach (TeamMember member in Team.Members)
@@ -77,27 +83,15 @@ namespace InfBuddy
                 }
             }
 
-            if (_phase == ReformPhase.Disbanding)
+            if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader || InfBuddy._settings["Merge"].AsBool()) { return; }
+
+            if (_phase == ReformPhase.Inviting 
+                && _invitedList.Count() < _teamCache.Count()
+                && Time.NormalTime > _inviting + DisbandDelay
+                && !_init)
             {
-                if (Team.IsInTeam && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
-                {
-                    if (Time.NormalTime > _reformStartedTime + DisbandDelay)
-                        Team.Disband();
-                }
+                _init = true;
 
-                if (Team.IsInTeam && Time.NormalTime > _reformStartedTime + ReformTimeout)
-                    Team.Disband();
-
-                if (!Team.IsInTeam)
-                {
-                    _inviting = Time.NormalTime;
-                    _phase = ReformPhase.Inviting;
-                    Chat.WriteLine("ReformPhase.Inviting");
-                }
-            }
-
-            if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count() && Time.NormalTime > _inviting + 4f)
-            {
                 foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
                 {
                     if (_invitedList.Contains(player.Identity)) { continue; }
@@ -111,10 +105,24 @@ namespace InfBuddy
                 }
             }
 
+            if (_phase == ReformPhase.Disbanding)
+            {
+                if (!Team.IsInTeam)
+                {
+                    _inviting = Time.NormalTime;
+                    _phase = ReformPhase.Inviting;
+                    Chat.WriteLine("ReformPhase.Inviting");
+                }
+                else if (Team.Members.Where(c => c.Character != null && c.Character.IsInPlay).ToList().Count == _teamCache.Count()
+                        || Time.NormalTime > _reformStartedTime + ReformTimeout)
+                    Team.Disband();
+            }
+
             if (_phase == ReformPhase.Inviting
-                && Team.IsInTeam
+                && _invitedList.Count() == _teamCache.Count()
+                && Time.NormalTime > _inviting + DisbandDelay
                 && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count()
-                && _invitedList.Count() == _teamCache.Count())
+                && _init)
             {
                 _phase = ReformPhase.Completed;
                 Chat.WriteLine("ReformPhase.Completed");
@@ -127,14 +135,6 @@ namespace InfBuddy
             {
                 _phase = ReformPhase.Completed;
                 e.Accept();
-
-                //Task.Factory.StartNew(
-                //    async () =>
-                //    {
-                //        await Task.Delay(2000);
-                //        _phase = ReformPhase.Completed;
-                //        e.Accept();
-                //    });
             }
         }
 

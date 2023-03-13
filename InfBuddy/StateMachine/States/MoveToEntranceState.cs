@@ -18,6 +18,8 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 
@@ -26,19 +28,25 @@ namespace InfBuddy
                 if (InfBuddy.ModeSelection.Leech == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                     return new LeechState();
 
-                if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader && InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 {
-                    if (!_init)
+                    if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
                     {
-                        InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterPos);
-                        _init = true;
+                        if (Team.Members.Any(c => c.Character != null && c.IsLeader)
+                            || InfBuddy._settings["Merge"].AsBool())
+                        {
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.QuestStarterPos) < 10f
+                                && Team.Members.Any(c => c.Character != null && c.IsLeader))
+                                return new RoamState();
+                            else if (!InfBuddy.NavMeshMovementController.IsNavigating)
+                                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterPos);
+                        }
                     }
-
-                    if (_init && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.QuestStarterPos) < 10f)
-                        return new RoamState();
+                    else
+                        return new MoveToQuestStarterState();
                 }
 
-                if (!_init)
+                if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                     return new MoveToQuestStarterState();
             }
 
@@ -75,7 +83,7 @@ namespace InfBuddy
         public void Tick()
         {
             if (Playfield.ModelIdentity.Instance != Constants.InfernoId
-                || Game.IsZoning) { return; }
+                || Game.IsZoning || !Team.IsInTeam) { return; }
 
             if (InfBuddy.NavMeshMovementController.IsNavigating
                 && Time.NormalTime > InfBuddy._stateTimeOut + 35f)
@@ -83,7 +91,6 @@ namespace InfBuddy
                 InfBuddy._stateTimeOut = Time.NormalTime;
 
                 InfBuddy.NavMeshMovementController.Halt();
-                //DynelManager.LocalPlayer.Position = new Vector3(DynelManager.LocalPlayer.Position.X, DynelManager.LocalPlayer.Position.Y, DynelManager.LocalPlayer.Position.Z - 4f);
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(2769.6f, 24.6f, 3319.9f));
                 InfBuddy.NavMeshMovementController.AppendNavMeshDestination(Constants.EntrancePos);
                 InfBuddy.NavMeshMovementController.AppendDestination(Constants.EntranceFinalPos);

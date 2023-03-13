@@ -9,9 +9,10 @@ namespace CityBuddy
     {
         public IState GetNextState()
         {
-            if (CityBuddy.gameTime > CityBuddy.cloakTime && CityBuddy.gameTime > CityBuddy.endWave1)
+            if (Team.IsLeader
+                && Time.NormalTime > CityBuddy._cloakTime + 3660f
+                && !DynelManager.NPCs.Any(c => c.Health > 0))
             {
-                CityBuddy.UsedCru = false;
                 return new ToggleState();
             }
 
@@ -30,21 +31,42 @@ namespace CityBuddy
 
         public void Tick()
         {
-            CityBuddy.gameTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Time.NormalTime);
-
-
-            Corpse anycorpse = DynelManager.Corpses
-                .Where(c => !c.Name.Contains("General"))
+            SimpleChar _alien = DynelManager.NPCs
+                .Where(c => c.Health > 0
+                    && c.DistanceFrom(DynelManager.LocalPlayer) < 30f)
+                .OrderByDescending(c => c.Name.Contains("Hacker"))
                 .FirstOrDefault();
 
-            if (anycorpse != null)
+            Corpse _genCorpse = DynelManager.Corpses
+                .Where(c => c.Name.Contains("General"))
+                .FirstOrDefault();
+
+            if (_genCorpse != null
+                && !Extensions.InCombat()
+                && MovementController.Instance.IsNavigating == false
+                && DynelManager.LocalPlayer.Position.DistanceFrom(_genCorpse.Position) > 2f)
             {
-                CityBuddy.endWave1 = CityBuddy.gameTime.AddSeconds(420);
+                MovementController.Instance.SetDestination(_genCorpse.Position);
             }
 
-            if (DynelManager.LocalPlayer.Position.DistanceFrom(CityBuddy.DefendPos) > 5f && MovementController.Instance.IsNavigating == false)
+            if (_alien != null) 
             {
-                MovementController.Instance.SetDestination(CityBuddy.DefendPos);
+                //Extensions.HandlePathing(_alien);
+
+                if (_alien.IsInAttackRange() && DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
+                {
+                    CityBuddy._combatTime = Time.NormalTime;
+                    DynelManager.LocalPlayer.Attack(_alien);
+                }
+            }
+
+            if (Time.NormalTime > CityBuddy._combatTime + 7f
+                && _genCorpse == null
+                && !Extensions.InCombat()
+                && MovementController.Instance.IsNavigating == false
+                && DynelManager.LocalPlayer.Position.DistanceFrom(CityBuddy.ParkPos) > 2f)
+            {
+                MovementController.Instance.SetDestination(CityBuddy.ParkPos);
             }
         }
     }

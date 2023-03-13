@@ -30,6 +30,8 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 
@@ -93,18 +95,20 @@ namespace InfBuddy
                 .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
 
-            if (mob != null && !InfBuddy._namesToIgnore.Contains(mob.Name))
+            if (mob != null)
             {
                 _target = mob;
                 Chat.WriteLine($"Found target: {_target.Name}");
             }
-            else if (mob == null && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
+            else if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
                 HoldPosition();
         }
 
         public void Tick()
         {
+            if (Game.IsZoning) { return; }
+
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
 

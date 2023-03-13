@@ -4,8 +4,12 @@ using AOSharp.Core.UI;
 using AOSharp.Common.GameData;
 using AOSharp.Pathfinding;
 using AOSharp.Core.IPC;
-using CityBuddy.IPCMessages;
 using AOSharp.Common.GameData.UI;
+using AOSharp.Core.Movement;
+using CityBuddy.IPCMessages;
+using AOSharp.Core.Inventory;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CityBuddy
 {
@@ -14,52 +18,56 @@ namespace CityBuddy
         public static StateMachine _stateMachine;
         public static NavMeshMovementController NavMeshMovementController { get; private set; }
         public static IPCChannel IPCChannel { get; private set; }
-
         public static Config Config { get; private set; }
 
-        public static DateTime gameTime;
         public static DateTime cloakTime;
-        public static DateTime endWave1;
 
-        public static bool Running = false;
+        public static Vector3 ParkPos;
 
-        public static bool UsedCru = false;
+        public static double _combatTime;
+        public static double _cloakTime;
+        public static double _sitUpdateTimer;
 
-        public static Identity Leader = Identity.None;
-        public static bool IsLeader = false;
-
-        public static Vector3 DefendPos;
-        public static Vector3 CityControllerPos;
+        public static bool Toggle = false;
+        public static bool Sitting = false;
 
         public static string PluginDirectory;
 
-        public static Settings CityBuddySettings = new Settings("CityBuddy");
+        public static Window _infoWindow;
+
+        public static Settings _settings;
+
+        public static string PluginDir;
 
         public override void Run(string pluginDir)
         {
             try
             {
-                PluginDirectory = pluginDir;
+                _settings = new Settings("CityBuddy");
+                PluginDir = pluginDir;
+
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\CityBuddy\\{Game.ClientInst}\\Config.json");
+                NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
+                MovementController.Set(NavMeshMovementController);
+                IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
+
+                IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
+
+                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
+
+                SettingsController.RegisterSettingsWindow("CityBuddy", pluginDir + "\\UI\\CityBuddySettingWindow.xml", _settings);
 
                 Chat.WriteLine("CityBuddy Loaded!");
                 Chat.WriteLine("/citybuddy for settings.");
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\CityBuddy\\{Game.ClientInst}\\Config.json");
-
-                IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[Game.ClientInst].IPCChannel));
-
                 _stateMachine = new StateMachine(new IdleState());
 
-                CityBuddySettings.AddVariable("Running", false);
+                _settings.AddVariable("Toggle", false);
 
-                CityBuddySettings["Running"] = false;
-
-                SettingsController.RegisterSettingsWindow("CityBuddy", pluginDir + "\\UI\\CityBuddySettingWindow.xml", CityBuddySettings);
+                _settings["Toggle"] = false;
 
                 Chat.RegisterCommand("buddy", CityBuddyCommand);
-
-                IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
 
                 Game.OnUpdate += OnUpdate;
             }
@@ -73,149 +81,112 @@ namespace CityBuddy
         {
             SettingsController.CleanUp();
         }
-
-        private void Start()
+        public static void IPCChannel_Changed(object s, int e)
         {
-            Running = true;
-
-            if (!(_stateMachine.CurrentState is IdleState))
-                _stateMachine.SetState(new IdleState());
-        }
-
-        private void Stop()
-        {
-            Running = false;
-
-            _stateMachine.SetState(new IdleState());
+            IPCChannel.SetChannelId(Convert.ToByte(e));
+            Config.Save();
         }
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            StartMessage startMsgCity = (StartMessage)msg;
-
-            CityBuddySettings["Running"] = true;
-
-            Leader = new Identity(IdentityType.SimpleChar, sender);
-
-            Start();
+            Toggle = true;
+            _settings["Toggle"] = true;
         }
 
         private void OnStopMessage(int sender, IPCMessage msg)
         {
-            StopMessage stopMsgCity = (StopMessage)msg;
-
-            CityBuddySettings["Running"] = false;
-
-            Stop();
+            Toggle = false;
+            _settings["Toggle"] = false;
         }
 
-        private void HelpBox(object s, ButtonBase button)
+        private void HandleInfoViewClick(object s, ButtonBase button)
         {
-            Window helpWindow = Window.CreateFromXml("Help", PluginDirectory + "\\UI\\CityBuddyHelpBox.xml",
-            windowSize: new Rect(0, 0, 455, 345),
-            windowStyle: WindowStyle.Default,
-            windowFlags: WindowFlags.AutoScale | WindowFlags.NoFade);
-            helpWindow.Show(true);
+            _infoWindow = Window.CreateFromXml("Info", PluginDir + "\\UI\\CityBuddyInfoView.xml",
+                windowSize: new Rect(0, 0, 440, 510),
+                windowStyle: WindowStyle.Default,
+                windowFlags: WindowFlags.AutoScale | WindowFlags.NoFade);
+
+            _infoWindow.Show(true);
         }
-
-        private void CcSetBox(object s, ButtonBase button)
-        {
-            CityControllerPos = DynelManager.LocalPlayer.Position;
-            Chat.WriteLine($"City controller position set.");
-        }
-
-
-        private void DefendSetBox(object s, ButtonBase button)
-        {
-            DefendPos = DynelManager.LocalPlayer.Position;
-            Chat.WriteLine($"Defend position set.");
-        }
-
 
         private void OnUpdate(object s, float deltaTime)
         {
             if (Game.IsZoning)
                 return;
 
-            if (!CityBuddySettings["Running"].AsBool() && Running == true)
+            if (Time.NormalTime > _sitUpdateTimer + 1)
             {
-                Stop();
-                IPCChannel.Broadcast(new StopMessage());
-                return;
-            }
-            if (CityBuddySettings["Running"].AsBool() && Running == false)
-            {
-                if (DefendPos == Vector3.Zero && CityControllerPos == Vector3.Zero) 
-                {
-                    Chat.WriteLine("Set your positions.");
-                    CityBuddySettings["Running"] = false;
-                    return;
-                }
-                if (CityControllerPos == Vector3.Zero)
-                {
-                    Chat.WriteLine("Set the city controller position.");
-                    CityBuddySettings["Running"] = false;
-                    return;
-                }
-                if (DefendPos == Vector3.Zero)
-                {
-                    Chat.WriteLine("Set your defend position.");
-                    CityBuddySettings["Running"] = false;
-                    return;
-                }
+                ListenerSit();
 
-                IsLeader = true;
-                Leader = DynelManager.LocalPlayer.Identity;
-
-                if (DynelManager.LocalPlayer.Identity == Leader)
-                {
-                    IPCChannel.Broadcast(new StartMessage());
-                }
-                Start();
-
-                return;
+                _sitUpdateTimer = Time.NormalTime;
             }
 
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {
-                SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelBox);
+                SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
 
-                if (channelBox != null && !string.IsNullOrEmpty(channelBox.Text))
+                if (channelInput != null)
                 {
-                    if (int.TryParse(channelBox.Text, out int channelValue))
+                    if (int.TryParse(channelInput.Text, out int channelValue)
+                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
                     {
-                        if (Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
-                        {
-                            IPCChannel.SetChannelId(Convert.ToByte(channelValue));
-                            Config.CharSettings[Game.ClientInst].IPCChannel = Convert.ToByte(channelValue);
-                            Config.Save();
-                        }
+                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
                     }
                 }
 
-                if (SettingsController.settingsView != null)
+                if (SettingsController.settingsWindow.FindView("CityBuddyInfoView", out Button infoView))
                 {
-                    if (SettingsController.settingsView.FindChild("CityBuddyHelpBox", out Button helpBox))
-                    {
-                        helpBox.Tag = SettingsController.settingsView;
-                        helpBox.Clicked = HelpBox;
-                    }
+                    infoView.Tag = SettingsController.settingsWindow;
+                    infoView.Clicked = HandleInfoViewClick;
+                }
 
-                    if (SettingsController.settingsView.FindChild("CityControllerSetBox", out Button ccBox))
-                    {
-                        ccBox.Tag = SettingsController.settingsView;
-                        ccBox.Clicked = CcSetBox;
-                    }
-
-                    if (SettingsController.settingsView.FindChild("DefendPosSetBox", out Button defendBox))
-                    {
-                        defendBox.Tag = SettingsController.settingsView;
-                        defendBox.Clicked = DefendSetBox;
-                    }
+                if (!_settings["Toggle"].AsBool() && Toggle)
+                {
+                    IPCChannel.Broadcast(new StopMessage());
+                    Toggle = false;
+                }
+                if (_settings["Toggle"].AsBool() && !Toggle)
+                {
+                    IPCChannel.Broadcast(new StartMessage());
+                    Toggle = true;
                 }
             }
 
             _stateMachine.Tick();
+        }
+
+        private void ListenerSit()
+        {
+            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
+
+            Item kit = Inventory.Items.Where(x => RelevantItems.Kits.Contains(x.Id)).FirstOrDefault();
+
+            if (kit == null) { return; }
+
+            if (spell != null)
+            {
+                if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && Extensions.CanUseSitKit())
+                {
+                    if (spell != null && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
+                        && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                    {
+                        if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                        {
+                            Task.Factory.StartNew(
+                               async () =>
+                               {
+                                   Sitting = true;
+                                   await Task.Delay(400);
+                                   NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
+                                   await Task.Delay(800);
+                                   NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+                                   await Task.Delay(200);
+                                   Sitting = false;
+                               });
+                        }
+                    }
+                }
+            }
         }
 
         private void CityBuddyCommand(string command, string[] param, ChatWindow chatWindow)
@@ -224,36 +195,31 @@ namespace CityBuddy
             {
                 if (param.Length < 1)
                 {
-                    if (!CityBuddySettings["Running"].AsBool() && !Running)
+                    if (!_settings["Toggle"].AsBool())
                     {
-                        IsLeader = true;
-                        Leader = DynelManager.LocalPlayer.Identity;
-
-                        CityBuddySettings["Running"] = true;
-                        Start();
+                        _settings["Toggle"] = true;
+                        Toggle = true;
                         Chat.WriteLine("Bot enabled.");
-                        if (DynelManager.LocalPlayer.Identity == Leader)
-                        {
-                            IPCChannel.Broadcast(new StartMessage());
-                        }
                     }
-                    else if (CityBuddySettings["Running"].AsBool() && Running)
+                    else if (_settings["Toggle"].AsBool())
                     {
-                        Stop();
+                        _settings["Toggle"] = false;
+                        Toggle = false;
                         Chat.WriteLine("Bot disabled.");
-                        if (DynelManager.LocalPlayer.Identity == Leader)
-                        {
-                            IPCChannel.Broadcast(new StopMessage());
-                        }
                     }
-                    return;
                 }
-                Config.Save();
             }
             catch (Exception e)
             {
                 Chat.WriteLine(e.Message);
             }
+        }
+
+        public static class RelevantItems
+        {
+            public static readonly int[] Kits = {
+                297274, 293296, 291084, 291083, 291082
+            };
         }
     }
 }

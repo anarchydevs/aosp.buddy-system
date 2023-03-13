@@ -50,6 +50,8 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             //Edge case correction
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId && MovementController.Instance.IsNavigating
                 && DynelManager.LocalPlayer.HealthPercent >= 66)
@@ -96,6 +98,8 @@ namespace InfBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning) { return; }
+
             List<Dynel> Statue = DynelManager.AllDynels
                 .Where(x => x.Name == "Unredeemed Garden Exit" || x.Name == "Redeemed Garden Exit")
                 .ToList();
