@@ -53,7 +53,7 @@ namespace CityBuddy
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\Generic\\{Game.ClientInst}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\CityBuddy\\{Game.ClientInst}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "CityBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 
@@ -61,10 +61,10 @@ namespace CityBuddy
                         {
                             AppendSettingsTab(settingsName, settingsWindow);
 
-                            settingsWindow.FindView("ChannelBox", out TextInputView channelValue);
+                            settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
 
-                            if (channelValue != null)
-                                channelValue.Text = $"{Config.CharSettings[Game.ClientInst].IPCChannel}";
+                            if (channelInput != null)
+                                channelInput.Text = $"{Config.CharSettings[Game.ClientInst].IPCChannel}";
                         }
                     }
                     catch (Exception e)

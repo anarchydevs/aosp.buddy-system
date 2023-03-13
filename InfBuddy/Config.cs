@@ -65,7 +65,7 @@ namespace InfBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 7;
+        private int _ipcChannel = 0;
 
         //Breaking out auto-property
         public int IPCChannel

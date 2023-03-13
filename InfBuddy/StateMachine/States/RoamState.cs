@@ -30,6 +30,8 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 
@@ -60,7 +62,6 @@ namespace InfBuddy
         {
             Chat.WriteLine("RoamState::OnStateExit");
 
-            InfBuddy._currentTarget = Identity.None;
             _missionsLoaded = false;
         }
 
@@ -125,6 +126,8 @@ namespace InfBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning) { return; }
+
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
 
@@ -155,7 +158,7 @@ namespace InfBuddy
                                 && c.Identity == (Identity)InfBuddy._leader?.FightingTarget?.Identity)
                             .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
 
-                        if (targetMob != null && !InfBuddy._namesToIgnore.Contains(targetMob.Name))
+                        if (targetMob != null)
                         {
                             _target = targetMob;
                             Chat.WriteLine($"Found target: {_target.Name}");
@@ -171,7 +174,7 @@ namespace InfBuddy
                             .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                             .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
 
-                        if (mob != null && !InfBuddy._namesToIgnore.Contains(mob.Name))
+                        if (mob != null)
                         {
                             _target = mob;
                             Chat.WriteLine($"Found target: {_target.Name}");

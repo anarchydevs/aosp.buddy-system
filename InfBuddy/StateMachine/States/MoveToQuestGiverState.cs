@@ -16,9 +16,13 @@ namespace InfBuddy
 
         private static float _entropy = 1.34f;
 
+        private static bool _init = false;
+
         private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 
@@ -47,8 +51,10 @@ namespace InfBuddy
 
                 Task.Delay(randomWait * 1000).ContinueWith(x =>
                 {
-                    InfBuddy.NavMeshMovementController.SetNavMeshDestination(randoPos);
                     InfBuddy._stateTimeOut = Time.NormalTime;
+                    _init = true;
+
+                    InfBuddy.NavMeshMovementController.SetNavMeshDestination(randoPos);
                 }, _cancellationToken.Token);
             }
         }
@@ -58,11 +64,16 @@ namespace InfBuddy
             Chat.WriteLine("MoveToQuestGiverState::OnStateExit");
 
             _cancellationToken.Cancel();
+            _init = false;
         }
 
         public void Tick()
         {
-            if (!Extensions.IsAtYutto() && InfBuddy.NavMeshMovementController.IsNavigating
+            if (Game.IsZoning || !Team.IsInTeam) { return; }
+
+            if (!Extensions.IsAtYutto() 
+                && _init
+                && InfBuddy.NavMeshMovementController.IsNavigating
                 && Time.NormalTime > InfBuddy._stateTimeOut + 40f)
             {
                 Vector3 randoPos = Constants.QuestGiverPos;
@@ -71,7 +82,6 @@ namespace InfBuddy
                 InfBuddy._stateTimeOut = Time.NormalTime;
 
                 InfBuddy.NavMeshMovementController.Halt();
-                //DynelManager.LocalPlayer.Position = new Vector3(DynelManager.LocalPlayer.Position.X, DynelManager.LocalPlayer.Position.Y, DynelManager.LocalPlayer.Position.Z - 4f);
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(2743.0f, 24.6f, 3312.0f));
                 InfBuddy.NavMeshMovementController.AppendNavMeshDestination(randoPos);
             }

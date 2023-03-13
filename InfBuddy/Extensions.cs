@@ -74,7 +74,7 @@ namespace InfBuddy
         {
             if (InfBuddy.NavMeshMovementController.IsNavigating && target?.IsInLineOfSight == true)
             {
-                if (target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 11f
+                if (target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 4f
                     && (GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(CharacterWieldedWeapon.Melee)
                     || GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(CharacterWieldedWeapon.MartialArts)))
                     InfBuddy.NavMeshMovementController.Halt();
@@ -84,7 +84,7 @@ namespace InfBuddy
                     InfBuddy.NavMeshMovementController.Halt();
             }
 
-            if (target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 11f
+            if (target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 4f
                 && (GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(CharacterWieldedWeapon.Melee)
                 || GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(CharacterWieldedWeapon.MartialArts)))
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)target?.Position);

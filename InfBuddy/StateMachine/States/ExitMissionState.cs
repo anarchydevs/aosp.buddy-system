@@ -10,12 +10,14 @@ namespace InfBuddy
 {
     public class ExitMissionState : IState
     {
-        private static double _pathTimeOut = Time.NormalTime;
+        private static bool _init = false;
 
         private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 
@@ -51,6 +53,7 @@ namespace InfBuddy
             Task.Delay(_time).ContinueWith(x =>
             {
                 InfBuddy._stateTimeOut = Time.NormalTime;
+                _init = true;
 
                 if (InfBuddy.ModeSelection.Leech == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 {
@@ -70,11 +73,16 @@ namespace InfBuddy
             Chat.WriteLine("ExitMissionState::OnStateExit");
 
             _cancellationToken.Cancel();
+            _init = false;
         }
 
         public void Tick()
         {
-            if (Time.NormalTime > InfBuddy._stateTimeOut + 15f)
+            if (Game.IsZoning || !Team.IsInTeam) { return; }
+
+            if (InfBuddy.ModeSelection.Leech != (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
+                && _init
+                && Time.NormalTime > InfBuddy._stateTimeOut + 15f)
             {
                 InfBuddy._stateTimeOut = Time.NormalTime;
 

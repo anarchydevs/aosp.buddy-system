@@ -1,5 +1,7 @@
 ﻿using AOSharp.Core;
+using AOSharp.Core.Inventory;
 using AOSharp.Core.IPC;
+using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using System.Linq;
@@ -9,14 +11,13 @@ namespace CityBuddy
 {
     public class ToggleState : IState
     {
-
-        public static bool ChangingState = false;
-        public static IPCChannel IPCChannel { get; private set; }
+        public static bool _init = false;
+        public static bool _toggled = false;
 
 
         public IState GetNextState()
         {
-            if (ChangingState == true)
+            if (_toggled == true)
                 return new AttackState();
 
             return null;
@@ -30,17 +31,28 @@ namespace CityBuddy
         public void OnStateExit()
         {
             //Chat.WriteLine("PullState::OnStateExit");
+            _init = false;
+            _toggled = false;
         }
 
         public void Tick()
         {
             Dynel citycontroller = DynelManager.AllDynels
                 .Where(c => c.Name == "City Controller")
-                .Where(c => c.DistanceFrom(DynelManager.LocalPlayer) < 10f)
                 .FirstOrDefault();
 
             if (citycontroller != null)
-                Logic(citycontroller);
+            {
+                if (citycontroller?.DistanceFrom(DynelManager.LocalPlayer) < 5f
+                    && !_init)
+                {
+                    MovementController.Instance.Halt();
+                    _init = true;
+                    Logic(citycontroller);
+                }
+                else if (MovementController.Instance.IsNavigating == false)
+                    MovementController.Instance.SetDestination(citycontroller.Position);
+            }
         }
 
         private static void Logic(Dynel cc)
@@ -49,31 +61,16 @@ namespace CityBuddy
                 async () =>
                 {
                     await Task.Delay(3000);
-                    CityBotOpenCC(cc);
+                    cc.Use();
+                    await Task.Delay(2000);
+                    if (Inventory.Find(257110, out Item cru))
+                        cru.UseOn(cc.Identity);
                     await Task.Delay(3000);
-                    CityBotToggleCloak();
+                    Extensions.ToggleCloak();
                     await Task.Delay(1500);
-                    ChangingState = true;
+                    MovementController.Instance.SetDestination(CityBuddy.ParkPos);
+                    _toggled = true;
                 });
-        }
-
-        private static void CityBotToggleCloak()
-        {
-            Chat.WriteLine("Toggling cloak");
-            Network.Send(new ToggleCloakMessage()
-            {
-                Unknown1 = 49152,
-            });
-            CityBuddy.cloakTime = CityBuddy.gameTime.AddSeconds(3660);
-
-            Chat.WriteLine($"current time {CityBuddy.gameTime}");
-            Chat.WriteLine($"Time set {CityBuddy.cloakTime}");
-        }
-
-        private static void CityBotOpenCC(Dynel citycontroller)
-        {
-            Chat.WriteLine("Opening City Controller");
-            citycontroller.Use();
         }
     }
 }
