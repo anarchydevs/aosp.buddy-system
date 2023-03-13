@@ -136,7 +136,7 @@ namespace AXPBuddy
                 _attackTimeout++;
                 _aggToolCounter = 0;
             }
-            else if (Inventory.Find(83920, 83920, out Item aggroTool)) //Aggression Enhancer 
+            else if (Inventory.Find(83920, 83919, out Item aggroTool)) //Aggression Enhancer 
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {

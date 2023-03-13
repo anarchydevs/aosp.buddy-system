@@ -12,6 +12,8 @@ namespace InfBuddy
     {
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 

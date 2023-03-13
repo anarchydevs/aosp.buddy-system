@@ -27,6 +27,8 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 
@@ -63,24 +65,22 @@ namespace InfBuddy
             if (_target?.IsInLineOfSight == false && !_initLOS)
             {
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
-                //Chat.WriteLine($"_init on - target out of sight.");
                 _initLOS = true;
             }
             else if (_target?.IsInLineOfSight == true && _target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 4f
                 && InfBuddy.NavMeshMovementController.IsNavigating && _initLOS)
             {
                 InfBuddy.NavMeshMovementController.Halt();
-                //Chat.WriteLine($"_init off - target in sight, halt.");
                 _initLOS = false;
             }
         }
 
         public void Tick()
         {
-            if (_target == null) { return; }
+            if (Game.IsZoning || _target == null) { return; }
 
             //REASON: Edge case for some reason randomly hitting a null reference, the SimpleChar is not null but the Accel and various others are.
-            if (_target.Name == "NoName") { return; }
+            //if (_target.Name == "NoName") { return; }
                 
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
@@ -88,17 +88,13 @@ namespace InfBuddy
             LineOfSightLogic();
 
             if (_target?.IsInAttackRange() == true && !DynelManager.LocalPlayer.IsAttackPending
-                && !DynelManager.LocalPlayer.IsAttacking && _target.Name != "Guardian Spirit of Purification")
+                && !DynelManager.LocalPlayer.IsAttacking/* && _target.Name != "Guardian Spirit of Purification"*/)
                 DynelManager.LocalPlayer.Attack(_target);
 
-            if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                //|| Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.Melee)
-                //|| Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.MartialArts))
+            if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
+                || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.Melee)
+                || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.MartialArts))
                     Extensions.HandlePathing(_target);
-
-            //Do we need this? try rmove
-            //if (Extensions.IsClear())
-            //    HoldPosition();
         }
     }
 }

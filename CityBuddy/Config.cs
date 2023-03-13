@@ -4,6 +4,7 @@ using System.IO;
 using AOSharp.Core;
 using Newtonsoft.Json;
 using AOSharp.Core.UI;
+using AOSharp.Common.GameData;
 
 namespace CityBuddy
 {
@@ -48,7 +49,7 @@ namespace CityBuddy
 
         public void Save()
         {
-            if(!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
                 Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
 
             if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\CityBuddy"))
@@ -64,7 +65,7 @@ namespace CityBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 6;
+        private int _ipcChannel = 0;
 
         //Breaking out auto-property
         public int IPCChannel

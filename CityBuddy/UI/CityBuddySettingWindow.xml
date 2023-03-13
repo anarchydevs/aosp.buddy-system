@@ -1,32 +1,16 @@
 ﻿<?xml version="1.0" standalone="yes"?>
 <root>
-  <View view_layout="vertical" name="parent">
-      <BorderView v_alignment="TOP" h_alignment="LEFT" view_layout="vertical" name="Settings" layout_borders="Rect(5,5,5,5)" max_size="Point(16000,-1)">
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-      <TextView value="         Toggles" layout_borders="Rect(5,5,5,5)"/>
-      <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <TextView value="  Channel" layout_borders="Rect(5,5,5,5)"/>
-      <TextInputView name="ChannelBox" min_size="Point(60,14)" max_size="Point(60,14)" layout_borders="Rect(4,4,4,4)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <OptionCheckBox label="Enabled" opt_category="AOSharp" opt_type="variant" opt_variable="CityBuddy__Running" layout_borders="Rect(10,1,5,1)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-      <TextView value="         Settings" layout_borders="Rect(5,5,5,5)"/>
-      <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-      <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-      <TextView value="City Controller" layout_borders="Rect(5,5,5,5)"/>
-      <Button name="CityControllerSetBox" label="Set" layout_borders="Rect(5,5,3,5)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <TextView value="Defend Pos" layout_borders="Rect(5,5,5,5)"/>
-      <Button name="DefendPosSetBox" label="Set" layout_borders="Rect(5,5,3,5)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <View v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" layout_borders="Rect(5,5,5,5)" max_size="Point(16000,-1)">
-          <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-          <Button name="CityBuddyHelpBox" label="Help" layout_borders="Rect(5,5,3,5)"/>
-          <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-      </View>
-    </BorderView>
-  </View>
+  <BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="Settings" layout_borders="Rect(5,5,5,5)" max_size="Point(16000,-1)">
+    <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+    <Button name="CityBuddyInfoView" label="Info" layout_borders="Rect(5,5,3,5)"/>
+    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+    <TextView value="Channel" layout_borders="Rect(5,5,5,5)"/>
+    <TextInputView name="ChannelBox" min_size="Point(30,14)" max_size="Point(30,14)" layout_borders="Rect(4,4,4,4)"/>
+    <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+    <OptionCheckBox label="Enabled" opt_category="AOSharp" opt_type="variant" opt_variable="CityBuddy__Toggle" layout_borders="Rect(10,1,5,1)"/>
+    <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+    <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+  </BorderView>
 </root>

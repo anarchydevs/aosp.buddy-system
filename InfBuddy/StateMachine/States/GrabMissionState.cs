@@ -16,6 +16,8 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 
@@ -39,6 +41,8 @@ namespace InfBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning || !Team.IsInTeam) { return; }
+
             Dynel _yutto = DynelManager.NPCs
                 .Where(c => c.Name == Constants.QuestGiverName)
                 .FirstOrDefault();
@@ -57,12 +61,12 @@ namespace InfBuddy
                     });
             }
 
-            if (!Extensions.IsAtYutto() && Time.NormalTime > InfBuddy._stateTimeOut + 30f)
+            if (!Extensions.IsAtYutto() 
+                && Time.NormalTime > InfBuddy._stateTimeOut + 30f)
             {
                 InfBuddy._stateTimeOut = Time.NormalTime;
 
                 InfBuddy.NavMeshMovementController.Halt();
-                //DynelManager.LocalPlayer.Position = new Vector3(DynelManager.LocalPlayer.Position.X, DynelManager.LocalPlayer.Position.Y, DynelManager.LocalPlayer.Position.Z - 4f);
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(2769.6f, 24.6f, 3319.9f));
                 InfBuddy.NavMeshMovementController.AppendNavMeshDestination(Constants.QuestGiverPos);
             }

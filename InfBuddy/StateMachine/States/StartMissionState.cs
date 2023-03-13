@@ -15,6 +15,8 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 
@@ -46,6 +48,8 @@ namespace InfBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning) { return; }
+
             Dynel _yutto = DynelManager.NPCs
                 .Where(c => c.Name == Constants.QuestStarterName)
                 .FirstOrDefault();

@@ -9,7 +9,6 @@ namespace InfBuddy.IPCMessages
     public enum IPCOpcode
     {
         Start = 1001,
-        Stop = 1002,
-        Target = 1003,
+        Stop = 1002
     }
 }

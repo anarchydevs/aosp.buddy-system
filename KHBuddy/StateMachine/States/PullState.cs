@@ -91,7 +91,7 @@ namespace KHBuddy
             if (KHBuddy.SideSelection.Beach == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32())
             {
                 if (DynelManager.LocalPlayer.Profession == Profession.Enforcer
-                    && (Time.NormalTime > KHBuddy._timer + 720f || !KHBuddy._init)) 
+                    && (Time.NormalTime > KHBuddy._timer + 580f || !KHBuddy._init)) 
                 {
                     if (!MovementController.Instance.IsNavigating)
                     {
@@ -129,7 +129,7 @@ namespace KHBuddy
             if (KHBuddy.SideSelection.East == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32())
             {
                 if (DynelManager.LocalPlayer.Profession == Profession.Enforcer
-                    && (Time.NormalTime > KHBuddy._timer + 720f || !KHBuddy._init))
+                    && (Time.NormalTime > KHBuddy._timer + 580f || !KHBuddy._init))
                 {
                     if (!MovementController.Instance.IsNavigating)
                     {
@@ -168,7 +168,7 @@ namespace KHBuddy
             if (KHBuddy.SideSelection.West == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32())
             {
                 if (DynelManager.LocalPlayer.Profession == Profession.Enforcer
-                    && (Time.NormalTime > KHBuddy._timer + 720f || !KHBuddy._init))
+                    && (Time.NormalTime > KHBuddy._timer + 580f || !KHBuddy._init))
                 {
                     if (!MovementController.Instance.IsNavigating)
                     {
@@ -209,7 +209,7 @@ namespace KHBuddy
                 if (KHBuddy._doingEast && !KHBuddy._doingWest)
                 {
                     if (DynelManager.LocalPlayer.Profession == Profession.Enforcer
-                        && (Time.NormalTime > KHBuddy._timer + 720f || !KHBuddy._init))
+                        && (Time.NormalTime > KHBuddy._timer + 580f || !KHBuddy._init))
                     {
                         if (!MovementController.Instance.IsNavigating)
                         {
@@ -248,7 +248,7 @@ namespace KHBuddy
                 if (!KHBuddy._doingEast && KHBuddy._doingWest)
                 {
                     if (DynelManager.LocalPlayer.Profession == Profession.Enforcer
-                        && Time.NormalTime > KHBuddy._timer + 720f)
+                        && Time.NormalTime > KHBuddy._timer + 580f)
                     {
                         if (!MovementController.Instance.IsNavigating)
                         {

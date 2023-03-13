@@ -235,8 +235,8 @@ namespace KHBuddy
             {
                 Spell.Find(270786, out Spell mongobuff);
 
-                if (absorb == null)
-                    absorb = Spell.List.Where(x => x.Nanoline == NanoLine.AbsorbACBuff).OrderBy(x => x.StackingOrder).FirstOrDefault();
+                //if (absorb == null)
+                //    absorb = Spell.List.Where(x => x.Nanoline == NanoLine.AbsorbACBuff).OrderBy(x => x.StackingOrder).FirstOrDefault();
 
                 if (_hecksAtPos.Count >= 1)
                 {
@@ -245,11 +245,11 @@ namespace KHBuddy
                         mongobuff.Cast();
                         _refreshMongoTimer = Time.NormalTime;
                     }
-                    if (!Spell.HasPendingCast && absorb.IsReady && Time.NormalTime > _refreshAbsorbTimer + RefreshAbsorbTime)
-                    {
-                        absorb.Cast();
-                        _refreshAbsorbTimer = Time.NormalTime;
-                    }
+                    //if (!Spell.HasPendingCast && absorb.IsReady && Time.NormalTime > _refreshAbsorbTimer + RefreshAbsorbTime)
+                    //{
+                    //    absorb.Cast();
+                    //    _refreshAbsorbTimer = Time.NormalTime;
+                    //}
                 }
             }
         }
