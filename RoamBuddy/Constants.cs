@@ -96,7 +96,9 @@ namespace RoamBuddy
                     "Unicorn Security Administrator",
                     "Alien Heavy Patroller",
                     "Vergil Doppelganger",
-                    "Harbingers of Pestilence"
+                    "Harbingers of Pestilence",
+                    "Notum Erruption",
+                    "Released Spirit"
         };
     }
 }
