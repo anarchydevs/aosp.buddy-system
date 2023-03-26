@@ -87,10 +87,11 @@ namespace AttackBuddy
                             DynelManager.LocalPlayer.Attack(_target);
                             Chat.WriteLine($"Attacking {_target.Name}.");
 
-                            if (Targeting.TargetChar != null)
-                            {
-                                Chat.WriteLine($"{Targeting.TargetChar?.Health}");
-                            }
+                            //if (Targeting.TargetChar != null)
+                            //{
+                            //    Chat.WriteLine($"{Targeting.TargetChar?.Health}");
+                            //}
+
                             _fightStartTime = Time.NormalTime;
                         }
                     }

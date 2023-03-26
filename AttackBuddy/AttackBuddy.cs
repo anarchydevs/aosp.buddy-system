@@ -394,11 +394,6 @@ namespace AttackBuddy
                 && Toggle == true)
                 Scanning();
 
-            //if (Targeting.TargetChar != null)
-            //{
-            //    Chat.WriteLine($"{Targeting.TargetChar?.Health}");
-            //}
-
             var window = SettingsController.FindValidWindow(_windows);
 
             if (window != null && window.IsValid)
