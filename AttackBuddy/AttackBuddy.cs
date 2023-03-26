@@ -345,7 +345,8 @@ namespace AttackBuddy
                    .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
                    .OrderByDescending(c => c.Name == "Lost Thought")
                    .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
-                   .OrderByDescending(c => c.Name == "Alien Cocoon" || c.Name == "Alien Coccoon")
+                   .OrderByDescending(c => c.Name == "Alien Cocoon" )
+                   .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
                    .ToList();
 
                 _mob = DynelManager.Characters
@@ -363,7 +364,7 @@ namespace AttackBuddy
                     .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
                     .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
                     .OrderByDescending(c => c.Name == "Alien Cocoon")
-                    .OrderByDescending(c => c.Name == "Alien Coccoon")
+                    .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
                     .OrderByDescending(c => c.Name == "Stim Fiend")
                     .OrderByDescending(c => c.Name == "Lost Thought")
                     .OrderByDescending(c => c.Name == "Masked Operator")
@@ -392,6 +393,11 @@ namespace AttackBuddy
             if (Time.NormalTime > _refreshList + 0.5f
                 && Toggle == true)
                 Scanning();
+
+            //if (Targeting.TargetChar != null)
+            //{
+            //    Chat.WriteLine($"{Targeting.TargetChar?.Health}");
+            //}
 
             var window = SettingsController.FindValidWindow(_windows);
 
