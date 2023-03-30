@@ -139,11 +139,7 @@ namespace MitaarBuddy
                 _settings["Toggle"] = false;
                 _settings["Farming"] = false;
 
-                //_settings["DifficultySelection"] = (int)IPCOpcode.EasyMode;
-
-                _settings["Easy"] = false;
-                _settings["Medium"] = false;
-                _settings["Hardcore"] = false;
+                _settings["DifficultySelection"] = (int)DifficultySelection.Easy;
 
                 Chat.RegisterCommand("buddy", MitaarCommand);
 
@@ -219,17 +215,17 @@ namespace MitaarBuddy
 
         private void EasyMessage(int sender, IPCMessage msg)
         {
-            _settings["Easy"] = false;
+            _settings["DifficultySelection"] = (int)DifficultySelection.Easy;
         }
 
         private void MediumMessage(int sender, IPCMessage msg)
         {
-            _settings["Medium"] = false;
+            _settings["DifficultySelection"] = (int)DifficultySelection.Medium;
         }
 
         private void HardcoreMessage(int sender, IPCMessage msg)
         {
-            _settings["Hardcore"] = false;
+            _settings["DifficultySelection"] = (int)DifficultySelection.Hardcore;
         }
 
 

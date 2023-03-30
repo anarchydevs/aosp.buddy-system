@@ -14,10 +14,7 @@ namespace MitaarBuddy.IPCMessages
         NoFarming = 1014,
         EasyMode = 1015,
         MediumMode = 1016,
-        HardcoreMode = 1017,
-        Easyoff = 1018,
-        Medoff = 1019,
-        Hardoff =1020
+        HardcoreMode = 1017
 
     }
 }
