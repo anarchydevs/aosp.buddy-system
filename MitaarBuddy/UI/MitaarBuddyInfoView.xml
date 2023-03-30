@@ -6,7 +6,9 @@
     <TextView value="MitaarBuddy" layout_borders="Rect(0,0,0,2)"/>
 	  <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
 	  <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-	  <TextView value="Farming = Paths to corpse, breaks team after 10 seconds, use lootmanager." layout_borders="Rect(0,0,0,2)"/>
+	  <TextView value="Farming = Paths to corpse, breaks team after 10 seconds," layout_borders="Rect(0,0,0,2)"/>
+	  <TextView value="use lootmanager. Do not delete leftovers!" layout_borders="Rect(0,0,0,2)"/>
+	  <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
     <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
     <TextView value="Easy = Stop attacking when spirits spawn then path to them." layout_borders="Rect(0,0,0,2)"/>

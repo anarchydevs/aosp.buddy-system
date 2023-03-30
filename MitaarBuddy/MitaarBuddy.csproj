@@ -80,6 +80,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="IPCMessages\Easyoff.cs" />
+    <Compile Include="IPCMessages\Hardoff.cs" />
+    <Compile Include="IPCMessages\HardcoreMode.cs" />
+    <Compile Include="IPCMessages\Medoff.cs" />
+    <Compile Include="IPCMessages\MediumMode.cs" />
+    <Compile Include="IPCMessages\EasyMode.cs" />
+    <Compile Include="IPCMessages\Farming.cs" />
+    <Compile Include="IPCMessages\NoFarming.cs" />
     <Compile Include="MitaarBuddy.cs" />
     <Compile Include="IPCMessages\IPCOpcode.cs" />
     <Compile Include="IPCMessages\StartMessage.cs" />

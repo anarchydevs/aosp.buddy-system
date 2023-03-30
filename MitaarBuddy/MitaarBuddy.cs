@@ -26,6 +26,14 @@ namespace MitaarBuddy
         protected double _lastZonedTime = Time.NormalTime;
 
         public static bool Toggle = false;
+        public static bool Farming = false;
+        public static bool Easy = false;
+        public static bool _easyToggled = false;
+        public static bool Medium = false;
+        public static bool _mediumToggled = false;
+        public static bool Hardcore = false;
+        public static bool _hardcoreToggled = false;
+
 
         public static bool _init = false;
         public static bool _initCorpse = false;
@@ -108,6 +116,14 @@ namespace MitaarBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
 
+                IPCChannel.RegisterCallback((int)IPCOpcode.Farming, FarmingMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.NoFarming, NoFarmingMessage);
+
+                IPCChannel.RegisterCallback((int)IPCOpcode.EasyMode, EasyMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.MediumMode, MediumMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.HardcoreMode, HardcoreMessage);
+
+
                 Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 SettingsController.RegisterSettingsWindow("MitaarBuddy", pluginDir + "\\UI\\MitaarBuddySettingWindow.xml", _settings);
@@ -116,11 +132,18 @@ namespace MitaarBuddy
                 Chat.WriteLine("/mitaarbuddy for settings.");
 
                 _settings.AddVariable("Toggle", false);
-                _settings.AddVariable("Farming", true);
-                _settings.AddVariable("DifficultySelection", (int)DifficultySelection.Hardcore);
+                _settings.AddVariable("Farming", false);
+
+                _settings.AddVariable("DifficultySelection", (int)DifficultySelection.Easy);
 
                 _settings["Toggle"] = false;
-                
+                _settings["Farming"] = false;
+
+                //_settings["DifficultySelection"] = (int)IPCOpcode.EasyMode;
+
+                _settings["Easy"] = false;
+                _settings["Medium"] = false;
+                _settings["Hardcore"] = false;
 
                 Chat.RegisterCommand("buddy", MitaarCommand);
 
@@ -137,6 +160,12 @@ namespace MitaarBuddy
             SettingsController.CleanUp();
         }
         public static void IPCChannel_Changed(object s, int e)
+        {
+            IPCChannel.SetChannelId(Convert.ToByte(e));
+            Config.Save();
+        }
+
+        public static void Difficulty_Changed(object s, int e)
         {
             IPCChannel.SetChannelId(Convert.ToByte(e));
             Config.Save();
@@ -175,6 +204,35 @@ namespace MitaarBuddy
             Stop();
         }
 
+        private void FarmingMessage(int sender, IPCMessage msg)
+        {
+            _settings["Farming"] = true;
+            Farming = false;
+            
+        }
+
+        private void NoFarmingMessage(int sender, IPCMessage msg)
+        {
+            _settings["Farming"] = false;
+            Farming = true;
+        }
+
+        private void EasyMessage(int sender, IPCMessage msg)
+        {
+            _settings["Easy"] = false;
+        }
+
+        private void MediumMessage(int sender, IPCMessage msg)
+        {
+            _settings["Medium"] = false;
+        }
+
+        private void HardcoreMessage(int sender, IPCMessage msg)
+        {
+            _settings["Hardcore"] = false;
+        }
+
+
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
             _infoWindow = Window.CreateFromXml("Info", PluginDir + "\\UI\\MitaarBuddyInfoView.xml",
@@ -187,8 +245,10 @@ namespace MitaarBuddy
 
         private void OnUpdate(object s, float deltaTime)
         {
-            if (Game.IsZoning || Time.NormalTime < _lastZonedTime + 6.0)
+            if (Game.IsZoning) //|| Time.NormalTime < _lastZonedTime + 6.0
                 return;
+
+            Difficulty();
 
             if (Toggle == true && _settings["Toggle"].AsBool())
             {
@@ -416,104 +476,135 @@ namespace MitaarBuddy
                         }
                     }
 
-                    if (_sinuhCorpse != null && _xanSpirits == null && _alienCoccoon == null && IsSettingEnabled("Farming"))
+                    if (IsSettingEnabled("Farming"))
                     {
-                        _sinuhCorpsePos = (Vector3)_sinuhCorpse?.Position;
-
-                        //Path to corpse
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(_sinuhCorpsePos) > 3.0f)
-                        MovementController.Instance.SetDestination(_sinuhCorpsePos);
-
-
-                        if (!_initCorpse && Team.IsInTeam)
+                        if (_sinuhCorpse != null && _xanSpirits == null && _alienCoccoon == null)
                         {
-                            if (Team.IsLeader && !_leader)
-                            {
-                                
-                                Leader = DynelManager.LocalPlayer.Identity;
+                            _sinuhCorpsePos = (Vector3)_sinuhCorpse?.Position;
 
-                                _leader = true;
-                            }
+                            //Path to corpse
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(_sinuhCorpsePos) > 3.0f)
+                                MovementController.Instance.SetDestination(_sinuhCorpsePos);
 
-                            if (Team.IsInTeam && _leader)
+
+                            if (!_initCorpse && Team.IsInTeam)
                             {
-                                Task.Factory.StartNew(
-                                    async () =>
-                                    {
-                                        //Team save and disbanding
-                                        foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_teamCache.Contains(c.Identity)))
+                                if (Team.IsLeader && !_leader)
+                                {
+
+                                    Leader = DynelManager.LocalPlayer.Identity;
+
+                                    _leader = true;
+                                }
+
+                                if (Team.IsInTeam && _leader)
+                                {
+                                    Task.Factory.StartNew(
+                                        async () =>
                                         {
-                                            if (!_teamCache.Contains(player.Identity))
-                                                _teamCache.Add(player.Identity);
-                                            Chat.WriteLine($"Player {player.Identity} added");
+                                            //Team save and disbanding
+                                            foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_teamCache.Contains(c.Identity)))
+                                            {
+                                                if (!_teamCache.Contains(player.Identity))
+                                                    _teamCache.Add(player.Identity);
+                                                Chat.WriteLine($"Player {player.Identity} added");
+
+                                                _invitedList.Clear();
+                                                _invitedList.Clear();
+                                            }
+
+                                            await Task.Delay(10000);
+                                            Team.Disband();
 
                                             _invitedList.Clear();
-                                            _invitedList.Clear();
-                                        }
+                                            _leader = false;
+                                            _repeat = true;
+                                            _initCorpse = true;
+                                            _initCorpse = true;
 
-                                        await Task.Delay(10000);
-                                        Team.Disband();
+                                        });
+                                }
 
-                                        _invitedList.Clear();
-                                        _leader = false;
-                                        _repeat = true;
-                                        _initCorpse = true;
-                                        _initCorpse = true;
+                                _invitedList.Clear();
+                                _leader = false;
+                                _repeat = true;
 
-
-                                    });
                             }
-
-                            _invitedList.Clear();
-                            _leader = false;
-                            _repeat = true;
-                            //_initCorpse = true;
-
                         }
                     }
                 }
             }
 
                 if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
-            {
-                SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
-
-                if (channelInput != null)
                 {
-                    if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                    SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
+
+                    if (channelInput != null)
                     {
-                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        if (int.TryParse(channelInput.Text, out int channelValue)
+                            && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                        {
+                            Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        }
                     }
-                }
 
-                if (SettingsController.settingsWindow.FindView("MitaarBuddyInfoView", out Button infoView))
-                {
-                    infoView.Tag = SettingsController.settingsWindow;
-                    infoView.Clicked = HandleInfoViewClick;
-                }
-
-                if (!_settings["Toggle"].AsBool() && Toggle)
-                {
-                    IPCChannel.Broadcast(new StopMessage());
-                    Toggle = false;
-                }
-                if (_settings["Toggle"].AsBool() && !Toggle)
-                {
-                    IPCChannel.Broadcast(new StartMessage());
-                    if (Team.IsLeader)
+                    if (SettingsController.settingsWindow.FindView("MitaarBuddyInfoView", out Button infoView))
                     {
-                        Leader = DynelManager.LocalPlayer.Identity;
+                        infoView.Tag = SettingsController.settingsWindow;
+                        infoView.Clicked = HandleInfoViewClick;
                     }
-                    Toggle = true;
+
+                    if (!_settings["Toggle"].AsBool() && Toggle)
+                    {
+                        IPCChannel.Broadcast(new StopMessage());
+                        Toggle = false;
+                    }
+                    if (_settings["Toggle"].AsBool() && !Toggle)
+                    {
+                        IPCChannel.Broadcast(new StartMessage());
+                        if (Team.IsLeader)
+                        {
+                            Leader = DynelManager.LocalPlayer.Identity;
+                        }
+                        Toggle = true;
+                    }
+
+                    if (!_settings["Farming"].AsBool() && Farming)
+                    {
+                        IPCChannel.Broadcast(new NoFarmingMessage());
+                        Farming = false;
+                        Chat.WriteLine("Farming disabled");
+                    }
+
+                    if (_settings["Farming"].AsBool() && !Farming)
+                    {
+                        IPCChannel.Broadcast(new FarmingMessage());
+                        Farming = true;
+                        Chat.WriteLine("Farming enabled.");
                 }
 
-               
 
-                }
+                    if (Easy)
+                    {
+                        IPCChannel.Broadcast(new EasyMessage());
+                        Easy = false;
+                    }
+
+                    if (Medium)
+                    {
+                        IPCChannel.Broadcast(new MediumMessage());
+                        Medium = false;
+                    }
+
+                    if (Hardcore)
+                    {
+                        IPCChannel.Broadcast(new HardecoreMessage());
+                        Hardcore = false;
+                    }
+
+            }
         }
 
-        
 
         private void MitaarCommand(string command, string[] param, ChatWindow chatWindow)
         {
@@ -541,6 +632,48 @@ namespace MitaarBuddy
             catch (Exception e)
             {
                 Chat.WriteLine(e.Message);
+            }
+        }
+
+        public static void Difficulty()
+        {
+            if (DifficultySelection.Easy == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_easyToggled)
+            {
+                Easy = true;
+                Medium = false;
+                Hardcore = false;
+
+                _easyToggled = true;
+                _mediumToggled = false;
+                _hardcoreToggled = false;
+
+                Chat.WriteLine("Stop being a Primitive Screwhead.");
+            }
+
+            if (DifficultySelection.Medium == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_mediumToggled)
+            {
+                Easy = false;
+                Medium = true;
+                Hardcore = false;
+
+                _easyToggled = false;
+                _mediumToggled = true;
+                _hardcoreToggled = false;
+
+                Chat.WriteLine("Okay, a little better. Groovy.");
+            }
+
+            if (DifficultySelection.Hardcore == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_hardcoreToggled)
+            {
+                Easy = false;
+                Medium = false;
+                Hardcore = true;
+
+                _easyToggled = false;
+                _mediumToggled = false;
+                _hardcoreToggled = true;
+
+                Chat.WriteLine("Destroyer! Hail to the king, baby.");
             }
         }
 
