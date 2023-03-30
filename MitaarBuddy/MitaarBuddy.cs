@@ -507,13 +507,13 @@ namespace MitaarBuddy
                                             {
                                                 if (!_teamCache.Contains(player.Identity))
                                                     _teamCache.Add(player.Identity);
-                                                Chat.WriteLine($"Player {player.Identity} added");
+                                                //Chat.WriteLine($"Player {player.Identity} added");
 
                                                 _invitedList.Clear();
                                                 _invitedList.Clear();
                                             }
 
-                                            await Task.Delay(10000);
+                                            await Task.Delay(15000);
                                             Team.Disband();
 
                                             _invitedList.Clear();
