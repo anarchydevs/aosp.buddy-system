@@ -171,14 +171,11 @@ namespace MitaarBuddy
         {
             Toggle = true;
 
-            Chat.WriteLine("MitaarBuddy enabled.");
         }
 
         private void Stop()
         {
             Toggle = false;
-
-            Chat.WriteLine("MitaarBuddy disabled.");
 
             NavMeshMovementController.Halt();
         }
@@ -331,6 +328,7 @@ namespace MitaarBuddy
                             _repeat = false;
 
                             _invitedList.Clear();
+                            Leader = DynelManager.LocalPlayer.Identity;
                         }
                     }
 
@@ -553,6 +551,8 @@ namespace MitaarBuddy
                     {
                         IPCChannel.Broadcast(new StopMessage());
                         Toggle = false;
+
+                        Chat.WriteLine("MitaarBuddy disabled.");
                     }
                     if (_settings["Toggle"].AsBool() && !Toggle)
                     {
@@ -562,6 +562,7 @@ namespace MitaarBuddy
                             Leader = DynelManager.LocalPlayer.Identity;
                         }
                         Toggle = true;
+                        Chat.WriteLine("MitaarBuddy enabled.");
                     }
 
                     if (!_settings["Farming"].AsBool() && Farming)
