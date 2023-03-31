@@ -252,13 +252,12 @@ namespace MitaarBuddy
                 //Outside
                 if (Playfield.ModelIdentity.Instance == 6013)
                 {
-                    //_sinuhCorpsePos = Vector3.Zero;
 
                     //Outside mitaar not in team
                     if (!Team.IsInTeam && Time.NormalTime > _time + 5f)
                     {
                             //Inviting to team
-                                foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))// && !_invitedList.Contains(c.Identity) 
+                                foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
                                 {
                                     if (_invitedList.Contains(player.Identity)) { continue; }
 
@@ -331,7 +330,7 @@ namespace MitaarBuddy
                             _atEntrance = false;
                             _repeat = false;
 
-                            // _teamCache.Clear();
+                            _invitedList.Clear();
                         }
                     }
 
