@@ -15,7 +15,7 @@ namespace ALBBuddy
         protected string _path;
 
         [JsonIgnore]
-        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 0;
+        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 49;
 
         public static Config Load(string path)
         {
@@ -65,7 +65,7 @@ namespace ALBBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 5;
+        private int _ipcChannel = 49;
 
         //Breaking out auto-property
         public int IPCChannel

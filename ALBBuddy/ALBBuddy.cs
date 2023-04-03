@@ -31,9 +31,10 @@ namespace ALBBuddy
         public static bool _initMerge = false;
         public static bool Toggle = false;
         public static bool Sitting = false;
-        public static bool _died = false;
-        public static bool _passedFirstCorrectionPos = false;
-        public static bool _passedSecondCorrectionPos = false;
+        
+        public static bool _passedFirstPos = false;
+        public static bool _passedSecondPos = false;
+        public static bool _passedThirdPos = false;
 
         public static double _stateTimeOut;
         public static double _sitUpdateTimer;
@@ -54,8 +55,10 @@ namespace ALBBuddy
                 PluginDir = pluginDir;
 
                 Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\ALBBuddy\\{Game.ClientInst}\\Config.json");
+
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
+
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
@@ -63,7 +66,7 @@ namespace ALBBuddy
 
                 Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
 
-                Chat.RegisterCommand("buddy", AXPBuddyCommand);
+                Chat.RegisterCommand("buddy", AlbBuddyCommand);
 
                 SettingsController.RegisterSettingsWindow("ALBBuddy", pluginDir + "\\UI\\ALBBuddySettingWindow.xml", _settings);
 
@@ -150,10 +153,6 @@ namespace ALBBuddy
         {
             if (Game.IsZoning)
                 return;
-            if (_settings["Merge"].AsBool())
-            {
-                NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
-            }
 
                 if (Time.NormalTime > _sitUpdateTimer + 1)
             {
@@ -246,7 +245,7 @@ namespace ALBBuddy
             }
         }
 
-        private void AXPBuddyCommand(string command, string[] param, ChatWindow chatWindow)
+        private void AlbBuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {

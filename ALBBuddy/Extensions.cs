@@ -52,13 +52,6 @@ namespace ALBBuddy
                     .Any(c => c.FightingTarget != null && c.FightingTarget?.Name == DynelManager.LocalPlayer.Name);
         }
 
-        public static bool HasDied()
-        {
-            return Playfield.ModelIdentity.Instance == Constants.XanHubId
-                    || Playfield.ModelIdentity.Instance == Constants.UnicornHubId
-                    || (Playfield.ModelIdentity.Instance == Constants.APFHubId
-                        && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13ZoneOutPos) > 10f);
-        }
         public static bool TimedOut(double _time, float _timeOut)
         {
             return Team.IsInTeam && Time.NormalTime > _time + _timeOut;

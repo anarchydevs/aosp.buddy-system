@@ -8,7 +8,7 @@ namespace ALBBuddy.IPCMessages
 {
     public enum IPCOpcode
     {
-        Start = 1001,
-        Stop = 1002
+        Start = 1951,
+        Stop = 1952
     }
 }

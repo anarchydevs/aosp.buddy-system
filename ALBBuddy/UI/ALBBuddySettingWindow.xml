@@ -16,7 +16,7 @@
         <OptionRadioButtonGroup label="Mode" h_alignment="LEFT" layout_borders="Rect(10,1,5,1)" opt_type="variant" opt_variable="ALBBuddy__ModeSelection">
           <RadioButton label="Normal" value="0"/>
           <RadioButton label="Roam" value="1"/>
-          <RadioButton label="Leech" value="2"/>
+          <RadioButton label="" value="2"/>
         </OptionRadioButtonGroup>
       </View>
       <TextView value=" " layout_borders="Rect(5,5,5,5)"/>

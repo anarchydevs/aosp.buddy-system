@@ -25,19 +25,13 @@ namespace ALBBuddy
         public IState GetNextState()
         {
             if (Extensions.TimedOut(_reformStartedTime, ReformTimeout))
-                return new EnterSectorState();
+                return new EnterAlbtraumState();
 
             if (_phase == ReformPhase.Completed)
             {
-                //if (!Team.IsRaid && Team.IsLeader
-                //    && !_init)
-                //{
-                //    _init = true;
-                //    Team.ConvertToRaid();
-                //}
 
                 if (Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
-                    return new EnterSectorState();
+                    return new EnterAlbtraumState();
             }
 
             return null;
@@ -45,29 +39,30 @@ namespace ALBBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("ReformState::OnStateEnter");
+            //Chat.WriteLine("ReformState::OnStateEnter");
 
             _reformStartedTime = Time.NormalTime;
 
-            ALBBuddy._passedFirstCorrectionPos = false;
-            ALBBuddy._passedSecondCorrectionPos = false;
+            ALBBuddy._passedFirstPos = false;
+            ALBBuddy._passedSecondPos = false;
+            ALBBuddy._passedThirdPos = false;
 
             if (ALBBuddy._settings["Merge"].AsBool() || DynelManager.LocalPlayer.Identity != ALBBuddy.Leader)
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
-                Chat.WriteLine("ReformPhase.Waiting");
+                //Chat.WriteLine("ReformPhase.Waiting");
             }
             else
             {
                 _phase = ReformPhase.Disbanding;
-                Chat.WriteLine("ReformPhase.Disbanding");
+               //Chat.WriteLine("ReformPhase.Disbanding");
             }
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("ReformState::OnStateExit");
+           //Chat.WriteLine("ReformState::OnStateExit");
 
             _invitedList.Clear();
             _teamCache.Clear();
@@ -80,36 +75,37 @@ namespace ALBBuddy
 
         public void Tick()
         {
-            if (Game.IsZoning) { return; }
+            if (Game.IsZoning ) { return; }
 
-            if (_phase == ReformPhase.Disbanding && Time.NormalTime > _reformStartedTime + DisbandDelay)
+            if (Playfield.ModelIdentity.Instance == Constants.Inferno)
             {
-                _phase = ReformPhase.Inviting;
-                Chat.WriteLine("ReformPhase.Inviting");
-            }
-
-            if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count())
-            {
-                foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
+                if (_phase == ReformPhase.Disbanding && Time.NormalTime > _reformStartedTime + DisbandDelay)
                 {
-                    if (_invitedList.Contains(player.Identity)) { continue; }
-
-                    _invitedList.Add(player.Identity);
-
-                    if (player.Identity == ALBBuddy.Leader) { continue; }
-
-                    Team.Invite(player.Identity);
-                    Chat.WriteLine($"Inviting {player.Name}");
+                    _phase = ReformPhase.Inviting;
+                    //Chat.WriteLine("ReformPhase.Inviting");
                 }
-            }
+                if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count())
+                {
+                    foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
+                    {
+                        if (_invitedList.Contains(player.Identity)) { continue; }
 
-            if (_phase == ReformPhase.Inviting
-                && Team.IsInTeam
-                && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count()
-                && _invitedList.Count() == _teamCache.Count())
-            {
-                _phase = ReformPhase.Completed;
-                Chat.WriteLine("ReformPhase.Completed");
+                        _invitedList.Add(player.Identity);
+
+                        if (player.Identity == ALBBuddy.Leader) { continue; }
+
+                        Team.Invite(player.Identity);
+                        //Chat.WriteLine($"Inviting {player.Name}");
+                    }
+                }
+                if (_phase == ReformPhase.Inviting
+                    && Team.IsInTeam
+                    && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count()
+                    && _invitedList.Count() == _teamCache.Count())
+                {
+                    _phase = ReformPhase.Completed;
+                    //Chat.WriteLine("ReformPhase.Completed");
+                }
             }
         }
 

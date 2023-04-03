@@ -13,10 +13,9 @@ namespace ALBBuddy
     {
         public IState GetNextState()
         {
-            if (ALBBuddy.Toggle == true && Team.IsInTeam 
-                && ALBBuddy._settings["Toggle"].AsBool())
+            if (ALBBuddy.Toggle == true && Team.IsInTeam && ALBBuddy._settings["Toggle"].AsBool())
             {
-                return new EnterSectorState();
+                return new EnterAlbtraumState();
             }
 
             return null;

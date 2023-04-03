@@ -26,8 +26,8 @@ namespace ALBBuddy
 
         public IState GetNextState()
         {
-            if (Extensions.HasDied())
-                return new DiedState();
+            //if (Extensions.HasDied())
+            //    return new DiedState();
 
             if (Extensions.IsNull(_target)
                 || Time.NormalTime > _fightStartTime + FightTimeout)
@@ -43,7 +43,7 @@ namespace ALBBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine($"FightState::OnStateEnter");
+            //Chat.WriteLine($"FightState::OnStateEnter");
 
             _fightStartTime = Time.NormalTime;
             ALBBuddy.NavMeshMovementController.Halt();
@@ -51,7 +51,7 @@ namespace ALBBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("FightState::OnStateExit");
+            //Chat.WriteLine("FightState::OnStateExit");
 
             _aggToolCounter = 0;
             _attackTimeout = 0;
@@ -80,7 +80,7 @@ namespace ALBBuddy
                     && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
                 {
                     DynelManager.LocalPlayer.Attack(_target);
-                    Chat.WriteLine($"Attacking {_target.Name}.");
+                    //Chat.WriteLine($"Attacking {_target.Name}.");
                 }
             }
             else if (DynelManager.LocalPlayer.Identity == ALBBuddy.Leader 
