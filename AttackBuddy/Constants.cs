@@ -101,7 +101,12 @@ namespace AttackBuddy
                     "Alien Seeker",
                     "Harbingers of Pestilence",
                     "Notum Erruption", 
-                    "Released Spirit"
+                    "Released Spirit",
+                    "Runic Detonation",
+                    "Male Lieutenant",
+                    "Omni-AF Urban Trooper",
+                    "Unicorn Commander",
+                    "Unicorn Specialist"
         };
     }
 }
