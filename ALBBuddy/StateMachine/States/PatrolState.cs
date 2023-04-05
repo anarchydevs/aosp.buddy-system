@@ -34,12 +34,12 @@ namespace ALBBuddy
         public void OnStateEnter()
         {
 
-            //Chat.WriteLine("PatrolState::OnStateEnter");
+            Chat.WriteLine("PatrolState::OnStateEnter");
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("PatrolState::OnStateExit");
+            Chat.WriteLine("PatrolState::OnStateExit");
         }
 
         private void HandleScan()
@@ -56,12 +56,13 @@ namespace ALBBuddy
             if (mob != null)
             {
                 _target = mob;
-                //Chat.WriteLine($"Found target: {_target.Name}");
+                Chat.WriteLine($"Found target: {_target.Name}");
             }
+
             else if (!Team.Members.Any(c => c.Character == null)
                     && !Team.Members.Where(c => c.Character != null
                        && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66
-                            || c.Character.Position.Distance2DFrom(DynelManager.LocalPlayer.Position) > 2f))
+                            || c.Character.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 10f))
                        .Any()
                     && Spell.List.Any(c => c.IsReady)
                     && !Spell.HasPendingCast
@@ -70,21 +71,21 @@ namespace ALBBuddy
             {
                 if (!ALBBuddy._passedFirstPos && !ALBBuddy._passedSecondPos && !ALBBuddy._passedThirdPos)
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.PosOne) < 10f)
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.PosOne) < 5f)
                         ALBBuddy._passedFirstPos = true;
                     else
                         ALBBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.PosOne);
                 }
                 else if (ALBBuddy._passedFirstPos && !ALBBuddy._passedSecondPos && !ALBBuddy._passedThirdPos)
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.PosTwo) < 10f)
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.PosTwo) < 5f)
                         ALBBuddy._passedSecondPos = true;
                     else
                         ALBBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.PosTwo);
                 }
                 else if (ALBBuddy._passedFirstPos && ALBBuddy._passedSecondPos && !ALBBuddy._passedThirdPos)
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.PosThree) < 10f)
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.PosThree) < 5f)
                         ALBBuddy._passedThirdPos = true;
                     else
                         ALBBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.PosThree);
@@ -109,14 +110,6 @@ namespace ALBBuddy
             if (Playfield.ModelIdentity.Instance == Constants.Albtraum)
                 ALBBuddy._ourPos = DynelManager.LocalPlayer.Position;
 
-            if (!ALBBuddy._initMerge && ALBBuddy._settings["Merge"].AsBool())
-            {
-                if (!ALBBuddy._initMerge)
-                    ALBBuddy._initMerge = true;
-
-                ALBBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.EndPos);
-            }
-
             if (DynelManager.LocalPlayer.Identity != ALBBuddy.Leader)
             {
                 ALBBuddy._leader = Team.Members
@@ -137,21 +130,21 @@ namespace ALBBuddy
                                 && c.Identity == (Identity)ALBBuddy._leader?.FightingTarget?.Identity)
                             .FirstOrDefault(c => !Constants._ignores.Contains(c.Name));
 
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(ALBBuddy._leaderPos) > 2f
-                            && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(ALBBuddy._leaderPos) > 7f
+                            && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                             ALBBuddy.NavMeshMovementController.SetNavMeshDestination(ALBBuddy._leaderPos);
 
                         if (targetMob != null)
                         {
                             _target = targetMob;
-                            //Chat.WriteLine($"Found target: {_target.Name}");
+                            Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
                     else
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(ALBBuddy._leaderPos) > 2f
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(ALBBuddy._leaderPos) > 7f
                         && Spell.List.Any(c => c.IsReady)
                         && !Spell.HasPendingCast
-                        && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
+                        && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                         ALBBuddy.NavMeshMovementController.SetNavMeshDestination(ALBBuddy._leaderPos);
                 }
                 else

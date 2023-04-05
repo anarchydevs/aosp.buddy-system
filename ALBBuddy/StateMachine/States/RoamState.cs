@@ -116,7 +116,6 @@ namespace ALBBuddy
 
                 if (ALBBuddy._leader != null)
                 {
-                    
                     ALBBuddy._leaderPos = (Vector3)ALBBuddy._leader?.Position;
 
                     if (ALBBuddy._leader?.FightingTarget != null)

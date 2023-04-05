@@ -15,6 +15,5 @@ namespace MitaarBuddy.IPCMessages
         EasyMode = 1015,
         MediumMode = 1016,
         HardcoreMode = 1017
-
     }
 }

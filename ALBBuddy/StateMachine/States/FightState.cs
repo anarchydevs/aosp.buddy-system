@@ -43,7 +43,7 @@ namespace ALBBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine($"FightState::OnStateEnter");
+            Chat.WriteLine($"FightState::OnStateEnter");
 
             _fightStartTime = Time.NormalTime;
             ALBBuddy.NavMeshMovementController.Halt();
@@ -51,7 +51,7 @@ namespace ALBBuddy
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("FightState::OnStateExit");
+            Chat.WriteLine("FightState::OnStateExit");
 
             _aggToolCounter = 0;
             _attackTimeout = 0;
@@ -80,14 +80,12 @@ namespace ALBBuddy
                     && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
                 {
                     DynelManager.LocalPlayer.Attack(_target);
-                    //Chat.WriteLine($"Attacking {_target.Name}.");
+                    Chat.WriteLine($"Attacking {_target.Name}.");
                 }
             }
             else if (DynelManager.LocalPlayer.Identity == ALBBuddy.Leader 
                 && ALBBuddy.ModeSelection.Normal == (ALBBuddy.ModeSelection)ALBBuddy._settings["ModeSelection"].AsInt32())
                 HandleTaunting(_target);
-            else if (ALBBuddy.ModeSelection.Roam == (ALBBuddy.ModeSelection)ALBBuddy._settings["ModeSelection"].AsInt32())
-                HandlePathing(_target);
         }
 
         public static CharacterWieldedWeapon GetWieldedWeapons(SimpleChar local) => (CharacterWieldedWeapon)local.GetStat(Stat.EquippedWeapons);
