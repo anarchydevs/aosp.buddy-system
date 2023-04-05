@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MitaarBuddy", "MitaarBuddy\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ALBBuddy", "ALBBuddy\ALBBuddy.csproj", "{FA924F5C-6E4B-42BC-A74F-057B2DC356DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB2Buddy", "DB2Buddy\DB2Buddy.csproj", "{3E5FA50D-2152-4700-A3E1-8497AD000480}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{FA924F5C-6E4B-42BC-A74F-057B2DC356DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FA924F5C-6E4B-42BC-A74F-057B2DC356DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FA924F5C-6E4B-42BC-A74F-057B2DC356DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3E5FA50D-2152-4700-A3E1-8497AD000480}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3E5FA50D-2152-4700-A3E1-8497AD000480}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3E5FA50D-2152-4700-A3E1-8497AD000480}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3E5FA50D-2152-4700-A3E1-8497AD000480}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
