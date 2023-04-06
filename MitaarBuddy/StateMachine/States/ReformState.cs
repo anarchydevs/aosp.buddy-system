@@ -30,13 +30,6 @@ namespace MitaarBuddy
 
             if (_phase == ReformPhase.Completed)
             {
-                //if (!Team.IsRaid && Team.IsLeader
-                //    && !_init)
-                //{
-                //    _init = true;
-                //    Team.ConvertToRaid();
-                //}
-
                 if (Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
                     return new EnterState();
             }

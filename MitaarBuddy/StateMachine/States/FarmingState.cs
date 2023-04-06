@@ -24,7 +24,6 @@ namespace MitaarBuddy
                 return new DiedState();
 
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-                && !Team.IsInTeam
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) <= 10f)
                 return new ReformState();
 
