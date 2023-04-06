@@ -20,11 +20,6 @@ namespace MitaarBuddy
         public IState GetNextState()
         {
 
-            //if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._reclaim) < 10.0f)
-            //{
-            //    MovementController.Instance.SetPath(Constants._pathToMitaar);
-            //}
-
             if ((DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20.0f)
                 && Extensions.CanProceed())
                 return new EnterState();
