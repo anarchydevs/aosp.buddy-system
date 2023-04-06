@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AOSharp.Common.GameData;
+using AOSharp.Common.GameData.UI;
 using AOSharp.Core;
-using AOSharp.Core.UI;
-using AOSharp.Core.Movement;
+using AOSharp.Core.Inventory;
 using AOSharp.Core.IPC;
+using AOSharp.Core.Movement;
+using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
 using MitaarBuddy.IPCMessages;
-using AOSharp.Common.GameData;
-using AOSharp.Core.Inventory;
-using AOSharp.Common.GameData.UI;
-using System.Security.Cryptography;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MitaarBuddy
 {
@@ -28,7 +25,7 @@ namespace MitaarBuddy
 
         public static Vector3 _sinuhCorpsePos = Vector3.Zero;
 
-        
+
         public static bool Toggle = false;
         public static bool Farming = false;
 

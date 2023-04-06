@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{787D0814-C072-44A5-8BC6-606EF35A62D0}</ProjectGuid>
+    <ProjectGuid>{3E5FA50D-2152-4700-A3E1-8497AD000480}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DB2buddy</RootNamespace>

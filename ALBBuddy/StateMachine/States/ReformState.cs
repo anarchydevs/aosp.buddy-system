@@ -1,8 +1,5 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
-using AOSharp.Core.UI;
-using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -39,31 +36,34 @@ namespace ALBBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("ReformState::OnStateEnter");
-
             _reformStartedTime = Time.NormalTime;
 
+            ALBBuddy._passedStartPos = false;
             ALBBuddy._passedFirstPos = false;
             ALBBuddy._passedSecondPos = false;
             ALBBuddy._passedThirdPos = false;
+            ALBBuddy._passedForthPos = false;
+            ALBBuddy. _passedFifthPos = false;
+            ALBBuddy._passedSixthPos = false;
+            ALBBuddy._passedSeventhPos = false;
+            ALBBuddy._passedEighthPos = false;
+            ALBBuddy._passedNinethPos = false;
+            ALBBuddy._passedTenthPos = false;
+            ALBBuddy._passedLastPos = false;
 
             if (ALBBuddy._settings["Merge"].AsBool() || DynelManager.LocalPlayer.Identity != ALBBuddy.Leader)
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
-                //Chat.WriteLine("ReformPhase.Waiting");
             }
             else
             {
                 _phase = ReformPhase.Disbanding;
-               //Chat.WriteLine("ReformPhase.Disbanding");
             }
         }
 
         public void OnStateExit()
         {
-           //Chat.WriteLine("ReformState::OnStateExit");
-
             _invitedList.Clear();
             _teamCache.Clear();
 
@@ -75,14 +75,13 @@ namespace ALBBuddy
 
         public void Tick()
         {
-            if (Game.IsZoning ) { return; }
+            if (Game.IsZoning) { return; }
 
             if (Playfield.ModelIdentity.Instance == Constants.Inferno)
             {
                 if (_phase == ReformPhase.Disbanding && Time.NormalTime > _reformStartedTime + DisbandDelay)
                 {
                     _phase = ReformPhase.Inviting;
-                    //Chat.WriteLine("ReformPhase.Inviting");
                 }
                 if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count())
                 {
@@ -95,7 +94,6 @@ namespace ALBBuddy
                         if (player.Identity == ALBBuddy.Leader) { continue; }
 
                         Team.Invite(player.Identity);
-                        //Chat.WriteLine($"Inviting {player.Name}");
                     }
                 }
                 if (_phase == ReformPhase.Inviting
@@ -104,7 +102,6 @@ namespace ALBBuddy
                     && _invitedList.Count() == _teamCache.Count())
                 {
                     _phase = ReformPhase.Completed;
-                    //Chat.WriteLine("ReformPhase.Completed");
                 }
             }
         }

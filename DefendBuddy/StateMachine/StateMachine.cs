@@ -20,12 +20,12 @@
         }
         public void SetState(IState state, bool triggerEvents = true)
         {
-            if(CurrentState != null && triggerEvents)
+            if (CurrentState != null && triggerEvents)
                 CurrentState.OnStateExit();
 
             CurrentState = state;
 
-            if(triggerEvents)
+            if (triggerEvents)
                 state.OnStateEnter();
         }
     }

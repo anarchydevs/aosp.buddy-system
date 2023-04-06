@@ -2,8 +2,6 @@
 using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
-using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -51,7 +49,7 @@ namespace MitaarBuddy
             _reformStartedTime = Time.NormalTime;
 
             MovementController.Instance.SetDestination(Constants._reneterPos);
-            
+
             if (DynelManager.LocalPlayer.Identity != MitaarBuddy.Leader)
             {
                 Team.TeamRequest += OnTeamRequest;
@@ -80,7 +78,7 @@ namespace MitaarBuddy
             if (_phase == ReformPhase.Disbanding && Time.NormalTime > _reformStartedTime + DisbandDelay)
             {
                 _phase = ReformPhase.Inviting;
-                
+
             }
 
             if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count())
@@ -94,7 +92,7 @@ namespace MitaarBuddy
                     if (player.Identity == MitaarBuddy.Leader) { continue; }
 
                     Team.Invite(player.Identity);
-                    
+
                 }
             }
 
@@ -104,7 +102,7 @@ namespace MitaarBuddy
                 && _invitedList.Count() == _teamCache.Count())
             {
                 _phase = ReformPhase.Completed;
-                
+
             }
         }
 

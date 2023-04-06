@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AOSharp.Core;
-using AOSharp.Core.UI;
-using AOSharp.Core.Movement;
-using AOSharp.Common.GameData;
-using System.IO;
-using AOSharp.Core.GameData;
-using AOSharp.Core.UI.Options;
-using AOSharp.Pathfinding;
-using System.Data;
-using AOSharp.Core.IPC;
-using AttackBuddy.IPCMessages;
-using AOSharp.Core.Inventory;
-using System.Collections.Concurrent;
+﻿using AOSharp.Common.GameData;
 using AOSharp.Common.GameData.UI;
-using System.Globalization;
+using AOSharp.Core;
+using AOSharp.Core.IPC;
+using AOSharp.Core.Movement;
+using AOSharp.Core.UI;
+using AOSharp.Pathfinding;
+using AttackBuddy.IPCMessages;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace AttackBuddy
 {
@@ -345,7 +337,7 @@ namespace AttackBuddy
                    .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
                    .OrderByDescending(c => c.Name == "Lost Thought")
                    .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
-                   .OrderByDescending(c => c.Name == "Alien Cocoon" )
+                   .OrderByDescending(c => c.Name == "Alien Cocoon")
                    .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
                    .ToList();
 
@@ -517,7 +509,7 @@ namespace AttackBuddy
                         Start();
 
                     }
-                    else 
+                    else
                     {
                         Stop();
                         Chat.WriteLine("AttackBuddy disabled.");

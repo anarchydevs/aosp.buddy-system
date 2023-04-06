@@ -1,12 +1,7 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
+﻿using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Threading;
-using System.Threading.Tasks;
 using static MitaarBuddy.MitaarBuddy;
 
 namespace MitaarBuddy
@@ -40,14 +35,14 @@ namespace MitaarBuddy
                 return new FarmingState();
 
 
-                    return null;
+            return null;
         }
 
         public void OnStateEnter()
         {
             Chat.WriteLine("Start on Red, Medium Mode");
 
-            
+
             MovementController.Instance.SetDestination(Constants._startPosition);
         }
 
@@ -84,7 +79,7 @@ namespace MitaarBuddy
                 {
                     if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
                         DynelManager.LocalPlayer.Attack(_sinuh);
-                    
+
                 }
 
                 if (_sinuh != null && _alienCoccoon != null)

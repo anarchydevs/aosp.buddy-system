@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using AOSharp.Common.GameData;
 
 namespace AttackBuddy
 {

@@ -1,11 +1,5 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
-using AOSharp.Core.UI;
-using System;
-using System.Collections.Generic;
+﻿using AOSharp.Core;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MitaarBuddy
 {
@@ -15,7 +9,7 @@ namespace MitaarBuddy
         {
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20.0f
-                && MitaarBuddy.Toggle == true 
+                && MitaarBuddy.Toggle == true
                 && Team.IsInTeam
                 && Extensions.CanProceed()
                 && MitaarBuddy._settings["Toggle"].AsBool())

@@ -87,7 +87,7 @@ namespace DefendBuddy
                     _target = DefendBuddy._mob.FirstOrDefault();
                     Chat.WriteLine($"Found target: {_target.Name}.");
                 }
-                else if(DefendBuddy._bossMob.Count >= 1)
+                else if (DefendBuddy._bossMob.Count >= 1)
                 {
                     if (DefendBuddy._bossMob.FirstOrDefault().Health == 0) { return; }
 
@@ -95,7 +95,7 @@ namespace DefendBuddy
                     Chat.WriteLine($"Found target: {_target.Name}.");
                 }
 
-                if (DefendBuddy._mob.Count == 0 && DefendBuddy._bossMob.Count == 0 && DynelManager.LocalPlayer.HealthPercent >= 66 
+                if (DefendBuddy._mob.Count == 0 && DefendBuddy._bossMob.Count == 0 && DynelManager.LocalPlayer.HealthPercent >= 66
                     && DynelManager.LocalPlayer.NanoPercent >= 66
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Rooted())
                     HoldPosition();

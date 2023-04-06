@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AOSharp.Core;
-using AOSharp.Core.UI;
-using AOSharp.Core.Movement;
-using AOSharp.Core.IPC;
-using AOSharp.Pathfinding;
-using ALBBuddy.IPCMessages;
+﻿using ALBBuddy.IPCMessages;
 using AOSharp.Common.GameData;
-using AOSharp.Core.Inventory;
 using AOSharp.Common.GameData.UI;
-using System.Security.Cryptography;
+using AOSharp.Core;
+using AOSharp.Core.Inventory;
+using AOSharp.Core.IPC;
+using AOSharp.Core.Movement;
+using AOSharp.Core.UI;
+using AOSharp.Pathfinding;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ALBBuddy
 {
@@ -31,10 +28,19 @@ namespace ALBBuddy
         public static bool _initMerge = false;
         public static bool Toggle = false;
         public static bool Sitting = false;
-        
+
+        public static bool _passedStartPos = false;
         public static bool _passedFirstPos = false;
         public static bool _passedSecondPos = false;
         public static bool _passedThirdPos = false;
+        public static bool _passedForthPos = false;
+        public static bool _passedFifthPos = false;
+        public static bool _passedSixthPos = false;
+        public static bool _passedSeventhPos = false;
+        public static bool _passedEighthPos = false;
+        public static bool _passedNinethPos = false;
+        public static bool _passedTenthPos = false;
+        public static bool _passedLastPos = false;
 
         public static double _stateTimeOut;
         public static double _sitUpdateTimer;
@@ -75,10 +81,7 @@ namespace ALBBuddy
                 Team.TeamRequest += OnTeamRequest;
                 Game.OnUpdate += OnUpdate;
 
-                _settings.AddVariable("ModeSelection", (int)ModeSelection.Normal);
-
                 _settings.AddVariable("Toggle", false);
-                _settings.AddVariable("Merge", false);
 
                 _settings["Toggle"] = false;
 
@@ -125,7 +128,8 @@ namespace ALBBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            if (!_settings["Merge"].AsBool())
+            if (Leader == Identity.None
+            && DynelManager.LocalPlayer.Identity.Instance != sender)
                 Leader = new Identity(IdentityType.SimpleChar, sender);
 
             _settings["Toggle"] = true;
@@ -154,7 +158,7 @@ namespace ALBBuddy
             if (Game.IsZoning)
                 return;
 
-                if (Time.NormalTime > _sitUpdateTimer + 1)
+            if (Time.NormalTime > _sitUpdateTimer + 1)
             {
                 ListenerSit();
 
@@ -187,9 +191,7 @@ namespace ALBBuddy
                 }
                 if (_settings["Toggle"].AsBool() && !Toggle)
                 {
-                    if (!_settings["Merge"].AsBool())
-                        Leader = DynelManager.LocalPlayer.Identity;
-
+                    Leader = DynelManager.LocalPlayer.Identity;
                     IPCChannel.Broadcast(new StartMessage());
                     Start();
                 }
@@ -232,11 +234,11 @@ namespace ALBBuddy
                                async () =>
                                {
                                    Sitting = true;
-                                   await Task.Delay(400);
+                                   await Task.Delay(4000);
                                    NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                                   await Task.Delay(800);
+                                   await Task.Delay(8000);
                                    NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-                                   await Task.Delay(200);
+                                   await Task.Delay(2000);
                                    Sitting = false;
                                });
                         }
@@ -253,8 +255,6 @@ namespace ALBBuddy
                 {
                     if (!_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        if (!_settings["Merge"].AsBool())
-                            Leader = DynelManager.LocalPlayer.Identity;
 
                         IPCChannel.Broadcast(new StartMessage());
                         Start();
@@ -271,11 +271,6 @@ namespace ALBBuddy
             {
                 Chat.WriteLine(e.Message);
             }
-        }
-
-        public enum ModeSelection
-        {
-            Normal, Roam, Leech
         }
 
         public static class RelevantItems

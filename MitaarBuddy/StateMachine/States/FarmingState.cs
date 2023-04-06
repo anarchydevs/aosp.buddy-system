@@ -2,10 +2,7 @@
 using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
-using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Threading;
 using System.Threading.Tasks;
 using static MitaarBuddy.MitaarBuddy;
 
@@ -65,7 +62,7 @@ namespace MitaarBuddy
                         Chat.WriteLine("Done, Disbanding");
                         Team.Disband();
 
-                        
+
 
                     });
                 _initCorpse = true;

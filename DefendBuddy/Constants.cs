@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using AOSharp.Common.GameData;
+﻿using AOSharp.Common.GameData;
+using System.Collections.Generic;
 
 namespace DefendBuddy
 {

@@ -1,8 +1,8 @@
 ﻿using AOSharp.Common.GameData;
-using System.Security.Cryptography;
-using System;
 using AOSharp.Core;
+using System;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace DefendBuddy
 {

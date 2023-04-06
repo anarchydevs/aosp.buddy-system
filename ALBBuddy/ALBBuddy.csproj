@@ -104,8 +104,6 @@
     <Compile Include="StateMachine\States\EnterAlbtraumState.cs" />
     <Compile Include="StateMachine\States\FightState.cs" />
     <Compile Include="StateMachine\States\IdleState.cs" />
-    <Compile Include="StateMachine\States\LeechState.cs" />
-    <Compile Include="StateMachine\States\RoamState.cs" />
     <Compile Include="StateMachine\States\PatrolState.cs" />
     <Compile Include="StateMachine\States\ReformState.cs" />
   </ItemGroup>

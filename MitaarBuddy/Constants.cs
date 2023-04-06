@@ -1,5 +1,4 @@
 ﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
 using System.Collections.Generic;
 
 namespace MitaarBuddy
@@ -41,6 +40,6 @@ namespace MitaarBuddy
 
         public const int XanHubId = 6013;
 
-       
+
     }
 }

@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using AOSharp.Core;
-using AOSharp.Core.UI;
-using AOSharp.Core.Movement;
-using AOSharp.Common.GameData;
-using AOSharp.Pathfinding;
-using System.Data;
-using AOSharp.Core.IPC;
-using DefendBuddy.IPCMessages;
+﻿using AOSharp.Common.GameData;
 using AOSharp.Common.GameData.UI;
+using AOSharp.Core;
+using AOSharp.Core.IPC;
+using AOSharp.Core.Movement;
+using AOSharp.Core.UI;
+using AOSharp.Pathfinding;
+using DefendBuddy.IPCMessages;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace DefendBuddy
 {
@@ -340,7 +340,7 @@ namespace DefendBuddy
                     infoView.Clicked = HandleInfoViewClick;
                 }
 
-                if (_settings["Toggle"].AsBool() 
+                if (_settings["Toggle"].AsBool()
                     && DynelManager.LocalPlayer.Identity == Leader
                     && Constants._posToDefend == Vector3.Zero)
                 {

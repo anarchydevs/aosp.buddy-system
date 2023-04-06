@@ -5,11 +5,8 @@ using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using KHBuddy.IPCMessages;
 using OSTBuddy;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace KHBuddy
 {
@@ -91,7 +88,7 @@ namespace KHBuddy
             if (KHBuddy.SideSelection.Beach == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32())
             {
                 if (DynelManager.LocalPlayer.Profession == Profession.Enforcer
-                    && (Time.NormalTime > KHBuddy._timer + 580f || !KHBuddy._init)) 
+                    && (Time.NormalTime > KHBuddy._timer + 580f || !KHBuddy._init))
                 {
                     if (!MovementController.Instance.IsNavigating)
                     {

@@ -1,11 +1,7 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
-using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
-using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace InfBuddy
 {
