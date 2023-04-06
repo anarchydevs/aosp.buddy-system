@@ -9,8 +9,6 @@ namespace ALBBuddy
 {
     public class FightState : IState
     {
-
-
         public static int _aggToolCounter = 0;
         public static int _attackTimeout = 0;
 
