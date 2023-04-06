@@ -51,7 +51,7 @@ namespace ALBBuddy
             ALBBuddy._passedTenthPos = false;
             ALBBuddy._passedLastPos = false;
 
-            if (ALBBuddy._settings["Merge"].AsBool() || DynelManager.LocalPlayer.Identity != ALBBuddy.Leader)
+            if (DynelManager.LocalPlayer.Identity != ALBBuddy.Leader)
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
@@ -69,7 +69,7 @@ namespace ALBBuddy
 
             _init = false;
 
-            if (ALBBuddy._settings["Merge"].AsBool() || DynelManager.LocalPlayer.Identity != ALBBuddy.Leader)
+            if (DynelManager.LocalPlayer.Identity != ALBBuddy.Leader)
                 Team.TeamRequest -= OnTeamRequest;
         }
 

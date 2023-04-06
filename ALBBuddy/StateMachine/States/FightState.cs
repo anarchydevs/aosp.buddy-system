@@ -3,6 +3,7 @@ using AOSharp.Core;
 using AOSharp.Core.Inventory;
 using AOSharp.Core.UI;
 using System;
+using System.Linq;
 
 namespace ALBBuddy
 {
@@ -66,13 +67,22 @@ namespace ALBBuddy
                         DynelManager.LocalPlayer.Attack(_target);
                         Chat.WriteLine($"Attacking {_target.Name}.");
                     }
+
+                    if (AttackingTeam(_target)
+                        && !DynelManager.LocalPlayer.IsAttacking 
+                        && !DynelManager.LocalPlayer.IsAttackPending)
+                    {
+                        DynelManager.LocalPlayer.Attack(_target);
+                        Chat.WriteLine($"Attacking {_target.Name}.");
+                    }
                 }
 
                 if (DynelManager.LocalPlayer.Identity == ALBBuddy.Leader
                     && _target.IsInLineOfSight
                     &&DynelManager.LocalPlayer.FightingTarget == null
                     && !DynelManager.LocalPlayer.IsAttacking 
-                    && !DynelManager.LocalPlayer.IsAttackPending)
+                    && !DynelManager.LocalPlayer.IsAttackPending
+                    && !AttackingTeam(_target))
                     HandleTaunting(_target);
             }
         }
@@ -81,28 +91,29 @@ namespace ALBBuddy
 
         public static void HandleTaunting(SimpleChar target)
         {
-            if (_aggToolCounter >= 2)
+            if (_aggToolCounter >= 1)
             {
-                if (_attackTimeout >= 1
+                if (_attackTimeout >= 2
                     && DynelManager.LocalPlayer.FightingTarget == null
                     && !DynelManager.LocalPlayer.IsAttacking 
                     && !DynelManager.LocalPlayer.IsAttackPending)
                 {
                     ALBBuddy.NavMeshMovementController.SetMovement(MovementAction.JumpStart);
-                    
-                    if (_attackTimeout >= 2)
-                    {
-                        ALBBuddy.NavMeshMovementController.SetNavMeshDestination(target.Position);
-                        _attackTimeout = 0;
-                        _aggToolCounter = 0;
-                        return;
-                    }
+                    return;
                 }
                 
-
                 _attackTimeout++;
-                _aggToolCounter = 0;
+                //_aggToolCounter = 0;
             }
+
+            if (_aggToolCounter >= 2)
+            {
+                ALBBuddy.NavMeshMovementController.SetNavMeshDestination(target.Position);
+                //_attackTimeout = 0;
+                _aggToolCounter = 0;
+                return;
+            }
+
             else if (Inventory.Find(83920, 83919, out Item aggroTool)) //Aggression Enhancer 
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
@@ -166,6 +177,17 @@ namespace ALBBuddy
                     return;
                 }
             }
+        }
+        public bool AttackingTeam(SimpleChar mob)
+        {
+            if (mob.FightingTarget == null) { return false; }
+
+            if (Team.IsInTeam)
+                return Team.Members.Select(m => m.Name).Contains(mob.FightingTarget?.Name)
+                        || (bool)mob.FightingTarget?.IsPet;
+
+            return mob.FightingTarget?.Name == DynelManager.LocalPlayer.Name
+                || (bool)mob.FightingTarget?.IsPet;
         }
     }
 }

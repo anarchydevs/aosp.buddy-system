@@ -179,6 +179,13 @@ namespace ALBBuddy
                         ALBBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.EndPos);
                 }
             }
+            if (!DynelManager.LocalPlayer.IsMoving
+                && DynelManager.LocalPlayer.FightingTarget == null
+                    && !DynelManager.LocalPlayer.IsAttacking
+                    && !DynelManager.LocalPlayer.IsAttackPending)
+            {
+                ALBBuddy.NavMeshMovementController.SetMovement(MovementAction.JumpStart);
+            }
         }
 
         public void Tick()
@@ -192,6 +199,8 @@ namespace ALBBuddy
                     if (!ReformState._teamCache.Contains(member.Identity))
                         ReformState._teamCache.Add(member.Identity);
                 }
+
+
 
                 if (Playfield.ModelIdentity.Instance == Constants.Albtraum)
                     ALBBuddy._ourPos = DynelManager.LocalPlayer.Position;

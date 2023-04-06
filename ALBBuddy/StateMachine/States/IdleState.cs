@@ -7,7 +7,8 @@ namespace ALBBuddy
     {
         public IState GetNextState()
         {
-            if (ALBBuddy.Toggle == true && Team.IsInTeam && ALBBuddy._settings["Toggle"].AsBool())
+            if (ALBBuddy.Toggle == true && Team.IsInTeam && ALBBuddy._settings["Toggle"].AsBool()
+                && Extensions.CanProceed())
             {
                 return new EnterAlbtraumState();
             }
