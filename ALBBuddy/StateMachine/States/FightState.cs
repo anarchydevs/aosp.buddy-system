@@ -62,15 +62,9 @@ namespace ALBBuddy
                 if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 10f)
                 {
                     if (DynelManager.LocalPlayer.FightingTarget == null
-                            && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
-                    {
-                        DynelManager.LocalPlayer.Attack(_target);
-                        Chat.WriteLine($"Attacking {_target.Name}.");
-                    }
-
-                    if (AttackingTeam(_target)
-                        && !DynelManager.LocalPlayer.IsAttacking 
-                        && !DynelManager.LocalPlayer.IsAttackPending)
+                            && !DynelManager.LocalPlayer.IsAttacking
+                            && !DynelManager.LocalPlayer.IsAttackPending
+                            && AttackingTeam(_target))
                     {
                         DynelManager.LocalPlayer.Attack(_target);
                         Chat.WriteLine($"Attacking {_target.Name}.");
@@ -78,42 +72,32 @@ namespace ALBBuddy
                 }
 
                 if (DynelManager.LocalPlayer.Identity == ALBBuddy.Leader
-                    && _target.IsInLineOfSight
-                    &&DynelManager.LocalPlayer.FightingTarget == null
-                    && !DynelManager.LocalPlayer.IsAttacking 
-                    && !DynelManager.LocalPlayer.IsAttackPending
-                    && !AttackingTeam(_target))
+                        && _target.IsInLineOfSight
+                        && DynelManager.LocalPlayer.FightingTarget == null
+                        && !DynelManager.LocalPlayer.IsAttacking
+                        && !DynelManager.LocalPlayer.IsAttackPending
+                        && !AttackingTeam(_target))
                     HandleTaunting(_target);
             }
         }
 
-       
+
 
         public static void HandleTaunting(SimpleChar target)
         {
-            if (_aggToolCounter >= 1)
-            {
-                if (_attackTimeout >= 2
-                    && DynelManager.LocalPlayer.FightingTarget == null
-                    && !DynelManager.LocalPlayer.IsAttacking 
-                    && !DynelManager.LocalPlayer.IsAttackPending)
-                {
-                    ALBBuddy.NavMeshMovementController.SetMovement(MovementAction.JumpStart);
-                    return;
-                }
-                
-                _attackTimeout++;
-                //_aggToolCounter = 0;
-            }
-
             if (_aggToolCounter >= 2)
             {
-                ALBBuddy.NavMeshMovementController.SetNavMeshDestination(target.Position);
-                //_attackTimeout = 0;
-                _aggToolCounter = 0;
-                return;
-            }
+                if (_attackTimeout >= 1)
+                {
+                    ALBBuddy.NavMeshMovementController.SetMovement(MovementAction.JumpStart);
+                    _attackTimeout = 0;
+                    _aggToolCounter = 0;
+                    return;
+                }
 
+                _attackTimeout++;
+                _aggToolCounter = 0;
+            }
             else if (Inventory.Find(83920, 83919, out Item aggroTool)) //Aggression Enhancer 
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
@@ -178,6 +162,7 @@ namespace ALBBuddy
                 }
             }
         }
+
         public bool AttackingTeam(SimpleChar mob)
         {
             if (mob.FightingTarget == null) { return false; }
