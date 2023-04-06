@@ -21,7 +21,7 @@ namespace MitaarBuddy
         private static SimpleChar _blueXanSpirit;
         private static SimpleChar _yellowXanSpirit;
 
-
+        
 
         public IState GetNextState()
         {
@@ -54,7 +54,7 @@ namespace MitaarBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Done with easy");
+                Chat.WriteLine("Done with easy");
         }
 
         public void Tick()

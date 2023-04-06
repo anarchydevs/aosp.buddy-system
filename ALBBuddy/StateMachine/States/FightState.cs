@@ -15,7 +15,7 @@ namespace ALBBuddy
         private SimpleChar _target;
 
         private double _fightStartTime;
-        public const double FightTimeout = 45f;
+        public const double FightTimeout = 20f;
 
         public FightState(SimpleChar target)
         {
@@ -24,7 +24,8 @@ namespace ALBBuddy
 
         public IState GetNextState()
         {
-            if (Extensions.IsNull(_target) || Time.NormalTime > _fightStartTime + FightTimeout)
+            if ( Extensions.IsNull(_target) 
+                || Time.NormalTime > _fightStartTime + FightTimeout)
                 return new PatrolState();
 
             return null;
@@ -90,6 +91,7 @@ namespace ALBBuddy
                 if (_attackTimeout >= 1)
                 {
                     ALBBuddy.NavMeshMovementController.SetMovement(MovementAction.JumpStart);
+                    ALBBuddy.NavMeshMovementController.SetNavMeshDestination(target.Position);
                     _attackTimeout = 0;
                     _aggToolCounter = 0;
                     return;

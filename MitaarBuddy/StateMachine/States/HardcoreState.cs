@@ -52,6 +52,7 @@ namespace MitaarBuddy
 
         public void OnStateExit()
         {
+            if (_sinuhCorpse != null && _alienCoccoon == null && _xanSpirits == null)
             Chat.WriteLine("Hardcore Parcore over");
         }
 

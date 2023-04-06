@@ -48,7 +48,8 @@ namespace MitaarBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Medium over");
+            if (_sinuhCorpse != null && _alienCoccoon == null && _xanSpirits == null)
+                Chat.WriteLine("Medium over");
         }
 
         public void Tick()
