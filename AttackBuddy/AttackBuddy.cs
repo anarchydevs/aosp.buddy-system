@@ -47,7 +47,6 @@ namespace AttackBuddy
         public static List<SimpleChar> _switchMobCharging = new List<SimpleChar>();
         public static List<SimpleChar> _switchMobShield = new List<SimpleChar>();
 
-        protected double _lastZonedTime = Time.NormalTime;
         private static double _refreshList;
 
         private static Window _infoWindow;
@@ -387,7 +386,7 @@ namespace AttackBuddy
 
         private void OnUpdate(object s, float deltaTime)
         {
-            if (Game.IsZoning || Time.NormalTime < _lastZonedTime + 7.0)
+            if (Game.IsZoning)
                 return;
 
             if (Time.NormalTime > _refreshList + 0.5f
