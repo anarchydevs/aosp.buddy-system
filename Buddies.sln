@@ -19,7 +19,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoamBuddy", "RoamBuddy\Roam
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OSTBuddy", "OSTBuddy\OSTBuddy.csproj", "{FAA5DA82-3187-4719-8455-65EDDA562552}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MitaarBuddy", "MitaarBuddy\MitaarBuddy.csproj", "{787D0814-C072-44A5-8BC6-606EF35A62D0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MitaarBuddy", "..\knows-buddy-mobs\MitaarBuddy\MitaarBuddy.csproj", "{787D0814-C072-44A5-8BC6-606EF35A62D0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
