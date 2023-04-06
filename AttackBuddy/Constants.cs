@@ -99,14 +99,7 @@ namespace AttackBuddy
                     "Alien Heavy Patroller",
                     "Vergil Doppelganger",
                     "Alien Seeker",
-                    "Harbingers of Pestilence",
-                    "Notum Erruption", 
-                    "Released Spirit",
-                    "Runic Detonation",
-                    "Male Lieutenant",
-                    "Omni-AF Urban Trooper",
-                    "Unicorn Commander",
-                    "Unicorn Specialist"
+                    "Harbingers of Pestilence"
         };
     }
 }
