@@ -31,7 +31,7 @@ namespace MitaarBuddy
             if (_sinuhCorpse != null
                 && _xanSpirits == null
                 && _alienCoccoon == null
-                && _settings["Farming"].AsBool())
+                && MitaarBuddy._settings["Farming"].AsBool())
                 return new FarmingState();
 
 
@@ -62,15 +62,15 @@ namespace MitaarBuddy
                     ReformState._teamCache.Add(member.Identity);
             }
 
-            _leader = Team.Members
+            MitaarBuddy._leader = Team.Members
                 .Where(c => c.Character?.Health > 0
                     && c.Character?.IsValid == true
                     && c.IsLeader)
                 .FirstOrDefault()?.Character;
 
             if (Playfield.ModelIdentity.Instance == 6017
-                && DifficultySelection.Medium == (DifficultySelection)_settings["DifficultySelection"].AsInt32()
-                && _settings["Toggle"].AsBool()
+                && MitaarBuddy.DifficultySelection.Medium == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32()
+                && MitaarBuddy._settings["Toggle"].AsBool()
                 && !Team.Members.Any(c => c.Character == null))
             {
                 Mobs();
