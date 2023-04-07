@@ -2,16 +2,7 @@
 using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
-using AOSharp.Pathfinding;
-using MitaarBuddy.IPCMessages;
-using SmokeLounge.AOtomation.Messaging.Messages.N3Messages.OrgServerMessages;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MitaarBuddy
 {
@@ -20,7 +11,8 @@ namespace MitaarBuddy
         public IState GetNextState()
         {
             if ((DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 10.0f)
-                && Extensions.CanProceed())
+                && Extensions.CanProceed()
+                && !Team.Members.Any(c => c.Character == null))
                 return new EnterState();
 
             return null;
@@ -41,6 +33,7 @@ namespace MitaarBuddy
         public void Tick()
         {
             if (Game.IsZoning) { return; }
+
             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._reclaim) < 10.0f)
             {
                 if (DynelManager.LocalPlayer.MovementState == MovementState.Sit

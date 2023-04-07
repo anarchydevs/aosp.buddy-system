@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using AOSharp.Common.GameData;
+using AOSharp.Common.GameData.UI;
 using AOSharp.Core;
-using AOSharp.Core.UI;
-using AOSharp.Core.Movement;
+using AOSharp.Core.Inventory;
 using AOSharp.Core.IPC;
+using AOSharp.Core.Movement;
+using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
 using MitaarBuddy.IPCMessages;
-using AOSharp.Common.GameData;
-using AOSharp.Core.Inventory;
-using AOSharp.Common.GameData.UI;
-using System.Security.Cryptography;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MitaarBuddy
 {
@@ -28,11 +25,11 @@ namespace MitaarBuddy
 
         public static Vector3 _sinuhCorpsePos = Vector3.Zero;
 
-        
+
         public static bool Toggle = false;
         public static bool Farming = false;
 
-        public static bool _initCorpse = false;
+        //public static bool _initCorpse = false;
 
         public static bool Easy = false;
         public static bool _easyToggled = false;
@@ -138,6 +135,15 @@ namespace MitaarBuddy
             NavMeshMovementController.Halt();
         }
 
+        private void farmingEnabled()
+        {
+            Farming = true;
+        }
+        private void farmingDisabled()
+        {
+            Farming = false;
+        }
+
         private void OnStartMessage(int sender, IPCMessage msg)
         {
             if (Leader == Identity.None
@@ -157,13 +163,13 @@ namespace MitaarBuddy
         private void FarmingMessage(int sender, IPCMessage msg)
         {
             _settings["Farming"] = true;
-            Farming = false;
+            farmingEnabled();
         }
 
         private void NoFarmingMessage(int sender, IPCMessage msg)
         {
             _settings["Farming"] = false;
-            Farming = true;
+            farmingDisabled();
         }
 
         private void EasyMessage(int sender, IPCMessage msg)
@@ -241,14 +247,14 @@ namespace MitaarBuddy
                 {
                     IPCChannel.Broadcast(new NoFarmingMessage());
                     Chat.WriteLine("Farming disabled");
-                    Farming = false;
+                    farmingDisabled();
                 }
 
                 if (_settings["Farming"].AsBool() && !Farming) // farming on
                 {
                     IPCChannel.Broadcast(new FarmingMessage());
                     Chat.WriteLine("Farming enabled.");
-                    Farming = true;
+                    farmingEnabled();
                 }
 
                 if (Easy)
