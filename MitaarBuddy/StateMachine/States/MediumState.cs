@@ -35,12 +35,12 @@ namespace MitaarBuddy
                 && MitaarBuddy._settings["Farming"].AsBool())
                 return new FarmingState();
 
-            if (_sinuhCorpse != null
-                && _xanSpirits == null
-                && _alienCoccoon == null
-                && Extensions.CanProceed()
-                && !MitaarBuddy._settings["Farming"].AsBool())
-                return new IdleState();
+            //if (_sinuhCorpse != null
+            //    && _xanSpirits == null
+            //    && _alienCoccoon == null
+            //    && Extensions.CanProceed()
+            //    && !MitaarBuddy._settings["Farming"].AsBool())
+            //    return new IdleState();
 
             return null;
         }
