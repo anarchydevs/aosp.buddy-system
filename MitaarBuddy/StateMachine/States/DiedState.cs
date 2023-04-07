@@ -10,9 +10,9 @@ namespace MitaarBuddy
     {
         public IState GetNextState()
         {
-            if ((DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 10.0f)
-                && Extensions.CanProceed()
-                && !Team.Members.Any(c => c.Character == null))
+            if ((DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20.0f)
+                && Extensions.CanProceed())
+                //&& !Team.Members.Any(c => c.Character == null))
                 return new EnterState();
 
             return null;
