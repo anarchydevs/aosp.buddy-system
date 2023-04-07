@@ -52,7 +52,7 @@ namespace MitaarBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Starting, Hardcore Mode");
+            Chat.WriteLine("Starting Hardcore Parkour");
 
             //MovementController.Instance.SetDestination(Constants._startPosition);
         }
@@ -60,7 +60,7 @@ namespace MitaarBuddy
         public void OnStateExit()
         {
             //if (_sinuhCorpse != null && _alienCoccoon == null && _xanSpirits == null)
-            Chat.WriteLine("Hardcore Parcore over");
+            Chat.WriteLine("Hardcore Parkore over");
         }
 
         public void Tick()
