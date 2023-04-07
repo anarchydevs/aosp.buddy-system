@@ -2,13 +2,13 @@
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System.Linq;
-using static MitaarBuddy.MitaarBuddy;
+//using static MitaarBuddy.MitaarBuddy;
 
 namespace MitaarBuddy
 {
     public class MediumState : IState
     {
-        private static bool _init = false;
+        //private static bool _init = false;
 
         private static SimpleChar _sinuh;
         private static Corpse _sinuhCorpse;
@@ -31,9 +31,16 @@ namespace MitaarBuddy
             if (_sinuhCorpse != null
                 && _xanSpirits == null
                 && _alienCoccoon == null
+                && Extensions.CanProceed()
                 && MitaarBuddy._settings["Farming"].AsBool())
                 return new FarmingState();
 
+            if (_sinuhCorpse != null
+                && _xanSpirits == null
+                && _alienCoccoon == null
+                && Extensions.CanProceed()
+                && !MitaarBuddy._settings["Farming"].AsBool())
+                return new IdleState();
 
             return null;
         }
@@ -48,7 +55,7 @@ namespace MitaarBuddy
 
         public void OnStateExit()
         {
-            if (_sinuhCorpse != null && _alienCoccoon == null && _xanSpirits == null)
+            //if (_sinuhCorpse != null && _alienCoccoon == null && _xanSpirits == null)
                 Chat.WriteLine("Medium over");
         }
 
@@ -68,10 +75,10 @@ namespace MitaarBuddy
                     && c.IsLeader)
                 .FirstOrDefault()?.Character;
 
-            if (Playfield.ModelIdentity.Instance == 6017
-                && MitaarBuddy.DifficultySelection.Medium == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32()
-                && MitaarBuddy._settings["Toggle"].AsBool()
-                && !Team.Members.Any(c => c.Character == null))
+            if (Playfield.ModelIdentity.Instance == 6017)
+                //&& MitaarBuddy.DifficultySelection.Medium == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32()
+                //&& MitaarBuddy._settings["Toggle"].AsBool()
+                //&& !Team.Members.Any(c => c.Character == null))
             {
                 Mobs();
 
@@ -104,7 +111,7 @@ namespace MitaarBuddy
                 if (_xanSpirits != null && !MovementController.Instance.IsNavigating)
                 {
                     if (_redXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
-                        && !DynelManager.LocalPlayer.Buffs.Contains(SpiritNanos.BlessingofTheBlood))
+                        && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheBlood))
                         MovementController.Instance.SetDestination(Constants._redPodium);
 
                 }
@@ -124,6 +131,12 @@ namespace MitaarBuddy
                .Where(c => c.Health > 0
                        && c.Name.Contains("Alien Coccoon"))
                    .FirstOrDefault();
+
+            _redXanSpirit = DynelManager.NPCs
+                .Where(c => c.Health > 0
+                    && c.Name.Contains("Xan Spirit")
+                    && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheBlood))
+                    .FirstOrDefault();
 
             _sinuhCorpse = DynelManager.Corpses
               .Where(c => c.Name.Contains("Remains of Technomaster Sinuh"))

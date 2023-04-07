@@ -2,6 +2,7 @@
 using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using System.Linq;
 
 namespace MitaarBuddy
 {
@@ -10,7 +11,8 @@ namespace MitaarBuddy
         public IState GetNextState()
         {
             if ((DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 10.0f)
-                && Extensions.CanProceed())
+                && Extensions.CanProceed()
+                && !Team.Members.Any(c => c.Character == null))
                 return new EnterState();
 
             return null;

@@ -16,7 +16,7 @@ namespace MitaarBuddy
 
         private ReformPhase _phase;
 
-        private static bool _init = false;
+        //private static bool _init = false;
 
         public static List<Identity> _teamCache = new List<Identity>();
         private static List<Identity> _invitedList = new List<Identity>();
@@ -49,7 +49,7 @@ namespace MitaarBuddy
                 _phase = ReformPhase.Waiting;
             }
 
-            MitaarBuddy._initCorpse = false;
+            FarmingState._initCorpse = false;
         }
 
         public void OnStateExit()
@@ -58,9 +58,9 @@ namespace MitaarBuddy
             _invitedList.Clear();
             _teamCache.Clear();
 
-            _init = false;
+            //_init = false;
 
-            MitaarBuddy._initCorpse = false;
+            FarmingState._initCorpse = false;
 
         }
 

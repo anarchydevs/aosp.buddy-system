@@ -29,7 +29,7 @@ namespace MitaarBuddy
         public static bool Toggle = false;
         public static bool Farming = false;
 
-        public static bool _initCorpse = false;
+        //public static bool _initCorpse = false;
 
         public static bool Easy = false;
         public static bool _easyToggled = false;
@@ -135,6 +135,15 @@ namespace MitaarBuddy
             NavMeshMovementController.Halt();
         }
 
+        private void farmingEnabled()
+        {
+            Farming = true;
+        }
+        private void farmingDisabled()
+        {
+            Farming = false;
+        }
+
         private void OnStartMessage(int sender, IPCMessage msg)
         {
             if (Leader == Identity.None
@@ -154,13 +163,13 @@ namespace MitaarBuddy
         private void FarmingMessage(int sender, IPCMessage msg)
         {
             _settings["Farming"] = true;
-            Farming = false;
+            farmingEnabled();
         }
 
         private void NoFarmingMessage(int sender, IPCMessage msg)
         {
             _settings["Farming"] = false;
-            Farming = true;
+            farmingDisabled();
         }
 
         private void EasyMessage(int sender, IPCMessage msg)
@@ -238,14 +247,14 @@ namespace MitaarBuddy
                 {
                     IPCChannel.Broadcast(new NoFarmingMessage());
                     Chat.WriteLine("Farming disabled");
-                    Farming = false;
+                    farmingDisabled();
                 }
 
                 if (_settings["Farming"].AsBool() && !Farming) // farming on
                 {
                     IPCChannel.Broadcast(new FarmingMessage());
                     Chat.WriteLine("Farming enabled.");
-                    Farming = true;
+                    farmingEnabled();
                 }
 
                 if (Easy)

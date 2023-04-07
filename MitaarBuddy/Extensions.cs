@@ -35,10 +35,11 @@ namespace MitaarBuddy
 
         public static bool Debuffed()
         {
-            return DynelManager.LocalPlayer.Buffs.Contains(SpiritNanos.BlessingofTheBlood)
-                || DynelManager.LocalPlayer.Buffs.Contains(SpiritNanos.BlessingofTheLight)
-                || DynelManager.LocalPlayer.Buffs.Contains(SpiritNanos.BlessingofTheOutsider)
-                || DynelManager.LocalPlayer.Buffs.Contains(SpiritNanos.BlessingofTheSource);
+            return DynelManager.LocalPlayer.Buffs.Contains(267283)
+                || DynelManager.LocalPlayer.Buffs.Contains(280469)
+                || DynelManager.LocalPlayer.Buffs.Contains(NanoLine.Cocoon) // coon
+                || DynelManager.LocalPlayer.Buffs.Contains(280470)
+                || DynelManager.LocalPlayer.Buffs.Contains(280488);
         }
 
         public static bool InCombat()
@@ -68,7 +69,7 @@ namespace MitaarBuddy
             return DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
                 && DynelManager.LocalPlayer.GetStat(Stat.TemporarySkillReduction) <= 1
                 && DynelManager.LocalPlayer.MovementState != MovementState.Sit
-                //&& Spell.List.Any(c => c.IsReady)
+                && Spell.List.Any(c => c.IsReady)
                 && !Spell.HasPendingCast
                 && !Debuffed();
         }

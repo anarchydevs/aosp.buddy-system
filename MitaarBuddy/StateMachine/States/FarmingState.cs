@@ -4,12 +4,12 @@ using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System.Linq;
 using System.Threading.Tasks;
-using static MitaarBuddy.MitaarBuddy;
 
 namespace MitaarBuddy
 {
     public class FarmingState : IState
     {
+        public static bool _initCorpse = false;
 
         private static Corpse _sinuhCorpse;
 
@@ -64,6 +64,7 @@ namespace MitaarBuddy
 
 
                     });
+
                 _initCorpse = true;
             }
 

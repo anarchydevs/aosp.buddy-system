@@ -1,7 +1,10 @@
 ﻿using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using AOSharp.Pathfinding;
+using AOSharp.Common.GameData;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,8 +12,8 @@ namespace MitaarBuddy
 {
     public class EnterState : IState
     {
-        private const int MinWait = 8;
-        private const int MaxWait = 10;
+        private const int MinWait = 3;
+        private const int MaxWait = 5;
         private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
 
         public IState GetNextState()
@@ -30,6 +33,10 @@ namespace MitaarBuddy
                         return new HardcoreState();
             }
 
+            if (Playfield.ModelIdentity.Instance == Constants.XanHubId
+                && !Extensions.CanProceed())
+                return new IdleState();
+
             return null;
         }
 
@@ -39,11 +46,15 @@ namespace MitaarBuddy
             {
                 Chat.WriteLine("Entering Mitaar");
 
+                //if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
+                //    && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                //    MitaarBuddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+
                 if (DynelManager.LocalPlayer.Identity == MitaarBuddy.Leader)
                 {
                     Task.Delay(2 * 1000).ContinueWith(x =>
                     {
-                        MovementController.Instance.SetDestination(Constants._entrance);
+                        MitaarBuddy.NavMeshMovementController.SetDestination(new Vector3(347.0f, 310.9f, 407.7f).Randomize(2f));
                     }, _cancellationToken.Token);
                 }
                 else
@@ -53,9 +64,11 @@ namespace MitaarBuddy
 
                     Task.Delay(randomWait * 1000).ContinueWith(x =>
                     {
-                        MovementController.Instance.SetDestination(Constants._entrance);
+                        MitaarBuddy.NavMeshMovementController.SetDestination(new Vector3(347.0f, 310.9f, 407.7f).Randomize(2f));
+
                     }, _cancellationToken.Token);
                 }
+
             }
         }
 

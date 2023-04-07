@@ -2,13 +2,13 @@
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System.Linq;
-using static MitaarBuddy.MitaarBuddy;
+//using static MitaarBuddy.MitaarBuddy;
 
 namespace MitaarBuddy
 {
     public class HardcoreState : IState
     {
-        private static bool _init = false;
+        //private static bool _init = false;
 
         private static SimpleChar _sinuh;
         private static Corpse _sinuhCorpse;
@@ -34,25 +34,32 @@ namespace MitaarBuddy
                 return new ReformState();
 
             if (_sinuhCorpse != null
+                 && _xanSpirits == null
+                 && _alienCoccoon == null
+                 && Extensions.CanProceed()
+                 && MitaarBuddy._settings["Farming"].AsBool())
+                return new FarmingState();
+
+            if (_sinuhCorpse != null
                 && _xanSpirits == null
                 && _alienCoccoon == null
-                && MitaarBuddy._settings["Farming"].AsBool())
-                return new FarmingState();
+                && Extensions.CanProceed()
+                && !MitaarBuddy._settings["Farming"].AsBool())
+                return new IdleState();
 
             return null;
         }
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Start on Red, Hardcore Mode");
+            Chat.WriteLine("Starting, Hardcore Mode");
 
-
-            MovementController.Instance.SetDestination(Constants._startPosition);
+            //MovementController.Instance.SetDestination(Constants._startPosition);
         }
 
         public void OnStateExit()
         {
-            if (_sinuhCorpse != null && _alienCoccoon == null && _xanSpirits == null)
+            //if (_sinuhCorpse != null && _alienCoccoon == null && _xanSpirits == null)
             Chat.WriteLine("Hardcore Parcore over");
         }
 
@@ -66,16 +73,16 @@ namespace MitaarBuddy
                     ReformState._teamCache.Add(member.Identity);
             }
 
-            _leader = Team.Members
+            MitaarBuddy._leader = Team.Members
                 .Where(c => c.Character?.Health > 0
                     && c.Character?.IsValid == true
                     && c.IsLeader)
                 .FirstOrDefault()?.Character;
 
-            if (Playfield.ModelIdentity.Instance == 6017
-                && MitaarBuddy.DifficultySelection.Hardcore == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32()
-                && MitaarBuddy._settings["Toggle"].AsBool()
-                && !Team.Members.Any(c => c.Character == null))
+            if (Playfield.ModelIdentity.Instance == 6017)
+                //&& MitaarBuddy.DifficultySelection.Hardcore == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32()
+                //&& MitaarBuddy._settings["Toggle"].AsBool()
+                //&& !Team.Members.Any(c => c.Character == null))
             {
                 Mobs();
 
@@ -108,19 +115,19 @@ namespace MitaarBuddy
                 if (_xanSpirits != null && !MovementController.Instance.IsNavigating)
                 {
                     if (_redXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
-                        && !DynelManager.LocalPlayer.Buffs.Contains(SpiritNanos.BlessingofTheBlood))
+                        && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheBlood))
                         MovementController.Instance.SetDestination(Constants._redPodium);
 
                     if (_blueXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) > 0.9f
-                        && !DynelManager.LocalPlayer.Buffs.Contains(SpiritNanos.BlessingofTheSource))
+                        && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheSource))
                         MovementController.Instance.SetDestination(Constants._bluePodium);
 
                     if (_greenXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) > 0.9f
-                        && !DynelManager.LocalPlayer.Buffs.Contains(SpiritNanos.BlessingofTheOutsider))
+                        && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheOutsider))
                         MovementController.Instance.SetDestination(Constants._greenPodium);
 
                     if (_yellowXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) > 0.9f
-                        && !DynelManager.LocalPlayer.Buffs.Contains(SpiritNanos.BlessingofTheLight))
+                        && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheLight))
                         MovementController.Instance.SetDestination(Constants._yellowPodium);
                 }
             }
@@ -148,25 +155,25 @@ namespace MitaarBuddy
             _redXanSpirit = DynelManager.NPCs
                 .Where(c => c.Health > 0
                     && c.Name.Contains("Xan Spirit")
-                    && c.Buffs.Contains(SpiritNanos.BlessingofTheBlood))
+                    && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheBlood))
                     .FirstOrDefault();
 
             _blueXanSpirit = DynelManager.NPCs
                 .Where(c => c.Health > 0
                     && c.Name.Contains("Xan Spirit")
-                    && c.Buffs.Contains(SpiritNanos.BlessingofTheSource))
+                    && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheSource))
                     .FirstOrDefault();
 
             _greenXanSpirit = DynelManager.NPCs
                .Where(c => c.Health > 0
                    && c.Name.Contains("Xan Spirit")
-                   && c.Buffs.Contains(SpiritNanos.BlessingofTheOutsider))
+                   && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheOutsider))
                    .FirstOrDefault();
 
             _yellowXanSpirit = DynelManager.NPCs
                 .Where(c => c.Health > 0
                     && c.Name.Contains("Xan Spirit")
-                    && c.Buffs.Contains(SpiritNanos.BlessingofTheLight))
+                    && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheLight))
                     .FirstOrDefault();
 
             _sinuhCorpse = DynelManager.Corpses
