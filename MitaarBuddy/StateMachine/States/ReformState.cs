@@ -2,8 +2,6 @@
 using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
-using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,7 +16,7 @@ namespace MitaarBuddy
 
         private ReformPhase _phase;
 
-        private static bool _init = false;
+        //private static bool _init = false;
 
         public static List<Identity> _teamCache = new List<Identity>();
         private static List<Identity> _invitedList = new List<Identity>();
@@ -44,14 +42,14 @@ namespace MitaarBuddy
             _reformStartedTime = Time.NormalTime;
 
             MovementController.Instance.SetDestination(Constants._reneterPos);
-            
+
             if (DynelManager.LocalPlayer.Identity != MitaarBuddy.Leader)
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
             }
 
-            MitaarBuddy._initCorpse = false;
+            FarmingState._initCorpse = false;
         }
 
         public void OnStateExit()
@@ -60,9 +58,9 @@ namespace MitaarBuddy
             _invitedList.Clear();
             _teamCache.Clear();
 
-            _init = false;
+            //_init = false;
 
-            MitaarBuddy._initCorpse = false;
+            FarmingState._initCorpse = false;
 
         }
 
@@ -73,7 +71,7 @@ namespace MitaarBuddy
             if (_phase == ReformPhase.Disbanding && Time.NormalTime > _reformStartedTime + DisbandDelay)
             {
                 _phase = ReformPhase.Inviting;
-                
+
             }
 
             if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count())
@@ -87,7 +85,7 @@ namespace MitaarBuddy
                     if (player.Identity == MitaarBuddy.Leader) { continue; }
 
                     Team.Invite(player.Identity);
-                    
+
                 }
             }
 
@@ -97,7 +95,7 @@ namespace MitaarBuddy
                 && _invitedList.Count() == _teamCache.Count())
             {
                 _phase = ReformPhase.Completed;
-                
+
             }
         }
 
