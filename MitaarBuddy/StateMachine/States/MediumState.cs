@@ -56,7 +56,7 @@ namespace MitaarBuddy
         public void OnStateExit()
         {
             //if (_sinuhCorpse != null && _alienCoccoon == null && _xanSpirits == null)
-            Chat.WriteLine("Medium over");
+                Chat.WriteLine("Medium over");
         }
 
         public void Tick()
@@ -76,9 +76,9 @@ namespace MitaarBuddy
                 .FirstOrDefault()?.Character;
 
             if (Playfield.ModelIdentity.Instance == 6017)
-            //&& MitaarBuddy.DifficultySelection.Medium == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32()
-            //&& MitaarBuddy._settings["Toggle"].AsBool()
-            //&& !Team.Members.Any(c => c.Character == null))
+                //&& MitaarBuddy.DifficultySelection.Medium == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32()
+                //&& MitaarBuddy._settings["Toggle"].AsBool()
+                //&& !Team.Members.Any(c => c.Character == null))
             {
                 Mobs();
 

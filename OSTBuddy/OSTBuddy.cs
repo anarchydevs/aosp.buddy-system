@@ -1,21 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AOSharp.Core;
-using AOSharp.Core.UI;
-using AOSharp.Core.Movement;
-using AOSharp.Common.GameData;
-using System.IO;
-using AOSharp.Core.GameData;
-using AOSharp.Core.UI.Options;
-using AOSharp.Pathfinding;
-using System.Data;
-using AOSharp.Core.IPC;
-using AOSharp.Core.Inventory;
-using System.Collections.Concurrent;
+﻿using AOSharp.Common.GameData;
 using AOSharp.Common.GameData.UI;
+using AOSharp.Core;
+using AOSharp.Core.IPC;
+using AOSharp.Core.UI;
+using System;
+using System.Collections.Generic;
 
 namespace OSTBuddy
 {
@@ -79,7 +68,7 @@ namespace OSTBuddy
 
                 RespawnDelay = Config.CharSettings[Game.ClientInst].RespawnDelay;
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Chat.WriteLine(e.Message);
             }
@@ -125,7 +114,7 @@ namespace OSTBuddy
                 windowSize: new Rect(0, 0, 455, 345),
                 windowStyle: WindowStyle.Default,
                 windowFlags: WindowFlags.AutoScale | WindowFlags.NoFade);
-                infoWindow.Show(true);
+            infoWindow.Show(true);
         }
 
         private void AddWaypoint(object s, ButtonBase button)

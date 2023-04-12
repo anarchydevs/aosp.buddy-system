@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using AOSharp.Common.GameData;
 
 namespace AttackBuddy
 {
@@ -8,6 +7,7 @@ namespace AttackBuddy
         public static List<string> _ignores = new List<string>
         {
                     "Sprysi D'Lere",
+                    "Notum Erruption",
                     "Alien Fuel Tower",
                     "Kyr'Ozch Guardian",
                     "Engorged Sacrificial Husks",
@@ -99,14 +99,7 @@ namespace AttackBuddy
                     "Alien Heavy Patroller",
                     "Vergil Doppelganger",
                     "Alien Seeker",
-                    "Harbingers of Pestilence",
-                    "Notum Erruption", 
-                    "Released Spirit",
-                    "Runic Detonation",
-                    "Male Lieutenant",
-                    "Omni-AF Urban Trooper",
-                    "Unicorn Commander",
-                    "Unicorn Specialist"
+                    "Harbingers of Pestilence"
         };
     }
 }

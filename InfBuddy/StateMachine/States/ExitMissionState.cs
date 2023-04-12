@@ -1,8 +1,5 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
-using AOSharp.Core.Movement;
+﻿using AOSharp.Core;
 using AOSharp.Core.UI;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 

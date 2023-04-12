@@ -1,11 +1,7 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace InfBuddy
@@ -61,7 +57,7 @@ namespace InfBuddy
                     });
             }
 
-            if (!Extensions.IsAtYutto() 
+            if (!Extensions.IsAtYutto()
                 && Time.NormalTime > InfBuddy._stateTimeOut + 30f)
             {
                 InfBuddy._stateTimeOut = Time.NormalTime;

@@ -46,10 +46,6 @@ namespace MitaarBuddy
             {
                 Chat.WriteLine("Entering Mitaar");
 
-                //if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
-                //    && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
-                //    MitaarBuddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-
                 if (DynelManager.LocalPlayer.Identity == MitaarBuddy.Leader)
                 {
                     Task.Delay(2 * 1000).ContinueWith(x =>

@@ -1,10 +1,8 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace InfBuddy
 {
@@ -34,7 +32,7 @@ namespace InfBuddy
                 return new MoveToQuestGiverState();
 
             if (_phase == ReformPhase.Completed && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
-                    return new MoveToQuestGiverState();
+                return new MoveToQuestGiverState();
 
             return null;
         }
@@ -85,7 +83,7 @@ namespace InfBuddy
 
             if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader || InfBuddy._settings["Merge"].AsBool()) { return; }
 
-            if (_phase == ReformPhase.Inviting 
+            if (_phase == ReformPhase.Inviting
                 && _invitedList.Count() < _teamCache.Count()
                 && Time.NormalTime > _inviting + DisbandDelay
                 && !_init)

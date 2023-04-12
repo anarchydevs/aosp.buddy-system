@@ -1,14 +1,10 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
-using AOSharp.Core.Inventory;
-using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using KHBuddy.IPCMessages;
 using OSTBuddy;
-using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 
 namespace KHBuddy
@@ -165,7 +161,7 @@ namespace KHBuddy
                 {
                     List<SimpleChar> _hecksAtPosBeach = DynelManager.NPCs
                             .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
-                                && x.DistanceFrom(DynelManager.LocalPlayer) <= 43f 
+                                && x.DistanceFrom(DynelManager.LocalPlayer) <= 43f
                                 && x.IsAlive && x.IsInLineOfSight && x.IsAttacking
                                 && !x.IsMoving
                                 && x.FightingTarget.Identity != DynelManager.LocalPlayer.Identity

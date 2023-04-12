@@ -32,12 +32,12 @@ namespace MitaarBuddy
         {
             if (Game.IsZoning) { return; }
 
-
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-                && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
-                MitaarBuddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-
-
+            
+                if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
+                    && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
+                    MitaarBuddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+           
+            
         }
     }
 }

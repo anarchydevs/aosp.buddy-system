@@ -1,5 +1,4 @@
 ﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
 using System.Collections.Generic;
 
 namespace MitaarBuddy
@@ -28,7 +27,7 @@ namespace MitaarBuddy
 
 
         public static Vector3 _reclaim = new Vector3(610.0f, 309.8f, 519.8f);
-        public static Vector3 _entrance = new Vector3(347.0f, 310.9f, 407.7f).Randomize(2f);
+        public static Vector3 _entrance = new Vector3(347.0f, 310.9f, 407.7f);
         public static Vector3 _reneterPos = new Vector3(353.2f, 310.9f, 409.3f);
 
         public static Vector3 _startPosition = new Vector3(91.3f, 12.1f, 110.2f);
@@ -41,6 +40,6 @@ namespace MitaarBuddy
 
         public const int XanHubId = 6013;
 
-       
+
     }
 }
