@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AOSharp.Common.GameData;
+using AOSharp.Core;
+using System;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using AOSharp.Common.GameData;
-using AOSharp.Core;
 
 namespace RoamBuddy
 {
@@ -90,7 +87,7 @@ namespace RoamBuddy
             return _target == null
                 || _target?.IsValid == false
                 || _target?.IsAlive == false
-                || _target?.IsInLineOfSight == false;    
+                || _target?.IsInLineOfSight == false;
         }
         public static bool ShouldStopAttack()
         {

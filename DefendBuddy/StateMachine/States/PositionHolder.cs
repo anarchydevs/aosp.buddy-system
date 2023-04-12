@@ -10,7 +10,7 @@ namespace DefendBuddy
         private readonly float _HoldDist;
         private readonly int _entropy;
 
-        public PositionHolder(Vector3 holdPos, float holdDist ,int entropy)
+        public PositionHolder(Vector3 holdPos, float holdDist, int entropy)
         {
             _holdPos = holdPos;
             _HoldDist = holdDist;

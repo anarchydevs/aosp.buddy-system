@@ -1,15 +1,4 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
-using AOSharp.Core.Inventory;
-using AOSharp.Core.Movement;
-using AOSharp.Core.UI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace AttackBuddy
+﻿namespace AttackBuddy
 {
     public class IdleState : IState
     {

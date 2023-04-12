@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using AOSharp.Common.GameData;
+﻿using AOSharp.Common.GameData;
+using System.Collections.Generic;
 
 namespace DefendBuddy
 {
@@ -98,14 +98,7 @@ namespace DefendBuddy
                     "Unicorn Security Administrator",
                     "Alien Heavy Patroller",
                     "Vergil Doppelganger",
-                    "Harbingers of Pestilence",
-                    "Notum Erruption",
-                    "Released Spirit",
-                    "Runic Detonation",
-                    "Male Lieutenant",
-                    "Omni-AF Urban Trooper",
-                    "Unicorn Commander",
-                    "Unicorn Specialist"
+                    "Harbingers of Pestilence"
         };
     }
 }

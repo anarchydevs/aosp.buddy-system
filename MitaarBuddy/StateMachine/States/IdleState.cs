@@ -23,8 +23,8 @@ namespace MitaarBuddy
                 //&& Team.IsInTeam
                 && Extensions.CanProceed()
                 && MitaarBuddy._settings["Toggle"].AsBool())
-                return new DiedState();
-
+                    return new DiedState();
+            
             if (Playfield.ModelIdentity.Instance == Constants.MitaarId)
             {
                 if (MitaarBuddy.DifficultySelection.Easy == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32())

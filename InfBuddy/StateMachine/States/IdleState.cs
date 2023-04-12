@@ -1,7 +1,5 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
+﻿using AOSharp.Core;
 using AOSharp.Core.UI;
-using System.Linq;
 
 namespace InfBuddy
 {

@@ -1,12 +1,7 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
-using AOSharp.Pathfinding;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
@@ -154,7 +149,7 @@ namespace AXPBuddy
                             Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
-                    else 
+                    else
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 2f
                         && Spell.List.Any(c => c.IsReady)
                         && !Spell.HasPendingCast

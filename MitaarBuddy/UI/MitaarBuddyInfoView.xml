@@ -8,16 +8,17 @@
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<TextView value="Inject MitaarBuddy and Handlers on each toon, add lootmanager if farming." layout_borders="Rect(0,0,0,2)"/>
 		<TextView value="Nothing else is required." layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<TextView value="Farming = Paths to corpse, breaks team after 20 seconds," layout_borders="Rect(0,0,0,2)"/>
-		<TextView value="use lootmanager. Do not delete leftovers! Disband team in mitaar if not farming" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="Use lootmanager. Do not delete leftovers! Disband team in mitaar if not farming" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<TextView value="Easy = Stops attacking when spirits spawn then paths to them." layout_borders="Rect(0,0,0,2)"/>
-		<TextView value="Med = No pathing and stays on red." layout_borders="Rect(0,0,0,2)"/>
-		<TextView value="Hardcore = Paths to spirits and keeps attacking" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="Med = No pathing and stay on red." layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="Hardcore = Paths to spirits and keep attacking" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>

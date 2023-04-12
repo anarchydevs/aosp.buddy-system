@@ -1,4 +1,5 @@
-﻿using AOSharp.Core;
+﻿using AOSharp.Common.GameData;
+using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System.Linq;
@@ -60,7 +61,7 @@ namespace MitaarBuddy
         public void OnStateExit()
         {
             //if (_sinuhCorpse != null && _alienCoccoon == null && _xanSpirits == null)
-            Chat.WriteLine("Hardcore Parkore over");
+            Chat.WriteLine("Hardcore Parkour over");
         }
 
         public void Tick()
@@ -80,9 +81,9 @@ namespace MitaarBuddy
                 .FirstOrDefault()?.Character;
 
             if (Playfield.ModelIdentity.Instance == 6017)
-            //&& MitaarBuddy.DifficultySelection.Hardcore == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32()
-            //&& MitaarBuddy._settings["Toggle"].AsBool()
-            //&& !Team.Members.Any(c => c.Character == null))
+                //&& MitaarBuddy.DifficultySelection.Hardcore == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32()
+                //&& MitaarBuddy._settings["Toggle"].AsBool()
+                //&& !Team.Members.Any(c => c.Character == null))
             {
                 Mobs();
 

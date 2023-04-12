@@ -1,8 +1,6 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
-using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 

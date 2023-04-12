@@ -1,10 +1,7 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace InfBuddy
@@ -21,7 +18,7 @@ namespace InfBuddy
                 return new DiedState();
 
             if (Extensions.IsAtStarterPos() && !InfBuddy.NavMeshMovementController.IsNavigating
-                && !DynelManager.NPCs.Any(c => c.Name == Constants.QuestStarterName) 
+                && !DynelManager.NPCs.Any(c => c.Name == Constants.QuestStarterName)
                 && DynelManager.NPCs.Any(c => c.Name == Constants.SpiritNPCName))
             {
                 if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())

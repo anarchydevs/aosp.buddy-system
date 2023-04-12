@@ -11,7 +11,7 @@ namespace DefendBuddy
     public class FightState : PositionHolder, IState
     {
         public const double _fightTimeout = 45f;
-        
+
         private double _fightStartTime;
         public static float _tetherDistance;
 
@@ -165,7 +165,7 @@ namespace DefendBuddy
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
-                                
+
                                 aggroTool.Use(_target, true);
                                 _aggToolCounter++;
                                 return;
@@ -175,7 +175,7 @@ namespace DefendBuddy
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
-                                
+
                                 aggroMultiTool.Use(_target, true);
                                 _aggToolCounter++;
                                 return;
@@ -212,7 +212,7 @@ namespace DefendBuddy
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
-                                
+
                                 EmertoLow.Use(_target, true);
                                 _aggToolCounter++;
                                 return;
@@ -222,7 +222,7 @@ namespace DefendBuddy
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
-                                
+
                                 EmertoHigh.Use(_target, true);
                                 _aggToolCounter++;
                                 return;

@@ -1,11 +1,6 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
-using AOSharp.Core.Inventory;
 using AOSharp.Core.UI;
-using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Linq;
 
 namespace InfBuddy
 {
@@ -81,7 +76,7 @@ namespace InfBuddy
 
             //REASON: Edge case for some reason randomly hitting a null reference, the SimpleChar is not null but the Accel and various others are.
             //if (_target.Name == "NoName") { return; }
-                
+
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
 
@@ -94,7 +89,7 @@ namespace InfBuddy
             if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
                 || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.Melee)
                 || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.MartialArts))
-                    Extensions.HandlePathing(_target);
+                Extensions.HandlePathing(_target);
         }
     }
 }
