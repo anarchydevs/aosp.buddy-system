@@ -1,5 +1,4 @@
-﻿using System;
-using AOSharp.Core.IPC;
+﻿using AOSharp.Core.IPC;
 using SmokeLounge.AOtomation.Messaging.Serialization.MappingAttributes;
 
 namespace KHBuddy.IPCMessages

@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using AOSharp.Common.GameData;
+using AOSharp.Core;
+using System;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using AOSharp.Common.GameData;
-using AOSharp.Core;
 
 namespace AttackBuddy
 {
@@ -117,7 +114,7 @@ namespace AttackBuddy
 
             if (DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(253953) == true
                 //|| DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(NanoLine.ShovelBuffs) == true
-               // || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(302745) == true
+                // || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(302745) == true
                 || DynelManager.LocalPlayer.FightingTarget?.Buffs.Contains(205607) == true) { return true; }
 
             return DynelManager.LocalPlayer.FightingTarget?.IsPlayer == true;

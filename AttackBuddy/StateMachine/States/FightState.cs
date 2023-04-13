@@ -1,12 +1,9 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.Inventory;
-using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace AttackBuddy
 {
@@ -78,14 +75,20 @@ namespace AttackBuddy
                 if (Extensions.CanAttack())
                 {
                     if (_target.Buffs.Contains(253953) == false
-                        && _target.Buffs.Contains(NanoLine.ShovelBuffs) == false
-                        && _target.Buffs.Contains(302745) == false
-                        && _target.IsPlayer == false) 
+                        // && _target.Buffs.Contains(NanoLine.ShovelBuffs) == false
+                        //&& _target.Buffs.Contains(302745) == false
+                        && _target.IsPlayer == false)
                     {
                         if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= AttackBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
                         {
                             DynelManager.LocalPlayer.Attack(_target);
                             Chat.WriteLine($"Attacking {_target.Name}.");
+
+                            //if (Targeting.TargetChar != null)
+                            //{
+                            //    Chat.WriteLine($"{Targeting.TargetChar?.Health}");
+                            //}
+
                             _fightStartTime = Time.NormalTime;
                         }
                     }

@@ -1,6 +1,5 @@
 ﻿using AOSharp.Core;
 using AOSharp.Core.Movement;
-using System;
 using System.Linq;
 
 namespace CityBuddy
@@ -49,7 +48,7 @@ namespace CityBuddy
                 MovementController.Instance.SetDestination(_genCorpse.Position);
             }
 
-            if (_alien != null) 
+            if (_alien != null)
             {
                 //Extensions.HandlePathing(_alien);
 

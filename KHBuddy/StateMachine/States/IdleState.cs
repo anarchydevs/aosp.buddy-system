@@ -1,19 +1,4 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
-using AOSharp.Core.Inventory;
-using AOSharp.Core.IPC;
-using AOSharp.Core.Movement;
-using AOSharp.Core.UI;
-using AOSharp.Pathfinding;
-using KHBuddy.IPCMessages;
-using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace KHBuddy
+﻿namespace KHBuddy
 {
     public class IdleState : IState
     {

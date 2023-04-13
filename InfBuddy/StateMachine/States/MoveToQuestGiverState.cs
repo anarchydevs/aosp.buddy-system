@@ -1,8 +1,6 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
-using NavmeshMovementController;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -71,7 +69,7 @@ namespace InfBuddy
         {
             if (Game.IsZoning || !Team.IsInTeam) { return; }
 
-            if (!Extensions.IsAtYutto() 
+            if (!Extensions.IsAtYutto()
                 && _init
                 && InfBuddy.NavMeshMovementController.IsNavigating
                 && Time.NormalTime > InfBuddy._stateTimeOut + 40f)

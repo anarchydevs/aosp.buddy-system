@@ -11,7 +11,7 @@ namespace RoamBuddy
     public class FightState : IState
     {
         public const double _fightTimeout = 45f;
-        
+
         private double _fightStartTime;
         public static float _tetherDistance;
 
