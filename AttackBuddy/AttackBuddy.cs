@@ -380,7 +380,14 @@ namespace AttackBuddy
         private void OnUpdate(object s, float deltaTime)
         {
             if (Game.IsZoning)
+            {
+                Toggle = false;
+
+                _settings["Toggle"] = false;
+
                 return;
+            }
+                
 
             if (Time.NormalTime > _refreshList + 0.5f
                 && Toggle == true)
