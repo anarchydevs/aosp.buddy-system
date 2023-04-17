@@ -28,6 +28,21 @@ namespace InfBuddy
         private static string InfBuddyDifficulty;
 
         public static bool Toggle = false;
+        public static bool Easy = false;
+        public static bool Medium = false;
+        public static bool Hard = false;
+        public static bool Neutral = false;
+        public static bool Clan = false;
+        public static bool Normal = false;
+        public static bool Roam = false;
+
+        public static bool _easyToggled = false;
+        public static bool _mediumToggled = false;
+        public static bool _hardToggled = false;
+        public static bool _clanToggled = false;
+        public static bool _neutralToggled = false;
+        public static bool _normalToggled = false;
+        public static bool _roamToggled = false;
 
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
@@ -67,6 +82,16 @@ namespace InfBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
 
+                IPCChannel.RegisterCallback((int)IPCOpcode.Easy, EasyMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Medium, MediumMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Hard, HardMessage);
+
+                IPCChannel.RegisterCallback((int)IPCOpcode.Neutral, NeutralMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Clan, ClanMessage);
+
+                IPCChannel.RegisterCallback((int)IPCOpcode.Normal, NormalMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Roam, RoamMessage);
+
                 Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 Chat.RegisterCommand("buddy", InfBuddyCommand);
@@ -78,8 +103,8 @@ namespace InfBuddy
                 NpcDialog.AnswerListChanged += NpcDialog_AnswerListChanged;
                 Game.OnUpdate += OnUpdate;
 
-                _settings.AddVariable("ModeSelection", (int)ModeSelection.Roam);
-                _settings.AddVariable("FactionSelection", (int)FactionSelection.Omni);
+                _settings.AddVariable("ModeSelection", (int)ModeSelection.Normal);
+                _settings.AddVariable("FactionSelection", (int)FactionSelection.Clan);
                 _settings.AddVariable("DifficultySelection", (int)DifficultySelection.Hard);
 
                 _settings.AddVariable("Toggle", false);
@@ -88,6 +113,10 @@ namespace InfBuddy
                 _settings.AddVariable("Merge", false);
 
                 _settings["Toggle"] = false;
+
+                _settings["ModeSelection"]= (int)ModeSelection.Normal;
+                _settings["FactionSelection"] = (int)FactionSelection.Clan;
+                _settings["DifficultySelection"] = (int)DifficultySelection.Hard;
 
                 Chat.WriteLine("InfBuddy Loaded!");
                 Chat.WriteLine("/infbuddy for settings.");
@@ -155,12 +184,48 @@ namespace InfBuddy
             Stop();
         }
 
+        private void EasyMessage(int sender, IPCMessage msg)
+        {
+            _settings["DifficultySelection"] = (int)DifficultySelection.Easy;
+        }
+
+        private void MediumMessage(int sender, IPCMessage msg)
+        {
+            _settings["DifficultySelection"] = (int)DifficultySelection.Medium;
+        }
+
+        private void HardMessage(int sender, IPCMessage msg)
+        {
+            _settings["DifficultySelection"] = (int)DifficultySelection.Hard;
+
+        }
+
+        private void NeutralMessage(int sender, IPCMessage msg)
+        {
+            _settings["FactionSelection"] = (int)FactionSelection.Neutral;
+        }
+
+        private void ClanMessage(int sender, IPCMessage msg)
+        {
+            _settings["FactionSelection"] = (int)FactionSelection.Clan;
+        }
+
+        private void NormalMessage(int sender, IPCMessage msg)
+        {
+            _settings["ModeSelection"] = (int)ModeSelection.Normal;
+        }
+        private void RoamMessage(int sender, IPCMessage msg)
+        {
+            _settings["ModeSelection"] = (int)ModeSelection.Roam;
+        }
 
         private void OnUpdate(object s, float deltaTime)
         {
             if (Game.IsZoning) { return; }
 
             _stateMachine.Tick();
+
+            Selections();
 
             if (Time.NormalTime > _sitUpdateTimer + 1)
             {
@@ -201,6 +266,116 @@ namespace InfBuddy
                     IPCChannel.Broadcast(new StartMessage());
                     Start();
                 }
+
+                if (Easy)
+                {
+                    IPCChannel.Broadcast(new EasyMessage());
+                    Easy = false;
+                }
+
+                if (Medium)
+                {
+                    IPCChannel.Broadcast(new MediumMessage());
+                    Medium = false;
+                }
+
+                if (Hard)
+                {
+                    IPCChannel.Broadcast(new HardMessage());
+                    Hard = false;
+                }
+
+                if (Neutral)
+                {
+                    IPCChannel.Broadcast(new NeutralMessage());
+                    Neutral = false;
+                }
+                if (Clan)
+                {
+                    IPCChannel.Broadcast(new ClanMessage());
+                    Clan = false;
+                }
+                if (Normal)
+                {
+                    IPCChannel.Broadcast(new NormalMessage());
+                    Normal = false;
+                }
+                if (Roam)
+                {
+                    IPCChannel.Broadcast(new RoamMessage());
+                    Roam = false;
+                }
+            }
+        }
+
+        public static void Selections()
+        {
+            if (DifficultySelection.Easy == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_easyToggled)
+            {
+                Easy = true;
+                Medium = false;
+                Hard = false;
+
+                _easyToggled = true;
+                _mediumToggled = false;
+                _hardToggled = false;
+            }
+
+            if (DifficultySelection.Medium == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_mediumToggled)
+            {
+                Easy = false;
+                Medium = true;
+                Hard = false;
+
+                _easyToggled = false;
+                _mediumToggled = true;
+                _hardToggled = false;
+            }
+
+            if (DifficultySelection.Hard == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_hardToggled)
+            {
+                Easy = false;
+                Medium = false;
+                Hard = true;
+
+                _easyToggled = false;
+                _mediumToggled = false;
+                _hardToggled = true;
+            }
+
+            if (FactionSelection.Neutral == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_neutralToggled)
+            {
+                Neutral = true;
+                Clan = false;
+
+                _neutralToggled = true;
+                _clanToggled = false;
+            }
+
+            if (FactionSelection.Clan == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_clanToggled)
+            {
+                Neutral = false;
+                Clan = true;
+
+                _neutralToggled = false;
+                _clanToggled = true;
+            }
+
+            if (ModeSelection.Normal == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_normalToggled)
+            {
+                Normal = true;
+                Roam = false;
+
+                _normalToggled = true;
+                _roamToggled = false;
+            }
+            if (ModeSelection.Roam == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_roamToggled)
+            {
+                Normal = false;
+                Roam = true;
+
+                _normalToggled = false;
+                _roamToggled = true;
             }
         }
 
