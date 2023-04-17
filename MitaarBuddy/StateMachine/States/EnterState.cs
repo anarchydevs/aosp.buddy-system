@@ -51,7 +51,8 @@ namespace MitaarBuddy
                     Task.Delay(2 * 1000).ContinueWith(x =>
                     {
                         MitaarBuddy.NavMeshMovementController.SetDestination(new Vector3(347.0f, 310.9f, 407.7f).Randomize(2f));
-                    }, _cancellationToken.Token);
+                    },
+                    _cancellationToken.Token);
                 }
                 else
                 {

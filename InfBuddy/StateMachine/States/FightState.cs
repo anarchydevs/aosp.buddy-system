@@ -57,7 +57,8 @@ namespace InfBuddy
         }
         public void LineOfSightLogic()
         {
-            if (_target?.IsInLineOfSight == false && !_initLOS)
+            if (_target?.IsInLineOfSight == false && !_initLOS 
+                && InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
             {
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
                 _initLOS = true;
@@ -86,9 +87,7 @@ namespace InfBuddy
                 && !DynelManager.LocalPlayer.IsAttacking/* && _target.Name != "Guardian Spirit of Purification"*/)
                 DynelManager.LocalPlayer.Attack(_target);
 
-            if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
-                || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.Melee)
-                || Extensions.GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(Extensions.CharacterWieldedWeapon.MartialArts))
+            if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 Extensions.HandlePathing(_target);
         }
     }
