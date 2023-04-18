@@ -28,14 +28,14 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("GrabMissionState::OnStateEnter");
+            //Chat.WriteLine("GrabMissionState::OnStateEnter");
 
             InfBuddy._stateTimeOut = Time.NormalTime;
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("GrabMissionState::OnStateExit");
+            //Chat.WriteLine("GrabMissionState::OnStateExit");
         }
 
         public void Tick()

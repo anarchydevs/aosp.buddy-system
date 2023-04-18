@@ -49,13 +49,13 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("FightState::OnStateEnter");
+            //Chat.WriteLine("FightState::OnStateEnter");
 
             _fightStartTime = Time.NormalTime;
         }
         public void OnStateExit()
         {
-            Chat.WriteLine("FightState::OnStateExit");
+           // Chat.WriteLine("FightState::OnStateExit");
 
             _missionsLoaded = false;
             _initLOS = false;
