@@ -10,6 +10,7 @@ namespace InfBuddy
     {
         private SimpleChar _target;
         private SimpleChar _charmMob;
+        public static Corpse _corpse;
 
         private static bool _charmMobAttacked = false;
         private static bool _missionsLoaded = false;
@@ -19,7 +20,7 @@ namespace InfBuddy
         private List<Identity> _charmMobs = new List<Identity>();
 
         private double _mobStuckStartTime;
-        public const double MobStuckTimeout = 1500f;
+        public const double MobStuckTimeout = 600f;
 
         public DefendSpiritState() : base(Constants.DefendPos, 3f, 1)
         {
@@ -39,12 +40,30 @@ namespace InfBuddy
             if (_target != null)
                 return new FightState(_target);
 
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
+                 && InfBuddy._settings["Looting"].AsBool()
+                 && _corpse != null)
+                return new LootingState();
+
+            if (Extensions.IsNull(_target)
+                && Time.NormalTime > _mobStuckStartTime + MobStuckTimeout)
+            {
+                foreach (Mission mission in Mission.List)
+                    if (mission.DisplayName.Contains("The Purification"))
+                        mission.Delete();
+
+                return new ExitMissionState();
+            }
+
+            
+
             return null;
         }
 
         public void OnStateEnter()
         {
             Chat.WriteLine("DefendSpiritState::OnStateEnter");
+            _mobStuckStartTime = Time.NormalTime;
         }
 
         public void OnStateExit()
@@ -88,7 +107,8 @@ namespace InfBuddy
         {
             SimpleChar mob = DynelManager.NPCs
                 .Where(c => c.Health > 0
-                    && c.Position.DistanceFrom(Constants.DefendPos) <= 30f)
+                    && c.Position.DistanceFrom(Constants.DefendPos) <= 20f
+                    && !c.Name.Contains("Guardian Spirit of Purification"))
                 .OrderBy(c => c.HealthPercent)
                 .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
@@ -97,6 +117,7 @@ namespace InfBuddy
             {
                 _target = mob;
                 Chat.WriteLine($"Found target: {_target.Name}");
+
             }
             else if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
@@ -114,6 +135,9 @@ namespace InfBuddy
                 HandleCharmScan();
 
             HandleScan();
+
+            _corpse = DynelManager.Corpses
+                            .FirstOrDefault();
         }
     }
 }

@@ -10,6 +10,7 @@ namespace InfBuddy
     {
         private SimpleChar _target;
         private SimpleChar _charmMob;
+        //public static Corpse _corpse;
 
         private static bool _charmMobAttacked = false;
         private static bool _missionsLoaded = false;
@@ -30,6 +31,8 @@ namespace InfBuddy
             if (Extensions.HasDied())
                 return new DiedState();
 
+           
+
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
             {
                 InfBuddy._settings["Toggle"] = false;
@@ -42,6 +45,8 @@ namespace InfBuddy
 
             if (_target != null)
                 return new FightState(_target);
+
+           
 
             return null;
         }
@@ -186,5 +191,6 @@ namespace InfBuddy
             else
                 HandleScan();
         }
+           
     }
 }

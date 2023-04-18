@@ -1,6 +1,7 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
+using System.Linq;
 
 namespace InfBuddy
 {
@@ -30,6 +31,8 @@ namespace InfBuddy
             if (Extensions.CanExit(_missionsLoaded))
                 return new ExitMissionState();
 
+            
+
             if (Extensions.IsNull(_target)
                 || Time.NormalTime > _fightStartTime + FightTimeout)
             {
@@ -38,6 +41,8 @@ namespace InfBuddy
 
                 return new DefendSpiritState();
             }
+
+            
 
             return null;
         }
@@ -83,12 +88,16 @@ namespace InfBuddy
 
             LineOfSightLogic();
 
-            if (_target?.IsInAttackRange() == true && !DynelManager.LocalPlayer.IsAttackPending
+            if //(_target?.IsInAttackRange() == true && 
+                 (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 20f
+                && !DynelManager.LocalPlayer.IsAttackPending
                 && !DynelManager.LocalPlayer.IsAttacking/* && _target.Name != "Guardian Spirit of Purification"*/)
                 DynelManager.LocalPlayer.Attack(_target);
 
             if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 Extensions.HandlePathing(_target);
+
+           
         }
     }
 }

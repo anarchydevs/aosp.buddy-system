@@ -20,6 +20,9 @@ namespace InfBuddy
             if (Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 return new MoveToEntranceState();
 
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
+
             return null;
         }
 

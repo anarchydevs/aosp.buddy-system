@@ -27,6 +27,9 @@ namespace InfBuddy
             if (!InfBuddy.NavMeshMovementController.IsNavigating && Extensions.IsAtYutto())
                 return new GrabMissionState();
 
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
+
             return null;
         }
 

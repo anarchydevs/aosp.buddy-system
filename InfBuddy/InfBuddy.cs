@@ -111,6 +111,7 @@ namespace InfBuddy
 
                 _settings.AddVariable("DoubleReward", false);
                 _settings.AddVariable("Merge", false);
+                _settings.AddVariable("Looting", false);
 
                 _settings["Toggle"] = false;
 
