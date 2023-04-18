@@ -89,7 +89,7 @@ namespace InfBuddy
                     _charmMobAttacked = false;
                     _charmMobs.Remove(_charmMob.Identity);
                     _target = _charmMob;
-                    Chat.WriteLine($"Found target: {_target.Name}.");
+                    //Chat.WriteLine($"Found target: {_target.Name}.");
                 }
 
                 if (_charmMob.FightingTarget != null && _charmMob.IsAttacking
@@ -113,10 +113,13 @@ namespace InfBuddy
                 .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
 
+            _corpse = DynelManager.Corpses
+                           .FirstOrDefault();
+
             if (mob != null)
             {
                 _target = mob;
-                Chat.WriteLine($"Found target: {_target.Name}");
+                //Chat.WriteLine($"Found target: {_target.Name}");
 
             }
             else if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
@@ -136,8 +139,7 @@ namespace InfBuddy
 
             HandleScan();
 
-            _corpse = DynelManager.Corpses
-                            .FirstOrDefault();
+           
         }
     }
 }

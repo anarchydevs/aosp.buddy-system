@@ -55,7 +55,7 @@ namespace InfBuddy
             _corpsePos = (Vector3)_corpse?.Position;
 
             //Path to corpse
-            if (_corpse != null && DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) > 3f)
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) > 3f)
             {
                 Task.Factory.StartNew(
                     async () =>
