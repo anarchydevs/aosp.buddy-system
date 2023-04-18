@@ -10,7 +10,9 @@ namespace InfBuddy
     {
         private SimpleChar _target;
         private SimpleChar _charmMob;
-        public static Corpse _corpse;
+        private static Corpse _corpse;
+
+        public static Vector3 _corpsePos = Vector3.Zero;
 
         private static bool _charmMobAttacked = false;
         private static bool _missionsLoaded = false;
@@ -42,7 +44,7 @@ namespace InfBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
                  && InfBuddy._settings["Looting"].AsBool()
-                 && _corpse != null)
+                && _corpse != null)
                 return new LootingState();
 
             if (Extensions.IsNull(_target)
@@ -55,7 +57,8 @@ namespace InfBuddy
                 return new ExitMissionState();
             }
 
-            
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
 
             return null;
         }
@@ -114,7 +117,8 @@ namespace InfBuddy
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
 
             _corpse = DynelManager.Corpses
-                           .FirstOrDefault();
+                .Where(c => c.Name.Contains("Remains of "))
+                .FirstOrDefault();
 
             if (mob != null)
             {

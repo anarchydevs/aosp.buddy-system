@@ -50,10 +50,11 @@ namespace InfBuddy
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId && !Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 return new ExitMissionState();
 
-            
 
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
 
-                return null;
+            return null;
         }
 
         public void OnStateEnter()

@@ -44,7 +44,7 @@ namespace InfBuddy
             if (InfBuddy._settings["DoubleReward"].AsBool() && !InfBuddy.DoubleReward)
                 _time = 1000;
             else
-                _time = 30000;
+                _time = 5000;
 
 
             Task.Delay(_time).ContinueWith(x =>
@@ -63,6 +63,10 @@ namespace InfBuddy
                     InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitFinalPos);
                 }
             }, _cancellationToken.Token);
+
+            foreach (Mission mission in Mission.List)
+                if (mission.DisplayName.Contains("The Purification"))
+                    mission.Delete();
         }
 
         public void OnStateExit()
