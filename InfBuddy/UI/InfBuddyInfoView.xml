@@ -4,8 +4,12 @@
 	  <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 	  <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
 	  <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-	  <TextView value="Handlers and Infbuddy on all. No Sync" layout_borders="Rect(0,0,0,2)"/>
+	  <TextView value="Handlers and Infbuddy on all. No Sync, No follow, No Help" layout_borders="Rect(0,0,0,2)"/>
 	  <TextView value="Can also use Researchmanager and Lootmanager" layout_borders="Rect(0,0,0,2)"/>
+	  <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+	  <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+	  <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+	  <TextView value="Path to corpse: Must delete leftovers!" layout_borders="Rect(0,0,0,2)"/>
 	  <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 	  <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
 	  <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
