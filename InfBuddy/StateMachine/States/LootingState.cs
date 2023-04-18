@@ -46,7 +46,8 @@ namespace InfBuddy
 
         public void OnStateExit()
         {
-            _initCorpse = false;
+            Chat.WriteLine("Done looting");
+            //_initCorpse = false;
         }
 
         public void Tick()
@@ -63,10 +64,10 @@ namespace InfBuddy
             InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
                     
 
-            if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 5f)
-            {
-                        _initCorpse = true;           
-            }
+            //if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 5f)
+            //{
+            //            _initCorpse = true;           
+            //}
 
 
         }
