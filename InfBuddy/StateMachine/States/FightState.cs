@@ -10,6 +10,7 @@ namespace InfBuddy
         public const double FightTimeout = 70f;
 
         private SimpleChar _target;
+        private static Corpse _corpse;
 
         private double _fightStartTime;
 
@@ -31,19 +32,15 @@ namespace InfBuddy
             if (Extensions.CanExit(_missionsLoaded))
                 return new ExitMissionState();
 
-            
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
+                 && InfBuddy._settings["Looting"].AsBool()
+                && _corpse != null)
+                return new LootingState();
 
             if (Extensions.IsNull(_target)
                 || Time.NormalTime > _fightStartTime + FightTimeout)
-            {
-                if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                    return new RoamState();
-
-                return new DefendSpiritState();
-            }
-
+                return new IdleState();
             
-
             return null;
         }
 
@@ -62,6 +59,8 @@ namespace InfBuddy
         }
         public void LineOfSightLogic()
         {
+
+
             if (_target?.IsInLineOfSight == false && !_initLOS 
                 && InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
             {
@@ -79,6 +78,10 @@ namespace InfBuddy
         public void Tick()
         {
             if (Game.IsZoning || _target == null) { return; }
+
+            _corpse = DynelManager.Corpses
+                .Where(c => c.Name.Contains("Remains of "))
+                .FirstOrDefault();
 
             //REASON: Edge case for some reason randomly hitting a null reference, the SimpleChar is not null but the Accel and various others are.
             //if (_target.Name == "NoName") { return; }

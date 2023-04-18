@@ -44,7 +44,9 @@ namespace InfBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
                  && InfBuddy._settings["Looting"].AsBool()
-                && _corpse != null)
+                && _corpse != null
+                && Spell.List.Any(c => c.IsReady) 
+                && !Spell.HasPendingCast)
                 return new LootingState();
 
             if (Extensions.IsNull(_target)
@@ -65,13 +67,13 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("DefendSpiritState::OnStateEnter");
+            Chat.WriteLine("DefendSpiritState::OnStateEnter");
             _mobStuckStartTime = Time.NormalTime;
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("DefendSpiritState::OnStateExit");
+            Chat.WriteLine("DefendSpiritState::OnStateExit");
             _missionsLoaded = false;
         }
 

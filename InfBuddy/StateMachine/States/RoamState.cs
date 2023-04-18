@@ -10,7 +10,7 @@ namespace InfBuddy
     {
         private SimpleChar _target;
         private SimpleChar _charmMob;
-        //public static Corpse _corpse;
+        public static Corpse _corpse;
 
         private static bool _charmMobAttacked = false;
         private static bool _missionsLoaded = false;
@@ -31,7 +31,6 @@ namespace InfBuddy
             if (Extensions.HasDied())
                 return new DiedState();
 
-           
 
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
             {
@@ -46,21 +45,29 @@ namespace InfBuddy
             if (_target != null)
                 return new FightState(_target);
 
-           
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
+                 && InfBuddy._settings["Looting"].AsBool()
+                && _corpse != null
+                && Spell.List.Any(c => c.IsReady)
+                && !Spell.HasPendingCast)
+                return new LootingState();
+
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
 
             return null;
         }
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("RoamState::OnStateEnter");
+            Chat.WriteLine("RoamState::OnStateEnter");
 
             InfBuddy._stateTimeOut = Time.NormalTime;
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("RoamState::OnStateExit");
+            Chat.WriteLine("RoamState::OnStateExit");
 
             _missionsLoaded = false;
         }
@@ -69,11 +76,15 @@ namespace InfBuddy
         {
             SimpleChar mob = DynelManager.NPCs
                 .Where(c => c.Health > 0
-                    && c.IsInLineOfSight
+                    //&& c.IsInLineOfSight
                     && c.Position.DistanceFrom(Constants.DefendPos) <= 80f)
                 .OrderBy(c => c.HealthPercent)
                 .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
+
+            _corpse = DynelManager.Corpses
+               .Where(c => c.Name.Contains("Remains of "))
+               .FirstOrDefault();
 
             if (mob != null)
             {
@@ -168,7 +179,7 @@ namespace InfBuddy
                     {
                         SimpleChar mob = DynelManager.NPCs
                             .Where(c => c.Health > 0
-                                && c.IsInLineOfSight
+                                //&& c.IsInLineOfSight
                                 && c.Position.DistanceFrom(Constants.DefendPos) <= 20f)
                             .OrderBy(c => c.HealthPercent)
                             .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))

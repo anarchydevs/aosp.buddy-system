@@ -10,6 +10,7 @@ namespace InfBuddy
     public class LootingState : IState
     {
         private static bool _initCorpse = false;
+        public static bool _missionsLoaded = false;
 
         private static Corpse _corpse;
 
@@ -19,22 +20,10 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId && _corpse == null)
-                {
-                    if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                    {
-                        Constants.DefendPos = new Vector3(165.6f, 2.2f, 186.4f);
-                        return new DefendSpiritState();
-                    }
+            if ( _corpse == null || _initCorpse)
+                return new IdleState();
 
-                    if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                        return new RoamState();
-
-                    if (InfBuddy.ModeSelection.Leech == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                        return new LeechState();
-                }
-
-            if (Extensions.CanExit(DefendSpiritState._missionsLoaded))
+            if (Extensions.CanExit(_missionsLoaded))
                 return new ExitMissionState();
 
             return null;
@@ -50,7 +39,8 @@ namespace InfBuddy
         public void OnStateExit()
         {
             Chat.WriteLine("Done looting");
-            //_initCorpse = false;
+            _initCorpse = false;
+            _missionsLoaded = false;
         }
 
         public void Tick()
@@ -62,15 +52,18 @@ namespace InfBuddy
 
             _corpsePos = (Vector3)_corpse?.Position;
 
+            if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+                _missionsLoaded = true;
+
             //Path to corpse
             if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) > 5f)
             InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
-                    
 
-            //if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 5f)
-            //{
-            //            _initCorpse = true;           
-            //}
+
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 2f)
+            {
+                _initCorpse = true;
+            }
 
 
         }
