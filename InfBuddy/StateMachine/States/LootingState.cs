@@ -34,6 +34,9 @@ namespace InfBuddy
                         return new LeechState();
                 }
 
+            if (Extensions.CanExit(DefendSpiritState._missionsLoaded))
+                return new ExitMissionState();
+
             return null;
         }
 

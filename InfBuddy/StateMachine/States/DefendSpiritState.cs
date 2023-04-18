@@ -15,7 +15,7 @@ namespace InfBuddy
         public static Vector3 _corpsePos = Vector3.Zero;
 
         private static bool _charmMobAttacked = false;
-        private static bool _missionsLoaded = false;
+        public static bool _missionsLoaded = false;
 
         private static double _charmMobAttacking;
 
