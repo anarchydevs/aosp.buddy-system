@@ -20,19 +20,22 @@ namespace InfBuddy
             if (Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 return new MoveToEntranceState();
 
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
+
             return null;
         }
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("GrabMissionState::OnStateEnter");
+            //Chat.WriteLine("GrabMissionState::OnStateEnter");
 
             InfBuddy._stateTimeOut = Time.NormalTime;
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("GrabMissionState::OnStateExit");
+            //Chat.WriteLine("GrabMissionState::OnStateExit");
         }
 
         public void Tick()

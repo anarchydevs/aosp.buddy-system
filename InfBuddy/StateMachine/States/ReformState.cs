@@ -39,7 +39,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("ReformState::OnStateEnter");
+            //Chat.WriteLine("ReformState::OnStateEnter");
 
             _reformStartedTime = Time.NormalTime;
 
@@ -47,18 +47,18 @@ namespace InfBuddy
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
-                Chat.WriteLine("ReformPhase.Waiting");
+               // Chat.WriteLine("ReformPhase.Waiting");
             }
             else
             {
                 _phase = ReformPhase.Disbanding;
-                Chat.WriteLine("ReformPhase.Disbanding");
+                Chat.WriteLine("Disbanding");
             }
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("ReformState::OnStateExit");
+            //Chat.WriteLine("ReformState::OnStateExit");
 
             _invitedList.Clear();
             _teamCache.Clear();
@@ -109,7 +109,7 @@ namespace InfBuddy
                 {
                     _inviting = Time.NormalTime;
                     _phase = ReformPhase.Inviting;
-                    Chat.WriteLine("ReformPhase.Inviting");
+                   //Chat.WriteLine("ReformPhase.Inviting");
                 }
                 else if (Team.Members.Where(c => c.Character != null && c.Character.IsInPlay).ToList().Count == _teamCache.Count()
                         || Time.NormalTime > _reformStartedTime + ReformTimeout)
@@ -123,7 +123,7 @@ namespace InfBuddy
                 && _init)
             {
                 _phase = ReformPhase.Completed;
-                Chat.WriteLine("ReformPhase.Completed");
+                //Chat.WriteLine("ReformPhase.Completed");
             }
         }
 

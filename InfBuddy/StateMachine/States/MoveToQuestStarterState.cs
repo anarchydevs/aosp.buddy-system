@@ -23,12 +23,15 @@ namespace InfBuddy
                 return new DefendSpiritState();
             }
 
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
+
             return null;
         }
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("MoveToQuestStarter::OnStateEnter");
+            //Chat.WriteLine("MoveToQuestStarter::OnStateEnter");
 
             InfBuddy._stateTimeOut = Time.NormalTime;
 
@@ -41,7 +44,7 @@ namespace InfBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("MoveToQuestStarter::OnStateExit");
+            //Chat.WriteLine("MoveToQuestStarter::OnStateExit");
         }
 
         public void Tick()
