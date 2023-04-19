@@ -12,7 +12,7 @@ namespace Db1Buddy
         public IState GetNextState()
         {
             if (Playfield.ModelIdentity.Instance == Constants.PWId
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 30.0f
+                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 30f
                 && Team.IsInTeam
                 && Extensions.CanProceed()
                 && Db1Buddy._settings["Toggle"].AsBool())
@@ -23,13 +23,15 @@ namespace Db1Buddy
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) < 20f)
                 return new StartState();
 
-            //if (Playfield.ModelIdentity.Instance == Constants.DB1Id
-            //    && !DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
-            //    return new GetBuffState();
+            if (Playfield.ModelIdentity.Instance == Constants.DB1Id
+                && !DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients)
+                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) > 40f)
+                return new GetBuffState();
 
-            //if (Playfield.ModelIdentity.Instance == Constants.DB1Id
-            //    && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
-            //    return new FightState();
+            if (Playfield.ModelIdentity.Instance == Constants.DB1Id
+                && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients)
+                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) > 40f)
+                return new FightState();
 
             if (_mikkelsenCorpse != null
                && Extensions.CanProceed()

@@ -63,9 +63,12 @@ namespace Db1Buddy
             {
                 _time = Time.NormalTime;
 
-                Db1Buddy.NavMeshMovementController.SetDestination(Constants._entrance);
-                Db1Buddy.NavMeshMovementController.AppendDestination(new Vector3 (2119.3f, 3.2f, 2762.1f));
-
+                if (DynelManager.LocalPlayer.Buffs.Find(Db1Buddy.Nanos.ThriceBlessedbytheAncients, out Buff buff) && buff.RemainingTime > 600
+                    || !DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
+                {
+                    Db1Buddy.NavMeshMovementController.SetDestination(Constants._entrance);
+                    Db1Buddy.NavMeshMovementController.AppendDestination(new Vector3(2119.3f, 3.2f, 2762.1f));
+                }
             }
 
         }
