@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ALBBuddy", "ALBBuddy\ALBBud
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB2Buddy", "DB2Buddy\DB2Buddy.csproj", "{3E5FA50D-2152-4700-A3E1-8497AD000480}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Db1Buddy", "Db1Buddy\Db1Buddy.csproj", "{8109566D-B2E5-4D15-99EF-CB267E3CAB3C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{3E5FA50D-2152-4700-A3E1-8497AD000480}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3E5FA50D-2152-4700-A3E1-8497AD000480}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3E5FA50D-2152-4700-A3E1-8497AD000480}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8109566D-B2E5-4D15-99EF-CB267E3CAB3C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8109566D-B2E5-4D15-99EF-CB267E3CAB3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8109566D-B2E5-4D15-99EF-CB267E3CAB3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8109566D-B2E5-4D15-99EF-CB267E3CAB3C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
