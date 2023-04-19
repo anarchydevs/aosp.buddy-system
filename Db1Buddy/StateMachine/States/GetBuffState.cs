@@ -27,7 +27,7 @@ namespace Db1Buddy
             //    return new IdleState();
 
             if (Playfield.ModelIdentity.Instance == Constants.DB1Id
-                && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
+                && _yellow && _blue && _green && _red)
                 return new FightState();
 
             return null;
