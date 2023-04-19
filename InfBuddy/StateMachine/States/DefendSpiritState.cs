@@ -10,16 +10,19 @@ namespace InfBuddy
     {
         private SimpleChar _target;
         private SimpleChar _charmMob;
+        private static Corpse _corpse;
+
+        public static Vector3 _corpsePos = Vector3.Zero;
 
         private static bool _charmMobAttacked = false;
-        private static bool _missionsLoaded = false;
+        public static bool _missionsLoaded = false;
 
         private static double _charmMobAttacking;
 
         private List<Identity> _charmMobs = new List<Identity>();
 
         private double _mobStuckStartTime;
-        public const double MobStuckTimeout = 1500f;
+        public const double MobStuckTimeout = 600f;
 
         public DefendSpiritState() : base(Constants.DefendPos, 3f, 1)
         {
@@ -39,12 +42,33 @@ namespace InfBuddy
             if (_target != null)
                 return new FightState(_target);
 
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
+                 && InfBuddy._settings["Looting"].AsBool()
+                && _corpse != null
+                && Spell.List.Any(c => c.IsReady) 
+                && !Spell.HasPendingCast)
+                return new LootingState();
+
+            if (Extensions.IsNull(_target)
+                && Time.NormalTime > _mobStuckStartTime + MobStuckTimeout)
+            {
+                foreach (Mission mission in Mission.List)
+                    if (mission.DisplayName.Contains("The Purification"))
+                        mission.Delete();
+
+                return new ExitMissionState();
+            }
+
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
+
             return null;
         }
 
         public void OnStateEnter()
         {
             Chat.WriteLine("DefendSpiritState::OnStateEnter");
+            _mobStuckStartTime = Time.NormalTime;
         }
 
         public void OnStateExit()
@@ -70,7 +94,7 @@ namespace InfBuddy
                     _charmMobAttacked = false;
                     _charmMobs.Remove(_charmMob.Identity);
                     _target = _charmMob;
-                    Chat.WriteLine($"Found target: {_target.Name}.");
+                    //Chat.WriteLine($"Found target: {_target.Name}.");
                 }
 
                 if (_charmMob.FightingTarget != null && _charmMob.IsAttacking
@@ -88,15 +112,21 @@ namespace InfBuddy
         {
             SimpleChar mob = DynelManager.NPCs
                 .Where(c => c.Health > 0
-                    && c.Position.DistanceFrom(Constants.DefendPos) <= 30f)
+                    && c.Position.DistanceFrom(Constants.DefendPos) <= 20f
+                    && !c.Name.Contains("Guardian Spirit of Purification"))
                 .OrderBy(c => c.HealthPercent)
                 .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
 
+            _corpse = DynelManager.Corpses
+                .Where(c => c.Name.Contains("Remains of "))
+                .FirstOrDefault();
+
             if (mob != null)
             {
                 _target = mob;
-                Chat.WriteLine($"Found target: {_target.Name}");
+                //Chat.WriteLine($"Found target: {_target.Name}");
+
             }
             else if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
@@ -114,6 +144,8 @@ namespace InfBuddy
                 HandleCharmScan();
 
             HandleScan();
+
+           
         }
     }
 }
