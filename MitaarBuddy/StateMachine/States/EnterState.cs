@@ -14,6 +14,7 @@ namespace MitaarBuddy
     {
         private const int MinWait = 3;
         private const int MaxWait = 5;
+        private static double _time;
         private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
 
         public IState GetNextState()
@@ -65,7 +66,7 @@ namespace MitaarBuddy
 
                     }, _cancellationToken.Token);
                 }
-
+                _time = Time.NormalTime;
             }
         }
 
