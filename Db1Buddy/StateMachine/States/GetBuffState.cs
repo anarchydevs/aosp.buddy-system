@@ -73,7 +73,7 @@ namespace Db1Buddy
                 {
                         if (!_yellow && !_blue && !_green && !_red)
                         {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) < 3f
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) < 5f
                             && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheAncientMachinist))
                                 _yellow = true;
                             else
@@ -81,7 +81,7 @@ namespace Db1Buddy
                         }
                         else if (_yellow && !_blue && !_green && !_red)
                         {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) < 3f
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) < 5f
                             && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheEternalCraftsman))
                                 _blue = true;
                             else
@@ -89,7 +89,7 @@ namespace Db1Buddy
                         }
                         else if (_yellow && _blue && !_green && !_red)
                         {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) < 3f
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) < 5f
                             && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheAncientForm))
                                 _green = true;
                             else
@@ -97,7 +97,7 @@ namespace Db1Buddy
                         }
                         else if (_yellow && _blue && _green && !_red)
                         {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) < 3f
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) < 5f
                             && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheEternalCleric))
                                 _red = true;
                             else
