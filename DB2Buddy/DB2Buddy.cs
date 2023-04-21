@@ -1,17 +1,19 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Common.GameData.UI;
+﻿using System;
 using AOSharp.Core;
-using AOSharp.Core.IPC;
-using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using AOSharp.Common.GameData;
 using AOSharp.Pathfinding;
+using AOSharp.Core.IPC;
+using AOSharp.Common.GameData.UI;
+using AOSharp.Core.Movement;
 using DB2Buddy.IPCMessages;
-using System;
+using AOSharp.Core.Inventory;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace DB2Buddy
 {
-    //push test
     public class DB2Buddy : AOPluginEntry
     {
         public static StateMachine _stateMachine;
@@ -88,7 +90,7 @@ namespace DB2Buddy
 
                 Game.OnUpdate += OnUpdate;
             }
-            catch (Exception e)
+            catch(Exception e)
             {
                 Chat.WriteLine(e.Message);
             }

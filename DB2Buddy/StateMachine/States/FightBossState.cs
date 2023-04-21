@@ -1,9 +1,13 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
+using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DB2Buddy
 {
@@ -20,12 +24,11 @@ namespace DB2Buddy
         {
             _aune = DynelManager.NPCs
                .Where(c => c.Health > 0
-                   && c.Name.Contains("Ground Chief Aune")
-                   && !c.Name.Contains("Remains of"))
+                   && c.Name.Contains("Ground Chief Aune"))
                .FirstOrDefault();
 
             _auneCorpse = DynelManager.Corpses
-               .Where(c => c.Name.Contains("Remains of Ground Chief Aune"))
+               .Where(c => c.Name.Contains("Ground Chief Aune"))
                .FirstOrDefault();
 
             List<Dynel> _mists = DynelManager.AllDynels
@@ -39,7 +42,7 @@ namespace DB2Buddy
                     return new CircleState();
             }
 
-            if (_auneCorpse != null) //&& _mists.Count == 0
+            if (_auneCorpse != null && _mists.Count == 0)
             {
                 if (!_init)
                 {
@@ -79,8 +82,7 @@ namespace DB2Buddy
 
             _aune = DynelManager.NPCs
                .Where(c => c.Health > 0
-                   && c.Name.Contains("Ground Chief Aune")
-                   && !c.Name.Contains("Remains of"))
+                   && c.Name.Contains("Ground Chief Aune"))
                .FirstOrDefault();
 
             List<Dynel> _mists = DynelManager.AllDynels

@@ -1,9 +1,10 @@
-﻿using AOSharp.Core;
-using AOSharp.Core.UI;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using AOSharp.Core;
+using Newtonsoft.Json;
+using AOSharp.Core.UI;
+using AOSharp.Common.GameData;
 
 namespace DB2Buddy
 {
