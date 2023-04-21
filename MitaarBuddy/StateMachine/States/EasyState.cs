@@ -31,7 +31,7 @@ namespace MitaarBuddy
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) <= 10f)
                 return new ReformState();
 
-            if (_sinuhCorpse != null
+            if (MitaarBuddy.SinuhCorpse
                 && _xanSpirits == null
                 && _alienCoccoon == null
                 && Extensions.CanProceed()
@@ -83,6 +83,9 @@ namespace MitaarBuddy
             {
 
                 Mobs();
+
+                if (_sinuhCorpse != null)
+                    MitaarBuddy.SinuhCorpse = true;
 
                 //Attack and initial start
                 if (_sinuh != null && _alienCoccoon == null && _xanSpirits == null)
