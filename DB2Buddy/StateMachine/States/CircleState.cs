@@ -50,8 +50,7 @@ namespace DB2Buddy
             if (Playfield.ModelIdentity.Instance == Constants.PWId)
                 return new IdleState();
 
-            if (_redTower != null && !MovementController.Instance.IsNavigating
-                && DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+            if (_redTower != null && !MovementController.Instance.IsNavigating)
             {
                 DB2Buddy.NavMeshMovementController.Halt();
                 DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);

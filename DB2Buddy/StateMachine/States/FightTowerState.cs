@@ -107,14 +107,12 @@ namespace DB2Buddy
 
             if (_redTower != null)
             {
-                if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                    && _redTower.IsInLineOfSight
+                if (_redTower.IsInLineOfSight
                     && DynelManager.LocalPlayer.FightingTarget == null
                     && !DynelManager.LocalPlayer.IsAttackPending)
                     DynelManager.LocalPlayer.Attack(_redTower);
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f
-                    && DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
 
