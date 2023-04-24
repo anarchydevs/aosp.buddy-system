@@ -147,7 +147,11 @@ namespace DB2Buddy
             }
 
             if (_aune != null)
-            {
+            
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 10
+                    && MovementController.Instance.IsNavigating)
+                    DB2Buddy.NavMeshMovementController.Halt();
+
                 if (DynelManager.LocalPlayer.FightingTarget == null
                     && !DynelManager.LocalPlayer.IsAttackPending
                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
@@ -171,9 +175,6 @@ namespace DB2Buddy
                 //    //DynelManager.LocalPlayer.Position = _aune.Position;
                 //    //MovementController.Instance.SetMovement(MovementAction.Update);
                 //}
-            }
-            
-            
             
 
         }
