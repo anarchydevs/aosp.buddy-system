@@ -22,6 +22,8 @@ namespace DB2Buddy
         public static Config Config { get; private set; }
 
         public static bool Toggle = false;
+        public static bool Farming = false;
+
         public static bool _init = false;
         public static bool _initLol = false;
         public static bool _initStart = false;
@@ -30,7 +32,12 @@ namespace DB2Buddy
         public static bool IsLeader = false;
         public static bool _repeat = false;
 
+        public static bool Sitting = false;
+
+        public static bool AuneCorpse = false;
+
         public static double _time = Time.NormalTime;
+        public static double _sitUpdateTimer;
 
         public static Identity Leader = Identity.None;
 
@@ -41,14 +48,6 @@ namespace DB2Buddy
         public static Settings _settings;
 
         public static List<Identity> _teamCache = new List<Identity>();
-
-        public static List<Vector3> _towerPositions = new List<Vector3>()
-        {
-            new Vector3(294.2f, 135.3f, 199.0f),
-            new Vector3(250.9f, 135.3f, 225.1f),
-            new Vector3(277.0f, 135.3f, 267.1f),
-            new Vector3(320.2f, 135.3f, 242.1f)
-        };
 
         public static List<Vector3> _mistLocations = new List<Vector3>();
 
@@ -73,6 +72,9 @@ namespace DB2Buddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Enter, OnEnterMessage);
 
+                IPCChannel.RegisterCallback((int)IPCOpcode.Farming, FarmingMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.NoFarming, NoFarmingMessage);
+
                 Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 SettingsController.RegisterSettingsWindow("DB2Buddy", pluginDir + "\\UI\\DB2BuddySettingWindow.xml", _settings);
@@ -83,8 +85,10 @@ namespace DB2Buddy
                 Chat.WriteLine("/db2buddy for settings.");
 
                 _settings.AddVariable("Toggle", false);
+                _settings.AddVariable("Farming", false);
 
                 _settings["Toggle"] = false;
+                _settings["Farming"] = false;
 
                 Chat.RegisterCommand("buddy", DB2BuddyCommand);
 
@@ -104,6 +108,15 @@ namespace DB2Buddy
         {
             IPCChannel.SetChannelId(Convert.ToByte(e));
             Config.Save();
+        }
+
+        private void farmingEnabled()
+        {
+            Farming = true;
+        }
+        private void farmingDisabled()
+        {
+            Farming = false;
         }
 
         private void OnEnterMessage(int sender, IPCMessage msg)
@@ -139,6 +152,18 @@ namespace DB2Buddy
             _settings["Toggle"] = false;
         }
 
+        private void FarmingMessage(int sender, IPCMessage msg)
+        {
+            _settings["Farming"] = true;
+            farmingEnabled();
+        }
+
+        private void NoFarmingMessage(int sender, IPCMessage msg)
+        {
+            _settings["Farming"] = false;
+            farmingDisabled();
+        }
+
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
             _infoWindow = Window.CreateFromXml("Info", PluginDir + "\\UI\\DB2BuddyInfoView.xml",
@@ -154,7 +179,17 @@ namespace DB2Buddy
             if (Game.IsZoning)
                 return;
 
-            _stateMachine.Tick();
+            if (Time.NormalTime > _sitUpdateTimer + 1)
+            {
+                ListenerSit();
+
+                _sitUpdateTimer = Time.NormalTime;
+            }
+
+            if (_settings["Toggle"].AsBool())
+            {
+                _stateMachine.Tick();
+            }
 
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {
@@ -190,6 +225,54 @@ namespace DB2Buddy
                     }
                     Toggle = true;
                 }
+
+                if (!_settings["Farming"].AsBool() && Farming) // Farming off
+                {
+                    IPCChannel.Broadcast(new NoFarmingMessage());
+                    Chat.WriteLine("Farming disabled");
+                    farmingDisabled();
+                }
+
+                if (_settings["Farming"].AsBool() && !Farming) // farming on
+                {
+                    IPCChannel.Broadcast(new FarmingMessage());
+                    Chat.WriteLine("Farming enabled.");
+                    farmingEnabled();
+                }
+            }
+        }
+
+        private void ListenerSit()
+        {
+            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
+
+            Item kit = Inventory.Items.Where(x => RelevantItems.Kits.Contains(x.Id)).FirstOrDefault();
+
+            if (kit == null) { return; }
+
+            if (spell != null)
+            {
+                if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && Extensions.CanUseSitKit())
+                {
+                    if (spell != null && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
+                        && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                    {
+                        if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                        {
+                            Task.Factory.StartNew(
+                               async () =>
+                               {
+                                   Sitting = true;
+                                   await Task.Delay(500);
+                                   NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
+                                   await Task.Delay(800);
+                                   NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+                                   await Task.Delay(500);
+                                   Sitting = false;
+                               });
+                        }
+                    }
+                }
             }
         }
 
@@ -221,6 +304,23 @@ namespace DB2Buddy
             {
                 Chat.WriteLine(e.Message);
             }
+        }
+
+        public static class RelevantItems
+        {
+            public static readonly int[] Kits = {
+                297274, 293296, 291084, 291083, 291082
+            };
+        }
+
+        public static class Nanos
+        {
+            public const int XanBlessingoftheEnemy = 274101; //boss heal
+            public const int StrengthOfTheAncients = 273220;
+            public const int SeismicActivity = 270742;
+            public const int ActivatingtheMachine = 274200;
+            public const int NotumPull = 274359;
+
         }
     }
 }

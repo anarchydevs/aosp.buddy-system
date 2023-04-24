@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{787D0814-C072-44A5-8BC6-606EF35A62D0}</ProjectGuid>
+    <ProjectGuid>{202A0300-0D8F-465E-B8D4-5A21E8EEB215}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>DB2buddy</RootNamespace>
@@ -80,21 +80,34 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Config.cs" />
+    <Compile Include="Constants.cs" />
     <Compile Include="DB2Buddy.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="IPCMessages\Farming.cs" />
     <Compile Include="IPCMessages\IPCOpcode.cs" />
     <Compile Include="IPCMessages\EnterMessage.cs" />
+    <Compile Include="IPCMessages\NoFarming.cs" />
     <Compile Include="IPCMessages\StartMessage.cs" />
     <Compile Include="IPCMessages\StopMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsController.cs" />
     <Compile Include="StateMachine\IState.cs" />
     <Compile Include="StateMachine\StateMachine.cs" />
+    <Compile Include="StateMachine\States\FarmingState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="StateMachine\States\PathToBossState.cs" />
     <Compile Include="StateMachine\States\EnterState.cs" />
     <Compile Include="StateMachine\States\FightTowerState.cs" />
-    <Compile Include="StateMachine\States\FightBossState.cs" />
+    <Compile Include="StateMachine\States\FightState.cs" />
     <Compile Include="StateMachine\States\IdleState.cs" />
-    <Compile Include="StateMachine\States\ReformState.cs" />
     <Compile Include="StateMachine\States\CircleState.cs" />
+    <Compile Include="StateMachine\States\ReformState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="StateMachine\States\SitState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
