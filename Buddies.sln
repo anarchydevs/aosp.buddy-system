@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Db1Buddy", "Db1Buddy\Db1Bud
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB2Buddy", "DB2Buddy\DB2Buddy.csproj", "{202A0300-0D8F-465E-B8D4-5A21E8EEB215}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VortexxBuddy", "VortexxBuddy\VortexxBuddy.csproj", "{DC776535-2D9E-4C0B-9FF1-B9B7BBE84412}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{202A0300-0D8F-465E-B8D4-5A21E8EEB215}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{202A0300-0D8F-465E-B8D4-5A21E8EEB215}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{202A0300-0D8F-465E-B8D4-5A21E8EEB215}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC776535-2D9E-4C0B-9FF1-B9B7BBE84412}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC776535-2D9E-4C0B-9FF1-B9B7BBE84412}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC776535-2D9E-4C0B-9FF1-B9B7BBE84412}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC776535-2D9E-4C0B-9FF1-B9B7BBE84412}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
