@@ -333,6 +333,7 @@ namespace VortexxBuddy
             public const int PulsatingGreenNanoInfusion = 280561;
             public const int GoldenNanoInfusion = 280562;
 
+            
         }
     }
 }

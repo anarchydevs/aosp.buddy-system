@@ -4,6 +4,7 @@ using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -17,16 +18,13 @@ namespace VortexxBuddy
         private static SimpleChar _vortexx;
         private static SimpleChar _releasedSpirit;
 
-        private static bool _red = false;
-        private static bool _green = false;
-        private static bool _yellow = false;
-        private static bool _blue = false;
+        private static double _timer;
 
         public IState GetNextState()
         {
 
             if (Playfield.ModelIdentity.Instance == Constants.VortexxId
-                 && _vortexx != null)
+                 && _releasedSpirit == null)
                 return new FightState();
 
             return null;
@@ -61,8 +59,6 @@ namespace VortexxBuddy
                   && !c.Name.Contains("Remains of"))
                   .FirstOrDefault();
 
-               
-
                 _releasedSpirit = DynelManager.NPCs
                    .Where(c => c.Health > 0
                           && c.Name.Contains("Released Spirit"))
@@ -80,42 +76,64 @@ namespace VortexxBuddy
                         DynelManager.LocalPlayer.StopAttack();
                     }
 
-                //if(_releasedSpirit != null)
-                //{
-                //    if (_releasedSpirit.Position.DistanceFrom(Constants._redPodium) <5)
-                //    {
-                //        if (_releasedSpirit.IsFalling)
-                //            Item.Use(_releasedSpirit, ImmunityCrystals.BloodRedNotumCrystal);
-                //    }
+                if (_releasedSpirit != null)
+                {
+                    if (_releasedSpirit.Position.DistanceFrom(Constants._redPodium) < 3)
+                    {
+                        if (Time.NormalTime > _timer + 10)
+                        {
+                            Item red = Inventory.Items.Where(x => ImmunityCrystals.BloodRedNotumCrystal.Contains(x.Id)).FirstOrDefault();
+                            red.Use();
 
-                //    if (_releasedSpirit.Position.DistanceFrom(Constants._greenPodium) < 5)
-                //    {
-                //        if (_releasedSpirit.IsFalling)
-                //            Item.Use(_releasedSpirit,ImmunityCrystals.PulsatingGreenNotumCrystal);
-                //    }
+                            _timer = Time.NormalTime;
+                        }
+                    }
 
-                //    if (_releasedSpirit.Position.DistanceFrom(Constants._yellowPodium) < 5)
-                //    {
-                //        if (_releasedSpirit.IsFalling)
-                //            Item.Use(_releasedSpirit,ImmunityCrystals.GoldenNotumCrystal);
-                //    }
+                    if (_releasedSpirit.Position.DistanceFrom(Constants._greenPodium) < 3)
+                    {
+                        if (Time.NormalTime > _timer + 10)
+                        {
+                            Item green = Inventory.Items.Where(x => ImmunityCrystals.PulsatingGreenNotumCrystal.Contains(x.Id)).FirstOrDefault();
+                            green.Use();
 
-                //    if (_releasedSpirit.Position.DistanceFrom(Constants._bluePodium) < 5)
-                //    {
-                //        if (_releasedSpirit.IsFalling)
-                //            Item.Use(_releasedSpirit,ImmunityCrystals.CobaltBlueNotumCrystal);
-                //    }
-                //}
+                            _timer = Time.NormalTime;
+                        }
+                    }
 
+                    if (_releasedSpirit.Position.DistanceFrom(Constants._yellowPodium) < 3)
+                    {
+                        if (Time.NormalTime > _timer + 10)
+                        {
+                            Item yellow = Inventory.Items.Where(x => ImmunityCrystals.GoldenNotumCrystal.Contains(x.Id)).FirstOrDefault();
+                            yellow.Use();
+
+                            _timer = Time.NormalTime;
+                        }
+                    }
+
+                    if (_releasedSpirit.Position.DistanceFrom(Constants._bluePodium) < 3)
+                    {
+                        if (Time.NormalTime > _timer + 10)
+                        {
+                            Item blue = Inventory.Items.Where(x => ImmunityCrystals.CobaltBlueNotumCrystal.Contains(x.Id)).FirstOrDefault();
+                            blue.Use();
+
+                            _timer = Time.NormalTime;
+                        }
+                    }
+                }
             }
         }
 
         public static class ImmunityCrystals
         {
-            public const int BloodRedNotumCrystal = 280581;
-            public const int PulsatingGreenNotumCrystal = 280585;
-            public const int GoldenNotumCrystal = 280586;
-            public const int CobaltBlueNotumCrystal = 280584;
+            public static readonly int[] BloodRedNotumCrystal = { 280581};
+            public static readonly int[] PulsatingGreenNotumCrystal = {280585};
+            public static readonly int[] GoldenNotumCrystal = { 280586 };
+            public static readonly int[] CobaltBlueNotumCrystal = { 280584 };
+
+           
+
 
         }
     }

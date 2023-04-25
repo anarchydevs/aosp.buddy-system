@@ -21,15 +21,26 @@ namespace VortexxBuddy
 
         public IState GetNextState()
         {
-            //if (VortexxBuddy._settings["Immunity"].AsBool() && _releasedSpirit != null)
-            //    return new ImmunityState();
+            _desecratedSpirits = DynelManager.NPCs
+                  .Where(c => c.Health > 0
+                          && c.Name.Contains("Desecrated Spirit"))
+                      .FirstOrDefault();
 
-                if (Playfield.ModelIdentity.Instance == Constants.XanHubId
+            _releasedSpirit = DynelManager.NPCs
+                   .Where(c => c.Health > 0
+                          && c.Name.Contains("Released Spirit"))
+                      .FirstOrDefault();
+
+            if (VortexxBuddy._settings["Immunity"].AsBool() && _releasedSpirit != null)
+                return new ImmunityState();
+
+            if (Playfield.ModelIdentity.Instance == Constants.XanHubId
                 && !Team.IsInTeam
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20f)
                 return new ReformState();
 
             if (Playfield.ModelIdentity.Instance == Constants.VortexxId
+                && _desecratedSpirits == null
                 && VortexxBuddy.VortexxCorpse
                 && Extensions.CanProceed()
                 && VortexxBuddy._settings["Farming"].AsBool())
@@ -60,16 +71,14 @@ namespace VortexxBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.VortexxId)
             {
-
                 _vortexx = DynelManager.NPCs
                  .Where(c => c.Health > 0
-                  && c.Name.Contains("Ground Chief Vortexx")
-                  && !c.Name.Contains("Remains of"))
+                  && c.Name.Contains("Ground Chief Vortexx"))
                   .FirstOrDefault();
 
                 _desecratedSpirits = DynelManager.NPCs
                    .Where(c => c.Health > 0
-                           && c.Name.Contains("Desecrated Spirits"))
+                           && c.Name.Contains("Desecrated Spirit"))
                        .FirstOrDefault();
 
                 _releasedSpirit = DynelManager.NPCs
@@ -93,17 +102,17 @@ namespace VortexxBuddy
                 if (_vortexxCorpse != null)
                     VortexxBuddy.VortexxCorpse = true;
 
-                //Attack and initial start
-                if (_vortexx != null && DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
-                    DynelManager.LocalPlayer.Attack(_vortexx);
-
-                if (_desecratedSpirits != null && _vortexx == null)
+                if (_desecratedSpirits != null && _vortexxCorpse != null)
                 {
                     if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
                     {
                         DynelManager.LocalPlayer.Attack(_desecratedSpirits);
                     }
                 }
+
+                //Attack and initial start
+                if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
+                    DynelManager.LocalPlayer.Attack(_vortexx);
 
                 if (VortexxBuddy._settings["Immunity"].AsBool() && _releasedSpirit != null)
                     if (DynelManager.LocalPlayer.FightingTarget != null
@@ -116,11 +125,11 @@ namespace VortexxBuddy
 
                 if (!MovementController.Instance.IsNavigating)
                 { 
-                    if (_notum.Count > 0  && _vortexx.Buffs.Contains(VortexxBuddy.Nanos.CrystalBossShapeChanger)
+                    if (_vortexx.Buffs.Contains(VortexxBuddy.Nanos.CrystalBossShapeChanger)
                     && !DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
                     {
                         foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
-                                VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position); 
+                            VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position); 
                     }
                 }
             }

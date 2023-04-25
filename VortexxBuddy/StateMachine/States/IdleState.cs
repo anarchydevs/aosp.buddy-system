@@ -31,15 +31,10 @@ namespace VortexxBuddy
                 && VortexxBuddy._settings["Toggle"].AsBool())
                 return new DiedState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.VortexxId 
-                && _vortexx != null)
+            if (Playfield.ModelIdentity.Instance == Constants.VortexxId)
                 return new FightState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.VortexxId
-                && VortexxBuddy.VortexxCorpse
-               && Extensions.CanProceed()
-               && VortexxBuddy._settings["Farming"].AsBool())
-                return new FarmingState();
+            
 
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return new SitState();
