@@ -4,6 +4,7 @@ using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading;
 
@@ -122,16 +123,23 @@ namespace VortexxBuddy
                     }
 
                 //Pathing to Notum
-
-                if (!MovementController.Instance.IsNavigating)
-                { 
-                    if (_vortexx.Buffs.Contains(VortexxBuddy.Nanos.CrystalBossShapeChanger)
-                    && !DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
+                if (_vortexx.Buffs.Contains(VortexxBuddy.Nanos.CrystalBossShapeChanger)
+                && !DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
+                {
+                    foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
                     {
-                        foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
-                            VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position); 
+                        if (notum != null)
+                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
+
+                        if (notum == null)
+                            return;
+                        //VortexxBuddy.NavMeshMovementController.Halt();
                     }
+                
+                    
+
                 }
+
             }
         }
     }

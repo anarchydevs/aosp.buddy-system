@@ -78,14 +78,17 @@ namespace VortexxBuddy
 
                 if (_releasedSpirit != null)
                 {
-                    if (_releasedSpirit.Position.DistanceFrom(Constants._redPodium) < 3)
+                    if (!VortexxBuddy._red && _releasedSpirit.Position.DistanceFrom(Constants._redPodium) < 3)
                     {
                         if (Time.NormalTime > _timer + 10)
                         {
                             Item red = Inventory.Items.Where(x => ImmunityCrystals.BloodRedNotumCrystal.Contains(x.Id)).FirstOrDefault();
+
+                            if(!Item.HasPendingUse)
                             red.Use();
 
                             _timer = Time.NormalTime;
+                            VortexxBuddy._red = true;
                         }
                     }
 
@@ -94,7 +97,9 @@ namespace VortexxBuddy
                         if (Time.NormalTime > _timer + 10)
                         {
                             Item green = Inventory.Items.Where(x => ImmunityCrystals.PulsatingGreenNotumCrystal.Contains(x.Id)).FirstOrDefault();
-                            green.Use();
+
+                            if (!Item.HasPendingUse)
+                                green.Use();
 
                             _timer = Time.NormalTime;
                         }
@@ -105,7 +110,9 @@ namespace VortexxBuddy
                         if (Time.NormalTime > _timer + 10)
                         {
                             Item yellow = Inventory.Items.Where(x => ImmunityCrystals.GoldenNotumCrystal.Contains(x.Id)).FirstOrDefault();
-                            yellow.Use();
+
+                            if (!Item.HasPendingUse)
+                                yellow.Use();
 
                             _timer = Time.NormalTime;
                         }
@@ -116,7 +123,9 @@ namespace VortexxBuddy
                         if (Time.NormalTime > _timer + 10)
                         {
                             Item blue = Inventory.Items.Where(x => ImmunityCrystals.CobaltBlueNotumCrystal.Contains(x.Id)).FirstOrDefault();
-                            blue.Use();
+
+                            if (!Item.HasPendingUse)
+                                blue.Use();
 
                             _timer = Time.NormalTime;
                         }

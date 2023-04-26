@@ -38,6 +38,11 @@ namespace VortexxBuddy
         public static bool Sitting = false;
         public static bool _died = false;
 
+        public static bool _yellow = false;
+        public static bool _blue = false;
+        public static bool _green = false;
+        public static bool _red = false;
+
         public static double _stateTimeOut;
         public static double _sitUpdateTimer;
 
