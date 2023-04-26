@@ -54,6 +54,8 @@ namespace DB2Buddy
 
         public void OnStateExit()
         {
+
+            Chat.WriteLine("Done Reforming");
             _invitedList.Clear();
             _teamCache.Clear();
 

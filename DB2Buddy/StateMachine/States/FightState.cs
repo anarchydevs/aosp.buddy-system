@@ -58,16 +58,18 @@ namespace DB2Buddy
             if (Playfield.ModelIdentity.Instance == Constants.PWId)
                 return new IdleState();
 
-                if (_aune != null && _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                || _redTower != null || _blueTower != null)
+            if (_aune != null)
+            {
+                if (_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+                     || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
+                     || _redTower != null || _blueTower != null)
                     return new CircleState();
+            }
 
             if (DB2Buddy.AuneCorpse
                 && Extensions.CanProceed()
                 && DB2Buddy._settings["Farming"].AsBool())
                 return new FarmingState();
-
 
             return null;
         }
@@ -135,48 +137,49 @@ namespace DB2Buddy
                 foreach (Dynel mist in _mists.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
                 {
                     if (!MovementController.Instance.IsNavigating)
-                    //    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(mist.Position);
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(mist.Position);
 
-                    {
-                        DynelManager.LocalPlayer.Position = mist.Position;
-                        MovementController.Instance.SetMovement(MovementAction.Update);
-                    }
+                    //{
+                    //    DynelManager.LocalPlayer.Position = mist.Position;
+                    //    MovementController.Instance.SetMovement(MovementAction.Update);
+                    //}
                 }
 
                 _taggedMist = true;
             }
 
             if (_aune != null)
-            
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 10
-                    && MovementController.Instance.IsNavigating)
-                    DB2Buddy.NavMeshMovementController.Halt();
+            {
+                //if (DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 10
+                //    && MovementController.Instance.IsNavigating)
+                //    DB2Buddy.NavMeshMovementController.Halt();
 
                 if (DynelManager.LocalPlayer.FightingTarget == null
                     && !DynelManager.LocalPlayer.IsAttackPending
                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                    && _aune.IsInLineOfSight)
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 15)
                     DynelManager.LocalPlayer.Attack(_aune);
 
                 if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                    || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
+                    || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+                    || MovementController.Instance.IsNavigating)
                 {
                     if (DynelManager.LocalPlayer.FightingTarget != null
                         && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
-                //if (_mists.Count == 0 && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10f
-                //    && !MovementController.Instance.IsNavigating)
-                //{
-                //    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
+                if (_mists.Count == 0 && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 5f
+                    && !MovementController.Instance.IsNavigating)
+                {
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
 
-                //    //DynelManager.LocalPlayer.Position = _aune.Position;
-                //    //MovementController.Instance.SetMovement(MovementAction.Update);
-                //}
-            
+                    //DynelManager.LocalPlayer.Position = _aune.Position;
+                    //MovementController.Instance.SetMovement(MovementAction.Update);
+                }
 
+            }
         }
     }
 }

@@ -47,12 +47,17 @@ namespace DB2Buddy
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
 
+             if (!DB2Buddy._settings["Toggle"].AsBool())
+            {
+                DB2Buddy.NavMeshMovementController.Halt();
+            }
+
             if (Playfield.ModelIdentity.Instance == Constants.PWId)
                 return new IdleState();
 
             if (_redTower != null && !MovementController.Instance.IsNavigating)
             {
-                DB2Buddy.NavMeshMovementController.Halt();
+                //DB2Buddy.NavMeshMovementController.Halt();
                 DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
                 //DynelManager.LocalPlayer.Position = _redTower.Position;
                 //DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
@@ -62,7 +67,7 @@ namespace DB2Buddy
             if (_blueTower != null && !MovementController.Instance.IsNavigating
                 && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
             {
-                DB2Buddy.NavMeshMovementController.Halt();
+                //DB2Buddy.NavMeshMovementController.Halt();
                 DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_blueTower.Position);
                 //DynelManager.LocalPlayer.Position = _blueTower.Position;
                 //DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
@@ -71,20 +76,26 @@ namespace DB2Buddy
 
 
 
-            if (_redTower == null && _blueTower == null)
-            {
-                if (_aune == null
-                    || (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                    && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                    && !MovementController.Instance.IsNavigating))
-                {
-                    DB2Buddy.NavMeshMovementController.Halt();
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
-                    //DynelManager.LocalPlayer.Position = (Constants._startPosition);
-                    //MovementController.Instance.SetMovement(MovementAction.Update);
-                    return new FightState();
-                }
-            }
+            //if (_redTower == null && _blueTower == null
+            //    && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 15)
+            //{
+            //    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+            //    return new FightState();
+            //}
+
+            //{
+            //    if (_aune == null
+            //        || (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+            //        && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
+            //        && !MovementController.Instance.IsNavigating))
+            //    {
+            //        //DB2Buddy.NavMeshMovementController.Halt();
+            //        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+            //        //DynelManager.LocalPlayer.Position = (Constants._startPosition);
+            //        //MovementController.Instance.SetMovement(MovementAction.Update);
+            //        return new FightState();
+            //    }
+            //}
 
             return null;
         }
@@ -112,18 +123,23 @@ namespace DB2Buddy
                     ReformState._teamCache.Add(member.Identity);
             }
 
-            //_aune = DynelManager.NPCs
-            //  .Where(c => c.Health > 0
-            //      && c.Name.Contains("Ground Chief Aune")
-            //      && !c.Name.Contains("Remains of "))
-            //  .FirstOrDefault();
+            _aune = DynelManager.NPCs
+              .Where(c => c.Health > 0
+                  && c.Name.Contains("Ground Chief Aune")
+                  && !c.Name.Contains("Remains of "))
+              .FirstOrDefault();
 
-            //if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
-            //{
-            //    if (DynelManager.LocalPlayer.FightingTarget != null
-            //        && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
-            //        DynelManager.LocalPlayer.StopAttack();
-            //}
+
+            if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+            {
+                if (DynelManager.LocalPlayer.FightingTarget != null
+                    && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
+                    DynelManager.LocalPlayer.StopAttack();
+            }
+
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 5
+                && !MovementController.Instance.IsNavigating)
+                DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
 
             //if (Time.NormalTime > _time + 2f)
             //{
@@ -157,7 +173,7 @@ namespace DB2Buddy
             //        DynelManager.LocalPlayer.Position = Constants.Pos4;
             //        DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
 
-                    
+
             //        _init = false;
             //    }
             //}

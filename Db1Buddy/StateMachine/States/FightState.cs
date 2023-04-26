@@ -17,10 +17,7 @@ namespace Db1Buddy
 
         private static SimpleChar _maskedCommando;
 
-        private static bool _yellow = false;
-        private static bool _blue = false;
-        private static bool _green = false;
-        private static bool _red = false;
+       
 
         public IState GetNextState()
         {

@@ -48,7 +48,7 @@ namespace DB2Buddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine(" Exit EnterState");
+            Chat.WriteLine("Exit EnterState");
             DB2Buddy.AuneCorpse = false;
             _init = false;
         }

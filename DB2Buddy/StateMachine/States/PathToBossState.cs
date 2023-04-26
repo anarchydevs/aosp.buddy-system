@@ -1,5 +1,6 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
+using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
 using System;
@@ -34,7 +35,7 @@ namespace DB2Buddy
             if (Playfield.ModelIdentity.Instance == Constants.PWId)
                 return new IdleState();
 
-            if (_aune != null && _aune.IsInLineOfSight)
+            if (_aune != null && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 15)
             {
                 return new FightState();
             }
@@ -63,7 +64,7 @@ namespace DB2Buddy
 
             if (Playfield.ModelIdentity.Instance == Constants.DB2Id && !Team.Members.Any(c => c.Character == null))
             {
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) > 1f)
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 5f)
                 {
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
                 }

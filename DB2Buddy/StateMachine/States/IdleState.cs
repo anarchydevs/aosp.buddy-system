@@ -50,38 +50,38 @@ namespace DB2Buddy
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return new SitState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.PWId
-               && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 30f
-               && !Team.IsInTeam
-               && DB2Buddy._settings["Toggle"].AsBool())
-                return new ReformState();
+            if (DB2Buddy._settings["Toggle"].AsBool())
 
-            if (Playfield.ModelIdentity.Instance == Constants.PWId
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 30f
-                && Team.IsInTeam
-                && Extensions.CanProceed()
-                && DB2Buddy._settings["Toggle"].AsBool())
-                return new EnterState();
+            {
+                if (Playfield.ModelIdentity.Instance == Constants.PWId)
+                {
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 30f
+                       && !Team.IsInTeam)
+                        return new ReformState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.DB2Id
-                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) < 10f
-                 && Team.IsInTeam
-                 && DB2Buddy._settings["Toggle"].AsBool())
-                return new PathToBossState();
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 30f
+                        && Team.IsInTeam
+                        && Extensions.CanProceed())
+                        return new EnterState();
+                }
 
-            if (Playfield.ModelIdentity.Instance == Constants.DB2Id
-                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 10f
-                 && Team.IsInTeam
-                 && DB2Buddy._settings["Toggle"].AsBool())
-                return new FightState();
+                if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
+                {
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) < 10f
+                     && Team.IsInTeam)
+                        return new PathToBossState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.DB2Id
-                && _auneCorpse != null
-                    && Extensions.CanProceed()
-                    && DB2Buddy._settings["Farming"].AsBool())
-                return new FarmingState();
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 10f
+                         && Team.IsInTeam)
+                        return new FightState();
+
+                    if (_auneCorpse != null
+                            && Extensions.CanProceed()
+                            && DB2Buddy._settings["Farming"].AsBool())
+                        return new FarmingState();
+                }
+            }
         
-
             return null;
         }
 
