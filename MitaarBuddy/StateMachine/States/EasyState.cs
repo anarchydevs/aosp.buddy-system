@@ -114,21 +114,21 @@ namespace MitaarBuddy
                 //Pathing to spirits
                 if (_xanSpirits != null && !MovementController.Instance.IsNavigating)
                 {
-                    if (_redXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
+                    if (_redXanSpirit != null //&& DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheBlood))
-                        MovementController.Instance.SetDestination(Constants._redPodium);
+                        MovementController.Instance.SetDestination(_redXanSpirit.Position);
 
-                    if (_blueXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) > 0.9f
+                    if (_blueXanSpirit != null //&& DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheSource))
-                        MovementController.Instance.SetDestination(Constants._bluePodium);
+                        MovementController.Instance.SetDestination(_blueXanSpirit.Position);
 
-                    if (_greenXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) > 0.9f
+                    if (_greenXanSpirit != null //&& DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheOutsider))
-                        MovementController.Instance.SetDestination(Constants._greenPodium);
+                        MovementController.Instance.SetDestination(_greenXanSpirit.Position);
 
-                    if (_yellowXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) > 0.9f
+                    if (_yellowXanSpirit != null //&& DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheLight))
-                        MovementController.Instance.SetDestination(Constants._yellowPodium);
+                        MovementController.Instance.SetDestination(_yellowXanSpirit.Position);
                 }
             }
 
