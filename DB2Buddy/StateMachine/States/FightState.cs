@@ -158,7 +158,8 @@ namespace DB2Buddy
                     && !DynelManager.LocalPlayer.IsAttackPending
                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 15)
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 15
+                    && !MovementController.Instance.IsNavigating)
                     DynelManager.LocalPlayer.Attack(_aune);
 
                 if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
@@ -170,15 +171,18 @@ namespace DB2Buddy
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
-                if (_mists.Count == 0 && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 5f
-                    && !MovementController.Instance.IsNavigating)
-                {
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
+                //if (_mists.Count == 0 && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10f
+                //    && !MovementController.Instance.IsNavigating)
+                //{
+                //    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
 
-                    //DynelManager.LocalPlayer.Position = _aune.Position;
-                    //MovementController.Instance.SetMovement(MovementAction.Update);
-                }
+                //    //DynelManager.LocalPlayer.Position = _aune.Position;
+                //    //MovementController.Instance.SetMovement(MovementAction.Update);
+                //}
 
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) > 130)
+                    DynelManager.LocalPlayer.Position = Constants._startPosition;
+                    MovementController.Instance.SetMovement(MovementAction.Update);
             }
         }
     }

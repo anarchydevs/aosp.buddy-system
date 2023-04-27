@@ -51,7 +51,7 @@ namespace DB2Buddy
             }
 
             if (_auneCorpse != null && !DynelManager.LocalPlayer.Buffs.Contains(NanoLine.Stun)
-                && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) > 3.0f
+                && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) > 1.0f
                 && !MovementController.Instance.IsNavigating)
             {
                 DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_auneCorpsePos);
@@ -61,7 +61,7 @@ namespace DB2Buddy
 
             if (!_initCorpse && Team.IsInTeam && Playfield.ModelIdentity.Instance == Constants.DB2Id
                 && !MovementController.Instance.IsNavigating
-                && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) < 7.0f)
+                && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) < 3.0f)
             {
                 Chat.WriteLine("Pause for looting, 20 sec");
                 Task.Factory.StartNew(

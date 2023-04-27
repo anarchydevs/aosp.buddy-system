@@ -47,7 +47,7 @@ namespace DB2Buddy
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
 
-             if (!DB2Buddy._settings["Toggle"].AsBool())
+            if (!DB2Buddy._settings["Toggle"].AsBool())
             {
                 DB2Buddy.NavMeshMovementController.Halt();
             }
@@ -130,12 +130,11 @@ namespace DB2Buddy
               .FirstOrDefault();
 
 
-            if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
-            {
-                if (DynelManager.LocalPlayer.FightingTarget != null
-                    && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
-                    DynelManager.LocalPlayer.StopAttack();
-            }
+
+            if (DynelManager.LocalPlayer.FightingTarget != null
+                && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
+                DynelManager.LocalPlayer.StopAttack();
+
 
             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 5
                 && !MovementController.Instance.IsNavigating)
