@@ -56,7 +56,7 @@ namespace VortexxBuddy
             if (Game.IsZoning) { return; }
 
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-                && !Team.Members.Any(c => c.Character == null)
+                //&& !Team.Members.Any(c => c.Character == null)
                 && Time.NormalTime > _time + 2f)
             {
                 _time = Time.NormalTime;

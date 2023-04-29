@@ -7,37 +7,34 @@ namespace VortexxBuddy
 {
     public class IdleState : IState
     {
-        private static SimpleChar _vortexx;
 
-        private static Corpse _vortexxCorpse;
+        
+
         public IState GetNextState()
         {
-            _vortexx = DynelManager.NPCs
-                .Where(c => c.Health > 0
-                 && c.Name.Contains("Ground Chief Vortexx")
-                 && !c.Name.Contains("Remains of"))
-                 .FirstOrDefault();
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20f
-                && Team.IsInTeam
-                && Extensions.CanProceed()
-                && VortexxBuddy._settings["Toggle"].AsBool())
-                return new EnterState();
+            if (Playfield.ModelIdentity.Instance == Constants.XanHubId && VortexxBuddy._settings["Toggle"].AsBool())
+            {
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20f
+                    && Team.IsInTeam
+                    && Extensions.CanProceed()
+                    && !VortexxBuddy._settings["Clear"].AsBool())
+                    return new EnterState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) > 20f
-                && Extensions.CanProceed()
-                && VortexxBuddy._settings["Toggle"].AsBool())
-                return new DiedState();
+                if (VortexxBuddy._clearToEnter)
+                    return new EnterState();
+
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) > 20f
+                    && Extensions.CanProceed())
+                    return new DiedState();
+            }
 
             if (Playfield.ModelIdentity.Instance == Constants.VortexxId)
                 return new FightState();
 
             
-
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return new SitState();
 
             return null;
         }

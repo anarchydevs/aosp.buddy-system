@@ -31,7 +31,7 @@ namespace VortexxBuddy
 
         public static bool Toggle = false;
         public static bool Farming = false;
-
+        public static bool _clearToEnter = false;
 
         public static bool VortexxCorpse = false;
 
@@ -84,6 +84,7 @@ namespace VortexxBuddy
                 _settings.AddVariable("Toggle", false);
                 _settings.AddVariable("Farming", false);
                 _settings.AddVariable("Immunity", false);
+                _settings.AddVariable("Clear", false);
 
                 _settings["Toggle"] = false;
                 _settings["Farming"] = false;

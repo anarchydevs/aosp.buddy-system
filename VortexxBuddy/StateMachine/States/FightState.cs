@@ -7,12 +7,19 @@ using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Threading;
-
+using SmokeLounge.AOtomation.Messaging.GameData;
+using SmokeLounge.AOtomation.Messaging.Messages;
+using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
+using AOSharp.Core.Inventory;
+using static VortexxBuddy.ImmunityState;
+using System.Timers;
 
 namespace VortexxBuddy
 {
     public class FightState : IState
     {
+        
 
         private static SimpleChar _vortexx;
         private static Corpse _vortexxCorpse;
@@ -35,13 +42,10 @@ namespace VortexxBuddy
             if (VortexxBuddy._settings["Immunity"].AsBool() && _releasedSpirit != null)
                 return new ImmunityState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-                && !Team.IsInTeam
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20f)
-                return new ReformState();
+            if (Playfield.ModelIdentity.Instance == Constants.XanHubId)
+                return new IdleState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.VortexxId
-                && _desecratedSpirits == null
+            if (_desecratedSpirits == null
                 && VortexxBuddy.VortexxCorpse
                 && Extensions.CanProceed()
                 && VortexxBuddy._settings["Farming"].AsBool())
@@ -59,6 +63,8 @@ namespace VortexxBuddy
         {
             Chat.WriteLine("Exit FightState");
         }
+
+       
 
         public void Tick()
         {
@@ -103,7 +109,7 @@ namespace VortexxBuddy
                 if (_vortexxCorpse != null)
                     VortexxBuddy.VortexxCorpse = true;
 
-                if (_desecratedSpirits != null && _vortexxCorpse != null)
+                if (_desecratedSpirits != null && _vortexx == null)
                 {
                     if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
                     {
@@ -112,32 +118,40 @@ namespace VortexxBuddy
                 }
 
                 //Attack and initial start
-                if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
-                    DynelManager.LocalPlayer.Attack(_vortexx);
-
-                if (VortexxBuddy._settings["Immunity"].AsBool() && _releasedSpirit != null)
-                    if (DynelManager.LocalPlayer.FightingTarget != null
-                       && DynelManager.LocalPlayer.FightingTarget.Name == _vortexx.Name)
-                    {
-                        DynelManager.LocalPlayer.StopAttack();
-                    }
-
-                //Pathing to Notum
-                if (_vortexx.Buffs.Contains(VortexxBuddy.Nanos.CrystalBossShapeChanger)
-                && !DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
+                if (_vortexx != null)
                 {
-                    foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
+
+                    if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
+                        DynelManager.LocalPlayer.Attack(_vortexx);
+
+                    if (VortexxBuddy._settings["Immunity"].AsBool() && _releasedSpirit != null)
+                        if (DynelManager.LocalPlayer.FightingTarget != null
+                           && DynelManager.LocalPlayer.FightingTarget.Name == _vortexx.Name)
+                        {
+                            DynelManager.LocalPlayer.StopAttack();
+                        }
+
+                    if (_releasedSpirit != null && !VortexxBuddy._clearToEnter &&
+                        _releasedSpirit.Position.DistanceFrom(Constants._bluePodium) < 3)
                     {
-                        if (notum != null)
-                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
-
-                        if (notum == null)
-                            return;
-                        //VortexxBuddy.NavMeshMovementController.Halt();
+                        VortexxBuddy._clearToEnter = true;
+                        Chat.WriteLine(" clear to enter");
                     }
-                
-                    
 
+                    if(_vortexx.Buffs.Contains(VortexxBuddy.Nanos.CrystalBossShapeChanger))
+                        Chat.WriteLine($"{Targeting.TargetChar?.HealthPercent}");
+
+                    //Pathing to Notum
+                    if (_vortexx.HealthPercent == 64.0 && !DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
+                    {
+                            foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
+                            {
+                                if (notum != null)
+                                    VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
+                                
+                            }
+                        
+                    }
                 }
 
             }

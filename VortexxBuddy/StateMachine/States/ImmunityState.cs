@@ -22,6 +22,10 @@ namespace VortexxBuddy
 
         public IState GetNextState()
         {
+            _releasedSpirit = DynelManager.NPCs
+                  .Where(c => c.Health > 0
+                         && c.Name.Contains("Released Spirit"))
+                     .FirstOrDefault();
 
             if (Playfield.ModelIdentity.Instance == Constants.VortexxId
                  && _releasedSpirit == null)
@@ -55,8 +59,7 @@ namespace VortexxBuddy
 
                 _vortexx = DynelManager.NPCs
                  .Where(c => c.Health > 0
-                  && c.Name.Contains("Ground Chief Vortexx")
-                  && !c.Name.Contains("Remains of"))
+                  && c.Name.Contains("Ground Chief Vortexx"))
                   .FirstOrDefault();
 
                 _releasedSpirit = DynelManager.NPCs
@@ -78,9 +81,9 @@ namespace VortexxBuddy
 
                 if (_releasedSpirit != null)
                 {
-                    if (!VortexxBuddy._red && _releasedSpirit.Position.DistanceFrom(Constants._redPodium) < 3)
+                    if (_releasedSpirit.Position.DistanceFrom(Constants._redPodium) < 3)
                     {
-                        if (Time.NormalTime > _timer + 10)
+                        if (!VortexxBuddy._red && Time.NormalTime > _timer + 10)
                         {
                             Item red = Inventory.Items.Where(x => ImmunityCrystals.BloodRedNotumCrystal.Contains(x.Id)).FirstOrDefault();
 
@@ -94,7 +97,7 @@ namespace VortexxBuddy
 
                     if (_releasedSpirit.Position.DistanceFrom(Constants._greenPodium) < 3)
                     {
-                        if (Time.NormalTime > _timer + 10)
+                        if (!VortexxBuddy._green && Time.NormalTime > _timer + 10)
                         {
                             Item green = Inventory.Items.Where(x => ImmunityCrystals.PulsatingGreenNotumCrystal.Contains(x.Id)).FirstOrDefault();
 
@@ -102,12 +105,13 @@ namespace VortexxBuddy
                                 green.Use();
 
                             _timer = Time.NormalTime;
+                            VortexxBuddy._green = true;
                         }
                     }
 
                     if (_releasedSpirit.Position.DistanceFrom(Constants._yellowPodium) < 3)
                     {
-                        if (Time.NormalTime > _timer + 10)
+                        if (!VortexxBuddy._yellow && Time.NormalTime > _timer + 10)
                         {
                             Item yellow = Inventory.Items.Where(x => ImmunityCrystals.GoldenNotumCrystal.Contains(x.Id)).FirstOrDefault();
 
@@ -115,12 +119,13 @@ namespace VortexxBuddy
                                 yellow.Use();
 
                             _timer = Time.NormalTime;
+                            VortexxBuddy._yellow = true;
                         }
                     }
 
-                    if (_releasedSpirit.Position.DistanceFrom(Constants._bluePodium) < 3)
+                    if ( _releasedSpirit.Position.DistanceFrom(Constants._bluePodium) < 3)
                     {
-                        if (Time.NormalTime > _timer + 10)
+                        if (!VortexxBuddy._blue && Time.NormalTime > _timer + 10)
                         {
                             Item blue = Inventory.Items.Where(x => ImmunityCrystals.CobaltBlueNotumCrystal.Contains(x.Id)).FirstOrDefault();
 
@@ -128,6 +133,7 @@ namespace VortexxBuddy
                                 blue.Use();
 
                             _timer = Time.NormalTime;
+                            VortexxBuddy._blue = true;
                         }
                     }
                 }
@@ -136,10 +142,10 @@ namespace VortexxBuddy
 
         public static class ImmunityCrystals
         {
-            public static readonly int[] BloodRedNotumCrystal = { 280581};
+            public static readonly int[] BloodRedNotumCrystal = {280581};
             public static readonly int[] PulsatingGreenNotumCrystal = {280585};
-            public static readonly int[] GoldenNotumCrystal = { 280586 };
-            public static readonly int[] CobaltBlueNotumCrystal = { 280584 };
+            public static readonly int[] GoldenNotumCrystal = {280586};
+            public static readonly int[] CobaltBlueNotumCrystal = {280584};
 
            
 

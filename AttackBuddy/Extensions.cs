@@ -29,43 +29,67 @@ namespace AttackBuddy
             return min + Math.Abs(BitConverter.ToInt32(intBytes, 0)) % (max - min + 1);
         }
 
-        public static bool IsFightingAny(SimpleChar target)
+        public static bool IsFightingAny(SimpleChar mob)
         {
+            if (mob?.FightingTarget == null) { return true; }
+
+            if (mob?.FightingTarget?.Name == "Guardian Spirit of Purification"
+                || mob?.FightingTarget?.Name == "Rookie Alien Hunter"
+                || mob?.FightingTarget?.Name == "Unicorn Service Tower Alpha"
+                || mob?.FightingTarget?.Name == "Unicorn Service Tower Delta"
+                || mob?.FightingTarget?.Name == "Unicorn Service Tower Gamma") { return true; }
+
             if (Team.IsInTeam)
             {
-                if (target?.FightingTarget == null) { return true; }
-
-                if (target?.FightingTarget != null
-                    && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name
-                        || AttackBuddy._helpers.Contains(target?.FightingTarget.Name)
-                        || Team.Members.Any(c => c.Name == target?.FightingTarget?.Name))) { return true; }
-
-                if (target?.FightingTarget?.Name == "Guardian Spirit of Purification"
-                    || target?.FightingTarget?.Name == "Rookie Alien Hunter"
-                    || target?.FightingTarget?.Name == "Unicorn Service Tower Alpha"
-                    || target?.FightingTarget?.Name == "Unicorn Service Tower Delta"
-                    || target?.FightingTarget?.Name == "Unicorn Service Tower Gamma") { return true; }
-
-                return false;
+                return Team.Members.Select(m => m.Name).Contains(mob.FightingTarget?.Name)
+                   || AttackBuddy._helpers.Contains(mob?.FightingTarget.Name)
+                   || (mob?.FightingTarget?.IsPet == true
+                        && Team.Members.Select(c => c.Identity.Instance).Any(c => c == mob?.FightingTarget?.PetOwnerId));
             }
-            else
-            {
-                if (target?.FightingTarget == null) { return true; }
 
-                if (target?.FightingTarget != null
-                    && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name
-                        || AttackBuddy._helpers.Contains(target?.FightingTarget.Name)
-                        || DynelManager.LocalPlayer.Pets.Any(c => target?.FightingTarget?.Name == c.Character?.Name))) { return true; }
-
-                if (target?.FightingTarget?.Name == "Guardian Spirit of Purification"
-                    || target?.FightingTarget?.Name == "Rookie Alien Hunter"
-                    || target?.FightingTarget?.Name == "Unicorn Service Tower Alpha"
-                    || target?.FightingTarget?.Name == "Unicorn Service Tower Delta"
-                    || target?.FightingTarget?.Name == "Unicorn Service Tower Gamma") { return true; }
-
-                return false;
-            }
+            return mob.FightingTarget?.Name == DynelManager.LocalPlayer.Name
+                || AttackBuddy._helpers.Contains(mob?.FightingTarget.Name)
+                || (mob?.FightingTarget?.IsPet == true
+                    && mob.FightingTarget?.PetOwnerId == DynelManager.LocalPlayer.Identity.Instance);
         }
+
+        //public static bool IsFightingAny(SimpleChar target)
+        //{
+        //    if (Team.IsInTeam)
+        //    {
+        //        if (target?.FightingTarget == null) { return true; }
+
+        //        if (target?.FightingTarget != null
+        //            && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name
+        //                || AttackBuddy._helpers.Contains(target?.FightingTarget.Name)
+        //                || Team.Members.Any(c => c.Name == target?.FightingTarget?.Name))) { return true; }
+
+        //        if (target?.FightingTarget?.Name == "Guardian Spirit of Purification"
+        //            || target?.FightingTarget?.Name == "Rookie Alien Hunter"
+        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Alpha"
+        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Delta"
+        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Gamma") { return true; }
+
+        //        return false;
+        //    }
+        //    else
+        //    {
+        //        if (target?.FightingTarget == null) { return true; }
+
+        //        if (target?.FightingTarget != null
+        //            && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name
+        //                || AttackBuddy._helpers.Contains(target?.FightingTarget.Name)
+        //                || DynelManager.LocalPlayer.Pets.Any(c => target?.FightingTarget?.Name == c.Character?.Name))) { return true; }
+
+        //        if (target?.FightingTarget?.Name == "Guardian Spirit of Purification"
+        //            || target?.FightingTarget?.Name == "Rookie Alien Hunter"
+        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Alpha"
+        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Delta"
+        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Gamma") { return true; }
+
+        //        return false;
+        //    }
+        //}
         public static SimpleChar GetLeader(Identity leader)
         {
             if (!DynelManager.Players

@@ -70,8 +70,8 @@ namespace VortexxBuddy
                 && DynelManager.LocalPlayer.GetStat(Stat.TemporarySkillReduction) <= 1
                 && DynelManager.LocalPlayer.MovementState != MovementState.Sit
                 && Spell.List.Any(c => c.IsReady)
-                && !Spell.HasPendingCast
-                && !Debuffed();
+                && !Spell.HasPendingCast;
+                //&& !Debuffed();
         }
 
         public static bool IsNull(SimpleChar _target)

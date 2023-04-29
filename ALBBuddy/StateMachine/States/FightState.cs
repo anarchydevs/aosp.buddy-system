@@ -82,8 +82,6 @@ namespace ALBBuddy
             }
         }
 
-
-
         public static void HandleTaunting(SimpleChar target)
         {
             if (_aggToolCounter >= 2)
@@ -165,16 +163,54 @@ namespace ALBBuddy
             }
         }
 
-        public bool AttackingTeam(SimpleChar mob)
+        public static bool AttackingTeam(SimpleChar mob)
         {
-            if (mob.FightingTarget == null) { return false; }
+            if (mob?.FightingTarget == null) { return true; }
+
+            if (mob?.FightingTarget?.Name == "Guardian Spirit of Purification"
+                || mob?.FightingTarget?.Name == "Rookie Alien Hunter"
+                || mob?.FightingTarget?.Name == "Unicorn Service Tower Alpha"
+                || mob?.FightingTarget?.Name == "Unicorn Service Tower Delta"
+                || mob?.FightingTarget?.Name == "Unicorn Service Tower Gamma") { return true; }
 
             if (Team.IsInTeam)
+            {
                 return Team.Members.Select(m => m.Name).Contains(mob.FightingTarget?.Name)
-                        || (bool)mob.FightingTarget?.IsPet;
+                   || (mob?.FightingTarget?.IsPet == true
+                        && Team.Members.Select(c => c.Identity.Instance).Any(c => c == mob?.FightingTarget?.PetOwnerId));
+            }
 
             return mob.FightingTarget?.Name == DynelManager.LocalPlayer.Name
-                || (bool)mob.FightingTarget?.IsPet;
+                || (mob?.FightingTarget?.IsPet == true
+                    && mob.FightingTarget?.PetOwnerId == DynelManager.LocalPlayer.Identity.Instance);
         }
+
+        public static bool TeamAttacking(SimpleChar mob)
+        {
+            if (Team.IsInTeam)
+            {
+                return Team.Members.Any(c => c.Character?.FightingTarget?.Identity == mob.Identity)
+                    || (DynelManager.Characters.Any(c => c.IsPet
+                        && Team.Members.Select(b => b.Identity.Instance).Contains(c.PetOwnerId)
+                        && c.FightingTarget != null && c.FightingTarget.Identity == mob.Identity));
+            }
+
+            return DynelManager.LocalPlayer.FightingTarget?.Identity == mob.Identity
+                || (DynelManager.Characters.Any(c => c.IsPet
+                        && c.PetOwnerId == DynelManager.LocalPlayer.Identity.Instance
+                        && c.FightingTarget != null && c.FightingTarget.Identity == mob.Identity));
+        }
+
+        //public bool AttackingTeam(SimpleChar mob)
+        //{
+        //    if (mob.FightingTarget == null) { return false; }
+
+        //    if (Team.IsInTeam)
+        //        return Team.Members.Select(m => m.Name).Contains(mob.FightingTarget?.Name)
+        //                || (bool)mob.FightingTarget?.IsPet;
+
+        //    return mob.FightingTarget?.Name == DynelManager.LocalPlayer.Name
+        //        || (bool)mob.FightingTarget?.IsPet;
+        //}
     }
 }

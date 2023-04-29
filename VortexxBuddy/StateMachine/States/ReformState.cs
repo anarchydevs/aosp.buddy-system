@@ -49,6 +49,7 @@ namespace VortexxBuddy
                 _phase = ReformPhase.Waiting;
             }
 
+            VortexxBuddy._clearToEnter = false;
             FarmingState._initCorpse = false;
         }
 
