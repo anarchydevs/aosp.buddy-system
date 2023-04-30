@@ -17,10 +17,7 @@ namespace Db1Buddy
 
         private static SimpleChar _maskedCommando;
 
-        private static bool _yellow = false;
-        private static bool _blue = false;
-        private static bool _green = false;
-        private static bool _red = false;
+       
 
         public IState GetNextState()
         {
@@ -36,7 +33,7 @@ namespace Db1Buddy
                 return new GetBuffState();
 
 
-            if (_mikkelsenCorpse != null
+            if (Db1Buddy.MikkelsenCorpse
                 && Extensions.CanProceed()
                 && Db1Buddy._settings["Farming"].AsBool())
                 return new FarmingState();
@@ -68,6 +65,9 @@ namespace Db1Buddy
             if (Playfield.ModelIdentity.Instance == 6003)
             {
                 Mobs();
+
+                if (_mikkelsenCorpse != null)
+                    Db1Buddy.MikkelsenCorpse = true;
 
                 //Attack and initial start
                 if (_mikkelsen != null 

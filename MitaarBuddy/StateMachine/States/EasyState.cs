@@ -31,7 +31,7 @@ namespace MitaarBuddy
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) <= 10f)
                 return new ReformState();
 
-            if (_sinuhCorpse != null
+            if (MitaarBuddy.SinuhCorpse
                 && _xanSpirits == null
                 && _alienCoccoon == null
                 && Extensions.CanProceed()
@@ -84,6 +84,9 @@ namespace MitaarBuddy
 
                 Mobs();
 
+                if (_sinuhCorpse != null)
+                    MitaarBuddy.SinuhCorpse = true;
+
                 //Attack and initial start
                 if (_sinuh != null && _alienCoccoon == null && _xanSpirits == null)
                 {
@@ -111,21 +114,21 @@ namespace MitaarBuddy
                 //Pathing to spirits
                 if (_xanSpirits != null && !MovementController.Instance.IsNavigating)
                 {
-                    if (_redXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
+                    if (_redXanSpirit != null //&& DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheBlood))
-                        MovementController.Instance.SetDestination(Constants._redPodium);
+                        MovementController.Instance.SetDestination(_redXanSpirit.Position);
 
-                    if (_blueXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) > 0.9f
+                    if (_blueXanSpirit != null //&& DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheSource))
-                        MovementController.Instance.SetDestination(Constants._bluePodium);
+                        MovementController.Instance.SetDestination(_blueXanSpirit.Position);
 
-                    if (_greenXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) > 0.9f
+                    if (_greenXanSpirit != null //&& DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheOutsider))
-                        MovementController.Instance.SetDestination(Constants._greenPodium);
+                        MovementController.Instance.SetDestination(_greenXanSpirit.Position);
 
-                    if (_yellowXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) > 0.9f
+                    if (_yellowXanSpirit != null //&& DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheLight))
-                        MovementController.Instance.SetDestination(Constants._yellowPodium);
+                        MovementController.Instance.SetDestination(_yellowXanSpirit.Position);
                 }
             }
 

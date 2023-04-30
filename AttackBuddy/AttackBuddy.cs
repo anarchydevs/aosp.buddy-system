@@ -387,6 +387,7 @@ namespace AttackBuddy
 
                 return;
             }
+                
 
             if (Time.NormalTime > _refreshList + 0.5f
                 && Toggle == true)

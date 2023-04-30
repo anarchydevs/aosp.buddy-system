@@ -33,7 +33,7 @@ namespace Db1Buddy
                  && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) > 40f)
                 return new FightState();
 
-            if (_mikkelsenCorpse != null
+            if (Db1Buddy.MikkelsenCorpse
                && Extensions.CanProceed()
                && Db1Buddy._settings["Farming"].AsBool())
                 return new FarmingState();

@@ -40,6 +40,8 @@ namespace Db1Buddy
         public static bool Hardcore = false;
         public static bool _hardcoreToggled = false;
 
+        public static bool MikkelsenCorpse = false;
+
         public static bool Sitting = false;
         public static bool _died = false;
 
