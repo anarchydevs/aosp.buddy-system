@@ -14,6 +14,7 @@ namespace MitaarBuddy
     {
         private const int MinWait = 3;
         private const int MaxWait = 5;
+        private static double _time;
         private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
 
         public IState GetNextState()
@@ -51,7 +52,8 @@ namespace MitaarBuddy
                     Task.Delay(2 * 1000).ContinueWith(x =>
                     {
                         MitaarBuddy.NavMeshMovementController.SetDestination(new Vector3(347.0f, 310.9f, 407.7f).Randomize(2f));
-                    }, _cancellationToken.Token);
+                    },
+                    _cancellationToken.Token);
                 }
                 else
                 {
@@ -64,7 +66,7 @@ namespace MitaarBuddy
 
                     }, _cancellationToken.Token);
                 }
-
+                _time = Time.NormalTime;
             }
         }
 

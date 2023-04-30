@@ -34,8 +34,9 @@ namespace MitaarBuddy
         {
             if (Game.IsZoning) { return; }
 
-            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._reclaim) < 10.0f)
-            {
+            //if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._reclaim) < 10.0f)
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) > 10.0f)
+                {
                 if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
                     && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
                     MitaarBuddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
@@ -44,7 +45,8 @@ namespace MitaarBuddy
                     && DynelManager.LocalPlayer.GetStat(Stat.TemporarySkillReduction) <= 1
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit
                     && Playfield.ModelIdentity.Instance == Constants.XanHubId && !MitaarBuddy.NavMeshMovementController.IsNavigating)
-                    MovementController.Instance.SetPath(Constants._pathToMitaar);
+                    MitaarBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._entrance);
+                    //MovementController.Instance.SetPath(Constants._pathToMitaar);
             }
         }
     }

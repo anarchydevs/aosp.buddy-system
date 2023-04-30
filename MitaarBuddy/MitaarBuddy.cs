@@ -38,6 +38,8 @@ namespace MitaarBuddy
         public static bool Hardcore = false;
         public static bool _hardcoreToggled = false;
 
+        public static bool SinuhCorpse = false;
+
         public static bool Sitting = false;
         public static bool _died = false;
 
