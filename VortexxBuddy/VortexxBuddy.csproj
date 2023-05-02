@@ -82,14 +82,12 @@
     <Compile Include="Config.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="IPCMessages\EasyMode.cs" />
     <Compile Include="IPCMessages\Farming.cs" />
-    <Compile Include="IPCMessages\HardcoreMode.cs" />
-    <Compile Include="IPCMessages\MediumMode.cs" />
     <Compile Include="IPCMessages\NoFarming.cs" />
     <Compile Include="IPCMessages\IPCOpcode.cs" />
     <Compile Include="IPCMessages\StartMessage.cs" />
     <Compile Include="IPCMessages\StopMessage.cs" />
+    <Compile Include="IPCMessages\EnterMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsController.cs" />
     <Compile Include="StateMachine\IState.cs">

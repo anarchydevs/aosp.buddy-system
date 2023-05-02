@@ -28,9 +28,12 @@ namespace VortexxBuddy
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) < 5f)
                 return new FightState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-                && !Extensions.CanProceed())
-                return new IdleState();
+            if (Playfield.ModelIdentity.Instance == Constants.XanHubId)
+            {
+                if (!Extensions.CanProceed())
+                    return new IdleState();
+
+            }
 
             return null;
         }
@@ -39,9 +42,8 @@ namespace VortexxBuddy
         {
             if (Extensions.CanProceed())
             {
-                Chat.WriteLine("Entering");
+                //Chat.WriteLine("Entering");
 
-                _time = Time.NormalTime;
             }
         }
 
@@ -55,18 +57,18 @@ namespace VortexxBuddy
         {
             if (Game.IsZoning) { return; }
 
-            if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-                //&& !Team.Members.Any(c => c.Character == null)
-                && Time.NormalTime > _time + 2f)
-            {
-                _time = Time.NormalTime;
-
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
+            if (Time.NormalTime > _time + 2f)
                 {
-                    VortexxBuddy.NavMeshMovementController.SetDestination(Constants._entrance);
-                    VortexxBuddy.NavMeshMovementController.AppendDestination(Constants._reneterPos);
+                    _time = Time.NormalTime;
+
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
+                    {
+                        VortexxBuddy.NavMeshMovementController.SetDestination(Constants._entrance);
+                        VortexxBuddy.NavMeshMovementController.AppendDestination(Constants._reneterPos);
+                    }
                 }
-            }
+
+           
 
             if (Playfield.ModelIdentity.Instance == Constants.VortexxId
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) > 5)

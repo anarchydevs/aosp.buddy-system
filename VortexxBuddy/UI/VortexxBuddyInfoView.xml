@@ -6,13 +6,17 @@
 		<TextView value="VortexxBuddy" layout_borders="Rect(0,0,0,2)"/>
 		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-		<TextView value="Inject VortexxBuddy and Handlers on each toon, add lootmanager if farming." layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="Inject VortexxBuddy and Handlers on each toon, add lootmanager if farming." layout_borders="Rect(5,5,5,5)"/>
 		<TextView value="Nothing else is required." layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<TextView value="Farming: Paths to corpse, disbands team after 20 seconds," layout_borders="Rect(0,0,0,2)"/>
 		<TextView value="Use lootmanager. Do not delete leftovers!" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="*Not Immune: Characters with this toggled will wait outside until its safe" layout_borders="Rect(5,5,5,5)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>

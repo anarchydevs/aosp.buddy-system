@@ -45,6 +45,7 @@ namespace VortexxBuddy
 
         public static double _stateTimeOut;
         public static double _sitUpdateTimer;
+        private static double _time;
 
         public static Window _infoWindow;
 
@@ -69,6 +70,8 @@ namespace VortexxBuddy
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Farming, FarmingMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.NoFarming, NoFarmingMessage);
+
+                IPCChannel.RegisterCallback((int)IPCOpcode.Enter, EnterMessage);
 
                 Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -167,6 +170,16 @@ namespace VortexxBuddy
             farmingDisabled();
         }
 
+        private void EnterMessage(int sender, IPCMessage msg)
+        {
+            if (Playfield.ModelIdentity.Instance == Constants.XanHubId
+                &&DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
+            {
+                NavMeshMovementController.SetDestination(Constants._entrance);
+                NavMeshMovementController.AppendDestination(Constants._reneterPos);
+            }
+        }
+
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
             _infoWindow = Window.CreateFromXml("Info", PluginDir + "\\UI\\VortexxBuddyInfoView.xml",
@@ -182,6 +195,8 @@ namespace VortexxBuddy
         {
             if (Game.IsZoning)
                 return;
+
+            
 
             if (Time.NormalTime > _sitUpdateTimer + 1)
             {
@@ -234,7 +249,7 @@ namespace VortexxBuddy
                     Chat.WriteLine("Farming enabled.");
                     farmingEnabled();
                 }
-                
+
             }
 
             if (_settings["Toggle"].AsBool())
@@ -314,11 +329,6 @@ namespace VortexxBuddy
             {
                 Chat.WriteLine(e.Message);
             }
-        }
-
-        public enum DifficultySelection
-        {
-            Easy, Medium, Hardcore
         }
 
         public static class RelevantItems

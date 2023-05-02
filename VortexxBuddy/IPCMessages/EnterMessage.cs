@@ -3,9 +3,9 @@ using SmokeLounge.AOtomation.Messaging.Serialization.MappingAttributes;
 
 namespace VortexxBuddy.IPCMessages
 {
-    [AoContract((int)IPCOpcode.EasyMode)]
-    public class EasyMessage : IPCMessage
+    [AoContract((int)IPCOpcode.Enter)]
+    public class EnterMessage : IPCMessage
     {
-        public override short Opcode => (short)IPCOpcode.EasyMode;
+        public override short Opcode => (short)IPCOpcode.Enter;
     }
 }

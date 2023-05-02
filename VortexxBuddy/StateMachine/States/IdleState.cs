@@ -8,7 +8,6 @@ namespace VortexxBuddy
     public class IdleState : IState
     {
 
-        
 
         public IState GetNextState()
         {
@@ -18,12 +17,9 @@ namespace VortexxBuddy
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId && VortexxBuddy._settings["Toggle"].AsBool())
             {
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20f
+                    && !VortexxBuddy._settings["Clear"].AsBool()
                     && Team.IsInTeam
-                    && Extensions.CanProceed()
-                    && !VortexxBuddy._settings["Clear"].AsBool())
-                    return new EnterState();
-
-                if (VortexxBuddy._clearToEnter)
+                    && Extensions.CanProceed())
                     return new EnterState();
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) > 20f
@@ -41,12 +37,12 @@ namespace VortexxBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("IdleState");
+            //Chat.WriteLine("IdleState");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exit IdleState");
+            //Chat.WriteLine("Exit IdleState");
         }
 
         public void Tick()
