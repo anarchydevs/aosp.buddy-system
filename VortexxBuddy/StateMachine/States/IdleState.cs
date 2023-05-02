@@ -16,6 +16,12 @@ namespace VortexxBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId && VortexxBuddy._settings["Toggle"].AsBool())
             {
+                if (!Team.IsInTeam && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPos) > 3)
+                    VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPos);
+
+                if (!Team.IsInTeam && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPos) < 3)
+                    return new ReformState();
+
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20f
                     && !VortexxBuddy._settings["Clear"].AsBool()
                     && Team.IsInTeam
@@ -37,12 +43,12 @@ namespace VortexxBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("IdleState");
+            Chat.WriteLine("IdleState");
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("Exit IdleState");
+            Chat.WriteLine("Exit IdleState");
         }
 
         public void Tick()

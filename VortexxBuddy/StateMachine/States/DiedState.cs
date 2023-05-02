@@ -42,7 +42,7 @@ namespace VortexxBuddy
                     && DynelManager.LocalPlayer.GetStat(Stat.TemporarySkillReduction) <= 1
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit
                     && Playfield.ModelIdentity.Instance == Constants.XanHubId && !VortexxBuddy.NavMeshMovementController.IsNavigating)
-                    VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._reneterPos);
+                    VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPos);
             }
         }
     }

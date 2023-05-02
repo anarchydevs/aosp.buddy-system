@@ -32,7 +32,6 @@ namespace VortexxBuddy
             {
                 if (!Extensions.CanProceed())
                     return new IdleState();
-
             }
 
             return null;
@@ -42,7 +41,7 @@ namespace VortexxBuddy
         {
             if (Extensions.CanProceed())
             {
-                //Chat.WriteLine("Entering");
+                Chat.WriteLine("Entering");
 
             }
         }
@@ -57,18 +56,20 @@ namespace VortexxBuddy
         {
             if (Game.IsZoning) { return; }
 
-            if (Time.NormalTime > _time + 2f)
+            if (!Team.IsInTeam && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPos) > 3)
+                VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPos);
+
+            if (Team.IsInTeam && Time.NormalTime > _time + 2f)
+            {
+                _time = Time.NormalTime;
+
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
                 {
-                    _time = Time.NormalTime;
-
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
-                    {
-                        VortexxBuddy.NavMeshMovementController.SetDestination(Constants._entrance);
-                        VortexxBuddy.NavMeshMovementController.AppendDestination(Constants._reneterPos);
-                    }
+                    VortexxBuddy.NavMeshMovementController.SetDestination(Constants._entrance);
+                    VortexxBuddy.NavMeshMovementController.AppendDestination(Constants._reneterPos);
                 }
+            }
 
-           
 
             if (Playfield.ModelIdentity.Instance == Constants.VortexxId
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) > 5)

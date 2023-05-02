@@ -121,6 +121,7 @@ namespace VortexxBuddy
                     VortexxBuddy._clearToEnter = false;
                 }
 
+                //Attacking adds
                 if (_desecratedSpirits != null && _vortexx == null)
                 {
                     if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
@@ -132,6 +133,7 @@ namespace VortexxBuddy
                 //Attack and initial start
                 if (_vortexx != null)
                 {
+                    // attacking vortexx
                     if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
                         DynelManager.LocalPlayer.Attack(_vortexx);
 
@@ -141,7 +143,7 @@ namespace VortexxBuddy
                         {
                             DynelManager.LocalPlayer.StopAttack();
                         }
-
+                    //Not Immune
                     if (_releasedSpiritCorpse != null && !VortexxBuddy._clearToEnter &&
                         _releasedSpiritCorpse.Position.DistanceFrom(Constants._bluePodium) < 5)
                     {
