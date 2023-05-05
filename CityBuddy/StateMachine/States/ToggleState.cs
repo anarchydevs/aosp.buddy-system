@@ -47,7 +47,7 @@ namespace CityBuddy
                     _init = true;
                     Logic(citycontroller);
                 }
-                else if (MovementController.Instance.IsNavigating == false)
+                else if (citycontroller?.DistanceFrom(DynelManager.LocalPlayer) > 5f && MovementController.Instance.IsNavigating == false)
                     MovementController.Instance.SetDestination(citycontroller.Position);
             }
         }
