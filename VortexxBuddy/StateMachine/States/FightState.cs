@@ -170,7 +170,6 @@ namespace VortexxBuddy
                             {
                                 VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
                             }
-
                         }
                     }
                    
