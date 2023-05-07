@@ -81,6 +81,15 @@ namespace InfBuddy
         {
             if (Game.IsZoning || !Team.IsInTeam) { return; }
 
+            if (Team.IsInTeam)
+            {
+                foreach (TeamMember member in Team.Members)
+                {
+                    if (!_teamCache.Contains(member.Identity))
+                        _teamCache.Add(member.Identity);
+                }
+            }
+
             if (InfBuddy.ModeSelection.Leech != (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
                 && _init
                 && Time.NormalTime > InfBuddy._stateTimeOut + 15f)

@@ -142,6 +142,15 @@ namespace InfBuddy
         {
             if (Game.IsZoning) { return; }
 
+            if (Team.IsInTeam)
+            {
+                foreach (TeamMember member in Team.Members)
+                {
+                    if (!_teamCache.Contains(member.Identity))
+                        _teamCache.Add(member.Identity);
+                }
+            }
+
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
 
