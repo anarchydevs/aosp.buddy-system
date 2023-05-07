@@ -172,7 +172,6 @@ namespace VortexxBuddy
                             }
                         }
                     }
-                   
                 }
 
                 if (_releasedSpiritCorpse != null)
