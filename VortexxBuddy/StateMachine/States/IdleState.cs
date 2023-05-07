@@ -43,12 +43,12 @@ namespace VortexxBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("IdleState");
+            //Chat.WriteLine("IdleState");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exit IdleState");
+            //Chat.WriteLine("Exit IdleState");
         }
 
         public void Tick()

@@ -74,7 +74,9 @@ namespace VortexxBuddy
                 _initCorpse = true;
             }
 
-            if (Beacon != null && _initCorpse && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._BeaconPos) < 3)
+            if (Beacon != null && _initCorpse && 
+                DynelManager.LocalPlayer.Position.DistanceFrom(Constants._BeaconPos) < 3
+                && Extensions.CanProceed())
             {
                 Beacon.Use();
             }

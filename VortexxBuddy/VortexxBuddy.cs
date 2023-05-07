@@ -172,12 +172,15 @@ namespace VortexxBuddy
 
         private void EnterMessage(int sender, IPCMessage msg)
         {
-            if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-                &&DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
-            {
-                NavMeshMovementController.SetDestination(Constants._entrance);
-                NavMeshMovementController.AppendDestination(Constants._reneterPos);
-            }
+            if (!(_stateMachine.CurrentState is EnterState))
+                _stateMachine.SetState(new EnterState());
+
+            //if (Playfield.ModelIdentity.Instance == Constants.XanHubId
+            //    &&DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
+            //{
+            //    NavMeshMovementController.SetDestination(Constants._entrance);
+            //    NavMeshMovementController.AppendDestination(Constants._reneterPos);
+            //}
         }
 
         private void HandleInfoViewClick(object s, ButtonBase button)
@@ -349,7 +352,9 @@ namespace VortexxBuddy
             public const int PulsatingGreenNanoInfusion = 280561;
             public const int GoldenNanoInfusion = 280562;
 
-            
+            public const int EmptyHusk = 280731;
+            public const int CreepingIllness = 280751;
+            public const int FlamesofConsequence = 280753;
         }
     }
 }

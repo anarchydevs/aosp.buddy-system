@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using static VortexxBuddy.VortexxBuddy;
 
 namespace VortexxBuddy
 {
@@ -35,11 +34,9 @@ namespace VortexxBuddy
 
         public static bool Debuffed()
         {
-            return DynelManager.LocalPlayer.Buffs.Contains(267283)
-                || DynelManager.LocalPlayer.Buffs.Contains(280469)
-                || DynelManager.LocalPlayer.Buffs.Contains(NanoLine.Cocoon) // coon
-                || DynelManager.LocalPlayer.Buffs.Contains(280470)
-                || DynelManager.LocalPlayer.Buffs.Contains(280488);
+            return DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.EmptyHusk)
+                || DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.CreepingIllness)
+                || DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.FlamesofConsequence);
         }
 
         public static bool InCombat()
@@ -70,8 +67,8 @@ namespace VortexxBuddy
                 && DynelManager.LocalPlayer.GetStat(Stat.TemporarySkillReduction) <= 1
                 && DynelManager.LocalPlayer.MovementState != MovementState.Sit
                 && Spell.List.Any(c => c.IsReady)
-                && !Spell.HasPendingCast;
-                //&& !Debuffed();
+                && !Spell.HasPendingCast
+                && !Debuffed();
         }
 
         public static bool IsNull(SimpleChar _target)

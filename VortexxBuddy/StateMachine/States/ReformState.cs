@@ -39,7 +39,7 @@ namespace VortexxBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Reforming");
+            //Chat.WriteLine("Reforming");
 
             _reformStartedTime = Time.NormalTime;
 
@@ -57,7 +57,7 @@ namespace VortexxBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Done Reforming");
+            //Chat.WriteLine("Done Reforming");
             _invitedList.Clear();
             _teamCache.Clear();
 
@@ -96,7 +96,7 @@ namespace VortexxBuddy
                     if (player.Identity == VortexxBuddy.Leader) { continue; }
 
                     Team.Invite(player.Identity);
-                    Chat.WriteLine($"Inviting {player.Name}");
+                   // Chat.WriteLine($"Inviting {player.Name}");
                 }
             }
 
