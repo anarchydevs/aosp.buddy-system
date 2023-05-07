@@ -24,7 +24,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("LeechState::OnStateEnter");
+            Chat.WriteLine("LeechState::OnStateEnter");
 
             DynelManager.LocalPlayer.Position = Constants.LeechSpot;
             MovementController.Instance.SetMovement(MovementAction.Update);
@@ -34,7 +34,7 @@ namespace InfBuddy
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("LeechState::OnStateExit");
+            Chat.WriteLine("LeechState::OnStateExit");
 
             _missionsLoaded = false;
             DynelManager.LocalPlayer.Position = new Vector3(160.4f, 2.6f, 103.0f);

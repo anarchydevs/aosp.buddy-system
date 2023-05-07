@@ -59,6 +59,9 @@ namespace InfBuddy
                 return new ExitMissionState();
             }
 
+            if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
+                return new IdleState();
+
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return new SitState();
 

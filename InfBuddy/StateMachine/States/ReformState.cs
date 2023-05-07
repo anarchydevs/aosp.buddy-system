@@ -39,7 +39,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("ReformState::OnStateEnter");
+            Chat.WriteLine("ReformState::OnStateEnter");
 
             _reformStartedTime = Time.NormalTime;
 
@@ -47,7 +47,7 @@ namespace InfBuddy
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
-               // Chat.WriteLine("ReformPhase.Waiting");
+               Chat.WriteLine("ReformPhase.Waiting");
             }
             else
             {

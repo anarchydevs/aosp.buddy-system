@@ -58,7 +58,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("MoveToEntranceState::OnStateEnter");
+            Chat.WriteLine("MoveToEntranceState::OnStateEnter");
 
             int randomWait = Extensions.Next(_minWait, _maxWait);
 
@@ -77,7 +77,7 @@ namespace InfBuddy
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("MoveToEntranceState::OnStateExit");
+            Chat.WriteLine("MoveToEntranceState::OnStateExit");
 
             _cancellationToken.Cancel();
             _init = false;
