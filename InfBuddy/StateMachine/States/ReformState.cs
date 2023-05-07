@@ -17,8 +17,8 @@ namespace InfBuddy
 
         private ReformPhase _phase;
 
-        private static List<Identity> _teamCache = new List<Identity>();
-        private static List<Identity> _invitedList = new List<Identity>();
+        public static List<Identity> _teamCache = new List<Identity>();
+        public static List<Identity> _invitedList = new List<Identity>();
         private bool _init = false;
 
         public IState GetNextState()

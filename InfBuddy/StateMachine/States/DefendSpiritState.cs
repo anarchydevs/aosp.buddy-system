@@ -144,8 +144,8 @@ namespace InfBuddy
             {
                 foreach (TeamMember member in Team.Members)
                 {
-                    if (!_teamCache.Contains(member.Identity))
-                        _teamCache.Add(member.Identity);
+                    if (!ReformState._teamCache.Contains(member.Identity))
+                        ReformState._teamCache.Add(member.Identity);
                 }
             }
 
