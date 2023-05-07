@@ -164,7 +164,7 @@ namespace VortexxBuddy
                     if (_notum != null)
                     {
                         if (!DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion)
-                            || DynelManager.LocalPlayer.Buffs.Find(VortexxBuddy.Nanos.NanoInfusion, out Buff antiFear) && antiFear.RemainingTime < 3)
+                            || DynelManager.LocalPlayer.Buffs.Find(VortexxBuddy.Nanos.NanoInfusion, out Buff antiFear) && antiFear.RemainingTime < 2)
                         {
                             foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
                             {
