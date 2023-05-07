@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 
 namespace VortexxBuddy
@@ -81,61 +82,75 @@ namespace VortexxBuddy
 
                 if (_releasedSpirit != null)
                 {
-                    if (_releasedSpirit.Position.DistanceFrom(Constants._redPodium) < 3)
+                    if (_releasedSpirit.Position.DistanceFrom(Constants._redPodium) < 5)
                     {
-                        if (!VortexxBuddy._red && Time.NormalTime > _timer + 10)
+                        if (!VortexxBuddy._red)
                         {
-                            Item red = Inventory.Items.Where(x => ImmunityCrystals.BloodRedNotumCrystal.Contains(x.Id)).FirstOrDefault();
+                            Task.Factory.StartNew(async () =>{
+                                Item red = Inventory.Items.Where(x => ImmunityCrystals.BloodRedNotumCrystal.Contains(x.Id)).FirstOrDefault();
 
-                            if(!Item.HasPendingUse)
-                            red.Use();
+                                await Task.Delay(10000);
 
-                            _timer = Time.NormalTime;
-                            VortexxBuddy._red = true;
+                                if (!Item.HasPendingUse)
+                                    red.Use();
+
+                            });
                         }
+                        VortexxBuddy._red = true;
                     }
 
-                    if (_releasedSpirit.Position.DistanceFrom(Constants._greenPodium) < 3)
+                    if (_releasedSpirit.Position.DistanceFrom(Constants._greenPodium) < 5)
                     {
-                        if (!VortexxBuddy._green && Time.NormalTime > _timer + 10)
+                        if (!VortexxBuddy._green)
                         {
-                            Item green = Inventory.Items.Where(x => ImmunityCrystals.PulsatingGreenNotumCrystal.Contains(x.Id)).FirstOrDefault();
+                            Task.Factory.StartNew(async () => {
+                                Item green = Inventory.Items.Where(x => ImmunityCrystals.PulsatingGreenNotumCrystal.Contains(x.Id)).FirstOrDefault();
 
-                            if (!Item.HasPendingUse)
-                                green.Use();
+                                await Task.Delay(10000);
 
-                            _timer = Time.NormalTime;
-                            VortexxBuddy._green = true;
+                                if (!Item.HasPendingUse)
+                                    green.Use();
+
+                            });
                         }
+                        VortexxBuddy._green = true;
                     }
 
-                    if (_releasedSpirit.Position.DistanceFrom(Constants._yellowPodium) < 3)
+                    if (_releasedSpirit.Position.DistanceFrom(Constants._yellowPodium) < 5)
                     {
-                        if (!VortexxBuddy._yellow && Time.NormalTime > _timer + 10)
+                        if (!VortexxBuddy._yellow)
                         {
-                            Item yellow = Inventory.Items.Where(x => ImmunityCrystals.GoldenNotumCrystal.Contains(x.Id)).FirstOrDefault();
+                            Task.Factory.StartNew(async () => {
+                                Item yellow = Inventory.Items.Where(x => ImmunityCrystals.GoldenNotumCrystal.Contains(x.Id)).FirstOrDefault(); 
 
-                            if (!Item.HasPendingUse)
-                                yellow.Use();
+                                await Task.Delay(10000);
 
-                            _timer = Time.NormalTime;
-                            VortexxBuddy._yellow = true;
+                                if (!Item.HasPendingUse)
+                                    yellow.Use();
+
+                            });
                         }
+                        VortexxBuddy._yellow = true;
                     }
 
-                    if ( _releasedSpirit.Position.DistanceFrom(Constants._bluePodium) < 3)
+                    if (_releasedSpirit.Position.DistanceFrom(Constants._bluePodium) < 5)
                     {
-                        if (!VortexxBuddy._blue && Time.NormalTime > _timer + 10)
+                        if (!VortexxBuddy._blue)
                         {
-                            Item blue = Inventory.Items.Where(x => ImmunityCrystals.CobaltBlueNotumCrystal.Contains(x.Id)).FirstOrDefault();
+                            Task.Factory.StartNew(async () => {
+                                Item blue = Inventory.Items.Where(x => ImmunityCrystals.CobaltBlueNotumCrystal.Contains(x.Id)).FirstOrDefault();
 
-                            if (!Item.HasPendingUse)
-                                blue.Use();
+                                await Task.Delay(10000);
 
-                            _timer = Time.NormalTime;
-                            VortexxBuddy._blue = true;
+                                if (!Item.HasPendingUse)
+                                    blue.Use();
+
+                            });
                         }
+                        VortexxBuddy._blue = true;
                     }
+
+                   
                 }
             }
         }

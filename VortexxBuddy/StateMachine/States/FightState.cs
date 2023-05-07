@@ -112,9 +112,12 @@ namespace VortexxBuddy
                   .ToList();
 
                 //return to center
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) > 5f
+                if (_vortexx != null || _desecratedSpirits != null)
+                { 
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) > 5f
                     && !MovementController.Instance.IsNavigating)
-                    VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._centerPodium);
+                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._centerPodium); 
+                }
 
                 //Attack and initial start
                 if (_vortexx != null)
