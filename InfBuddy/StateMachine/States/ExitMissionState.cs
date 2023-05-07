@@ -37,7 +37,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("ExitMissionState::OnStateEnter");
+            //Chat.WriteLine("ExitMissionState::OnStateEnter");
 
             int _time = 0;
 
@@ -71,7 +71,7 @@ namespace InfBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("ExitMissionState::OnStateExit");
+            //Chat.WriteLine("ExitMissionState::OnStateExit");
 
             _cancellationToken.Cancel();
             _init = false;

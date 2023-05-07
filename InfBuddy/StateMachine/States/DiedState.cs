@@ -89,12 +89,12 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("DiedState::OnStateEnter");
+            //Chat.WriteLine("DiedState::OnStateEnter");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("DiedState::OnStateExit");
+            //Chat.WriteLine("DiedState::OnStateExit");
 
             _init = false;
         }

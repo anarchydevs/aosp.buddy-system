@@ -35,7 +35,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-           Chat.WriteLine("MoveToQuestGiverState::OnStateEnter");
+           //Chat.WriteLine("MoveToQuestGiverState::OnStateEnter");
 
             if (!Extensions.IsAtYutto())
             {
@@ -48,7 +48,7 @@ namespace InfBuddy
                     || InfBuddy._settings["Merge"].AsBool())
                     randomWait = 1;
 
-                Chat.WriteLine($"Idling for {randomWait} seconds..");
+                //Chat.WriteLine($"Idling for {randomWait} seconds..");
 
                 Task.Delay(randomWait * 1000).ContinueWith(x =>
                 {
@@ -62,7 +62,7 @@ namespace InfBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("MoveToQuestGiverState::OnStateExit");
+            //Chat.WriteLine("MoveToQuestGiverState::OnStateExit");
 
             _cancellationToken.Cancel();
             _init = false;

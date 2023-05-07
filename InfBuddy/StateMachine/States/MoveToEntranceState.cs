@@ -58,14 +58,14 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("MoveToEntranceState::OnStateEnter");
+            //Chat.WriteLine("MoveToEntranceState::OnStateEnter");
 
             int randomWait = Extensions.Next(_minWait, _maxWait);
 
             if (DynelManager.LocalPlayer.Identity == InfBuddy.Leader)
                 randomWait = 4;
 
-            Chat.WriteLine($"Idling for {randomWait} seconds..");
+            //Chat.WriteLine($"Idling for {randomWait} seconds..");
 
             Task.Delay(randomWait * 1000).ContinueWith(x =>
             {
@@ -77,7 +77,7 @@ namespace InfBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("MoveToEntranceState::OnStateExit");
+            //Chat.WriteLine("MoveToEntranceState::OnStateExit");
 
             _cancellationToken.Cancel();
             _init = false;
