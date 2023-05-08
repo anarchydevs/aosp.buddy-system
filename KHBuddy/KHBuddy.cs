@@ -533,7 +533,7 @@ namespace KHBuddy
                 if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                 {
-                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                    if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
                     {
                         Task.Factory.StartNew(
                            async () =>
