@@ -38,6 +38,11 @@ namespace Db1Buddy
         public void OnStateEnter()
         {
             Chat.WriteLine("GetBuffState");
+
+            _yellow = false;
+            _blue = false;
+            _green = false;
+            _red = false;
         }
 
         public void OnStateExit()
@@ -103,10 +108,10 @@ namespace Db1Buddy
                             else
                                 Db1Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._redPodium);
                         }
-                        else
-                    {
-                        Db1Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
-                    }
+                    //    else
+                    //{
+                    //    Db1Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+                    //}
                     
                 }
             }
