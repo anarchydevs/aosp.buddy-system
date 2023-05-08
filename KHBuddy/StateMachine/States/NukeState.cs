@@ -176,6 +176,10 @@ namespace KHBuddy
                             DynelManager.LocalPlayer.Attack(_hecksAtPosBeach.FirstOrDefault());
                             KHBuddy._stateTimeOut = Time.NormalTime;
                         }
+                        if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
+                        {
+                            DynelManager.LocalPlayer.StopAttack();
+                        }
                     }
                 }
 
@@ -200,6 +204,10 @@ namespace KHBuddy
                             DynelManager.LocalPlayer.Attack(_hecksAtPosWest.FirstOrDefault());
                             KHBuddy._stateTimeOut = Time.NormalTime;
                         }
+                        if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
+                        {
+                            DynelManager.LocalPlayer.StopAttack();
+                        }
                     }
                 }
 
@@ -222,6 +230,10 @@ namespace KHBuddy
                         {
                             DynelManager.LocalPlayer.Attack(_hecksAtPosEast.FirstOrDefault());
                             KHBuddy._stateTimeOut = Time.NormalTime;
+                        }
+                        if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
+                        {
+                            DynelManager.LocalPlayer.StopAttack();
                         }
                     }
                 }
