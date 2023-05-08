@@ -99,7 +99,8 @@ namespace AttackBuddy
                     "Alien Heavy Patroller",
                     "Vergil Doppelganger",
                     "Alien Seeker",
-                    "Harbingers of Pestilence"
+                    "Harbingers of Pestilence",
+                    "Otacustes"
         };
     }
 }

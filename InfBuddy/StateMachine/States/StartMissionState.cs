@@ -33,14 +33,14 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("StartMissionState::OnStateEnter");
+            //Chat.WriteLine("StartMissionState::OnStateEnter");
 
             InfBuddy._stateTimeOut = Time.NormalTime;
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("StartMissionState::OnStateExit");
+            //Chat.WriteLine("StartMissionState::OnStateExit");
         }
 
         public void Tick()

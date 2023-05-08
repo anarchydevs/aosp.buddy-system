@@ -27,12 +27,15 @@ namespace InfBuddy
             if (!InfBuddy.NavMeshMovementController.IsNavigating && Extensions.IsAtYutto())
                 return new GrabMissionState();
 
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
+
             return null;
         }
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("MoveToQuestGiverState::OnStateEnter");
+           // Chat.WriteLine("MoveToQuestGiverState::OnStateEnter");
 
             if (!Extensions.IsAtYutto())
             {
@@ -59,7 +62,7 @@ namespace InfBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("MoveToQuestGiverState::OnStateExit");
+            //Chat.WriteLine("MoveToQuestGiverState::OnStateExit");
 
             _cancellationToken.Cancel();
             _init = false;
