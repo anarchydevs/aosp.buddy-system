@@ -548,7 +548,9 @@ namespace KHBuddy
                                await Task.Delay(800);
                                NavMeshMovementController.Instance.SetMovement(MovementAction.LeaveSit);
                                await Task.Delay(200);
-                               Sitting = false;
+
+                               if (DynelManager.LocalPlayer.NanoPercent > 30 || DynelManager.LocalPlayer.HealthPercent > 65)
+                                   Sitting = false;
                            });
                     }
                 }
