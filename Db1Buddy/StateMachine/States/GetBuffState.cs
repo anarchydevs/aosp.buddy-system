@@ -22,13 +22,15 @@ namespace Db1Buddy
         public IState GetNextState()
         {
 
-            //if (Playfield.ModelIdentity.Instance == Constants.DB1Id
-            //    && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
-            //    return new IdleState();
+            if (Playfield.ModelIdentity.Instance == Constants.DB1Id)
+            {
+                if (_yellow && _blue && _green && _red
+                && !DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
+                    return new IdleState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.DB1Id
-                && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
-                return new FightState();
+                if (DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
+                    return new FightState();
+            }
 
             return null;
         }
@@ -59,15 +61,13 @@ namespace Db1Buddy
 
             if (!Team.IsInTeam || Game.IsZoning) { return; }
 
-            if (Playfield.ModelIdentity.Instance == 6003)
+            if (Playfield.ModelIdentity.Instance == Constants.DB1Id)
             {
-
                 if (_mikkelsen != null && DynelManager.LocalPlayer.Identity == Db1Buddy.Leader)
                 {
                     if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
                         DynelManager.LocalPlayer.Attack(_mikkelsen);
                 }
-
 
                 foreach (TeamMember member in Team.Members)
                 {
@@ -105,10 +105,7 @@ namespace Db1Buddy
                         }
                         else
                     {
-                        _yellow = false;
-                        _blue = false;
-                        _green = false;
-                        _red = false;
+                        Db1Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
                     }
                     
                 }
