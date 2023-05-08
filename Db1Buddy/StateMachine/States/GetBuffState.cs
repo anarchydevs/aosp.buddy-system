@@ -24,7 +24,7 @@ namespace Db1Buddy
 
             if (Playfield.ModelIdentity.Instance == Constants.DB1Id)
             {
-                if (_yellow && _blue && _green && _red
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) < 2
                 && !DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
                     return new IdleState();
 
