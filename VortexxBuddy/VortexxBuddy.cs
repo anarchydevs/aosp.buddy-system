@@ -4,6 +4,7 @@ using AOSharp.Core;
 using AOSharp.Core.Inventory;
 using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
+using AOSharp.Pathfinding;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
 using VortexxBuddy.IPCMessages;

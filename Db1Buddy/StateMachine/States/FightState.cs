@@ -98,20 +98,20 @@ namespace Db1Buddy
                 //Pathing to podiums
                 if (!MovementController.Instance.IsNavigating)
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
-                        && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.HealingBlight))
+                    if (//DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
+                         DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.HealingBlight))
                         MovementController.Instance.SetDestination(Constants._redPodium);
 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) > 0.9f
-                        && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.CallofRust))
+                    if (//DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) > 0.9f
+                         DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.CallofRust))
                         MovementController.Instance.SetDestination(Constants._bluePodium);
 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) > 0.9f
-                        && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.CrawlingSkin))
+                    if (//DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) > 0.9f
+                         DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.CrawlingSkin))
                         MovementController.Instance.SetDestination(Constants._greenPodium);
 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) > 0.9f
-                        && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.GreedoftheSource))
+                    if (//DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) > 0.9f
+                         DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.GreedoftheSource))
                         MovementController.Instance.SetDestination(Constants._yellowPodium);
                 }
 

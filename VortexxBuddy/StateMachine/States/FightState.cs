@@ -169,6 +169,9 @@ namespace VortexxBuddy
                             foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
                             {
                                 VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
+
+                                if (DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
+                                    VortexxBuddy.NavMeshMovementController.Halt();
                             }
                         }
                     }
