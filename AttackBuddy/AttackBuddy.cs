@@ -381,8 +381,7 @@ namespace AttackBuddy
         {
             if (Game.IsZoning)
             {
-                Toggle = true;
-
+                Toggle = false;
                 _settings["Toggle"] = false;
 
                 return;
