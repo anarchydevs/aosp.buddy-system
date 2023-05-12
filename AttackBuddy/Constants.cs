@@ -100,6 +100,8 @@ namespace AttackBuddy
                     "Vergil Doppelganger",
                     "Alien Seeker",
                     "Harbingers of Pestilence",
+                    "Flaming Vengeance",
+                    "Unstable Rift",
                     "Otacustes"
         };
     }
