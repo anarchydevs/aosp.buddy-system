@@ -136,13 +136,13 @@ namespace DB2Buddy
 
                 foreach (Dynel mist in _mists.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
                 {
-                    if (!MovementController.Instance.IsNavigating)
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(mist.Position);
+                    //if (!MovementController.Instance.IsNavigating)
+                    //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(mist.Position);
 
-                    //{
-                    //    DynelManager.LocalPlayer.Position = mist.Position;
-                    //    MovementController.Instance.SetMovement(MovementAction.Update);
-                    //}
+                    {
+                        DynelManager.LocalPlayer.Position = mist.Position;
+                        MovementController.Instance.SetMovement(MovementAction.Update);
+                    }
                 }
 
                 _taggedMist = true;
@@ -171,14 +171,14 @@ namespace DB2Buddy
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
-                //if (_mists.Count == 0 && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10f
-                //    && !MovementController.Instance.IsNavigating)
-                //{
-                //    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
+                if (_mists.Count == 0 && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10f
+                    && !MovementController.Instance.IsNavigating)
+                {
+                    //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
 
-                //    //DynelManager.LocalPlayer.Position = _aune.Position;
-                //    //MovementController.Instance.SetMovement(MovementAction.Update);
-                //}
+                    DynelManager.LocalPlayer.Position = _aune.Position;
+                    MovementController.Instance.SetMovement(MovementAction.Update);
+                }
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) > 130)
                     DynelManager.LocalPlayer.Position = Constants._startPosition;

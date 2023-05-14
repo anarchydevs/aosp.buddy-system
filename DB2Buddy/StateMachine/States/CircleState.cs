@@ -58,9 +58,9 @@ namespace DB2Buddy
             if (_redTower != null && !MovementController.Instance.IsNavigating)
             {
                 //DB2Buddy.NavMeshMovementController.Halt();
-                DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
-                //DynelManager.LocalPlayer.Position = _redTower.Position;
-                //DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
+                //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
+                DynelManager.LocalPlayer.Position = _redTower.Position;
+                DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
                 return new FightTowerState();
             }
 
@@ -68,9 +68,9 @@ namespace DB2Buddy
                 && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
             {
                 //DB2Buddy.NavMeshMovementController.Halt();
-                DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_blueTower.Position);
-                //DynelManager.LocalPlayer.Position = _blueTower.Position;
-                //DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
+                //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_blueTower.Position);
+                DynelManager.LocalPlayer.Position = _blueTower.Position;
+                DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
                 return new FightTowerState();
             }
 

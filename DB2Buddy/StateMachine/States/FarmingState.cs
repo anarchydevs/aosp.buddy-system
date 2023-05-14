@@ -54,9 +54,9 @@ namespace DB2Buddy
                 && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) > 1.0f
                 && !MovementController.Instance.IsNavigating)
             {
-                DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_auneCorpsePos);
-                //DynelManager.LocalPlayer.Position = _auneCorpse.Position;
-                //MovementController.Instance.SetMovement(MovementAction.Update);
+                //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_auneCorpsePos);
+                DynelManager.LocalPlayer.Position = _auneCorpse.Position;
+                MovementController.Instance.SetMovement(MovementAction.Update);
             }
 
             if (!_initCorpse && Team.IsInTeam && Playfield.ModelIdentity.Instance == Constants.DB2Id
