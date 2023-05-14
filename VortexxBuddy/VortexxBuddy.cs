@@ -356,6 +356,9 @@ namespace VortexxBuddy
             public const int EmptyHusk = 280731;
             public const int CreepingIllness = 280751;
             public const int FlamesofConsequence = 280753;
+
+            public const int Terrified = 280868; // fear
+
         }
     }
 }

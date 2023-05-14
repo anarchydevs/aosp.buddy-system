@@ -114,9 +114,10 @@ namespace VortexxBuddy
                 //return to center
                 if (_vortexx != null || _desecratedSpirits != null)
                 { 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) > 5f
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) > 2f
                     && !MovementController.Instance.IsNavigating)
                         VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._centerPodium); 
+
                 }
 
                 //Attack and initial start
@@ -128,7 +129,7 @@ namespace VortexxBuddy
                         && !MovementController.Instance.IsNavigating)
                         DynelManager.LocalPlayer.Attack(_vortexx);
 
-                   
+
                     //if (_vortexx.HealthPercent < 63 && _vortexx.HealthPercent > 62)
                     //    VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._redPodium);
 
@@ -164,16 +165,26 @@ namespace VortexxBuddy
                     if (_notum != null)
                     {
                         if (!DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion)
-                            || DynelManager.LocalPlayer.Buffs.Find(VortexxBuddy.Nanos.NanoInfusion, out Buff antiFear) && antiFear.RemainingTime < 2)
+                            || DynelManager.LocalPlayer.Buffs.Find(VortexxBuddy.Nanos.NanoInfusion, out Buff antiFear) && antiFear.RemainingTime < 3)
+                        //if(_vortexx.Buffs.Contains(VortexxBuddy.Nanos.CrystalBossShapeChanger))
                         {
                             foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
                             {
                                 VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
+                                //DynelManager.LocalPlayer.Position = notum.Position;
+                                //MovementController.Instance.SetMovement(MovementAction.Update);
 
                                 if (DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
                                     VortexxBuddy.NavMeshMovementController.Halt();
+
+                                if (DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.Terrified))
+                                    VortexxBuddy.NavMeshMovementController.Halt();
                             }
                         }
+
+                        if (DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.Terrified))
+                            DynelManager.LocalPlayer.Position = Constants._centerPodium;
+                            MovementController.Instance.SetMovement(MovementAction.Update);
                     }
                 }
 
