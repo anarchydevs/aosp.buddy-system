@@ -136,46 +136,46 @@ namespace DB2Buddy
                 DynelManager.LocalPlayer.StopAttack();
 
 
-            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 5
-                && !MovementController.Instance.IsNavigating)
-                DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+            //if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 5
+            //    && !MovementController.Instance.IsNavigating)
+            //    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
 
-            //if (Time.NormalTime > _time + 2f)
-            //{
-            //    _time = Time.NormalTime;
+            if (Time.NormalTime > _time + 2f)
+            {
+                _time = Time.NormalTime;
 
-            //    if (!_init)
-            //    {
-            //        DynelManager.LocalPlayer.Position = Constants.Pos1;
-            //        DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
+                if (!_init)
+                {
+                    DynelManager.LocalPlayer.Position = Constants.Pos1;
+                    DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
 
-            //        _init = true;
-            //        _POS1 = true;
-            //    }
-            //    else if (_POS1)
-            //    {
-            //        DynelManager.LocalPlayer.Position = Constants.Pos2;
-            //        DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
+                    _init = true;
+                    _POS1 = true;
+                }
+                else if (_POS1)
+                {
+                    DynelManager.LocalPlayer.Position = Constants.Pos2;
+                    DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
 
-            //        _POS1 = false;
-            //        _POS2 = true;
-            //    }
-            //    else if (_POS2)
-            //    {
-            //        DynelManager.LocalPlayer.Position = Constants.Pos3;
-            //        DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
+                    _POS1 = false;
+                    _POS2 = true;
+                }
+                else if (_POS2)
+                {
+                    DynelManager.LocalPlayer.Position = Constants.Pos3;
+                    DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
 
-            //        _POS2 = false;
-            //    }
-            //    else
-            //    {
-            //        DynelManager.LocalPlayer.Position = Constants.Pos4;
-            //        DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
+                    _POS2 = false;
+                }
+                else
+                {
+                    DynelManager.LocalPlayer.Position = Constants.Pos4;
+                    DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.Update);
 
 
-            //        _init = false;
-            //    }
-            //}
+                    _init = false;
+                }
+            }
         }
 
     }

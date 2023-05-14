@@ -67,6 +67,11 @@ namespace DB2Buddy
 
                 if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
                 {
+                    if (_auneCorpse != null
+                            && Extensions.CanProceed()
+                            && DB2Buddy._settings["Farming"].AsBool())
+                        return new FarmingState();
+
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) < 10f
                      && Team.IsInTeam)
                         return new PathToBossState();
@@ -75,10 +80,7 @@ namespace DB2Buddy
                          && Team.IsInTeam)
                         return new FightState();
 
-                    if (_auneCorpse != null
-                            && Extensions.CanProceed()
-                            && DB2Buddy._settings["Farming"].AsBool())
-                        return new FarmingState();
+                    
                 }
             }
         

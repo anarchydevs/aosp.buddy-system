@@ -45,11 +45,6 @@ namespace DB2Buddy
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
 
-            List<Dynel> _mists = DynelManager.AllDynels
-               .Where(c => c.Name.Contains("Notum Irregularity"))
-               .OrderBy(c => c.Position.DistanceFrom(_aune.Position))
-               .ToList();
-
             if (!DB2Buddy._settings["Toggle"].AsBool())
             {
                 DB2Buddy.NavMeshMovementController.Halt();
@@ -58,6 +53,14 @@ namespace DB2Buddy
             if (Playfield.ModelIdentity.Instance == Constants.PWId)
                 return new IdleState();
 
+            if (_aune == null)
+            { 
+                if (DB2Buddy.AuneCorpse
+                            && Extensions.CanProceed()
+                            && DB2Buddy._settings["Farming"].AsBool())
+                    return new FarmingState(); 
+            }
+
             if (_aune != null)
             {
                 if (_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
@@ -65,11 +68,6 @@ namespace DB2Buddy
                      || _redTower != null || _blueTower != null)
                     return new CircleState();
             }
-
-            if (DB2Buddy.AuneCorpse
-                && Extensions.CanProceed()
-                && DB2Buddy._settings["Farming"].AsBool())
-                return new FarmingState();
 
             return null;
         }

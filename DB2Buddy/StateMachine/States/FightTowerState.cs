@@ -61,7 +61,9 @@ namespace DB2Buddy
 
                 if (_aune == null && !MovementController.Instance.IsNavigating)
                 {
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+                    //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+                    DynelManager.LocalPlayer.Position = (Constants._startPosition);
+                    MovementController.Instance.SetMovement(MovementAction.Update);
                     return new FightState();
                 }
             }
