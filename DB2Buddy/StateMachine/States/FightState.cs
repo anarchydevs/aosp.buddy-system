@@ -128,7 +128,7 @@ namespace DB2Buddy
             if (_auneCorpse != null)
                 DB2Buddy.AuneCorpse = true;
 
-            if (_mists.Count > 0 && Time.NormalTime > _mistCycle + 3f)
+            if (_mists != null && _mists.Count > 0 && Time.NormalTime > _mistCycle + 3f)
             {
                 _mistCycle = Time.NormalTime;
 
