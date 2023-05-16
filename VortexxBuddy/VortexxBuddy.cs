@@ -317,8 +317,13 @@ namespace VortexxBuddy
                 {
                     if (!_settings["Toggle"].AsBool() && !Toggle)
                     {
+                        
+                        Leader = DynelManager.LocalPlayer.Identity;
 
-                        IPCChannel.Broadcast(new StartMessage());
+                        if (DynelManager.LocalPlayer.Identity == Leader)
+                            IPCChannel.Broadcast(new StartMessage());
+
+                        _settings["Toggle"] = true;
                         Start();
                     }
                     else
