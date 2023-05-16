@@ -62,7 +62,7 @@ namespace Db1Buddy
                     ReformState._teamCache.Add(member.Identity);
             }
 
-            if (Playfield.ModelIdentity.Instance == 6003)
+            if (Playfield.ModelIdentity.Instance == Constants.DB1Id)
             {
                 Mobs();
 
@@ -120,7 +120,12 @@ namespace Db1Buddy
                    && !DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.HealingBlight)
                    && !DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.GreedoftheSource))
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._returnPosition) > 10f)
+                    if (_mikkelsen != null
+                        && DynelManager.LocalPlayer.Position.DistanceFrom(_mikkelsen.Position) > 7f)
+                        Db1Buddy.NavMeshMovementController.SetNavMeshDestination(_mikkelsen.Position);
+
+                    if (_mikkelsen == null &&  _mikkelsenCorpse == null
+                        && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._returnPosition) > 10f)
                         Db1Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._returnPosition);
                 }
             }
