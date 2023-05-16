@@ -380,7 +380,7 @@ namespace MitaarBuddy
                 {
                     if (!_settings["Toggle"].AsBool() && !Toggle)
                     {
-
+                        Leader = DynelManager.LocalPlayer.Identity;
                         IPCChannel.Broadcast(new StartMessage());
                         Start();
                     }
