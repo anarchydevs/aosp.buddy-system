@@ -50,8 +50,8 @@ namespace DB2Buddy
             if (_redTower == null && _blueTower == null)
             {
                 if (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                 && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                 && !MovementController.Instance.IsNavigating)
+                 && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                 //&& !MovementController.Instance.IsNavigating)
                 {
                     //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
                     DynelManager.LocalPlayer.Position = (Constants._startPosition);
@@ -59,7 +59,7 @@ namespace DB2Buddy
                     return new FightState();
                 }
 
-                if (_aune == null && !MovementController.Instance.IsNavigating)
+                if (_aune == null)
                 {
                     //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
                     DynelManager.LocalPlayer.Position = (Constants._startPosition);
@@ -106,7 +106,7 @@ namespace DB2Buddy
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
 
-            if (_redTower != null && !MovementController.Instance.IsNavigating)
+            if (_redTower != null)
             {
                 if (_redTower.IsInLineOfSight
                     && DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) < 3f
@@ -124,7 +124,7 @@ namespace DB2Buddy
                 }
 
             }
-            else if (_blueTower != null && !MovementController.Instance.IsNavigating)
+            else if (_blueTower != null)
             {
                 if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) < 3f

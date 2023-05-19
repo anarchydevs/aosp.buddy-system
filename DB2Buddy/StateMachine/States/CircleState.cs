@@ -55,7 +55,7 @@ namespace DB2Buddy
             if (Playfield.ModelIdentity.Instance == Constants.PWId)
                 return new IdleState();
 
-            if (_redTower != null && !MovementController.Instance.IsNavigating)
+            if (_redTower != null)
             {
                 //DB2Buddy.NavMeshMovementController.Halt();
                 //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
@@ -64,7 +64,7 @@ namespace DB2Buddy
                 return new FightTowerState();
             }
 
-            if (_blueTower != null && !MovementController.Instance.IsNavigating
+            if (_blueTower != null
                 && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
             {
                 //DB2Buddy.NavMeshMovementController.Halt();
@@ -129,12 +129,9 @@ namespace DB2Buddy
                   && !c.Name.Contains("Remains of "))
               .FirstOrDefault();
 
-
-
             if (DynelManager.LocalPlayer.FightingTarget != null
                 && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
                 DynelManager.LocalPlayer.StopAttack();
-
 
             //if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 5
             //    && !MovementController.Instance.IsNavigating)

@@ -3,6 +3,8 @@ using AOSharp.Core;
 using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
+using SmokeLounge.AOtomation.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -22,6 +24,8 @@ namespace DB2Buddy
         private static double _time;
         private static double _mistCycle;
         public static bool _taggedMist = false;
+
+        
 
         public IState GetNextState()
         {
@@ -46,28 +50,19 @@ namespace DB2Buddy
                .FirstOrDefault();
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
-            {
                 DB2Buddy.NavMeshMovementController.Halt();
-            }
-
+            
             if (Playfield.ModelIdentity.Instance == Constants.PWId)
                 return new IdleState();
 
-            if (_aune == null)
-            { 
-                if (DB2Buddy.AuneCorpse
-                            && Extensions.CanProceed()
-                            && DB2Buddy._settings["Farming"].AsBool())
-                    return new FarmingState(); 
-            }
+            if (DB2Buddy.AuneCorpse
+                        && Extensions.CanProceed()
+                        && DB2Buddy._settings["Farming"].AsBool())
+                return new FarmingState();
 
-            if (_aune != null)
-            {
-                if (_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                     || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                     || _redTower != null || _blueTower != null)
-                    return new CircleState();
-            }
+            if (_aune != null && _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+                 || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                return new CircleState();
 
             return null;
         }
@@ -89,6 +84,19 @@ namespace DB2Buddy
         public void Tick()
         {
             if (Game.IsZoning) { return; }
+
+            Network.ChatMessageReceived += Network_ChatMessageReceived;
+
+            //Network.ChatMessageReceived += (s, msg) =>
+            //{
+            //    if (msg.PacketType == ChatMessageType.NpcMessage)
+            //    {
+            //        NpcMessage m = (NpcMessage)msg;
+            //        string text = m.Text;
+            //        Chat.WriteLine("This came from some npc");
+            //        Chat.WriteLine($"{text}");
+            //    }
+            //};
 
             foreach (TeamMember member in Team.Members)
             {
@@ -156,7 +164,7 @@ namespace DB2Buddy
                     && !DynelManager.LocalPlayer.IsAttackPending
                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 15
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 20
                     && !MovementController.Instance.IsNavigating)
                     DynelManager.LocalPlayer.Attack(_aune);
 
@@ -181,6 +189,13 @@ namespace DB2Buddy
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) > 130)
                     DynelManager.LocalPlayer.Position = Constants._startPosition;
                     MovementController.Instance.SetMovement(MovementAction.Update);
+            }
+        }
+        private void Network_ChatMessageReceived(object s, ChatMessageBody chatMessage)
+        {
+            if (chatMessage.PacketType == ChatMessageType.NpcMessage)
+            {
+                Chat.WriteLine($"Received {((NpcMessage)chatMessage).Text}");
             }
         }
     }

@@ -43,10 +43,8 @@ namespace DB2Buddy
                .FirstOrDefault();
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
-            {
                 DB2Buddy.NavMeshMovementController.Halt();
-            }
-
+            
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return new SitState();
 
@@ -79,7 +77,6 @@ namespace DB2Buddy
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 10f
                          && Team.IsInTeam)
                         return new FightState();
-
                     
                 }
             }

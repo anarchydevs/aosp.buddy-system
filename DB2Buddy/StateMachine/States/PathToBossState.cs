@@ -6,6 +6,7 @@ using AOSharp.Pathfinding;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
@@ -35,7 +36,7 @@ namespace DB2Buddy
             if (Playfield.ModelIdentity.Instance == Constants.PWId)
                 return new IdleState();
 
-            if (_aune != null && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 15)
+            if (_aune != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) < 1)
             {
                 return new FightState();
             }
