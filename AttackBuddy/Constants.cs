@@ -102,7 +102,8 @@ namespace AttackBuddy
                     "Harbingers of Pestilence",
                     "Flaming Vengeance",
                     "Unstable Rift",
-                    "Otacustes"
+                    "Otacustes",
+                    "Curse Rot"
         };
     }
 }
