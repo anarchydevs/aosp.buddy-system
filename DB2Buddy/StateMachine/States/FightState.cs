@@ -25,8 +25,6 @@ namespace DB2Buddy
         private static double _mistCycle;
         public static bool _taggedMist = false;
 
-        
-
         public IState GetNextState()
         {
             _aune = DynelManager.NPCs
@@ -84,19 +82,6 @@ namespace DB2Buddy
         public void Tick()
         {
             if (Game.IsZoning) { return; }
-
-            Network.ChatMessageReceived += Network_ChatMessageReceived;
-
-            //Network.ChatMessageReceived += (s, msg) =>
-            //{
-            //    if (msg.PacketType == ChatMessageType.NpcMessage)
-            //    {
-            //        NpcMessage m = (NpcMessage)msg;
-            //        string text = m.Text;
-            //        Chat.WriteLine("This came from some npc");
-            //        Chat.WriteLine($"{text}");
-            //    }
-            //};
 
             foreach (TeamMember member in Team.Members)
             {
@@ -191,12 +176,6 @@ namespace DB2Buddy
                     MovementController.Instance.SetMovement(MovementAction.Update);
             }
         }
-        private void Network_ChatMessageReceived(object s, ChatMessageBody chatMessage)
-        {
-            if (chatMessage.PacketType == ChatMessageType.NpcMessage)
-            {
-                Chat.WriteLine($"Received {((NpcMessage)chatMessage).Text}");
-            }
-        }
+       
     }
 }
