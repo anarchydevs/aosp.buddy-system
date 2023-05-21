@@ -107,17 +107,17 @@ namespace VortexxBuddy
                   .Where(c => c.Name.Contains("Remains of Released Spirit"))
                       .FirstOrDefault();
 
-                 _notum = DynelManager.NPCs
-                    .Where(c => c.Name.Contains("Notum Erruption"))
-                    .FirstOrDefault();
+                _notum = DynelManager.NPCs
+                   .Where(c => c.Name.Contains("Notum Erruption"))
+                   .FirstOrDefault();
 
                 //return to center
                 if (_vortexx != null || _desecratedSpirits != null)
-                { 
+                {
                     if (!DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.Terrified)
                         && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) > 2f
                         && !MovementController.Instance.IsNavigating)
-                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._centerPodium); 
+                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._centerPodium);
                 }
 
                 //Attack and initial start
@@ -128,15 +128,21 @@ namespace VortexxBuddy
                         && !DynelManager.LocalPlayer.IsAttackPending
                         && !MovementController.Instance.IsNavigating)
                         DynelManager.LocalPlayer.Attack(_vortexx);
-
-
-                    Network.ChatMessageReceived += (s, msg) =>
-                    {
-                        if (msg.PacketType == ChatMessageType.NpcMessage)
-                            VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(_notum.Position);
-                    };
-
                 }
+
+                Network.ChatMessageReceived += (s, msg) =>
+                {
+                    if (msg.PacketType != ChatMessageType.NpcMessage)
+                        return;
+
+                    var npcMsg = (NpcMessage)msg;
+
+                    string[] triggerMsg = new string[4] { "Flee you pathetic insects", "Fear my power", "I will have your head", "Breathe in the terror" };
+
+                    if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
+                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(_notum.Position);
+                };
+
 
                 if (_releasedSpiritCorpse != null)
                 {
