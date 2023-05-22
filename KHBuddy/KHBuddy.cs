@@ -47,6 +47,16 @@ namespace KHBuddy
         public static bool _init = false;
         public static bool Sitting = false;
 
+        public static bool Beach = false;
+        public static bool East = false;
+        public static bool West = false;
+        public static bool EastandWest = false;
+
+        public static bool _beachToggled = false;
+        public static bool _eastToggled = false;
+        public static bool _westToggled = false;
+        public static bool _eastandWestToggled = false;
+
         public override void Run(string pluginDir)
         {
             try
@@ -62,6 +72,11 @@ namespace KHBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.MoveEast, OnMoveEastMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.MoveWest, OnMoveWestMessage);
 
+                IPCChannel.RegisterCallback((int)IPCOpcode.Beach, BeachMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.East, EastMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.West, WestMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.EastandWest, EastAndWestMessage);
+
                 Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 //Chat.RegisterCommand("buddy", KHBuddyCommand);
@@ -73,6 +88,7 @@ namespace KHBuddy
                 _settings["Toggle"] = false;
 
                 _settings.AddVariable("SideSelection", (int)SideSelection.East);
+                _settings["SideSelection"] = (int)SideSelection.East;
 
                 SettingsController.RegisterSettingsWindow("KHBuddy", pluginDir + "\\UI\\KHBuddySettingWindow.xml", _settings);
 
@@ -159,6 +175,23 @@ namespace KHBuddy
                 NavMeshMovementController.Halt();
         }
 
+        private void BeachMessage(int sender, IPCMessage msg)
+        {
+            _settings["SideSelection"] = (int)SideSelection.Beach;
+        }
+        private void EastMessage(int sender, IPCMessage msg)
+        {
+            _settings["SideSelection"] = (int)SideSelection.East;
+        }
+        private void WestMessage(int sender, IPCMessage msg)
+        {
+            _settings["SideSelection"] = (int)SideSelection.West;
+        }
+        private void EastAndWestMessage(int sender, IPCMessage msg)
+        {
+            _settings["SideSelection"] = (int)SideSelection.EastAndWest;
+        }
+
         public override void Teardown()
         {
             SettingsController.CleanUp();
@@ -203,6 +236,8 @@ namespace KHBuddy
                 return;
 
             _stateMachine.Tick();
+
+            Selection();
 
             if (Time.NormalTime > _sitUpdateTimer + 1)
             {
@@ -277,6 +312,7 @@ namespace KHBuddy
                         {
                             Side = (int)SideSelection.East
                         });
+
                     }
                     else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
                     {
@@ -284,6 +320,7 @@ namespace KHBuddy
                         {
                             Side = (int)SideSelection.West
                         });
+
                     }
                     else if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
                     {
@@ -291,6 +328,7 @@ namespace KHBuddy
                         {
                             Side = (int)SideSelection.EastAndWest
                         });
+
                     }
 
                     Stop();
@@ -372,6 +410,90 @@ namespace KHBuddy
 
                     Start();
                 }
+
+                if (Beach)
+                {
+                    IPCChannel.Broadcast(new BeachSelection());
+                    Beach = false;
+                }
+
+                if (East)
+                {
+                    IPCChannel.Broadcast(new EastSelection());
+                    East = false;
+                }
+
+                if (West)
+                {
+                    IPCChannel.Broadcast(new WestSelection());
+                    West = false;
+                }
+
+                if (EastandWest)
+                {
+                    IPCChannel.Broadcast(new EastandWestSelection());
+                    EastandWest = false;
+                }
+            }
+        }
+
+        public static void Selection()
+        {
+            if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32() && !_beachToggled)
+                {
+                Beach = true;
+                East = false;
+                West = false;
+                EastandWest = false;
+
+                _beachToggled = true;
+                _eastToggled = false;
+                _westToggled = false;
+                _eastandWestToggled = false;
+
+                Chat.WriteLine("Beach selected");
+            }
+            if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32() && !_eastToggled)
+            {
+                Beach = false;
+                East = true;
+                West = false;
+                EastandWest = false;
+
+                _beachToggled = false;
+                _eastToggled = true;
+                _westToggled = false;
+                _eastandWestToggled = false;
+
+                Chat.WriteLine("East selected");
+            }
+            if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32() && !_westToggled)
+            {
+                Beach = false;
+                East = false;
+                West = true;
+                EastandWest = false;
+
+                _beachToggled = false;
+                _eastToggled = false;
+                _westToggled = true;
+                _eastandWestToggled = false;
+
+                Chat.WriteLine("West selected");
+            }
+            if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32() && !_eastandWestToggled)
+            {
+                Beach = false;
+                East = false;
+                West = false;
+                EastandWest = true;
+
+                _beachToggled = false;
+                _eastToggled = false;
+                _westToggled = false;
+                _eastandWestToggled = true;
+
+                Chat.WriteLine("East and West selected");
             }
         }
 
@@ -411,7 +533,7 @@ namespace KHBuddy
                 if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                 {
-                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                    if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
                     {
                         Task.Factory.StartNew(
                            async () =>
@@ -426,7 +548,9 @@ namespace KHBuddy
                                await Task.Delay(800);
                                NavMeshMovementController.Instance.SetMovement(MovementAction.LeaveSit);
                                await Task.Delay(200);
-                               Sitting = false;
+
+                               if (DynelManager.LocalPlayer.NanoPercent > 30 || DynelManager.LocalPlayer.HealthPercent > 65)
+                                   Sitting = false;
                            });
                     }
                 }

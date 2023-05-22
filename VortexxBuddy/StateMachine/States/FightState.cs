@@ -19,6 +19,7 @@ using System.Security.Cryptography;
 using System.Runtime.InteropServices;
 using AOSharp.Core.IPC;
 using VortexxBuddy.IPCMessages;
+using System;
 
 namespace VortexxBuddy
 {
@@ -29,10 +30,10 @@ namespace VortexxBuddy
         private static SimpleChar _vortexx;
         private static SimpleChar _releasedSpirit;
         private static SimpleChar _desecratedSpirits;
+        private static SimpleChar _notum;
 
         private static Corpse _vortexxCorpse;
         private static Corpse _releasedSpiritCorpse;
-
 
         public IState GetNextState()
         {
@@ -106,76 +107,42 @@ namespace VortexxBuddy
                   .Where(c => c.Name.Contains("Remains of Released Spirit"))
                       .FirstOrDefault();
 
-                List<Dynel> _notum = DynelManager.AllDynels
-                  .Where(c => c.Name.Contains("Notum Erruption"))
-                  .OrderBy(c => c.Position.DistanceFrom(Constants._centerPodium))
-                  .ToList();
+                _notum = DynelManager.NPCs
+                   .Where(c => c.Name.Contains("Notum Erruption"))
+                   .FirstOrDefault();
 
                 //return to center
                 if (_vortexx != null || _desecratedSpirits != null)
-                { 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) > 5f
-                    && !MovementController.Instance.IsNavigating)
-                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._centerPodium); 
+                {
+                    if (!DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.Terrified)
+                        && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) > 2f
+                        && !MovementController.Instance.IsNavigating)
+                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._centerPodium);
                 }
 
                 //Attack and initial start
                 if (_vortexx != null)
                 {
                     // attacking vortexx
-                    if (DynelManager.LocalPlayer.FightingTarget == null 
+                    if (DynelManager.LocalPlayer.FightingTarget == null
                         && !DynelManager.LocalPlayer.IsAttackPending
                         && !MovementController.Instance.IsNavigating)
                         DynelManager.LocalPlayer.Attack(_vortexx);
-
-                   
-                    //if (_vortexx.HealthPercent < 63 && _vortexx.HealthPercent > 62)
-                    //    VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._redPodium);
-
-                    //if (_notum != null && !DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
-                    //{
-                    //    if (_vortexx.HealthPercent < 44 && _vortexx.HealthPercent > 42)
-                    //        foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
-                    //        {
-                    //            VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
-                    //        }
-                    //    if (_vortexx.HealthPercent < 29 && _vortexx.HealthPercent > 28)
-                    //        foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
-                    //        {
-                    //            VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
-                    //        }
-                    //    if (_vortexx.HealthPercent < 19 && _vortexx.HealthPercent > 18)
-                    //        foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
-                    //        {
-                    //            VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
-                    //        }
-                    //    if (_vortexx.HealthPercent < 14 && _vortexx.HealthPercent > 13)
-                    //        foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
-                    //        {
-                    //            VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
-                    //        }
-                    //    if (_vortexx.HealthPercent < 7 && _vortexx.HealthPercent > 5) // missed
-                    //        foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
-                    //        {
-                    //            VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
-                    //        }
-                    //}
-
-                    if (_notum != null)
-                    {
-                        if (!DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion)
-                            || DynelManager.LocalPlayer.Buffs.Find(VortexxBuddy.Nanos.NanoInfusion, out Buff antiFear) && antiFear.RemainingTime < 2)
-                        {
-                            foreach (Dynel notum in _notum.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
-                            {
-                                VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(notum.Position);
-
-                                if (DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
-                                    VortexxBuddy.NavMeshMovementController.Halt();
-                            }
-                        }
-                    }
                 }
+
+                Network.ChatMessageReceived += (s, msg) =>
+                {
+                    if (msg.PacketType != ChatMessageType.NpcMessage)
+                        return;
+
+                    var npcMsg = (NpcMessage)msg;
+
+                    string[] triggerMsg = new string[4] { "Flee you pathetic insects", "Fear my power", "I will have your head", "Breathe in the terror" };
+
+                    if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
+                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(_notum.Position);
+                };
+
 
                 if (_releasedSpiritCorpse != null)
                 {
@@ -212,7 +179,6 @@ namespace VortexxBuddy
                 if (_vortexxCorpse != null)
                 {
                     VortexxBuddy.VortexxCorpse = true;
-                    VortexxBuddy._clearToEnter = false;
                 }
             }
         }

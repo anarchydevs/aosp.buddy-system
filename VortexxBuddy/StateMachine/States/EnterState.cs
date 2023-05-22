@@ -24,7 +24,8 @@ namespace VortexxBuddy
 
         public IState GetNextState()
         {
-            if (Playfield.ModelIdentity.Instance == Constants.VortexxId)
+            if (Playfield.ModelIdentity.Instance == Constants.VortexxId
+                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) <5)
                 return new FightState();
 
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId)
@@ -67,6 +68,12 @@ namespace VortexxBuddy
                     VortexxBuddy.NavMeshMovementController.SetDestination(Constants._entrance);
                     VortexxBuddy.NavMeshMovementController.AppendDestination(Constants._reneterPos);
                 }
+            }
+
+            if (Playfield.ModelIdentity.Instance == Constants.VortexxId)
+            {
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPodium) > 2f)
+                    VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._centerPodium);
             }
         }
     }

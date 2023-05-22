@@ -317,8 +317,13 @@ namespace VortexxBuddy
                 {
                     if (!_settings["Toggle"].AsBool() && !Toggle)
                     {
+                        
+                        Leader = DynelManager.LocalPlayer.Identity;
 
-                        IPCChannel.Broadcast(new StartMessage());
+                        if (DynelManager.LocalPlayer.Identity == Leader)
+                            IPCChannel.Broadcast(new StartMessage());
+
+                        _settings["Toggle"] = true;
                         Start();
                     }
                     else
@@ -356,6 +361,9 @@ namespace VortexxBuddy
             public const int EmptyHusk = 280731;
             public const int CreepingIllness = 280751;
             public const int FlamesofConsequence = 280753;
+
+            public const int Terrified = 280868; // fear
+
         }
     }
 }

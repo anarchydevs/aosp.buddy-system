@@ -22,13 +22,15 @@ namespace Db1Buddy
         public IState GetNextState()
         {
 
-            //if (Playfield.ModelIdentity.Instance == Constants.DB1Id
-            //    && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
-            //    return new IdleState();
+            if (Playfield.ModelIdentity.Instance == Constants.DB1Id)
+            {
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) < 2
+                && !DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
+                    return new IdleState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.DB1Id
-                && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
-                return new FightState();
+                if (DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients))
+                    return new FightState();
+            }
 
             return null;
         }
@@ -36,6 +38,11 @@ namespace Db1Buddy
         public void OnStateEnter()
         {
             Chat.WriteLine("GetBuffState");
+
+            _yellow = false;
+            _blue = false;
+            _green = false;
+            _red = false;
         }
 
         public void OnStateExit()
@@ -59,57 +66,52 @@ namespace Db1Buddy
 
             if (!Team.IsInTeam || Game.IsZoning) { return; }
 
-            if (Playfield.ModelIdentity.Instance == 6003)
+            if (Playfield.ModelIdentity.Instance == Constants.DB1Id)
             {
-
                 if (_mikkelsen != null && DynelManager.LocalPlayer.Identity == Db1Buddy.Leader)
                 {
                     if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
                         DynelManager.LocalPlayer.Attack(_mikkelsen);
                 }
 
-
                 foreach (TeamMember member in Team.Members)
                 {
                         if (!_yellow && !_blue && !_green && !_red)
                         {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) < 5f
-                            && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheAncientMachinist))
+                            if (//DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) < 5f
+                             DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheAncientMachinist))
                                 _yellow = true;
                             else
                                 Db1Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._yellowPodium);
                         }
                         else if (_yellow && !_blue && !_green && !_red)
                         {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) < 5f
-                            && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheEternalCraftsman))
+                            if (//DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) < 5f
+                             DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheEternalCraftsman))
                                 _blue = true;
                             else
                                 Db1Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._bluePodium);
                         }
                         else if (_yellow && _blue && !_green && !_red)
                         {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) < 5f
-                            && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheAncientForm))
+                            if (//DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) < 5f
+                             DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheAncientForm))
                                 _green = true;
                             else
                                 Db1Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._greenPodium);
                         }
                         else if (_yellow && _blue && _green && !_red)
                         {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) < 5f
-                            && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheEternalCleric))
+                            if (//DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) < 5f
+                             DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.BlessingoftheEternalCleric))
                                 _red = true;
                             else
                                 Db1Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._redPodium);
                         }
-                        else
-                    {
-                        _yellow = false;
-                        _blue = false;
-                        _green = false;
-                        _red = false;
-                    }
+                    //    else
+                    //{
+                    //    Db1Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+                    //}
                     
                 }
             }

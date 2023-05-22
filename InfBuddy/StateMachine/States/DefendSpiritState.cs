@@ -59,6 +59,9 @@ namespace InfBuddy
                 return new ExitMissionState();
             }
 
+            if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
+                return new IdleState();
+
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return new SitState();
 
@@ -67,13 +70,13 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("DefendSpiritState::OnStateEnter");
+            //Chat.WriteLine("DefendSpiritState::OnStateEnter");
             _mobStuckStartTime = Time.NormalTime;
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("DefendSpiritState::OnStateExit");
+            //Chat.WriteLine("DefendSpiritState::OnStateExit");
             _missionsLoaded = false;
         }
 
@@ -136,6 +139,15 @@ namespace InfBuddy
         public void Tick()
         {
             if (Game.IsZoning) { return; }
+
+            if (Team.IsInTeam)
+            {
+                foreach (TeamMember member in Team.Members)
+                {
+                    if (!ReformState._teamCache.Contains(member.Identity))
+                        ReformState._teamCache.Add(member.Identity);
+                }
+            }
 
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
