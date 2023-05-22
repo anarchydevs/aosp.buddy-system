@@ -54,6 +54,7 @@ namespace AttackBuddy
                     "Unicorn Service Tower Alpha",
                     "Unicorn Service Tower Delta",
                     "Unicorn Service Tower Gamma",
+                    "North Alien Signal Tower",
                     "Sean Powell",
                     "Unicorn Guard",
                     "Essence Fragment",
