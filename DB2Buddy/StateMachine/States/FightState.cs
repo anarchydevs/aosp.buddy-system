@@ -17,6 +17,7 @@ namespace DB2Buddy
     {
         private static SimpleChar _aune;
         private static Corpse _auneCorpse;
+        private static SimpleChar _mist;
         private static SimpleChar _redTower;
         private static SimpleChar _blueTower;
 
@@ -112,32 +113,32 @@ namespace DB2Buddy
                    && !c.Name.Contains("Remains of ")
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
-
-            List<Dynel> _mists = DynelManager.AllDynels
+            
+            _mist = DynelManager.NPCs
                 .Where(c => c.Name.Contains("Notum Irregularity"))
-                .OrderBy(c => c.Position.DistanceFrom(_aune.Position))
-                .ToList();
+                .FirstOrDefault();
 
             if (_auneCorpse != null)
                 DB2Buddy.AuneCorpse = true;
 
-            if (_mists != null && _mists.Count > 0 && Time.NormalTime > _mistCycle + 3f)
+            Network.ChatMessageReceived += (s, msg) =>
             {
-                _mistCycle = Time.NormalTime;
+                if (msg.PacketType != ChatMessageType.NpcMessage)
+                    return;
 
-                foreach (Dynel mist in _mists.Where(c => c.DistanceFrom(DynelManager.LocalPlayer) > 1f))
+                var npcMsg = (NpcMessage)msg;
+
+                string[] triggerMsg = new string[2] { "Know the power of the Xan", "You will never know the secrets of the machine" };
+
+                if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
                 {
-                    //if (!MovementController.Instance.IsNavigating)
-                    //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(mist.Position);
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) > 1)
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_mist.Position);
 
-                    {
-                        DynelManager.LocalPlayer.Position = mist.Position;
-                        MovementController.Instance.SetMovement(MovementAction.Update);
-                    }
+                    //DynelManager.LocalPlayer.Position = _mist.Position;
+                    //MovementController.Instance.SetMovement(MovementAction.Update);
                 }
-
-                _taggedMist = true;
-            }
+            };
 
             if (_aune != null)
             {
@@ -162,13 +163,13 @@ namespace DB2Buddy
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
-                if (_mists.Count == 0 && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10f
+                if (_mist == null && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10f
                     && !MovementController.Instance.IsNavigating)
                 {
-                    //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
 
-                    DynelManager.LocalPlayer.Position = _aune.Position;
-                    MovementController.Instance.SetMovement(MovementAction.Update);
+                    //DynelManager.LocalPlayer.Position = _aune.Position;
+                    //MovementController.Instance.SetMovement(MovementAction.Update);
                 }
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) > 130)
