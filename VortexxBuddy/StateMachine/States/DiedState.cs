@@ -12,8 +12,7 @@ namespace VortexxBuddy
         {
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPos) < 20.0f
-                && Extensions.CanProceed()
-                && !Team.Members.Any(c => c.Character == null))
+                && Extensions.CanProceed())
                 return new EnterState();
 
             return null;

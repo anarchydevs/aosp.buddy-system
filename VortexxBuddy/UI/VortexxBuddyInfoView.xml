@@ -22,6 +22,7 @@
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<TextView value="*Get Immunity: Toggle on characters that need Immunity" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" The crystals need to be in their inventory" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" Slow DD, leave some toons outside" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
 		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>

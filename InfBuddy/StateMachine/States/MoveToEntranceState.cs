@@ -65,7 +65,7 @@ namespace InfBuddy
             if (DynelManager.LocalPlayer.Identity == InfBuddy.Leader)
                 randomWait = 4;
 
-            Chat.WriteLine($"Idling for {randomWait} seconds..");
+            //Chat.WriteLine($"Idling for {randomWait} seconds..");
 
             Task.Delay(randomWait * 1000).ContinueWith(x =>
             {

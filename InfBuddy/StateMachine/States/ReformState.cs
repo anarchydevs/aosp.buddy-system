@@ -17,8 +17,8 @@ namespace InfBuddy
 
         private ReformPhase _phase;
 
-        private static List<Identity> _teamCache = new List<Identity>();
-        private static List<Identity> _invitedList = new List<Identity>();
+        public static List<Identity> _teamCache = new List<Identity>();
+        public static List<Identity> _invitedList = new List<Identity>();
         private bool _init = false;
 
         public IState GetNextState()
@@ -47,12 +47,12 @@ namespace InfBuddy
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
-               // Chat.WriteLine("ReformPhase.Waiting");
+               //Chat.WriteLine("ReformPhase.Waiting");
             }
             else
             {
                 _phase = ReformPhase.Disbanding;
-                Chat.WriteLine("Disbanding");
+               //Chat.WriteLine("Disbanding");
             }
         }
 
@@ -99,7 +99,7 @@ namespace InfBuddy
                     if (player.Identity == InfBuddy.Leader) { continue; }
 
                     Team.Invite(player.Identity);
-                    Chat.WriteLine($"Inviting {player.Name}");
+                    //Chat.WriteLine($"Inviting {player.Name}");
                 }
             }
 
