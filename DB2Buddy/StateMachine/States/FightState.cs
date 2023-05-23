@@ -59,9 +59,12 @@ namespace DB2Buddy
                         && DB2Buddy._settings["Farming"].AsBool())
                 return new FarmingState();
 
-            if (_aune != null && (_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                 || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)))
-                return new FightTowerState();
+            if (_aune != null)
+            {
+                if (_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+                 || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                    return new FightTowerState();
+            }
 
             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 30)
                 return new FellState();
@@ -135,8 +138,8 @@ namespace DB2Buddy
 
                 if (triggerMsg.Any(x => npcMsg.Text.Contains(x)) )
                 {
-                    if (Extensions.Debuffed()) 
-                        return;
+                    //if (Extensions.Debuffed()) 
+                    //    return;
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) > 0.1)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_mist.Position);
