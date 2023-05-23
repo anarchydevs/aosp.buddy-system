@@ -174,14 +174,7 @@ namespace VortexxBuddy
         private void EnterMessage(int sender, IPCMessage msg)
         {
             if (!(_stateMachine.CurrentState is EnterState))
-                _stateMachine.SetState(new EnterState());
-
-            //if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-            //    &&DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
-            //{
-            //    NavMeshMovementController.SetDestination(Constants._entrance);
-            //    NavMeshMovementController.AppendDestination(Constants._reneterPos);
-            //}
+                _stateMachine.SetState(new EnterState()); 
         }
 
         private void HandleInfoViewClick(object s, ButtonBase button)
@@ -194,14 +187,12 @@ namespace VortexxBuddy
             _infoWindow.Show(true);
         }
 
-
         private void OnUpdate(object s, float deltaTime)
         {
             if (Game.IsZoning)
                 return;
 
-            
-
+ 
             if (Time.NormalTime > _sitUpdateTimer + 1)
             {
                 ListenerSit();
@@ -285,7 +276,9 @@ namespace VortexxBuddy
 
             if (spell != null)
             {
-                if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && Extensions.CanUseSitKit())
+                if (!DynelManager.LocalPlayer.Buffs.Contains(280488) 
+                    && !DynelManager.LocalPlayer.Buffs.Contains(Nanos.AncientMist)
+                    && Extensions.CanUseSitKit())
                 {
                     if (spell != null && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
@@ -358,6 +351,7 @@ namespace VortexxBuddy
             public const int PulsatingGreenNanoInfusion = 280561;
             public const int GoldenNanoInfusion = 280562;
 
+            public const int AncientMist = 280799; // nano drain
             public const int EmptyHusk = 280731;
             public const int CreepingIllness = 280751;
             public const int FlamesofConsequence = 280753;
