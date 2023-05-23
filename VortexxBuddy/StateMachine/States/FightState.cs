@@ -130,7 +130,7 @@ namespace VortexxBuddy
                         DynelManager.LocalPlayer.Attack(_vortexx);
                 }
 
-                if (_vortexx.HealthPercent < 63 && _vortexx.HealthPercent > 62
+                if (_vortexx != null && _vortexx.HealthPercent < 63 && _vortexx.HealthPercent > 62
                 && !DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
                     VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._redPodium);
 
