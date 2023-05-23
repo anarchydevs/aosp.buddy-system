@@ -97,6 +97,7 @@
     <Compile Include="StateMachine\States\FarmingState.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="StateMachine\States\FellState.cs" />
     <Compile Include="StateMachine\States\PathToBossState.cs" />
     <Compile Include="StateMachine\States\EnterState.cs" />
     <Compile Include="StateMachine\States\FightTowerState.cs" />

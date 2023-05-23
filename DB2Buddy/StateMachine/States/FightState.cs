@@ -59,9 +59,12 @@ namespace DB2Buddy
                         && DB2Buddy._settings["Farming"].AsBool())
                 return new FarmingState();
 
-            if (_aune != null && _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                 || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
-                return new CircleState();
+            if (_aune != null && (_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+                 || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)))
+                return new FightTowerState();
+
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 30)
+                return new FellState();
 
             return null;
         }
@@ -132,7 +135,10 @@ namespace DB2Buddy
 
                 if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) > 1)
+                    //if (MovementController.Instance.IsNavigating)
+                    //DB2Buddy.NavMeshMovementController.Halt();
+
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) > 0.1)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_mist.Position);
 
                     //DynelManager.LocalPlayer.Position = _mist.Position;
@@ -163,8 +169,9 @@ namespace DB2Buddy
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
-                if (_mist == null && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10f
-                    && !MovementController.Instance.IsNavigating)
+                if (_mist == null && _blueTower == null && _redTower == null 
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10f
+                    && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
                 {
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
 
@@ -172,9 +179,11 @@ namespace DB2Buddy
                     //MovementController.Instance.SetMovement(MovementAction.Update);
                 }
 
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) > 130)
-                    DynelManager.LocalPlayer.Position = Constants._startPosition;
-                    MovementController.Instance.SetMovement(MovementAction.Update);
+                //if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) > 130)
+                //{
+                //    DynelManager.LocalPlayer.Position = Constants._startPosition;
+                //    MovementController.Instance.SetMovement(MovementAction.Update);
+                //}
             }
         }
        

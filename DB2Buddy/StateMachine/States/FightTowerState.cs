@@ -51,7 +51,7 @@ namespace DB2Buddy
             {
                 if (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
                  && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                 && !MovementController.Instance.IsNavigating)
+                 && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
                 {
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
                     //DynelManager.LocalPlayer.Position = (Constants._startPosition);
@@ -59,7 +59,7 @@ namespace DB2Buddy
                     return new FightState();
                 }
 
-                if (_aune == null)
+                if (_aune == null && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
                 {
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
                     //DynelManager.LocalPlayer.Position = (Constants._startPosition);
@@ -114,7 +114,8 @@ namespace DB2Buddy
                     && !DynelManager.LocalPlayer.IsAttackPending)
                     DynelManager.LocalPlayer.Attack(_redTower);
 
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f)
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f
+                    && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
 
                 //if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f)
@@ -133,10 +134,11 @@ namespace DB2Buddy
                     DynelManager.LocalPlayer.Attack(_blueTower);
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 3f
-                    && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                    && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
+                    && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_blueTower.Position);
 
-                ////if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 3f)
+                //if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 3f)
                 //{
                 //    DynelManager.LocalPlayer.Position = _blueTower.Position;
                 //    MovementController.Instance.SetMovement(MovementAction.Update);
