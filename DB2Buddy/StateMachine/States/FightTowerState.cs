@@ -14,7 +14,6 @@ namespace DB2Buddy
     public class FightTowerState : IState
     {
         private static SimpleChar _aune;
-        private static Corpse _auneCorpse;
         private static SimpleChar _redTower;
         private static SimpleChar _blueTower;
 

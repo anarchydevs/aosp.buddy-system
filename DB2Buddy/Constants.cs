@@ -45,7 +45,7 @@ namespace DB2Buddy
         public const int PWId = 570;
 
         //podiums 
-        public static Vector3 first = new Vector3 (263.9f, 50.8f , 246.0f);
+        public static Vector3 first = new Vector3 (263.8f, 50.8f , 246.4f); //263.8, 246.4, 50.8,
         public static Vector3 second = new Vector3(299.2f, 50.8f, 255.4f);
         public static Vector3 third = new Vector3(307.3f, 50.8f, 220.7f);
         public static Vector3 forth = new Vector3(273.6f, 50.8f, 211.8f);

@@ -133,16 +133,13 @@ namespace DB2Buddy
 
                 string[] triggerMsg = new string[2] { "Know the power of the Xan", "You will never know the secrets of the machine" };
 
-                if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
+                if (triggerMsg.Any(x => npcMsg.Text.Contains(x)) )
                 {
-                    //if (MovementController.Instance.IsNavigating)
-                    //DB2Buddy.NavMeshMovementController.Halt();
+                    if (Extensions.Debuffed()) 
+                        return;
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) > 0.1)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_mist.Position);
-
-                    //DynelManager.LocalPlayer.Position = _mist.Position;
-                    //MovementController.Instance.SetMovement(MovementAction.Update);
                 }
             };
 
