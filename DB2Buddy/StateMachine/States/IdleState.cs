@@ -70,14 +70,17 @@ namespace DB2Buddy
                             && DB2Buddy._settings["Farming"].AsBool())
                         return new FarmingState();
 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) < 10f
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 50f
                      && Team.IsInTeam)
                         return new PathToBossState();
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 10f
                          && Team.IsInTeam)
                         return new FightState();
-                    
+
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
+                        return new FellState();
+
                 }
             }
         

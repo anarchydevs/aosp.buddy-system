@@ -33,12 +33,17 @@ namespace DB2Buddy
                 DB2Buddy.NavMeshMovementController.Halt();
             }
 
-            if (Playfield.ModelIdentity.Instance == Constants.PWId)
+            if (Playfield.ModelIdentity.Instance != Constants.DB2Id)
                 return new IdleState();
 
             if (_aune != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) < 1)
             {
                 return new FightState();
+            }
+
+            if (_aune == null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) < 5)
+            {
+                return new IdleState();
             }
 
             return null;
@@ -63,7 +68,7 @@ namespace DB2Buddy
         {
             if (Game.IsZoning) { return; }
 
-            if (Playfield.ModelIdentity.Instance == Constants.DB2Id && !Team.Members.Any(c => c.Character == null))
+            if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
             {
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 5f)
                 {

@@ -321,6 +321,11 @@ namespace DB2Buddy
             public const int ActivatingtheMachine = 274200;
             public const int NotumPull = 274359;
 
+            public const int PathtoElevation1 = 277947;
+            public const int PathtoElevation2 = 277958;
+            public const int PathtoElevation3 = 277959;
+            public const int PathtoElevation4 = 277952;
+
         }
     }
 }

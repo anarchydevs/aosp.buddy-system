@@ -67,6 +67,9 @@ namespace DB2Buddy
                 }
             }
 
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
+                return new FellState();
+
             return null;
         }
 
@@ -114,7 +117,7 @@ namespace DB2Buddy
                     DynelManager.LocalPlayer.Attack(_redTower);
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f
-                    && !MovementController.Instance.IsNavigating)
+                    && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
 
                 //if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f)

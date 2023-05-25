@@ -26,7 +26,7 @@ namespace Db1Buddy
         public static Vector3 _greenPodium = new Vector3(363.8f, 29.7f, 395.3f); 
         public static Vector3 _redPodium = new Vector3(441.9f, 32.0f, 318.3f);
         public static Vector3 _bluePodium = new Vector3(439.2f, 30.1f, 384.6f);
-        public static Vector3 _yellowPodium = new Vector3(357.5f, 34.8f, 324.9f); 
+        public static Vector3 _yellowPodium = new Vector3(357.5f, 34.8f, 324.9f);
 
         //Instance IDs
         public const int DB1Id = 6003;

@@ -27,33 +27,44 @@ namespace DB2Buddy
                 DB2Buddy.NavMeshMovementController.Halt();
             }
 
-            if (Playfield.ModelIdentity.Instance == Constants.PWId)
+            if (Playfield.ModelIdentity.Instance != Constants.DB2Id)
                 return new IdleState();
 
             if (Playfield.ModelIdentity.Instance == Constants.DB2Id
-                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) < 10f
+                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._warpPos) < 10f
                  && DB2Buddy._settings["Toggle"].AsBool())
+            {
+                _first = false;
+                _second = false;
+                _third = false;
+                _forth = false;
+
                 return new PathToBossState();
+            }
 
             return null;
         }
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("FellState");
+
             _first = false;
             _second = false;
             _third = false;
             _forth = false;
+
+            Chat.WriteLine("FellState");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine(" Exit FellState");
+
             _first = false;
             _second = false;
             _third = false;
             _forth = false;
+
+            Chat.WriteLine(" Exit FellState");
         }
 
         public void Tick()
@@ -67,29 +78,46 @@ namespace DB2Buddy
                 {
                     if (!_first && !_second && !_third && !_forth)
                     {
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) > 1)
-                            DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants.first);
+                        if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.PathtoElevation1))
                         _first = true;
+
+                        else
+                        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants.first);
+
+                        //Chat.WriteLine("First");
+
                     }
                     else if (_first && !_second && !_third && !_forth)
                     {
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.second) > 1)
-                            DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants.second);
-                        _second = true;
+                        if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.PathtoElevation2))
+                            _second = true;
 
+                        else
+                            DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants.second);
+
+                        //Chat.WriteLine("Second");
+                        
                     }
                     else if (_first && _second && !_third && !_forth)
                     {
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.third) > 1)
-                            DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants.second);
-                        _third = true;
+                        if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.PathtoElevation3))
+                            _third = true;
 
+                        else
+                            DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants.third);
+
+                        //Chat.WriteLine("Third");
+                       
                     }
                     else if (_first && _second && _third && !_forth)
                     {
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.forth) > 1)
-                            DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants.second);
-                        _forth = true;
+                        if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.PathtoElevation4))
+                            _forth = true;
+
+                        else
+                        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants.forth);
+
+                        //Chat.WriteLine("Forth");
 
                     }
 

@@ -27,6 +27,7 @@ namespace DB2Buddy
                  && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) < 10f
                  && Team.IsInTeam
                  && Extensions.CanProceed()
+                 && !Team.Members.Any(c => c.Character == null)
                  && DB2Buddy._settings["Toggle"].AsBool())
                 return new PathToBossState();
 
