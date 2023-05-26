@@ -139,7 +139,7 @@ namespace DB2Buddy
 
                 if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
                 {
-                    DB2Buddy.NavMeshMovementController.Halt();
+                    
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_mist.Position);
                 }
 
