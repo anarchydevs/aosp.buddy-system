@@ -55,8 +55,6 @@ namespace DB2Buddy
                 && !MovementController.Instance.IsNavigating)
             {
                 DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_auneCorpsePos);
-                //DynelManager.LocalPlayer.Position = _auneCorpse.Position;
-                //MovementController.Instance.SetMovement(MovementAction.Update);
             }
 
             if (!_initCorpse && Team.IsInTeam && Playfield.ModelIdentity.Instance == Constants.DB2Id
