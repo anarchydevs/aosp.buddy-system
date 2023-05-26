@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace DB2Buddy
 {
+
     public class EnterState : IState
     {
         private static bool _init = false;
@@ -19,17 +20,54 @@ namespace DB2Buddy
         private static double _startTime;
 
         private static SimpleChar _aune;
+        private static SimpleChar _redTower;
+        private static SimpleChar _blueTower;
 
         public IState GetNextState()
         {
+            _aune = DynelManager.NPCs
+             .Where(c => c.Health > 0
+                 && c.Name.Contains("Ground Chief Aune")
+                 && !c.Name.Contains("Remains of "))
+             .FirstOrDefault();
 
-            if (Playfield.ModelIdentity.Instance == Constants.DB2Id
-                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) < 10f
+            _redTower = DynelManager.NPCs
+           .Where(c => c.Health > 0
+               && c.Name.Contains("Strange Xan Artifact")
+               && !c.Name.Contains("Remains of ")
+               && c.Buffs.Contains(274119))
+           .FirstOrDefault();
+
+            _blueTower = DynelManager.NPCs
+               .Where(c => c.Health > 0
+                   && c.Name.Contains("Strange Xan Artifact")
+                   && !c.Name.Contains("Remains of ")
+                   && !c.Buffs.Contains(274119))
+               .FirstOrDefault();
+
+            if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
+            {
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) < 10)
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._warpPos);
+
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._warpPos) < 5f
                  && Team.IsInTeam
                  && Extensions.CanProceed()
                  && !Team.Members.Any(c => c.Character == null)
                  && DB2Buddy._settings["Toggle"].AsBool())
-                return new PathToBossState();
+                    return new PathToBossState();
+
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 30f
+                        && Team.IsInTeam)
+                    return new FightState();
+
+                if (_aune != null)
+                {
+                    if (_redTower != null || _blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+                        || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                        return new FightTowerState();
+                }
+            }
 
 
             if (Playfield.ModelIdentity.Instance == Constants.PWId

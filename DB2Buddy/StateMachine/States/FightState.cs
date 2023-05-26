@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Collections;
 
 namespace DB2Buddy
 {
@@ -17,9 +18,9 @@ namespace DB2Buddy
     {
         private static SimpleChar _aune;
         private static Corpse _auneCorpse;
-        private static SimpleChar _mist;
         private static SimpleChar _redTower;
         private static SimpleChar _blueTower;
+        private static SimpleChar _mist;
 
         private static bool _init = false;
         private static double _time;
@@ -69,6 +70,8 @@ namespace DB2Buddy
             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
                 return new FellState();
 
+            
+
             return null;
         }
 
@@ -77,6 +80,7 @@ namespace DB2Buddy
             Chat.WriteLine($"FightBossState");
 
             _mistCycle = Time.NormalTime;
+            DB2Buddy.NavMeshMovementController.Halt();
         }
 
         public void OnStateExit()
@@ -119,13 +123,10 @@ namespace DB2Buddy
                    && !c.Name.Contains("Remains of ")
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
-            
-            _mist = DynelManager.NPCs
-                .Where(c => c.Name.Contains("Notum Irregularity"))
-                .FirstOrDefault();
 
-            if (_auneCorpse != null)
-                DB2Buddy.AuneCorpse = true;
+            _mist = DynelManager.NPCs
+              .Where(c => c.Name.Contains("Notum Irregularity"))
+              .FirstOrDefault();
 
             Network.ChatMessageReceived += (s, msg) =>
             {
@@ -136,21 +137,16 @@ namespace DB2Buddy
 
                 string[] triggerMsg = new string[2] { "Know the power of the Xan", "You will never know the secrets of the machine" };
 
-                if (triggerMsg.Any(x => npcMsg.Text.Contains(x)) )
+                if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
                 {
-                    //if (Extensions.Debuffed())
-                    //{
-                    //    Task.Factory.StartNew(
-                    //async () =>
-                    //{
-                    //    await Task.Delay(300);
-                    //        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_mist.Position);
-                    //});
-                    //}
-                    //else
-                        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_mist.Position);
+                    DB2Buddy.NavMeshMovementController.Halt();
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_mist.Position);
                 }
+
             };
+
+            if (_auneCorpse != null)
+                DB2Buddy.AuneCorpse = true;
 
             if (_aune != null && _blueTower == null &&  _redTower == null )
             {
@@ -159,7 +155,7 @@ namespace DB2Buddy
                     && !DynelManager.LocalPlayer.IsAttackPending
                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 20
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 19
                     && !MovementController.Instance.IsNavigating)
                     DynelManager.LocalPlayer.Attack(_aune);
 
@@ -172,8 +168,8 @@ namespace DB2Buddy
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
-                if (_mist == null && _blueTower == null && _redTower == null 
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10f
+                if (_blueTower == null && _redTower == null 
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 19f
                     && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
 

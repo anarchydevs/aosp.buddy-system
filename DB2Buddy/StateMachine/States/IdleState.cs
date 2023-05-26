@@ -74,7 +74,7 @@ namespace DB2Buddy
                      && Team.IsInTeam)
                         return new PathToBossState();
 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 10f
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 30f
                          && Team.IsInTeam)
                         return new FightState();
 

@@ -3,6 +3,7 @@ using AOSharp.Core;
 using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using AOSharp.Pathfinding;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -41,30 +42,27 @@ namespace DB2Buddy
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
                 DB2Buddy.NavMeshMovementController.Halt();
-            
 
             if (Playfield.ModelIdentity.Instance == Constants.PWId)
                 return new IdleState();
 
-            if (_redTower == null && _blueTower == null)
+            if (_redTower == null && _blueTower == null && !MovementController.Instance.IsNavigating)
             {
                 if (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                 && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                 && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
+                 && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                 {
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
+                    //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
                     //DynelManager.LocalPlayer.Position = (Constants._startPosition);
                     //MovementController.Instance.SetMovement(MovementAction.Update);
                     return new FightState();
                 }
-
-                if (_aune == null && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
-                {
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
-                    //DynelManager.LocalPlayer.Position = (Constants._startPosition);
-                    //MovementController.Instance.SetMovement(MovementAction.Update);
-                    return new FightState();
-                }
+                //else //(_aune == null && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
+                //{
+                //    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+                //    DynelManager.LocalPlayer.Position = (Constants._startPosition);
+                //    MovementController.Instance.SetMovement(MovementAction.Update);
+                //    return new FightState();
+                //}
             }
 
             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
@@ -75,6 +73,7 @@ namespace DB2Buddy
 
         public void OnStateEnter()
         {
+            DB2Buddy.NavMeshMovementController.Halt();
             Chat.WriteLine($"FightTowerState");
             FightState._taggedMist = false;
         }
@@ -117,7 +116,7 @@ namespace DB2Buddy
                     DynelManager.LocalPlayer.Attack(_redTower);
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f
-                    && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
+                    && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
 
                 //if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f)
@@ -137,15 +136,15 @@ namespace DB2Buddy
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 3f
                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                    && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
+                    && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_blueTower.Position);
 
-                //if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 3f)
+                //else if (_blueTower == null && _redTower == null
+                //    && MovementController.Instance.IsNavigating)
                 //{
-                //    DynelManager.LocalPlayer.Position = _blueTower.Position;
-                //    MovementController.Instance.SetMovement(MovementAction.Update);
+                //    DB2Buddy.NavMeshMovementController.Halt();
                 //}
-
+                
             }
         }
 
