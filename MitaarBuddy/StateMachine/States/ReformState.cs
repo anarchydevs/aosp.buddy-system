@@ -13,23 +13,24 @@ namespace MitaarBuddy
         private const float DisbandDelay = 10;
 
         private static double _reformStartedTime;
+        private double _inviting;
 
         private ReformPhase _phase;
-
-        //private static bool _init = false;
 
         public static List<Identity> _teamCache = new List<Identity>();
         private static List<Identity> _invitedList = new List<Identity>();
 
+        private static bool _init = false;
+
         public IState GetNextState()
         {
             if (Extensions.TimedOut(_reformStartedTime, ReformTimeout))
-                return new EnterState();
+                return new IdleState();
 
             if (_phase == ReformPhase.Completed)
             {
                 if (Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
-                    return new EnterState();
+                    return new IdleState();
             }
 
             return null;
@@ -41,7 +42,7 @@ namespace MitaarBuddy
 
             _reformStartedTime = Time.NormalTime;
 
-            MovementController.Instance.SetDestination(Constants._reneterPos);
+            MitaarBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._reneterPos);
 
             if (DynelManager.LocalPlayer.Identity != MitaarBuddy.Leader)
             {
@@ -49,17 +50,19 @@ namespace MitaarBuddy
                 _phase = ReformPhase.Waiting;
             }
 
+            FarmingState._atCorpse = false;
             FarmingState._initCorpse = false;
         }
 
         public void OnStateExit()
         {
-
+            Chat.WriteLine("Done Reforming");
             _invitedList.Clear();
             _teamCache.Clear();
 
-            //_init = false;
+            _init = false;
 
+            FarmingState._atCorpse = false;
             FarmingState._initCorpse = false;
 
         }
@@ -68,14 +71,22 @@ namespace MitaarBuddy
         {
             if (Game.IsZoning) { return; }
 
-            if (_phase == ReformPhase.Disbanding && Time.NormalTime > _reformStartedTime + DisbandDelay)
+            if (Team.IsInTeam)
             {
-                _phase = ReformPhase.Inviting;
-
+                foreach (TeamMember member in Team.Members)
+                {
+                    if (!_teamCache.Contains(member.Identity))
+                        _teamCache.Add(member.Identity);
+                }
             }
 
-            if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count())
+            if (_phase == ReformPhase.Inviting
+                && _invitedList.Count() < _teamCache.Count()
+                && Time.NormalTime > _inviting + DisbandDelay
+                && !_init)
             {
+                _init = true;
+
                 foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
                 {
                     if (_invitedList.Contains(player.Identity)) { continue; }
@@ -85,17 +96,31 @@ namespace MitaarBuddy
                     if (player.Identity == MitaarBuddy.Leader) { continue; }
 
                     Team.Invite(player.Identity);
-
+                    // Chat.WriteLine($"Inviting {player.Name}");
                 }
             }
 
+            if (_phase == ReformPhase.Disbanding)
+            {
+                if (!Team.IsInTeam)
+                {
+                    _inviting = Time.NormalTime;
+                    _phase = ReformPhase.Inviting;
+                    //Chat.WriteLine("ReformPhase.Inviting");
+                }
+                else if (Team.Members.Where(c => c.Character != null && c.Character.IsInPlay).ToList().Count == _teamCache.Count()
+                        || Time.NormalTime > _reformStartedTime + ReformTimeout)
+                    Team.Disband();
+            }
+
             if (_phase == ReformPhase.Inviting
-                && Team.IsInTeam
+                && _invitedList.Count() == _teamCache.Count()
+                && Time.NormalTime > _inviting + DisbandDelay
                 && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count()
-                && _invitedList.Count() == _teamCache.Count())
+                && _init)
             {
                 _phase = ReformPhase.Completed;
-
+                //Chat.WriteLine("ReformPhase.Completed");
             }
         }
 

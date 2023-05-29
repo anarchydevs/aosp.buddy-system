@@ -11,7 +11,6 @@ namespace VortexxBuddy
     {
         private const float ReformTimeout = 100;
         private const float DisbandDelay = 10;
-        private const float InviteDelay = 13;
 
         private static double _reformStartedTime;
         private double _inviting;
@@ -51,7 +50,7 @@ namespace VortexxBuddy
                 _phase = ReformPhase.Waiting;
             }
 
-            VortexxBuddy._clearToEnter = false;
+           
             FarmingState._initCorpse = false;
         }
 

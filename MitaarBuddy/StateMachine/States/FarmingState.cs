@@ -3,6 +3,7 @@ using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MitaarBuddy
@@ -10,6 +11,7 @@ namespace MitaarBuddy
     public class FarmingState : IState
     {
         public static bool _initCorpse = false;
+        public static bool _atCorpse = false;
 
         private static Corpse _sinuhCorpse;
 
@@ -17,57 +19,78 @@ namespace MitaarBuddy
 
         public IState GetNextState()
         {
-            if (Extensions.HasDied())
-                return new DiedState();
-
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) <= 10f)
+                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
+            {
                 return new ReformState();
+            }
 
             return null;
         }
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Pause for looting, 20 sec");
-
+            _atCorpse = false;
+            _initCorpse = false;
+            Chat.WriteLine("Farming");
         }
 
         public void OnStateExit()
         {
+            _atCorpse = false;
+            _initCorpse = false;
 
+            Chat.WriteLine("Farming done");
         }
 
         public void Tick()
         {
-            _sinuhCorpse = DynelManager.Corpses
-                         .Where(c => c.Name.Contains("Remains of Technomaster Sinuh"))
-                             .FirstOrDefault();
-
-            _sinuhCorpsePos = (Vector3)_sinuhCorpse?.Position;
-
-            //Path to corpse
-            if (DynelManager.LocalPlayer.Position.DistanceFrom(_sinuhCorpsePos) > 3.0f)
-                MovementController.Instance.SetDestination(_sinuhCorpsePos);
-
-
-            if (!_initCorpse && Team.IsInTeam && Playfield.ModelIdentity.Instance == 6017)
+            if (Playfield.ModelIdentity.Instance == Constants.MitaarId)
             {
+                Dynel Device = DynelManager.AllDynels
+               .Where(c => c.Name == "Strange Alien Device")
+               .FirstOrDefault();
 
-                Task.Factory.StartNew(
-                    async () =>
+                _sinuhCorpse = DynelManager.Corpses
+                             .Where(c => c.Name.Contains("Remains of Technomaster Sinuh"))
+                                 .FirstOrDefault();
+
+                _sinuhCorpsePos = (Vector3)_sinuhCorpse?.Position;
+
+                //Path to corpse
+                if (!_atCorpse && DynelManager.LocalPlayer.Position.DistanceFrom(_sinuhCorpsePos) > 1.0f)
+                {
+                    MovementController.Instance.SetDestination(_sinuhCorpsePos);
+
+                    _atCorpse = true;
+                }
+
+                if (!_initCorpse && _atCorpse)
+                {
+                    Chat.WriteLine("Pause for looting, 10 sec");
+                    Task.Factory.StartNew(
+                        async () =>
+                        {
+                            await Task.Delay(10000);
+                            Chat.WriteLine("Done, Leaving");
+
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._strangeAlienDevice) > 1)
+                                MovementController.Instance.SetDestination(Constants._strangeAlienDevice);
+
+                        });
+
+                    _initCorpse = true;
+                }
+
+                if (Device != null && _initCorpse && _atCorpse)
+                {
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._strangeAlienDevice) < 1
+                    && Extensions.CanProceed())
                     {
-                        await Task.Delay(20000);
-                        Chat.WriteLine("Done, Disbanding");
-                        Team.Disband();
-
-
-
-                    });
-
-                _initCorpse = true;
+                        Device.Use();
+                    }
+                }
             }
-
         }
     }
 }
