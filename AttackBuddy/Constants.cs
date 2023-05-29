@@ -104,7 +104,8 @@ namespace AttackBuddy
                     "Flaming Vengeance",
                     "Unstable Rift",
                     "Otacustes",
-                    "Curse Rot"
+                    "Curse Rot",
+                    "John McLane"
         };
     }
 }
