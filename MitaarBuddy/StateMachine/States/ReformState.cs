@@ -9,7 +9,7 @@ namespace MitaarBuddy
 {
     public class ReformState : IState
     {
-        private const float ReformTimeout = 100;
+        private const float ReformTimeout = 10;
         private const float DisbandDelay = 10;
 
         private static double _reformStartedTime;
