@@ -36,7 +36,7 @@ namespace DB2Buddy
             if (Playfield.ModelIdentity.Instance != Constants.DB2Id)
                 return new IdleState();
 
-            if (_aune != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) < 1)
+            if (_aune != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) < 5)
             {
                 return new FightState();
             }

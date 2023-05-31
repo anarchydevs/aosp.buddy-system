@@ -15,7 +15,7 @@ namespace DB2Buddy
         protected string _path;
 
         [JsonIgnore]
-        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 48;
+        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 44;
 
         public static Config Load(string path)
         {
@@ -65,7 +65,7 @@ namespace DB2Buddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 48;
+        private int _ipcChannel = 44;
 
         //Breaking out auto-property
         public int IPCChannel

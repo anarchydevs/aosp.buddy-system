@@ -75,7 +75,6 @@ namespace DB2Buddy
         {
             DB2Buddy.NavMeshMovementController.Halt();
             Chat.WriteLine($"FightTowerState");
-            FightState._taggedMist = false;
         }
 
         public void OnStateExit()
@@ -119,12 +118,6 @@ namespace DB2Buddy
                     && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
 
-                //if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f)
-                //{
-                //    DynelManager.LocalPlayer.Position = _redTower.Position;
-                //    MovementController.Instance.SetMovement(MovementAction.Update);
-                //}
-
             }
             else if (_blueTower != null)
             {
@@ -139,11 +132,6 @@ namespace DB2Buddy
                     && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_blueTower.Position);
 
-                //else if (_blueTower == null && _redTower == null
-                //    && MovementController.Instance.IsNavigating)
-                //{
-                //    DB2Buddy.NavMeshMovementController.Halt();
-                //}
                 
             }
         }
