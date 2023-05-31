@@ -50,7 +50,7 @@ namespace InfBuddy
         public static Identity Leader = Identity.None;
 
         public static bool DoubleReward = false;
-        private static bool Sitting = false;
+        private static bool _initSit = false;
 
         private static double _sitUpdateTimer;
         public static double _stateTimeOut;
@@ -118,7 +118,7 @@ namespace InfBuddy
 
                 _settings["Toggle"] = false;
 
-                _settings["ModeSelection"]= (int)ModeSelection.Normal;
+                _settings["ModeSelection"] = (int)ModeSelection.Normal;
                 _settings["FactionSelection"] = (int)FactionSelection.Clan;
                 _settings["DifficultySelection"] = (int)DifficultySelection.Hard;
 
@@ -236,7 +236,7 @@ namespace InfBuddy
 
             Selections();
 
-            if (Time.NormalTime > _sitUpdateTimer + 1)
+            if (Time.NormalTime > _sitUpdateTimer + 1.5)
             {
                 ListenerSit();
 
@@ -356,7 +356,7 @@ namespace InfBuddy
                 _mediumToggled = false;
                 _hardToggled = true;
             }
-        
+
             if (FactionSelection.Neutral == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_neutralToggled)
             {
                 Neutral = true;
@@ -414,7 +414,7 @@ namespace InfBuddy
                 if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
                                     && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
 
-            if (DynelManager.LocalPlayer.IsAlive && !Extensions.InCombat()
+            if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
                     && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
             {
                 List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
@@ -441,11 +441,11 @@ namespace InfBuddy
 
             if (kit == null) { return; }
 
-            if (spell != null)
+            if (_initSit == false && spell != null)
             {
                 if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
                 {
-                    if (spell != null && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
+                    if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment)
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                     {
                         if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
@@ -453,13 +453,14 @@ namespace InfBuddy
                             Task.Factory.StartNew(
                                async () =>
                                {
-                                   Sitting = true;
+                                   _initSit = true;
                                    await Task.Delay(400);
                                    NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                                   await Task.Delay(800);
+                                   await Task.Delay(1200);
                                    NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-                                   await Task.Delay(200);
-                                   Sitting = false;
+                                   await Task.Delay(400);
+                                   _initSit = false;
+                                   _sitUpdateTimer = Time.NormalTime;
                                });
                         }
                     }
