@@ -83,6 +83,7 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="InfBuddy.cs" />
+    <Compile Include="IPCMessages\OmniMessage.cs" />
     <Compile Include="IPCMessages\RoamMessage.cs" />
     <Compile Include="IPCMessages\NormalMessage .cs" />
     <Compile Include="IPCMessages\ClanMessage.cs" />

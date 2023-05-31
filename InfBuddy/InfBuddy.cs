@@ -33,6 +33,7 @@ namespace InfBuddy
         public static bool Hard = false;
         public static bool Neutral = false;
         public static bool Clan = false;
+        public static bool Omni = false;
         public static bool Normal = false;
         public static bool Roam = false;
 
@@ -40,6 +41,7 @@ namespace InfBuddy
         public static bool _mediumToggled = false;
         public static bool _hardToggled = false;
         public static bool _clanToggled = false;
+        public static bool _omniToggled = false;
         public static bool _neutralToggled = false;
         public static bool _normalToggled = false;
         public static bool _roamToggled = false;
@@ -88,6 +90,7 @@ namespace InfBuddy
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Neutral, NeutralMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Clan, ClanMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Omni, OmniMessage);
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Normal, NormalMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Roam, RoamMessage);
@@ -211,6 +214,11 @@ namespace InfBuddy
             _settings["FactionSelection"] = (int)FactionSelection.Clan;
         }
 
+        private void OmniMessage(int sender, IPCMessage msg)
+        {
+            _settings["FactionSelection"] = (int)FactionSelection.Omni;
+        }
+
         private void NormalMessage(int sender, IPCMessage msg)
         {
             _settings["ModeSelection"] = (int)ModeSelection.Normal;
@@ -296,6 +304,11 @@ namespace InfBuddy
                     IPCChannel.Broadcast(new ClanMessage());
                     Clan = false;
                 }
+                if (Omni)
+                {
+                    IPCChannel.Broadcast(new OmniMessage());
+                    Omni = false;
+                }
                 if (Normal)
                 {
                     IPCChannel.Broadcast(new NormalMessage());
@@ -343,23 +356,38 @@ namespace InfBuddy
                 _mediumToggled = false;
                 _hardToggled = true;
             }
-
+        
             if (FactionSelection.Neutral == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_neutralToggled)
             {
                 Neutral = true;
                 Clan = false;
+                Omni = false;
 
                 _neutralToggled = true;
                 _clanToggled = false;
+                _omniToggled = false;
             }
 
             if (FactionSelection.Clan == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_clanToggled)
             {
                 Neutral = false;
                 Clan = true;
+                Omni = false;
 
                 _neutralToggled = false;
                 _clanToggled = true;
+                _omniToggled = false;
+            }
+
+            if (FactionSelection.Omni == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_omniToggled)
+            {
+                Neutral = false;
+                Clan = false;
+                Omni = true;
+
+                _neutralToggled = false;
+                _clanToggled = false;
+                _omniToggled = true;
             }
 
             if (ModeSelection.Normal == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_normalToggled)
