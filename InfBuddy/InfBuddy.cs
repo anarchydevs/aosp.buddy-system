@@ -324,88 +324,157 @@ namespace InfBuddy
 
         public static void Selections()
         {
-            if (DifficultySelection.Easy == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_easyToggled)
+            switch ((DifficultySelection)_settings["DifficultySelection"].AsInt32())
             {
-                Easy = true;
-                Medium = false;
-                Hard = false;
-
-                _easyToggled = true;
-                _mediumToggled = false;
-                _hardToggled = false;
+                case DifficultySelection.Easy:
+                    Easy = true;
+                    Medium = false;
+                    Hard = false;
+                    _easyToggled = true;
+                    _mediumToggled = false;
+                    _hardToggled = false;
+                    break;
+                case DifficultySelection.Medium:
+                    Easy = false;
+                    Medium = true;
+                    Hard = false;
+                    _easyToggled = false;
+                    _mediumToggled = true;
+                    _hardToggled = false;
+                    break;
+                case DifficultySelection.Hard:
+                    Easy = false;
+                    Medium = false;
+                    Hard = true;
+                    _easyToggled = false;
+                    _mediumToggled = false;
+                    _hardToggled = true;
+                    break;
             }
-
-            if (DifficultySelection.Medium == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_mediumToggled)
+            switch ((FactionSelection)_settings["FactionSelection"].AsInt32())
             {
-                Easy = false;
-                Medium = true;
-                Hard = false;
-
-                _easyToggled = false;
-                _mediumToggled = true;
-                _hardToggled = false;
+                case FactionSelection.Neutral:
+                    Neutral = true;
+                    Clan = false;
+                    Omni = false;
+                    _neutralToggled = true;
+                    _clanToggled = false;
+                    _omniToggled = false;
+                    break;
+                case FactionSelection.Clan:
+                    Neutral = false;
+                    Clan = true;
+                    Omni = false;
+                    _neutralToggled = false;
+                    _clanToggled = true;
+                    _omniToggled = false;
+                    break;
+                case FactionSelection.Omni:
+                    Neutral = false;
+                    Clan = false;
+                    Omni = true;
+                    _neutralToggled = false;
+                    _clanToggled = false;
+                    _omniToggled = true;
+                    break;
             }
-
-            if (DifficultySelection.Hard == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_hardToggled)
+            switch ((ModeSelection)_settings["ModeSelection"].AsInt32())
             {
-                Easy = false;
-                Medium = false;
-                Hard = true;
-
-                _easyToggled = false;
-                _mediumToggled = false;
-                _hardToggled = true;
+                case ModeSelection.Normal:
+                    Normal = true;
+                    Roam = false;
+                    _normalToggled = true;
+                    _roamToggled = false;
+                    break;
+                case ModeSelection.Roam:
+                    Normal = false;
+                    Roam = true;
+                    _normalToggled = false;
+                    _roamToggled = true;
+                    break;
             }
+            //if (DifficultySelection.Easy == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_easyToggled)
+            //{
+            //    Easy = true;
+            //    Medium = false;
+            //    Hard = false;
 
-            if (FactionSelection.Neutral == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_neutralToggled)
-            {
-                Neutral = true;
-                Clan = false;
-                Omni = false;
+            //    _easyToggled = true;
+            //    _mediumToggled = false;
+            //    _hardToggled = false;
+            //}
 
-                _neutralToggled = true;
-                _clanToggled = false;
-                _omniToggled = false;
-            }
+            //if (DifficultySelection.Medium == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_mediumToggled)
+            //{
+            //    Easy = false;
+            //    Medium = true;
+            //    Hard = false;
 
-            if (FactionSelection.Clan == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_clanToggled)
-            {
-                Neutral = false;
-                Clan = true;
-                Omni = false;
+            //    _easyToggled = false;
+            //    _mediumToggled = true;
+            //    _hardToggled = false;
+            //}
 
-                _neutralToggled = false;
-                _clanToggled = true;
-                _omniToggled = false;
-            }
+            //if (DifficultySelection.Hard == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_hardToggled)
+            //{
+            //    Easy = false;
+            //    Medium = false;
+            //    Hard = true;
 
-            if (FactionSelection.Omni == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_omniToggled)
-            {
-                Neutral = false;
-                Clan = false;
-                Omni = true;
+            //    _easyToggled = false;
+            //    _mediumToggled = false;
+            //    _hardToggled = true;
+            //}
 
-                _neutralToggled = false;
-                _clanToggled = false;
-                _omniToggled = true;
-            }
+            //if (FactionSelection.Neutral == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_neutralToggled)
+            //{
+            //    Neutral = true;
+            //    Clan = false;
+            //    Omni = false;
 
-            if (ModeSelection.Normal == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_normalToggled)
-            {
-                Normal = true;
-                Roam = false;
+            //    _neutralToggled = true;
+            //    _clanToggled = false;
+            //    _omniToggled = false;
+            //}
 
-                _normalToggled = true;
-                _roamToggled = false;
-            }
-            if (ModeSelection.Roam == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_roamToggled)
-            {
-                Normal = false;
-                Roam = true;
+            //if (FactionSelection.Clan == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_clanToggled)
+            //{
+            //    Neutral = false;
+            //    Clan = true;
+            //    Omni = false;
 
-                _normalToggled = false;
-                _roamToggled = true;
-            }
+            //    _neutralToggled = false;
+            //    _clanToggled = true;
+            //    _omniToggled = false;
+            //}
+
+            //if (FactionSelection.Omni == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_omniToggled)
+            //{
+            //    Neutral = false;
+            //    Clan = false;
+            //    Omni = true;
+
+            //    _neutralToggled = false;
+            //    _clanToggled = false;
+            //    _omniToggled = true;
+            //}
+
+            //if (ModeSelection.Normal == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_normalToggled)
+            //{
+            //    Normal = true;
+            //    Roam = false;
+
+            //    _normalToggled = true;
+            //    _roamToggled = false;
+            //}
+            //if (ModeSelection.Roam == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_roamToggled)
+            //{
+            //    Normal = false;
+            //    Roam = true;
+
+            //    _normalToggled = false;
+            //    _roamToggled = true;
+            //}
         }
 
         private bool CanUseSitKit()
