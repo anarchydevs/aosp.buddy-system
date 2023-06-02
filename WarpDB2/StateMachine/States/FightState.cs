@@ -169,7 +169,29 @@ namespace WarpDB2
                 }
             }
 
+            if (_blueTower == null && _redTower == null
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10
+                    && !Extensions.Debuffed())
+            {
+                if (_aune != null)
+                {
+                    Task.Factory.StartNew(
+                              async () =>
+                              {
+                                  await Task.Delay(2000);
+                                  DynelManager.LocalPlayer.Position = _aune.Position;
+                                  await Task.Delay(1000);
+                                  MovementController.Instance.SetMovement(MovementAction.Update);
+                                  await Task.Delay(1000);
+                                  MovementController.Instance.SetMovement(MovementAction.Update);
+                              });
+                }
 
+                if (_aune == null)
+                {
+                    WarpDB2.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+                }
+            }
 
             if (_aune != null)
             {
@@ -188,29 +210,7 @@ namespace WarpDB2
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
-                if (_blueTower == null && _redTower == null
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10
-                    && !Extensions.Debuffed())
-                {
-                    if (_aune != null)
-                    {
-                        Task.Factory.StartNew(
-                                  async () =>
-                                  {
-                                      await Task.Delay(2000);
-                                      DynelManager.LocalPlayer.Position = _aune.Position;
-                                      await Task.Delay(1000);
-                                      MovementController.Instance.SetMovement(MovementAction.Update);
-                                      await Task.Delay(1000);
-                                      MovementController.Instance.SetMovement(MovementAction.Update);
-                                  });
-                    }
-
-                    if (_aune == null)
-                    {
-                        WarpDB2.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
-                    }
-                }
+                
 
             }
 
