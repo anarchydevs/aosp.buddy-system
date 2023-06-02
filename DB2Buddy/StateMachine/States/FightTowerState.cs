@@ -51,18 +51,8 @@ namespace DB2Buddy
                 if (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
                  && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                 {
-                    //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
-                    //DynelManager.LocalPlayer.Position = (Constants._startPosition);
-                    //MovementController.Instance.SetMovement(MovementAction.Update);
                     return new FightState();
                 }
-                //else //(_aune == null && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
-                //{
-                //    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
-                //    DynelManager.LocalPlayer.Position = (Constants._startPosition);
-                //    MovementController.Instance.SetMovement(MovementAction.Update);
-                //    return new FightState();
-                //}
             }
 
             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
@@ -75,6 +65,7 @@ namespace DB2Buddy
         {
             DB2Buddy.NavMeshMovementController.Halt();
             Chat.WriteLine($"FightTowerState");
+            FightState._taggedMist = false;
         }
 
         public void OnStateExit()
@@ -117,7 +108,6 @@ namespace DB2Buddy
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f
                     && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
-
             }
             else if (_blueTower != null)
             {
@@ -132,7 +122,6 @@ namespace DB2Buddy
                     && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_blueTower.Position);
 
-                
             }
         }
 

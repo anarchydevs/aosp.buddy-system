@@ -5,12 +5,12 @@ using AOSharp.Core.UI;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace DB2Buddy
+namespace WarpDB2
 {
     public class ReformState : IState
     {
-        private const float ReformTimeout = 100;
-        private const float DisbandDelay = 10;
+        private const float ReformTimeout = 5;
+        private const float DisbandDelay = 5;
 
         private static double _reformStartedTime;
 
@@ -43,7 +43,7 @@ namespace DB2Buddy
 
             MovementController.Instance.SetDestination(Constants._reneterPos);
 
-            if (DynelManager.LocalPlayer.Identity != DB2Buddy.Leader)
+            if (DynelManager.LocalPlayer.Identity != WarpDB2.Leader)
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
@@ -82,7 +82,7 @@ namespace DB2Buddy
 
                     _invitedList.Add(player.Identity);
 
-                    if (player.Identity == DB2Buddy.Leader) { continue; }
+                    if (player.Identity == WarpDB2.Leader) { continue; }
 
                     Team.Invite(player.Identity);
 

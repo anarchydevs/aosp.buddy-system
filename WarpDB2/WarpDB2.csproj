@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{FAB40EE4-B3E7-47D2-8BA3-954C495224A5}</ProjectGuid>
+    <ProjectGuid>{202A0300-0D8F-465E-B8D4-5A21E8EEB215}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DB2buddy</RootNamespace>
-    <AssemblyName>DB2buddy</AssemblyName>
+    <RootNamespace>WarpDB2</RootNamespace>
+    <AssemblyName>WarpDB2</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -36,43 +36,33 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AOSharp.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.1.0.28\lib\net48\AOSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.1.0.28\lib\net48\AOSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Recast, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.4\lib\net48\AOSharp.Recast.dll</HintPath>
     </Reference>
     <Reference Include="cai-nav, Version=0.4.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.4\lib\net48\cai-nav.dll</HintPath>
     </Reference>
     <Reference Include="cai-nav-rcn, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.4\lib\net48\cai-nav-rcn.dll</HintPath>
     </Reference>
     <Reference Include="cai-nmbuild, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.4\lib\net48\cai-nmbuild.dll</HintPath>
     </Reference>
     <Reference Include="cai-nmgen, Version=0.4.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.4\lib\net48\cai-nmgen.dll</HintPath>
     </Reference>
     <Reference Include="cai-nmgen-rcn, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.4\lib\net48\cai-nmgen-rcn.dll</HintPath>
     </Reference>
     <Reference Include="cai-util, Version=0.5.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.4\lib\net48\cai-util.dll</HintPath>
     </Reference>
     <Reference Include="NavmeshMovementController, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.4\lib\net48\NavmeshMovementController.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -92,7 +82,8 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="DB2Buddy.cs" />
+    <Compile Include="StateMachine\States\NotumState.cs" />
+    <Compile Include="WarpDB2.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IPCMessages\Farming.cs" />
     <Compile Include="IPCMessages\IPCOpcode.cs" />
@@ -110,10 +101,8 @@
     <Compile Include="StateMachine\States\FellState.cs" />
     <Compile Include="StateMachine\States\PathToBossState.cs" />
     <Compile Include="StateMachine\States\EnterState.cs" />
-    <Compile Include="StateMachine\States\FightTowerState.cs" />
     <Compile Include="StateMachine\States\FightState.cs" />
     <Compile Include="StateMachine\States\IdleState.cs" />
-    <Compile Include="StateMachine\States\MistState.cs" />
     <Compile Include="StateMachine\States\ReformState.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
@@ -129,10 +118,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="UI\DB2BuddyInfoView.xml">
+    <Content Include="UI\WarpDB2InfoView.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="UI\DB2BuddySettingWindow.xml">
+    <Content Include="UI\WarpDB2SettingWindow.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

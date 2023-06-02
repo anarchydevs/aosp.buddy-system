@@ -22,7 +22,7 @@ namespace DB2Buddy
         private static SimpleChar _blueTower;
         private static SimpleChar _mist;
 
-        private static bool _taggedNotum = false;
+        private static bool _init = false;
         private static double _time;
         private static double _mistCycle;
         public static bool _taggedMist = false;
@@ -60,22 +60,34 @@ namespace DB2Buddy
                         && DB2Buddy._settings["Farming"].AsBool())
                 return new FarmingState();
 
+            if (_aune != null )
+            {
+                if ( _redTower != null || _blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+                    || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                    return new FightTowerState();
+            }
+
             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
                 return new FellState();
+
+            
 
             return null;
         }
 
         public void OnStateEnter()
         {
-            Chat.WriteLine($"Fight State");
+            Chat.WriteLine($"FightBossState");
 
             _mistCycle = Time.NormalTime;
+            DB2Buddy.NavMeshMovementController.Halt();
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exit Fight State");
+            Chat.WriteLine("Exit FightBossState");
+            DynelManager.LocalPlayer.StopAttack();
+            _init = false;
         }
 
         public void Tick()
@@ -127,51 +139,15 @@ namespace DB2Buddy
 
                 if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
                 {
-                    _taggedNotum = true;
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_mist.Position);
                 }
+
             };
-
-            if (_taggedNotum)
-            {
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) < 0.5)
-                    _taggedNotum = false;
-
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) > 0.5)
-                    DynelManager.LocalPlayer.Position = _mist.Position;
-                    //DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_mist.Position);
-            }
-
-            if (_redTower != null && !MovementController.Instance.IsNavigating)
-            {
-                if (_redTower.IsInLineOfSight
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) < 3f
-                    && DynelManager.LocalPlayer.FightingTarget == null
-                    && !DynelManager.LocalPlayer.IsAttackPending)
-                    DynelManager.LocalPlayer.Attack(_redTower);
-
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f)
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
-
-            }
-            if (_blueTower != null && !MovementController.Instance.IsNavigating)
-            {
-                if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) < 3f
-                    && DynelManager.LocalPlayer.FightingTarget == null
-                    && !DynelManager.LocalPlayer.IsAttackPending)
-                    DynelManager.LocalPlayer.Attack(_blueTower);
-
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 3f
-                    && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_blueTower.Position);
-
-
-            }
 
             if (_auneCorpse != null)
                 DB2Buddy.AuneCorpse = true;
 
-            if (_aune != null) //&& _blueTower == null &&  _redTower == null )
+            if (_aune != null && _blueTower == null &&  _redTower == null )
             {
 
                 if (DynelManager.LocalPlayer.FightingTarget == null
@@ -191,13 +167,13 @@ namespace DB2Buddy
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
-                if (_blueTower == null && _redTower == null
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10f
+                if (_blueTower == null && _redTower == null 
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 19f
                     && !MovementController.Instance.IsNavigating && !Extensions.Debuffed())
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
 
             }
         }
-
+       
     }
 }

@@ -1,7 +1,7 @@
 ﻿using AOSharp.Common.GameData;
 using System.Collections.Generic;
 
-namespace DB2Buddy
+namespace WarpDB2
 {
     public static class Constants
     {
@@ -24,7 +24,7 @@ namespace DB2Buddy
         ///Unable to find NavMeshPoint for ((286.0045, 133.2877, 233.4044))
 
         public static Vector3 _atDoor = new Vector3(280.6f, 135.3, 144.0f);
-        public static Vector3 _startPosition = new Vector3(285.1f, 133.4f, 229.1f);
+        public static Vector3 _startPosition = new Vector3(283.0f, 133.4f, 232.0f); 
         public static Vector3 _centerPosition = new Vector3(286.1f, 133.3f, 233.5f);
 
         //Nutom pos
@@ -39,11 +39,6 @@ namespace DB2Buddy
         public static Vector3 Tow3 = new Vector3(277.0f, 135.3f, 267.1f); 
         public static Vector3 Tow4 = new Vector3(320.2f, 135.3f, 242.1f);
 
-
-        //Instance IDs
-        public const int DB2Id = 6055;
-        public const int PWId = 570;
-
         //podiums 
         public static Vector3 first = new Vector3 (264.0f, 50.8f , 246.3f); //264.0, 246.3, 50.8
         public static Vector3 second = new Vector3(298.7f, 50.7f, 255.4f); //298.7, 255.4, 50.7
@@ -53,6 +48,11 @@ namespace DB2Buddy
         //warp pos
         public static Vector3 _warpPos = new Vector3(303.0f, 135.3f, 171.0f);// 303.0, 171.0, 135.3
 
+        public static Vector3 _stuck1 = new Vector3(301.4f, 134.5f, 262.8f); //301.4, 262.8, 134.5 ,
+        public static Vector3 _stuck1Move = new Vector3(301.1f, 135.4f, 266.0f);//301.1, 266.0, 135.4
 
+        //Instance IDs
+        public const int DB2Id = 6055;
+        public const int PWId = 570;
     }
 }
