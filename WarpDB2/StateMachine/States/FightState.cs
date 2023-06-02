@@ -21,9 +21,8 @@ namespace WarpDB2
         private static Corpse _auneCorpse;
         private static SimpleChar _redTower;
         private static SimpleChar _blueTower;
-        private static SimpleChar _mist;
 
-        
+
 
         public IState GetNextState()
         {
@@ -61,10 +60,10 @@ namespace WarpDB2
                     WarpDB2._taggedNotum = true;
                 }
             };
-            
+
             if (WarpDB2._taggedNotum)
-            { 
-                return new NotumState(); 
+            {
+                return new NotumState();
             }
 
             return null;
@@ -115,27 +114,17 @@ namespace WarpDB2
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
 
-            _mist = DynelManager.NPCs
-              .Where(c => c.Name.Contains("Notum Irregularity"))
-              .FirstOrDefault();
 
             if (_redTower != null || _blueTower != null)
             {
                 if (_redTower != null)
                 {
-                    if (DynelManager.LocalPlayer.FightingTarget == null
-                        && !DynelManager.LocalPlayer.IsAttackPending
-                        && DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) < 5)
-                    {
-                        DynelManager.LocalPlayer.Attack(_redTower);
-                    }
-
-                   else if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3)
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3)
                     {
                         Task.Factory.StartNew(
                                    async () =>
                                    {
-                                       await Task.Delay(1000);
+                                       await Task.Delay(3000);
                                        DynelManager.LocalPlayer.Position = _redTower.Position;
                                        await Task.Delay(1000);
                                        MovementController.Instance.SetMovement(MovementAction.Update);
@@ -144,25 +133,24 @@ namespace WarpDB2
                                    });
 
                     }
-                }
 
-               else if (_blueTower != null)
-                {
                     if (DynelManager.LocalPlayer.FightingTarget == null
                         && !DynelManager.LocalPlayer.IsAttackPending
-                        && !DynelManager.LocalPlayer.Buffs.Contains(WarpDB2.Nanos.XanBlessingoftheEnemy)
-                        && DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) < 5)
+                        && DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) < 5)
                     {
-                        DynelManager.LocalPlayer.Attack(_blueTower);
+                        DynelManager.LocalPlayer.Attack(_redTower);
                     }
+                }
 
-                   else if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 3
-                        && !DynelManager.LocalPlayer.Buffs.Contains(WarpDB2.Nanos.XanBlessingoftheEnemy))
+                else if (_blueTower != null && !DynelManager.LocalPlayer.Buffs.Contains(WarpDB2.Nanos.XanBlessingoftheEnemy))
+                {
+
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 3)
                     {
                         Task.Factory.StartNew(
                                    async () =>
                                    {
-                                       await Task.Delay(1000);
+                                       await Task.Delay(3000);
                                        DynelManager.LocalPlayer.Position = _blueTower.Position;
                                        await Task.Delay(1000);
                                        MovementController.Instance.SetMovement(MovementAction.Update);
@@ -171,12 +159,19 @@ namespace WarpDB2
                                    });
 
                     }
+
+                    if (DynelManager.LocalPlayer.FightingTarget == null
+                        && !DynelManager.LocalPlayer.IsAttackPending
+                        && DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) < 5)
+                    {
+                        DynelManager.LocalPlayer.Attack(_blueTower);
+                    }
                 }
             }
 
-            
 
-            if (_aune != null) 
+
+            if (_aune != null)
             {
                 if (DynelManager.LocalPlayer.FightingTarget == null
                     && !DynelManager.LocalPlayer.IsAttackPending
@@ -186,9 +181,10 @@ namespace WarpDB2
                     DynelManager.LocalPlayer.Attack(_aune);
 
                 if (DynelManager.LocalPlayer.Buffs.Contains(WarpDB2.Nanos.XanBlessingoftheEnemy)
-                    || _aune.Buffs.Contains(WarpDB2.Nanos.StrengthOfTheAncients))
+                    || _aune.Buffs.Contains(WarpDB2.Nanos.StrengthOfTheAncients)
+                    || _blueTower != null || _redTower != null)
                 {
-                    if(DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
+                    if (DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
@@ -201,7 +197,7 @@ namespace WarpDB2
                         Task.Factory.StartNew(
                                   async () =>
                                   {
-                                      await Task.Delay(1000);
+                                      await Task.Delay(2000);
                                       DynelManager.LocalPlayer.Position = _aune.Position;
                                       await Task.Delay(1000);
                                       MovementController.Instance.SetMovement(MovementAction.Update);
@@ -210,7 +206,7 @@ namespace WarpDB2
                                   });
                     }
 
-                    else
+                    if (_aune == null)
                     {
                         WarpDB2.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
                     }

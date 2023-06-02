@@ -54,7 +54,7 @@ namespace WarpDB2
               .Where(c => c.Name.Contains("Notum Irregularity"))
               .FirstOrDefault();
 
-            if (WarpDB2._taggedNotum && _mist != null)
+            if (_mist != null)
             {
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) < 0.6)
                 {
@@ -80,6 +80,11 @@ namespace WarpDB2
                                });
 
                 }
+            }
+
+            if (_mist == null)
+            {
+                WarpDB2.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
             }
 
         }

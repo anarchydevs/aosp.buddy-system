@@ -24,7 +24,7 @@ namespace WarpDB2
         ///Unable to find NavMeshPoint for ((286.0045, 133.2877, 233.4044))
 
         public static Vector3 _atDoor = new Vector3(280.6f, 135.3, 144.0f);
-        public static Vector3 _startPosition = new Vector3(283.0f, 133.4f, 232.0f); 
+        public static Vector3 _startPosition = new Vector3(288.7f, 133.4f, 233.8f); //288.7, 233.8, 133.4
         public static Vector3 _centerPosition = new Vector3(286.1f, 133.3f, 233.5f);
 
         //Nutom pos
@@ -47,9 +47,6 @@ namespace WarpDB2
 
         //warp pos
         public static Vector3 _warpPos = new Vector3(303.0f, 135.3f, 171.0f);// 303.0, 171.0, 135.3
-
-        public static Vector3 _stuck1 = new Vector3(301.4f, 134.5f, 262.8f); //301.4, 262.8, 134.5 ,
-        public static Vector3 _stuck1Move = new Vector3(301.1f, 135.4f, 266.0f);//301.1, 266.0, 135.4
 
         //Instance IDs
         public const int DB2Id = 6055;
