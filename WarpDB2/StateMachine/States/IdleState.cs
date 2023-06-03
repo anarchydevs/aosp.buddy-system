@@ -72,7 +72,7 @@ namespace WarpDB2
                             && WarpDB2._settings["Farming"].AsBool())
                         return new FarmingState();
 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 50f
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 30f
                      && Team.IsInTeam)
                         return new PathToBossState();
 

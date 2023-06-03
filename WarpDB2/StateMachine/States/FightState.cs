@@ -21,9 +21,20 @@ namespace WarpDB2
         private static Corpse _auneCorpse;
         private static SimpleChar _redTower;
         private static SimpleChar _blueTower;
+        private static SimpleChar _mist;
 
         public IState GetNextState()
         {
+            _aune = DynelManager.NPCs
+             .Where(c => c.Health > 0
+                 && c.Name.Contains("Ground Chief Aune")
+                 && !c.Name.Contains("Remains of "))
+             .FirstOrDefault();
+
+            _mist = DynelManager.NPCs
+              .Where(c => c.Name.Contains("Notum Irregularity"))
+              .FirstOrDefault();
+
             _redTower = DynelManager.NPCs
              .Where(c => c.Health > 0
                  && c.Name.Contains("Strange Xan Artifact")
@@ -44,39 +55,48 @@ namespace WarpDB2
             if (Playfield.ModelIdentity.Instance != Constants.DB2Id)
                 return new IdleState();
 
-            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
-                return new FellState();
-
-            Network.ChatMessageReceived += (s, msg) =>
+            if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
             {
-                if (msg.PacketType != ChatMessageType.NpcMessage)
-                    return;
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
+                    return new FellState();
 
-                var npcMsg = (NpcMessage)msg;
-
-                string[] triggerMsg = new string[2] { "Know the power of the Xan", "You will never know the secrets of the machine" };
-
-                if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
+                Network.ChatMessageReceived += (s, msg) =>
                 {
-                    WarpDB2._taggedNotum = true;
+                    if (msg.PacketType != ChatMessageType.NpcMessage)
+                        return;
+
+                    var npcMsg = (NpcMessage)msg;
+
+                    string[] triggerMsg = new string[2] { "Know the power of the Xan", "You will never know the secrets of the machine" };
+
+                    if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
+                    {
+                        WarpDB2._taggedNotum = true;
+                    }
+                };
+
+                if (WarpDB2._taggedNotum)
+                {
+                    return new NotumState();
                 }
-            };
 
-            if (WarpDB2._taggedNotum)
-            {
-                return new NotumState();
+                if (_aune != null)
+                {
+                    if (DynelManager.LocalPlayer.Buffs.Contains(WarpDB2.Nanos.XanBlessingoftheEnemy)
+                    || _aune.Buffs.Contains(WarpDB2.Nanos.StrengthOfTheAncients))
+                    {
+                        return new FindTowerState();
+                    }
+                }
+
+                if (_redTower != null || _blueTower != null)
+                    return new FightTowerState();
+
+                if (WarpDB2.AuneCorpse
+                    && Extensions.CanProceed()
+                    && WarpDB2._settings["Farming"].AsBool())
+                    return new FarmingState();
             }
-
-            if (_blueTower != null || _redTower != null)
-            {
-                return new FightTowerState();
-            }
-
-            if (WarpDB2.AuneCorpse
-                && Extensions.CanProceed()
-                && WarpDB2._settings["Farming"].AsBool())
-                return new FarmingState();
-
             return null;
         }
 
@@ -87,7 +107,7 @@ namespace WarpDB2
 
         public void OnStateExit()
         {
-
+            DynelManager.LocalPlayer.StopAttack();
             Chat.WriteLine("Exit Fight State");
         }
 
@@ -103,7 +123,22 @@ namespace WarpDB2
 
             _aune = DynelManager.NPCs
                .Where(c => c.Health > 0
-                   && c.Name.Contains("Ground Chief Aune"))
+                   && c.Name.Contains("Ground Chief Aune")
+                   && !c.Name.Contains("Remains of "))
+               .FirstOrDefault();
+
+            _redTower = DynelManager.NPCs
+             .Where(c => c.Health > 0
+                 && c.Name.Contains("Strange Xan Artifact")
+                 && !c.Name.Contains("Remains of ")
+                 && c.Buffs.Contains(274119))
+             .FirstOrDefault();
+
+            _blueTower = DynelManager.NPCs
+               .Where(c => c.Health > 0
+                   && c.Name.Contains("Strange Xan Artifact")
+                   && !c.Name.Contains("Remains of ")
+                   && !c.Buffs.Contains(274119))
                .FirstOrDefault();
 
             _auneCorpse = DynelManager.Corpses
@@ -129,9 +164,8 @@ namespace WarpDB2
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10)
                 {
-                    
-                        DynelManager.LocalPlayer.Position = _aune.Position;
-                        MovementController.Instance.SetMovement(MovementAction.Update);
+                    DynelManager.LocalPlayer.Position = _aune.Position;
+                    MovementController.Instance.SetMovement(MovementAction.Update);
                 }
             }
 
@@ -139,6 +173,7 @@ namespace WarpDB2
             {
                 WarpDB2.AuneCorpse = true;
             }
+
         }
 
     }

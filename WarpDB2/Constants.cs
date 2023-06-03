@@ -13,7 +13,6 @@ namespace WarpDB2
             new Vector3(320.2f, 135.3f, 242.1f)
         };
 
-
         ////outside
         public static Vector3 _entrance = new Vector3(2123.5f, 0.3f, 2768.5f);
         public static Vector3 _centerofentrance = new Vector3(2121.5f, 0.4f, 2769.2f);
@@ -21,8 +20,6 @@ namespace WarpDB2
         public static Vector3 _reneterPos = new Vector3(2117.4, 0.0f, 2771.2f);
 
         ////inside
-        ///Unable to find NavMeshPoint for ((286.0045, 133.2877, 233.4044))
-
         public static Vector3 _atDoor = new Vector3(280.6f, 135.3, 144.0f);
         public static Vector3 _startPosition = new Vector3(288.7f, 133.4f, 233.8f); //288.7, 233.8, 133.4
         public static Vector3 _centerPosition = new Vector3(286.1f, 133.3f, 233.5f);

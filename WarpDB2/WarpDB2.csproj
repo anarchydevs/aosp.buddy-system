@@ -85,6 +85,9 @@
     <Compile Include="StateMachine\States\FightTowerState.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
+    <Compile Include="StateMachine\States\FindTowerState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="StateMachine\States\NotumState.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
