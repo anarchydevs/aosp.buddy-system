@@ -22,19 +22,6 @@ namespace WarpDB2
 
         public IState GetNextState()
         {
-            _redTower = DynelManager.NPCs
-             .Where(c => c.Health > 0
-                 && c.Name.Contains("Strange Xan Artifact")
-                 && !c.Name.Contains("Remains of ")
-                 && c.Buffs.Contains(274119))
-             .FirstOrDefault();
-
-            _blueTower = DynelManager.NPCs
-               .Where(c => c.Health > 0
-                   && c.Name.Contains("Strange Xan Artifact")
-                   && !c.Name.Contains("Remains of ")
-                   && !c.Buffs.Contains(274119))
-               .FirstOrDefault();
 
             if (!WarpDB2._settings["Toggle"].AsBool())
             {
@@ -47,11 +34,6 @@ namespace WarpDB2
             if (!WarpDB2._taggedNotum)
             {
                 return new FightState();
-            }
-
-            if (_blueTower != null || _redTower != null)
-            {
-                return new FightTowerState();
             }
 
             return null;

@@ -95,6 +95,11 @@ namespace WarpDB2
 
         public void OnStateExit()
         {
+            _pos1 = false;
+            _pos2 = false;
+            _pos3 = false;
+            _pos4 = false;
+
             Chat.WriteLine("Tower Found");
         }
 

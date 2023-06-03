@@ -57,9 +57,10 @@ namespace WarpDB2
                 {
                     return new FightState();
                 }
+
                 if (_aune == null)
                 {
-                    DynelManager.LocalPlayer.Position = Constants._startPosition;
+                    DynelManager.LocalPlayer.Position = Constants._centerPosition;
                 }
             }
 
