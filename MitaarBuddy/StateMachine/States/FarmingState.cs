@@ -100,7 +100,7 @@ namespace MitaarBuddy
 
                     _initCorpse = true;
                     _atCorpse = true;
-                    
+
                 }
 
                 if (Device != null && _initCorpse && _atCorpse)
