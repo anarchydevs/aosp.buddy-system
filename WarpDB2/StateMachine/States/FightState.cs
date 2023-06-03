@@ -22,26 +22,27 @@ namespace WarpDB2
         private static SimpleChar _redTower;
         private static SimpleChar _blueTower;
 
-
-
         public IState GetNextState()
         {
-            _aune = DynelManager.NPCs
-              .Where(c => c.Health > 0
-                  && c.Name.Contains("Ground Chief Aune")
-                  && !c.Name.Contains("Remains of "))
-              .FirstOrDefault();
+            _redTower = DynelManager.NPCs
+             .Where(c => c.Health > 0
+                 && c.Name.Contains("Strange Xan Artifact")
+                 && !c.Name.Contains("Remains of ")
+                 && c.Buffs.Contains(274119))
+             .FirstOrDefault();
+
+            _blueTower = DynelManager.NPCs
+               .Where(c => c.Health > 0
+                   && c.Name.Contains("Strange Xan Artifact")
+                   && !c.Name.Contains("Remains of ")
+                   && !c.Buffs.Contains(274119))
+               .FirstOrDefault();
 
             if (!WarpDB2._settings["Toggle"].AsBool())
                 WarpDB2.NavMeshMovementController.Halt();
 
             if (Playfield.ModelIdentity.Instance != Constants.DB2Id)
                 return new IdleState();
-
-            if (WarpDB2.AuneCorpse
-                        && Extensions.CanProceed()
-                        && WarpDB2._settings["Farming"].AsBool())
-                return new FarmingState();
 
             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
                 return new FellState();
@@ -65,6 +66,16 @@ namespace WarpDB2
             {
                 return new NotumState();
             }
+
+            if (_blueTower != null || _redTower != null)
+            {
+                return new FightTowerState();
+            }
+
+            if (WarpDB2.AuneCorpse
+                && Extensions.CanProceed()
+                && WarpDB2._settings["Farming"].AsBool())
+                return new FarmingState();
 
             return null;
         }
@@ -92,106 +103,12 @@ namespace WarpDB2
 
             _aune = DynelManager.NPCs
                .Where(c => c.Health > 0
-                   && c.Name.Contains("Ground Chief Aune")
-                   && !c.Name.Contains("Remains of "))
+                   && c.Name.Contains("Ground Chief Aune"))
                .FirstOrDefault();
 
             _auneCorpse = DynelManager.Corpses
                .Where(c => c.Name.Contains("Remains of Ground Chief Aune"))
                .FirstOrDefault();
-
-            _redTower = DynelManager.NPCs
-            .Where(c => c.Health > 0
-                && c.Name.Contains("Strange Xan Artifact")
-                && !c.Name.Contains("Remains of ")
-                && c.Buffs.Contains(274119))
-            .FirstOrDefault();
-
-            _blueTower = DynelManager.NPCs
-               .Where(c => c.Health > 0
-                   && c.Name.Contains("Strange Xan Artifact")
-                   && !c.Name.Contains("Remains of ")
-                   && !c.Buffs.Contains(274119))
-               .FirstOrDefault();
-
-
-            if (_redTower != null || _blueTower != null)
-            {
-                if (_redTower != null)
-                {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3)
-                    {
-                        Task.Factory.StartNew(
-                                   async () =>
-                                   {
-                                       await Task.Delay(3000);
-                                       DynelManager.LocalPlayer.Position = _redTower.Position;
-                                       await Task.Delay(1000);
-                                       MovementController.Instance.SetMovement(MovementAction.Update);
-                                       await Task.Delay(1000);
-                                       MovementController.Instance.SetMovement(MovementAction.Update);
-                                   });
-
-                    }
-
-                    if (DynelManager.LocalPlayer.FightingTarget == null
-                        && !DynelManager.LocalPlayer.IsAttackPending
-                        && DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) < 5)
-                    {
-                        DynelManager.LocalPlayer.Attack(_redTower);
-                    }
-                }
-
-                else if (_blueTower != null && !DynelManager.LocalPlayer.Buffs.Contains(WarpDB2.Nanos.XanBlessingoftheEnemy))
-                {
-
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 3)
-                    {
-                        Task.Factory.StartNew(
-                                   async () =>
-                                   {
-                                       await Task.Delay(3000);
-                                       DynelManager.LocalPlayer.Position = _blueTower.Position;
-                                       await Task.Delay(1000);
-                                       MovementController.Instance.SetMovement(MovementAction.Update);
-                                       await Task.Delay(1000);
-                                       MovementController.Instance.SetMovement(MovementAction.Update);
-                                   });
-
-                    }
-
-                    if (DynelManager.LocalPlayer.FightingTarget == null
-                        && !DynelManager.LocalPlayer.IsAttackPending
-                        && DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) < 5)
-                    {
-                        DynelManager.LocalPlayer.Attack(_blueTower);
-                    }
-                }
-            }
-
-            if (_blueTower == null && _redTower == null
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10
-                    && !Extensions.Debuffed())
-            {
-                if (_aune != null)
-                {
-                    Task.Factory.StartNew(
-                              async () =>
-                              {
-                                  await Task.Delay(2000);
-                                  DynelManager.LocalPlayer.Position = _aune.Position;
-                                  await Task.Delay(1000);
-                                  MovementController.Instance.SetMovement(MovementAction.Update);
-                                  await Task.Delay(1000);
-                                  MovementController.Instance.SetMovement(MovementAction.Update);
-                              });
-                }
-
-                if (_aune == null)
-                {
-                    WarpDB2.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
-                }
-            }
 
             if (_aune != null)
             {
@@ -210,12 +127,18 @@ namespace WarpDB2
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
-                
-
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 10)
+                {
+                    
+                        DynelManager.LocalPlayer.Position = _aune.Position;
+                        MovementController.Instance.SetMovement(MovementAction.Update);
+                }
             }
 
             if (_auneCorpse != null)
+            {
                 WarpDB2.AuneCorpse = true;
+            }
         }
 
     }

@@ -82,7 +82,12 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="Constants.cs" />
-    <Compile Include="StateMachine\States\NotumState.cs" />
+    <Compile Include="StateMachine\States\FightTowerState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="StateMachine\States\NotumState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="WarpDB2.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IPCMessages\Farming.cs" />
@@ -98,11 +103,21 @@
     <Compile Include="StateMachine\States\FarmingState.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="StateMachine\States\FellState.cs" />
-    <Compile Include="StateMachine\States\PathToBossState.cs" />
-    <Compile Include="StateMachine\States\EnterState.cs" />
-    <Compile Include="StateMachine\States\FightState.cs" />
-    <Compile Include="StateMachine\States\IdleState.cs" />
+    <Compile Include="StateMachine\States\FellState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="StateMachine\States\PathToBossState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="StateMachine\States\EnterState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="StateMachine\States\FightState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="StateMachine\States\IdleState.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="StateMachine\States\ReformState.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

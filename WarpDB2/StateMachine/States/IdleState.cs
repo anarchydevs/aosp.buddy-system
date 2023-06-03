@@ -1,6 +1,8 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
+using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
+using SmokeLounge.AOtomation.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -81,6 +83,30 @@ namespace WarpDB2
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
                         return new FellState();
 
+                    if (_blueTower != null || _redTower != null)
+                    {
+                        return new FightTowerState();
+                    }
+
+                    Network.ChatMessageReceived += (s, msg) =>
+                    {
+                        if (msg.PacketType != ChatMessageType.NpcMessage)
+                            return;
+
+                        var npcMsg = (NpcMessage)msg;
+
+                        string[] triggerMsg = new string[2] { "Know the power of the Xan", "You will never know the secrets of the machine" };
+
+                        if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
+                        {
+                            WarpDB2._taggedNotum = true;
+                        }
+                    };
+
+                    if (WarpDB2._taggedNotum)
+                    {
+                        return new NotumState();
+                    }
                 }
             }
         

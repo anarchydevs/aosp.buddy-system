@@ -17,7 +17,6 @@ namespace WarpDB2
 
         public IState GetNextState()
         {
-            
 
             if (Playfield.ModelIdentity.Instance == Constants.PWId
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 30f)
@@ -50,30 +49,30 @@ namespace WarpDB2
                     ReformState._teamCache.Add(member.Identity);
             }
 
-            if (_auneCorpse != null && !DynelManager.LocalPlayer.Buffs.Contains(NanoLine.Stun)
-                && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) > 1.0f
-                && !MovementController.Instance.IsNavigating)
+            if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
             {
-                DynelManager.LocalPlayer.Position = _auneCorpse.Position;
-                MovementController.Instance.SetMovement(MovementAction.Update);
+                if (_auneCorpse != null && !DynelManager.LocalPlayer.Buffs.Contains(NanoLine.Stun)
+                && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) > 1)
+                {
+                    DynelManager.LocalPlayer.Position = _auneCorpse.Position;
+                    MovementController.Instance.SetMovement(MovementAction.Update);
+                }
+
+                if (!_initCorpse && Team.IsInTeam
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) < 1.0f)
+                {
+                    Chat.WriteLine("Pause for looting, 20 sec");
+                    Task.Factory.StartNew(
+                        async () =>
+                        {
+                            await Task.Delay(20000);
+                            Chat.WriteLine("Done, Disbanding");
+                            Team.Disband();
+                        });
+
+                    _initCorpse = true;
+                }
             }
-
-            if (!_initCorpse && Team.IsInTeam && Playfield.ModelIdentity.Instance == Constants.DB2Id
-                && !MovementController.Instance.IsNavigating
-                && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) < 1.0f)
-            {
-                Chat.WriteLine("Pause for looting, 20 sec");
-                Task.Factory.StartNew(
-                    async () =>
-                    {
-                        await Task.Delay(20000);
-                        Chat.WriteLine("Done, Disbanding");
-                        Team.Disband();
-                    });
-
-                _initCorpse = true;
-            }
-
         }
     }
 }
