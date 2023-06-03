@@ -100,6 +100,8 @@ namespace InfBuddy
             if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 Extensions.HandlePathing(_target);
 
+
+
            
         }
     }

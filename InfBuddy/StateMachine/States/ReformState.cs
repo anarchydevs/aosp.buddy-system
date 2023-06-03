@@ -41,6 +41,9 @@ namespace InfBuddy
         {
             //Chat.WriteLine("ReformState::OnStateEnter");
 
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.EntrancePos) > 1f)
+                DynelManager.LocalPlayer.Position = Constants.EntrancePos;
+
             _reformStartedTime = Time.NormalTime;
 
             if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader || InfBuddy._settings["Merge"].AsBool())
