@@ -23,6 +23,16 @@ namespace MitaarBuddy
 
         public IState GetNextState()
         {
+            _alienCoccoon = DynelManager.NPCs
+                   .Where(c => c.Health > 0
+                           && c.Name.Contains("Alien Coccoon"))
+                       .FirstOrDefault();
+
+            _xanSpirits = DynelManager.NPCs
+                .Where(c => c.Health > 0
+                    && c.Name.Contains("Xan Spirit"))
+                    .FirstOrDefault();
+
             if (Extensions.HasDied())
                 return new DiedState();
 
@@ -38,12 +48,7 @@ namespace MitaarBuddy
                 && MitaarBuddy._settings["Farming"].AsBool())
                 return new FarmingState();
 
-            //if (_sinuhCorpse != null
-            //    && _xanSpirits == null
-            //    && _alienCoccoon == null
-            //    && Extensions.CanProceed()
-            //    && !MitaarBuddy._settings["Farming"].AsBool())
-            //    return new IdleState();
+
 
             return null;
         }
@@ -52,7 +57,6 @@ namespace MitaarBuddy
         {
             Chat.WriteLine("Starting Easy Mode");
 
-            //MovementController.Instance.SetDestination(Constants._startPosition);
         }
 
         public void OnStateExit()
@@ -77,12 +81,51 @@ namespace MitaarBuddy
                 .FirstOrDefault()?.Character;
 
             if (Playfield.ModelIdentity.Instance == 6017)
-            //&& MitaarBuddy.DifficultySelection.Easy == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32()
-            //&& MitaarBuddy._settings["Toggle"].AsBool()
-            //&& !Team.Members.Any(c => c.Character == null))
             {
 
-                Mobs();
+                _sinuh = DynelManager.NPCs
+                .Where(c => c.Health > 0
+                 && c.Name.Contains("Technomaster Sinuh")
+                 && !c.Name.Contains("Remains of"))
+                 .FirstOrDefault();
+
+                _alienCoccoon = DynelManager.NPCs
+                   .Where(c => c.Health > 0
+                           && c.Name.Contains("Alien Coccoon"))
+                       .FirstOrDefault();
+
+                _xanSpirits = DynelManager.NPCs
+                    .Where(c => c.Health > 0
+                        && c.Name.Contains("Xan Spirit"))
+                        .FirstOrDefault();
+
+                _redXanSpirit = DynelManager.NPCs
+                    .Where(c => c.Health > 0
+                        && c.Name.Contains("Xan Spirit")
+                        && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheBlood))
+                        .FirstOrDefault();
+
+                _blueXanSpirit = DynelManager.NPCs
+                    .Where(c => c.Health > 0
+                        && c.Name.Contains("Xan Spirit")
+                        && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheSource))
+                        .FirstOrDefault();
+
+                _greenXanSpirit = DynelManager.NPCs
+                   .Where(c => c.Health > 0
+                       && c.Name.Contains("Xan Spirit")
+                       && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheOutsider))
+                       .FirstOrDefault();
+
+                _yellowXanSpirit = DynelManager.NPCs
+                    .Where(c => c.Health > 0
+                        && c.Name.Contains("Xan Spirit")
+                        && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheLight))
+                        .FirstOrDefault();
+
+                _sinuhCorpse = DynelManager.Corpses
+                  .Where(c => c.Name.Contains("Remains of Technomaster Sinuh"))
+                      .FirstOrDefault();
 
                 if (_sinuhCorpse != null)
                     MitaarBuddy.SinuhCorpse = true;
@@ -131,57 +174,6 @@ namespace MitaarBuddy
                         MovementController.Instance.SetDestination(_yellowXanSpirit.Position);
                 }
             }
-
         }
-
-        public static void Mobs()
-        {
-
-            _sinuh = DynelManager.NPCs
-                 .Where(c => c.Health > 0
-                  && c.Name.Contains("Technomaster Sinuh")
-                  && !c.Name.Contains("Remains of"))
-                  .FirstOrDefault();
-
-            _alienCoccoon = DynelManager.NPCs
-               .Where(c => c.Health > 0
-                       && c.Name.Contains("Alien Coccoon"))
-                   .FirstOrDefault();
-
-            _xanSpirits = DynelManager.NPCs
-                .Where(c => c.Health > 0
-                    && c.Name.Contains("Xan Spirit"))
-                    .FirstOrDefault();
-
-            _redXanSpirit = DynelManager.NPCs
-                .Where(c => c.Health > 0
-                    && c.Name.Contains("Xan Spirit")
-                    && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheBlood))
-                    .FirstOrDefault();
-
-            _blueXanSpirit = DynelManager.NPCs
-                .Where(c => c.Health > 0
-                    && c.Name.Contains("Xan Spirit")
-                    && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheSource))
-                    .FirstOrDefault();
-
-            _greenXanSpirit = DynelManager.NPCs
-               .Where(c => c.Health > 0
-                   && c.Name.Contains("Xan Spirit")
-                   && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheOutsider))
-                   .FirstOrDefault();
-
-            _yellowXanSpirit = DynelManager.NPCs
-                .Where(c => c.Health > 0
-                    && c.Name.Contains("Xan Spirit")
-                    && c.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheLight))
-                    .FirstOrDefault();
-
-            _sinuhCorpse = DynelManager.Corpses
-              .Where(c => c.Name.Contains("Remains of Technomaster Sinuh"))
-                  .FirstOrDefault();
-
-        }
-
     }
 }
