@@ -52,7 +52,6 @@ namespace WarpDB2
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._warpPos) < 5f
                  && Team.IsInTeam
-                 && Extensions.CanProceed()
                  && !Team.Members.Any(c => c.Character == null)
                  && WarpDB2._settings["Toggle"].AsBool())
                     return new PathToBossState();
