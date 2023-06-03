@@ -97,6 +97,7 @@ namespace WarpDB2
 
         public void OnStateExit()
         {
+            WarpDB2.NavMeshMovementController.Halt();
             Chat.WriteLine("Exit FightTowerState");
         }
 

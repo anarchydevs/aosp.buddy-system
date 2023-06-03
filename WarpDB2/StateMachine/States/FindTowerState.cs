@@ -100,6 +100,7 @@ namespace WarpDB2
             _pos3 = false;
             _pos4 = false;
 
+            WarpDB2.NavMeshMovementController.Halt();
             Chat.WriteLine("Tower Found");
         }
 

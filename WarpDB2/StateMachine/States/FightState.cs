@@ -102,6 +102,7 @@ namespace WarpDB2
 
         public void OnStateEnter()
         {
+            WarpDB2.NavMeshMovementController.Halt();
             Chat.WriteLine($"Fight State");
         }
 
@@ -167,6 +168,8 @@ namespace WarpDB2
                     DynelManager.LocalPlayer.Position = _aune.Position;
                     MovementController.Instance.SetMovement(MovementAction.Update);
                 }
+
+                
             }
 
             if (_auneCorpse != null)
