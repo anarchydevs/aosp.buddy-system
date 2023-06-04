@@ -26,7 +26,7 @@ namespace InfBuddy
 
         public DefendSpiritState() : base(Constants.DefendPos, 3f, 1)
         { }
-        
+
         public IState GetNextState()
         {
             if (Game.IsZoning) { return null; }
@@ -156,7 +156,7 @@ namespace InfBuddy
 
             HandleScan();
 
-           
+
         }
     }
 }
