@@ -39,7 +39,6 @@ namespace InfBuddy
         {
             //Chat.WriteLine("Moving to corpse");
             looting = Time.NormalTime;
-
         }
 
         public void OnStateExit()
@@ -72,8 +71,7 @@ namespace InfBuddy
                 }
             }
 
-            if (_corpse == null)
-                _initCorpse = true;
+           
 
         }
     }
