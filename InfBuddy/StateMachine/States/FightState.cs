@@ -97,6 +97,9 @@ namespace InfBuddy
                 && !DynelManager.LocalPlayer.IsAttacking/* && _target.Name != "Guardian Spirit of Purification"*/)
                 DynelManager.LocalPlayer.Attack(_target);
 
+            if (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 20f
+                && )
+
             if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 Extensions.HandlePathing(_target);
 
