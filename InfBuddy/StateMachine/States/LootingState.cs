@@ -20,7 +20,7 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
-            if ( _corpse == null || _initCorpse)
+            if (_corpse == null || _initCorpse)
                 return new IdleState();
 
             if (Extensions.CanExit(_missionsLoaded))
@@ -33,7 +33,7 @@ namespace InfBuddy
         {
             //Chat.WriteLine("Moving to corpse");
             looting = Time.NormalTime;
-           
+
         }
 
         public void OnStateExit()
@@ -45,7 +45,7 @@ namespace InfBuddy
 
         public void Tick()
         {
-           
+
             _corpse = DynelManager.Corpses
                 .Where(c => c.Name.Contains("Remains of "))
                 .FirstOrDefault();
@@ -55,16 +55,17 @@ namespace InfBuddy
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
 
-            //Path to corpse
-            if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) > 5f)
-            InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
-
-
-            if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 2f)
+            if (_corpse != null)//Path to corpse
             {
-                _initCorpse = true;
-            }
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) > 5f)
+                    InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
 
+
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 2f)
+                {
+                    _initCorpse = true;
+                }
+            }
 
         }
     }
