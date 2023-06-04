@@ -66,7 +66,7 @@ namespace InfBuddy
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) > 5f)
                     InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
 
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 2f)
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 8f)
                 {
                     _initCorpse = true;
                 }

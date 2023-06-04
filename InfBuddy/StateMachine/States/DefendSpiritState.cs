@@ -67,7 +67,8 @@ namespace InfBuddy
                     return new ExitMissionState();
 
                 if (InfBuddy._settings["Looting"].AsBool()
-                    && _corpse != null)
+                    && _corpse != null
+                    && Extensions.IsNull(_target))
                     return new LootingState();
             }
 

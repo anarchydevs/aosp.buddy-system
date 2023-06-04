@@ -44,7 +44,8 @@ namespace InfBuddy
                     return new FightState(_target);
 
                 if (InfBuddy._settings["Looting"].AsBool()
-                    && _corpse != null)
+                    && _corpse != null
+                    && Extensions.IsNull(_target))
                     return new LootingState();
             }
 

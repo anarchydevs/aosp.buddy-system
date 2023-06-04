@@ -45,7 +45,8 @@ namespace InfBuddy
                     return new IdleState();
 
                 if (InfBuddy._settings["Looting"].AsBool()
-                    && _corpse != null)
+                    && _corpse != null
+                    && Extensions.IsNull(_target))
                     return new LootingState();
             }
 
