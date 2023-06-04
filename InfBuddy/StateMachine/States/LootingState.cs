@@ -20,25 +20,31 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
-            if (_corpse == null || _initCorpse)
-                return new IdleState();
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
+            {
+                if (_corpse == null || _initCorpse)
+                    return new IdleState();
 
-            if (Extensions.CanExit(_missionsLoaded))
-                return new ExitMissionState();
+                if (Extensions.CanExit(_missionsLoaded) || Extensions.IsClear())
+                    return new ExitMissionState();
+            }
+
+            if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
+                return new IdleState();
 
             return null;
         }
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("Moving to corpse");
+            Chat.WriteLine("Moving to corpse");
             looting = Time.NormalTime;
 
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("Done looting");
+            Chat.WriteLine("Done looting");
             _initCorpse = false;
             _missionsLoaded = false;
         }

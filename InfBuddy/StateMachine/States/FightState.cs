@@ -10,7 +10,6 @@ namespace InfBuddy
         public const double FightTimeout = 70f;
 
         private SimpleChar _target;
-        private static Corpse _corpse;
         private SimpleChar _primevalSpinetooth;
 
 
@@ -31,16 +30,17 @@ namespace InfBuddy
             if (Extensions.HasDied())
                 return new DiedState();
 
-            if (Extensions.CanExit(_missionsLoaded))
-                return new ExitMissionState();
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
+            {
+                if (Extensions.IsClear() || Extensions.CanExit(_missionsLoaded))
+                    return new ExitMissionState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
-                 && InfBuddy._settings["Looting"].AsBool()
-                && _corpse != null)
-                return new LootingState();
+                if (Extensions.IsNull(_target)
+                    || Time.NormalTime > _fightStartTime + FightTimeout)
+                    return new IdleState();
+            }
 
-            if (Extensions.IsNull(_target)
-                || Time.NormalTime > _fightStartTime + FightTimeout)
+            if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
                 return new IdleState();
 
             return null;
@@ -48,27 +48,26 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("FightState::OnStateEnter");
+            Chat.WriteLine("FightState::OnStateEnter");
 
             _fightStartTime = Time.NormalTime;
         }
         public void OnStateExit()
         {
-            //Chat.WriteLine("FightState::OnStateExit");
+            Chat.WriteLine("FightState::OnStateExit");
 
             _missionsLoaded = false;
             _initLOS = false;
         }
         public void LineOfSightLogic()
         {
-
-
-            if (_target?.IsInLineOfSight == false && !_initLOS
-                && InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+            if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
+                && _target?.IsInLineOfSight == false && !_initLOS)
             {
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
                 _initLOS = true;
             }
+
             else if (_target?.IsInLineOfSight == true && _target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 4f
                 && InfBuddy.NavMeshMovementController.IsNavigating && _initLOS)
             {
@@ -87,35 +86,23 @@ namespace InfBuddy
                  && !c.Name.Contains("Remains of "))
              .FirstOrDefault();
 
-            _corpse = DynelManager.Corpses
-                .Where(c => c.Name.Contains("Remains of "))
-                .FirstOrDefault();
-
-            //REASON: Edge case for some reason randomly hitting a null reference, the SimpleChar is not null but the Accel and various others are.
-            //if (_target.Name == "NoName") { return; }
-
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
 
             LineOfSightLogic();
 
-            if //(_target?.IsInAttackRange() == true && 
-                 (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 25f
+            if (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 20f
                 && !DynelManager.LocalPlayer.IsAttackPending
                 && !DynelManager.LocalPlayer.IsAttacking/* && _target.Name != "Guardian Spirit of Purification"*/)
                 DynelManager.LocalPlayer.Attack(_target);
 
-            if (DynelManager.LocalPlayer.FightingTarget == null
-                    && !DynelManager.LocalPlayer.IsAttackPending)
+            if (_primevalSpinetooth != null
+                && DynelManager.LocalPlayer.FightingTarget == null
+                && !DynelManager.LocalPlayer.IsAttackPending)
                 DynelManager.LocalPlayer.Attack(_primevalSpinetooth);
-
-            if (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 15f
-                && !_target.IsMoving)
-                InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
 
             if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 Extensions.HandlePathing(_target);
-
         }
     }
 }

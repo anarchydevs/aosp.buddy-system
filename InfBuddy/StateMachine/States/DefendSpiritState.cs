@@ -10,7 +10,6 @@ namespace InfBuddy
     {
         private SimpleChar _target;
         private SimpleChar _charmMob;
-        private static Corpse _corpse;
         private SimpleChar _primevalSpinetooth;
 
         public static Vector3 _corpsePos = Vector3.Zero;
@@ -26,10 +25,8 @@ namespace InfBuddy
         public const double MobStuckTimeout = 600f;
 
         public DefendSpiritState() : base(Constants.DefendPos, 3f, 1)
-        {
-
-        }
-
+        { }
+        
         public IState GetNextState()
         {
             if (Game.IsZoning) { return null; }
@@ -43,33 +40,29 @@ namespace InfBuddy
             if (Extensions.HasDied())
                 return new DiedState();
 
-            if (Extensions.CanExit(_missionsLoaded))
-                return new ExitMissionState();
-
-            if (_target != null)
-                return new FightState(_target);
-
-            if (_primevalSpinetooth != null)
-                return new FightState(_primevalSpinetooth);
-
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
-                 && InfBuddy._settings["Looting"].AsBool()
-                && _corpse != null
-                && Spell.List.Any(c => c.IsReady) 
-                && !Spell.HasPendingCast)
-                return new LootingState();
-
-            if (Extensions.IsNull(_target)
-                && Time.NormalTime > _mobStuckStartTime + MobStuckTimeout)
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                foreach (Mission mission in Mission.List)
-                    if (mission.DisplayName.Contains("The Purification"))
-                        mission.Delete();
+                if (_target != null)
+                    return new FightState(_target);
 
-                return new ExitMissionState();
+                if (_primevalSpinetooth != null)
+                    return new FightState(_primevalSpinetooth);
+
+                if (Extensions.IsNull(_target)
+                    && Time.NormalTime > _mobStuckStartTime + MobStuckTimeout)
+                {
+                    foreach (Mission mission in Mission.List)
+                        if (mission.DisplayName.Contains("The Purification"))
+                            mission.Delete();
+
+                    return new ExitMissionState();
+                }
+
+                if (Extensions.IsClear() || Extensions.CanExit(_missionsLoaded))
+                    return new ExitMissionState();
             }
 
-            if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
+            if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
                 return new IdleState();
 
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
@@ -80,13 +73,13 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("DefendSpiritState::OnStateEnter");
+            Chat.WriteLine("DefendSpiritState::OnStateEnter");
             _mobStuckStartTime = Time.NormalTime;
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("DefendSpiritState::OnStateExit");
+            Chat.WriteLine("DefendSpiritState::OnStateExit");
             _missionsLoaded = false;
         }
 
@@ -130,10 +123,6 @@ namespace InfBuddy
                 .OrderBy(c => c.HealthPercent)
                 .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
-
-            _corpse = DynelManager.Corpses
-                .Where(c => c.Name.Contains("Remains of "))
-                .FirstOrDefault();
 
             if (mob != null)
             {
