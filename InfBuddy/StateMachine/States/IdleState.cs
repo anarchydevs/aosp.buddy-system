@@ -7,6 +7,7 @@ namespace InfBuddy
 {
     public class IdleState : IState
     {
+        private SimpleChar _target;
         private static Corpse _corpse;
 
         public static bool _init = false;
@@ -62,7 +63,8 @@ namespace InfBuddy
                     return new ExitMissionState();
 
                 if (InfBuddy._settings["Looting"].AsBool()
-                    && _corpse != null)
+                    && _corpse != null
+                    && Extensions.IsNull(_target))
                     return new LootingState();
             }
 
