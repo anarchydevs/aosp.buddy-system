@@ -98,7 +98,8 @@ namespace InfBuddy
                 DynelManager.LocalPlayer.Attack(_target);
 
             if (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 20f
-                && )
+                && !_target.IsMoving)
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
 
             if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 Extensions.HandlePathing(_target);
