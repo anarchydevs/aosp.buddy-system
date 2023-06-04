@@ -50,14 +50,14 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("RoamState::OnStateEnter");
+            //Chat.WriteLine("RoamState::OnStateEnter");
 
             InfBuddy._stateTimeOut = Time.NormalTime;
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("RoamState::OnStateExit");
+            //Chat.WriteLine("RoamState::OnStateExit");
 
             _missionsLoaded = false;
         }

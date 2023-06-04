@@ -37,14 +37,14 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Moving to corpse");
+            //Chat.WriteLine("Moving to corpse");
             looting = Time.NormalTime;
 
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Done looting");
+            //Chat.WriteLine("Done looting");
             _initCorpse = false;
             _missionsLoaded = false;
         }
