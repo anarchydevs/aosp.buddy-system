@@ -11,6 +11,7 @@ namespace InfBuddy
 
         private SimpleChar _target;
         private SimpleChar _primevalSpinetooth;
+        private static Corpse _corpse;
 
 
         private double _fightStartTime;
@@ -25,6 +26,10 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            _corpse = DynelManager.Corpses
+                .Where(c => c.Name.Contains("Remains of "))
+                .FirstOrDefault();
+
             if (Game.IsZoning) { return null; }
 
             if (Extensions.HasDied())
@@ -38,6 +43,10 @@ namespace InfBuddy
                 if (Extensions.IsNull(_target)
                     || Time.NormalTime > _fightStartTime + FightTimeout)
                     return new IdleState();
+
+                if (InfBuddy._settings["Looting"].AsBool()
+                    && _corpse != null)
+                    return new LootingState();
             }
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)

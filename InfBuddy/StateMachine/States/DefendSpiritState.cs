@@ -11,6 +11,7 @@ namespace InfBuddy
         private SimpleChar _target;
         private SimpleChar _charmMob;
         private SimpleChar _primevalSpinetooth;
+        private static Corpse _corpse;
 
         public static Vector3 _corpsePos = Vector3.Zero;
 
@@ -29,6 +30,10 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            _corpse = DynelManager.Corpses
+                .Where(c => c.Name.Contains("Remains of "))
+                .FirstOrDefault();
+
             if (Game.IsZoning) { return null; }
 
             _primevalSpinetooth = DynelManager.NPCs
@@ -60,6 +65,10 @@ namespace InfBuddy
 
                 if (Extensions.IsClear() || Extensions.CanExit(_missionsLoaded))
                     return new ExitMissionState();
+
+                if (InfBuddy._settings["Looting"].AsBool()
+                    && _corpse != null)
+                    return new LootingState();
             }
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)

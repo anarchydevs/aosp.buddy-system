@@ -10,6 +10,7 @@ namespace InfBuddy
     {
         private SimpleChar _target;
         private SimpleChar _charmMob;
+        private static Corpse _corpse;
 
         private static bool _charmMobAttacked = false;
         private static bool _missionsLoaded = false;
@@ -25,6 +26,10 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            _corpse = DynelManager.Corpses
+                .Where(c => c.Name.Contains("Remains of "))
+                .FirstOrDefault();
+
             if (Game.IsZoning) { return null; }
 
             if (Extensions.HasDied())
@@ -37,6 +42,10 @@ namespace InfBuddy
 
                 if (_target != null)
                     return new FightState(_target);
+
+                if (InfBuddy._settings["Looting"].AsBool()
+                    && _corpse != null)
+                    return new LootingState();
             }
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
