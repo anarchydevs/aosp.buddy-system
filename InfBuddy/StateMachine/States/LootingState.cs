@@ -12,6 +12,8 @@ namespace InfBuddy
         private static bool _initCorpse = false;
         public static bool _missionsLoaded = false;
 
+        private SimpleChar _target;
+
         private static Corpse _corpse;
 
         private static Vector3 _corpsePos = Vector3.Zero;
@@ -25,8 +27,11 @@ namespace InfBuddy
                 if (_corpse == null) //|| _initCorpse)
                     return new IdleState();
 
-                if (Extensions.CanExit(_missionsLoaded) || Extensions.IsClear())
-                    return new ExitMissionState();
+                if (!Extensions.IsNull(_target))
+                    return new IdleState();
+
+                //if (Extensions.CanExit(_missionsLoaded) || Extensions.IsClear())
+                //    return new ExitMissionState();
             }
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
@@ -38,14 +43,14 @@ namespace InfBuddy
         public void OnStateEnter()
         {
             //Chat.WriteLine("Moving to corpse");
-            looting = Time.NormalTime;
+            //looting = Time.NormalTime;
         }
 
         public void OnStateExit()
         {
             //Chat.WriteLine("Done looting");
-            _initCorpse = false;
-            _missionsLoaded = false;
+            //_initCorpse = false;
+            //_missionsLoaded = false;
         }
 
         public void Tick()
@@ -57,8 +62,8 @@ namespace InfBuddy
 
             _corpsePos = (Vector3)_corpse?.Position;
 
-            if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-                _missionsLoaded = true;
+            //if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+            //    _missionsLoaded = true;
 
             if (_corpse != null)//Path to corpse
             {
@@ -70,9 +75,6 @@ namespace InfBuddy
                 //    _initCorpse = true;
                 //}
             }
-
-           
-
         }
     }
 }
