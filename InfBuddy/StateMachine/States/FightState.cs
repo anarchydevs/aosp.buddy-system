@@ -11,6 +11,8 @@ namespace InfBuddy
 
         private SimpleChar _target;
         private static Corpse _corpse;
+        private SimpleChar _primevalSpinetooth;
+
 
         private double _fightStartTime;
 
@@ -46,13 +48,13 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("FightState::OnStateEnter");
+            Chat.WriteLine("FightState::OnStateEnter");
 
             _fightStartTime = Time.NormalTime;
         }
         public void OnStateExit()
         {
-            // Chat.WriteLine("FightState::OnStateExit");
+            Chat.WriteLine("FightState::OnStateExit");
 
             _missionsLoaded = false;
             _initLOS = false;
@@ -79,6 +81,12 @@ namespace InfBuddy
         {
             if (Game.IsZoning || _target == null) { return; }
 
+            _primevalSpinetooth = DynelManager.NPCs
+             .Where(c => c.Health > 0
+                 && c.Name.Contains("Primeval Spinetooth")
+                 && !c.Name.Contains("Remains of "))
+             .FirstOrDefault();
+
             _corpse = DynelManager.Corpses
                 .Where(c => c.Name.Contains("Remains of "))
                 .FirstOrDefault();
@@ -92,12 +100,16 @@ namespace InfBuddy
             LineOfSightLogic();
 
             if //(_target?.IsInAttackRange() == true && 
-                 (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 20f
+                 (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 25f
                 && !DynelManager.LocalPlayer.IsAttackPending
                 && !DynelManager.LocalPlayer.IsAttacking/* && _target.Name != "Guardian Spirit of Purification"*/)
                 DynelManager.LocalPlayer.Attack(_target);
 
-            if (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 20f
+            if (DynelManager.LocalPlayer.FightingTarget == null
+                    && !DynelManager.LocalPlayer.IsAttackPending)
+                DynelManager.LocalPlayer.Attack(_primevalSpinetooth);
+
+            if (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 15f
                 && !_target.IsMoving)
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
 
