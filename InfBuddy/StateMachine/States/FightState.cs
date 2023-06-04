@@ -40,7 +40,7 @@ namespace InfBuddy
             if (Extensions.IsNull(_target)
                 || Time.NormalTime > _fightStartTime + FightTimeout)
                 return new IdleState();
-            
+
             return null;
         }
 
@@ -52,7 +52,7 @@ namespace InfBuddy
         }
         public void OnStateExit()
         {
-           // Chat.WriteLine("FightState::OnStateExit");
+            // Chat.WriteLine("FightState::OnStateExit");
 
             _missionsLoaded = false;
             _initLOS = false;
@@ -61,7 +61,7 @@ namespace InfBuddy
         {
 
 
-            if (_target?.IsInLineOfSight == false && !_initLOS 
+            if (_target?.IsInLineOfSight == false && !_initLOS
                 && InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
             {
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
@@ -104,9 +104,6 @@ namespace InfBuddy
             if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 Extensions.HandlePathing(_target);
 
-
-
-           
         }
     }
 }

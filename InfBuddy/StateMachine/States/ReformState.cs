@@ -50,12 +50,12 @@ namespace InfBuddy
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
-               //Chat.WriteLine("ReformPhase.Waiting");
+                //Chat.WriteLine("ReformPhase.Waiting");
             }
             else
             {
                 _phase = ReformPhase.Disbanding;
-               //Chat.WriteLine("Disbanding");
+                //Chat.WriteLine("Disbanding");
             }
         }
 
@@ -112,7 +112,7 @@ namespace InfBuddy
                 {
                     _inviting = Time.NormalTime;
                     _phase = ReformPhase.Inviting;
-                   //Chat.WriteLine("ReformPhase.Inviting");
+                    //Chat.WriteLine("ReformPhase.Inviting");
                 }
                 else if (Team.Members.Where(c => c.Character != null && c.Character.IsInPlay).ToList().Count == _teamCache.Count()
                         || Time.NormalTime > _reformStartedTime + ReformTimeout)
