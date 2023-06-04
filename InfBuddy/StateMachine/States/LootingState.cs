@@ -22,7 +22,7 @@ namespace InfBuddy
         {
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                if (_corpse == null || _initCorpse)
+                if (_corpse == null) //|| _initCorpse)
                     return new IdleState();
 
                 if (Extensions.CanExit(_missionsLoaded) || Extensions.IsClear())
@@ -65,10 +65,10 @@ namespace InfBuddy
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) > 5f)
                     InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
 
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 10f)
-                {
-                    _initCorpse = true;
-                }
+                //if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 10f)
+                //{
+                //    _initCorpse = true;
+                //}
             }
 
            
