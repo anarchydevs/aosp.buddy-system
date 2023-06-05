@@ -138,7 +138,7 @@ namespace DB2Buddy
                     && !DynelManager.LocalPlayer.IsAttackPending
                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 19
+                    && _aune.IsInAttackRange()
                     && !MovementController.Instance.IsNavigating)
                     DynelManager.LocalPlayer.Attack(_aune);
 
@@ -151,11 +151,12 @@ namespace DB2Buddy
                         DynelManager.LocalPlayer.StopAttack();
                 }
 
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 19f
+                if (DynelManager.LocalPlayer.Position.DistanceFrom (_aune.Position) > 20
                     && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
 
-                if (DynelManager.LocalPlayer.Position.DistanceFrom (_aune.Position) < 12)
+                if (_aune.IsInLineOfSight && _aune.IsInAttackRange()
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 20)
                     DB2Buddy.NavMeshMovementController.Halt();
 
             }

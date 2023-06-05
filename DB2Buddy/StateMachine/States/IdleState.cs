@@ -67,20 +67,6 @@ namespace DB2Buddy
 
                 if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
                 {
-                    if (_aune != null)
-                    {
-                        if (_redTower != null || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
-                        {
-                            return new FightTowerState();
-                        }
-
-                        if (_blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
-                        {
-                            if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
-                                return new FightTowerState();
-                        }
-                    }
-
                     Network.ChatMessageReceived += (s, msg) =>
                     {
                         if (msg.PacketType != ChatMessageType.NpcMessage)
@@ -101,11 +87,25 @@ namespace DB2Buddy
                         return new NotumState();
                     }
 
+                    if (_aune != null)
+                    {
+                        if (_redTower != null || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                        {
+                            return new FightTowerState();
+                        }
+
+                        if (_blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
+                        {
+                            if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                                return new FightTowerState();
+                        }
+                    }
+
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 50f
                      && Team.IsInTeam)
                         return new PathToBossState();
 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 30f
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 50f
                          && Team.IsInTeam)
                         return new FightState();
 
