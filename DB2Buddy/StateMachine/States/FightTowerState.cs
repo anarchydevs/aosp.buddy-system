@@ -4,6 +4,8 @@ using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
+using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
+using SmokeLounge.AOtomation.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -46,17 +48,40 @@ namespace DB2Buddy
             if (Playfield.ModelIdentity.Instance == Constants.PWId)
                 return new IdleState();
 
-            if (_redTower == null && _blueTower == null && !MovementController.Instance.IsNavigating)
+            if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
             {
-                if (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                 && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                Network.ChatMessageReceived += (s, msg) =>
                 {
-                    return new FightState();
-                }
-            }
+                    if (msg.PacketType != ChatMessageType.NpcMessage)
+                        return;
 
-            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
-                return new FellState();
+                    var npcMsg = (NpcMessage)msg;
+
+                    string[] triggerMsg = new string[2] { "Know the power of the Xan", "You will never know the secrets of the machine" };
+
+                    if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
+                    {
+                        DB2Buddy._taggedNotum = true;
+                    }
+                };
+
+                if (DB2Buddy._taggedNotum)
+                {
+                    return new NotumState();
+                }
+
+                if (_redTower == null && _blueTower == null)
+                {
+                    if (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                    {
+                        return new FightState();
+                    }
+                }
+
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
+                    return new FellState();
+            }
 
             return null;
         }
@@ -65,7 +90,6 @@ namespace DB2Buddy
         {
             DB2Buddy.NavMeshMovementController.Halt();
             Chat.WriteLine($"FightTowerState");
-            FightState._taggedMist = false;
         }
 
         public void OnStateExit()

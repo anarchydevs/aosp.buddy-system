@@ -3,6 +3,8 @@ using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
+using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
+using SmokeLounge.AOtomation.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,8 @@ namespace DB2Buddy
         private static double _startTime;
 
         private static SimpleChar _aune;
+        private static SimpleChar _redTower;
+        private static SimpleChar _blueTower;
 
         public IState GetNextState()
         {
@@ -27,6 +31,20 @@ namespace DB2Buddy
             .Where(c => c.Health > 0
                 && c.Name.Contains("Ground Chief Aune"))
             .FirstOrDefault();
+
+            _redTower = DynelManager.NPCs
+           .Where(c => c.Health > 0
+               && c.Name.Contains("Strange Xan Artifact")
+               && !c.Name.Contains("Remains of ")
+               && c.Buffs.Contains(274119))
+           .FirstOrDefault();
+
+            _blueTower = DynelManager.NPCs
+               .Where(c => c.Health > 0
+                   && c.Name.Contains("Strange Xan Artifact")
+                   && !c.Name.Contains("Remains of ")
+                   && !c.Buffs.Contains(274119))
+               .FirstOrDefault();
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
             {
@@ -36,14 +54,51 @@ namespace DB2Buddy
             if (Playfield.ModelIdentity.Instance != Constants.DB2Id)
                 return new IdleState();
 
-            if (_aune != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) < 1)
+            if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
             {
-                return new FightState();
-            }
+                Network.ChatMessageReceived += (s, msg) =>
+                {
+                    if (msg.PacketType != ChatMessageType.NpcMessage)
+                        return;
 
-            if (_aune == null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) < 5)
-            {
-                return new IdleState();
+                    var npcMsg = (NpcMessage)msg;
+
+                    string[] triggerMsg = new string[2] { "Know the power of the Xan", "You will never know the secrets of the machine" };
+
+                    if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
+                    {
+                        DB2Buddy._taggedNotum = true;
+                    }
+                };
+
+                if (DB2Buddy._taggedNotum)
+                {
+                    return new NotumState();
+                }
+
+                if (_aune != null)
+                {
+                    if (_redTower != null || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                    {
+                        return new FightTowerState();
+                    }
+
+                    if (_blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
+                    {
+                        if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                            return new FightTowerState();
+                    }
+                }
+
+                if (_aune != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) < 1)
+                {
+                    return new FightState();
+                }
+
+                if (_aune == null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) < 5)
+                {
+                    return new IdleState();
+                }
             }
 
             return null;

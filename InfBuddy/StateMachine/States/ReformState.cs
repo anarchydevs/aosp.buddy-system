@@ -41,18 +41,21 @@ namespace InfBuddy
         {
             //Chat.WriteLine("ReformState::OnStateEnter");
 
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.EntrancePos) > 1f)
+                DynelManager.LocalPlayer.Position = Constants.EntrancePos;
+
             _reformStartedTime = Time.NormalTime;
 
             if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader || InfBuddy._settings["Merge"].AsBool())
             {
                 Team.TeamRequest += OnTeamRequest;
                 _phase = ReformPhase.Waiting;
-               //Chat.WriteLine("ReformPhase.Waiting");
+                //Chat.WriteLine("ReformPhase.Waiting");
             }
             else
             {
                 _phase = ReformPhase.Disbanding;
-               //Chat.WriteLine("Disbanding");
+                //Chat.WriteLine("Disbanding");
             }
         }
 
@@ -103,13 +106,13 @@ namespace InfBuddy
                 }
             }
 
-            if (_phase == ReformPhase.Disbanding)
+            if (_phase == ReformPhase.Disbanding && !Team.Members.Any(c => c.Character == null))
             {
                 if (!Team.IsInTeam)
                 {
                     _inviting = Time.NormalTime;
                     _phase = ReformPhase.Inviting;
-                   //Chat.WriteLine("ReformPhase.Inviting");
+                    //Chat.WriteLine("ReformPhase.Inviting");
                 }
                 else if (Team.Members.Where(c => c.Character != null && c.Character.IsInPlay).ToList().Count == _teamCache.Count()
                         || Time.NormalTime > _reformStartedTime + ReformTimeout)

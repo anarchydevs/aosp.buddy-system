@@ -32,6 +32,8 @@ namespace DB2Buddy
         public static bool IsLeader = false;
         public static bool _repeat = false;
 
+        public static bool _taggedNotum = false;
+
         public static bool Sitting = false;
 
         public static bool AuneCorpse = false;

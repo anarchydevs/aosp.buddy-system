@@ -57,15 +57,34 @@ namespace MitaarBuddy
 
                 _sinuhCorpsePos = (Vector3)_sinuhCorpse?.Position;
 
-                //Path to corpse
-                if (!_atCorpse && DynelManager.LocalPlayer.Position.DistanceFrom(_sinuhCorpsePos) > 1.0f)
-                {
-                    MovementController.Instance.SetDestination(_sinuhCorpsePos);
+                if (_sinuhCorpse != null)
+                { //Path to corpse
+                    if (!_atCorpse && DynelManager.LocalPlayer.Position.DistanceFrom(_sinuhCorpsePos) > 1.0f)
+                    {
+                        MovementController.Instance.SetDestination(_sinuhCorpsePos);
 
-                    _atCorpse = true;
+                        _atCorpse = true;
+                    }
+
+                    if (!_initCorpse && _atCorpse)
+                    {
+                        Chat.WriteLine("Pause for looting, 10 sec");
+                        Task.Factory.StartNew(
+                            async () =>
+                            {
+                                await Task.Delay(10000);
+                                Chat.WriteLine("Done, Leaving");
+
+                                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._strangeAlienDevice) > 1)
+                                    MovementController.Instance.SetDestination(Constants._strangeAlienDevice);
+
+                            });
+
+                        _initCorpse = true;
+                    }
                 }
 
-                if (!_initCorpse && _atCorpse)
+                if (_sinuhCorpse == null)
                 {
                     Chat.WriteLine("Pause for looting, 10 sec");
                     Task.Factory.StartNew(
@@ -80,6 +99,8 @@ namespace MitaarBuddy
                         });
 
                     _initCorpse = true;
+                    _atCorpse = true;
+
                 }
 
                 if (Device != null && _initCorpse && _atCorpse)

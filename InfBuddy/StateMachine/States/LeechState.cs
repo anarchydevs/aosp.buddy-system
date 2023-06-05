@@ -19,6 +19,9 @@ namespace InfBuddy
             if (Extensions.CanExit(_missionsLoaded))
                 return new ExitMissionState();
 
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId && Extensions.IsClear())
+                return new ExitMissionState();
+
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
                 return new IdleState();
 
