@@ -156,7 +156,7 @@ namespace DB2Buddy
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
 
                 if (_aune.IsInLineOfSight && _aune.IsInAttackRange()
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 20)
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 12)
                     DB2Buddy.NavMeshMovementController.Halt();
 
             }
