@@ -3,6 +3,8 @@ using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
+using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
+using SmokeLounge.AOtomation.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +37,26 @@ namespace WarpDB2
 
             if (Playfield.ModelIdentity.Instance != Constants.DB2Id)
                 return new IdleState();
+
+            Network.ChatMessageReceived += (s, msg) =>
+            {
+                if (msg.PacketType != ChatMessageType.NpcMessage)
+                    return;
+
+                var npcMsg = (NpcMessage)msg;
+
+                string[] triggerMsg = new string[2] { "Know the power of the Xan", "You will never know the secrets of the machine" };
+
+                if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
+                {
+                    WarpDB2._taggedNotum = true;
+                }
+            };
+
+            if (WarpDB2._taggedNotum)
+            {
+                return new NotumState();
+            }
 
             if (_aune != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) < 5)
             {
