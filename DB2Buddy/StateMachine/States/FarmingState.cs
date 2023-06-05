@@ -17,7 +17,8 @@ namespace DB2Buddy
 
         public IState GetNextState()
         {
-            
+            if (!DB2Buddy._settings["Toggle"].AsBool())
+                DB2Buddy.NavMeshMovementController.Halt();
 
             if (Playfield.ModelIdentity.Instance == Constants.PWId
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 30f)

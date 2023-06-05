@@ -1,6 +1,8 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
+using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
+using SmokeLounge.AOtomation.Messaging.Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -65,10 +67,39 @@ namespace DB2Buddy
 
                 if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
                 {
-                    if (_auneCorpse != null
-                            && Extensions.CanProceed()
-                            && DB2Buddy._settings["Farming"].AsBool())
-                        return new FarmingState();
+                    if (_aune != null)
+                    {
+                        if (_redTower != null || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                        {
+                            return new FightTowerState();
+                        }
+
+                        if (_blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
+                        {
+                            if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                                return new FightTowerState();
+                        }
+                    }
+
+                    Network.ChatMessageReceived += (s, msg) =>
+                    {
+                        if (msg.PacketType != ChatMessageType.NpcMessage)
+                            return;
+
+                        var npcMsg = (NpcMessage)msg;
+
+                        string[] triggerMsg = new string[2] { "Know the power of the Xan", "You will never know the secrets of the machine" };
+
+                        if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
+                        {
+                            DB2Buddy._taggedNotum = true;
+                        }
+                    };
+
+                    if (DB2Buddy._taggedNotum)
+                    {
+                        return new NotumState();
+                    }
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) > 50f
                      && Team.IsInTeam)
@@ -80,6 +111,11 @@ namespace DB2Buddy
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
                         return new FellState();
+
+                    if (_auneCorpse != null
+                           && Extensions.CanProceed()
+                           && DB2Buddy._settings["Farming"].AsBool())
+                        return new FarmingState();
 
                 }
             }
@@ -94,7 +130,7 @@ namespace DB2Buddy
 
     public void OnStateExit()
     {
-        Chat.WriteLine("Exit IdleState");
+       Chat.WriteLine("Exit IdleState");
     }
 
     public void Tick()

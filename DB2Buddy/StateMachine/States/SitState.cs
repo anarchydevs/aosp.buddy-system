@@ -19,12 +19,12 @@ namespace DB2Buddy
         public void OnStateEnter()
         {
 
-            Chat.WriteLine($"SitState");
+            //Chat.WriteLine($"SitState");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exit SitState");
+            //Chat.WriteLine("Exit SitState");
         }
 
         public void Tick()
