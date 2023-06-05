@@ -106,7 +106,7 @@ namespace InfBuddy
                 }
             }
 
-            if (_phase == ReformPhase.Disbanding)
+            if (_phase == ReformPhase.Disbanding && !Team.Members.Any(c => c.Character == null))
             {
                 if (!Team.IsInTeam)
                 {
