@@ -1,8 +1,11 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.Inventory;
+using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System;
+using System.Configuration;
+using System.Linq;
 
 namespace AXPBuddy
 {
@@ -23,12 +26,16 @@ namespace AXPBuddy
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             if (Extensions.HasDied())
                 return new DiedState();
 
             if (Extensions.IsNull(_target)
                 || Time.NormalTime > _fightStartTime + FightTimeout)
             {
+                if (AXPBuddy.ModeSelection.Gather == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                    return new GatherState();
                 if (AXPBuddy.ModeSelection.Roam == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
                     return new RoamState();
 
@@ -44,6 +51,9 @@ namespace AXPBuddy
 
             _fightStartTime = Time.NormalTime;
             AXPBuddy.NavMeshMovementController.Halt();
+
+            _aggToolCounter = 0;
+            _attackTimeout = 0;
         }
 
         public void OnStateExit()
@@ -69,7 +79,25 @@ namespace AXPBuddy
 
             if (_target == null) { return; }
 
-            if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 19f)
+            if (AXPBuddy.ModeSelection.Patrol == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+            {
+                if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 11f)
+                {
+                    HandlePathing(_target);
+
+                    if (DynelManager.LocalPlayer.FightingTarget == null
+                        && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                    {
+                        DynelManager.LocalPlayer.Attack(_target);
+                        Chat.WriteLine($"Attacking {_target.Name}.");
+                    }
+                }
+                else if (DynelManager.LocalPlayer.Identity == AXPBuddy.Leader)
+                    HandleTaunting(_target);
+            }
+
+            if (AXPBuddy.ModeSelection.Roam == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32()
+                || AXPBuddy.ModeSelection.Gather == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
             {
                 HandlePathing(_target);
 
@@ -80,11 +108,6 @@ namespace AXPBuddy
                     Chat.WriteLine($"Attacking {_target.Name}.");
                 }
             }
-            else if (DynelManager.LocalPlayer.Identity == AXPBuddy.Leader
-                && AXPBuddy.ModeSelection.Normal == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-                HandleTaunting(_target);
-            else if (AXPBuddy.ModeSelection.Roam == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-                HandlePathing(_target);
         }
 
         public static CharacterWieldedWeapon GetWieldedWeapons(SimpleChar local) => (CharacterWieldedWeapon)local.GetStat(Stat.EquippedWeapons);
@@ -127,77 +150,47 @@ namespace AXPBuddy
                     AXPBuddy.NavMeshMovementController.SetDestination(target.Position);
                     _attackTimeout = 0;
                     _aggToolCounter = 0;
-                    return;
                 }
-
-                _attackTimeout++;
-                _aggToolCounter = 0;
+                else
+                {
+                    _attackTimeout++;
+                    _aggToolCounter = 0;
+                }
             }
-            else if (Inventory.Find(83920, 83919, out Item aggroTool)) //Aggression Enhancer 
+            else if (Inventory.Find(83920, 83919, out Item aggroTool))
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
                     AXPBuddy.NavMeshMovementController.Halt();
                     aggroTool.Use(target, true);
                     _aggToolCounter++;
-                    return;
                 }
             }
-            else if (Inventory.Find(83919, 83919, out Item aggroMultiTool)) //Aggression Multiplier
+            else if (Inventory.Find(83919, 83919, out Item aggroMultiTool)) //TODO: Could be wrong
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
                     AXPBuddy.NavMeshMovementController.Halt();
                     aggroMultiTool.Use(target, true);
                     _aggToolCounter++;
-                    return;
                 }
             }
-            else if (Inventory.Find(152029, 152029, out Item JealousyTool)) //Aggression Enhancer (Jealousy Augmented) 
-            {
-                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                {
-                    JealousyTool.Use(target, true);
-                    _aggToolCounter++;
-                    return;
-                }
-            }
-            else if (Inventory.Find(152028, 152028, out Item JealousyMultiTool)) //Aggression Multiplier (Jealousy Augmented) 
-            {
-                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                {
-                    JealousyMultiTool.Use(target, true);
-                    _aggToolCounter++;
-                    return;
-                }
-            }
-            else if (Inventory.Find(244655, 244655, out Item scorpioTool)) //Scorpio's Aim of Anger
-            {
-                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                {
-                    scorpioTool.Use(target, true);
-                    _aggToolCounter++;
-                    return;
-                }
-            }
-            else if (Inventory.Find(253186, 253186, out Item EmertoLow))//Codex of the Insulting Emerto
+            else if (Inventory.Find(253186, 253186, out Item EmertoLow))
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
                     AXPBuddy.NavMeshMovementController.Halt();
                     EmertoLow.Use(target, true);
                     _aggToolCounter++;
-                    return;
                 }
             }
-            else if (Inventory.Find(253187, 253187, out Item EmertoHigh))//Codex of the Insulting Emerto
+            else if (Inventory.Find(253187, 253187, out Item EmertoHigh))
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
                     AXPBuddy.NavMeshMovementController.Halt();
                     EmertoHigh.Use(target, true);
                     _aggToolCounter++;
-                    return;
                 }
             }
         }

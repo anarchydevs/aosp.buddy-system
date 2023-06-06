@@ -1,4 +1,11 @@
-﻿using AOSharp.Core;
+﻿using AOSharp.Common.GameData;
+using AOSharp.Core;
+using AOSharp.Core.UI;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
@@ -6,6 +13,8 @@ namespace AXPBuddy
     {
         public IState GetNextState()
         {
+            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return null; }
+
             if (AXPBuddy.Toggle == true && Team.IsInTeam && Team.IsRaid
                 && AXPBuddy._settings["Toggle"].AsBool())
             {
@@ -27,6 +36,7 @@ namespace AXPBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return; }
         }
     }
 }

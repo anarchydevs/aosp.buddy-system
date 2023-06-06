@@ -1,6 +1,16 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
+using AOSharp.Pathfinding;
+using AXPBuddy.IPCMessages;
+using SmokeLounge.AOtomation.Messaging.Messages.N3Messages.OrgServerMessages;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
@@ -33,11 +43,11 @@ namespace AXPBuddy
 
         public void Tick()
         {
-            if (Game.IsZoning) { return; }
+            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return; }
 
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-                && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
-                AXPBuddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+            //if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
+            //    && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
+            //    AXPBuddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
 
             if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
                 && DynelManager.LocalPlayer.GetStat(Stat.TemporarySkillReduction) <= 1

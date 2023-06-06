@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
-    public class PatrolState : IState
+    public class GatherState : IState
     {
         private SimpleChar _target;
 
@@ -35,12 +35,12 @@ namespace AXPBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("PatrolState::OnStateEnter");
+            //Chat.WriteLine("GatherState::OnStateEnter");
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("PatrolState::OnStateExit");
+            //Chat.WriteLine("GatherState::OnStateExit");
 
             _init = false;
         }
@@ -51,8 +51,8 @@ namespace AXPBuddy
                 .Where(c => c.Health > 0
                     && !Constants._ignores.Contains(c.Name)
                     && c.IsInLineOfSight
-                    && c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 35f)
-                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+                    && c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 60f)
+                .OrderByDescending(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                 .ThenBy(c => c.HealthPercent)
                 .FirstOrDefault();
 
