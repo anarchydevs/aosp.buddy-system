@@ -9,8 +9,8 @@ namespace DB2Buddy
 {
     public class ReformState : IState
     {
-        private const float ReformTimeout = 100;
-        private const float DisbandDelay = 10;
+        private const float ReformTimeout = 5;
+        private const float DisbandDelay = 5;
 
         private static double _reformStartedTime;
 

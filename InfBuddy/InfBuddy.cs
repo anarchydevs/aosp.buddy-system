@@ -33,6 +33,7 @@ namespace InfBuddy
         public static bool Hard = false;
         public static bool Neutral = false;
         public static bool Clan = false;
+        public static bool Omni = false;
         public static bool Normal = false;
         public static bool Roam = false;
 
@@ -40,6 +41,7 @@ namespace InfBuddy
         public static bool _mediumToggled = false;
         public static bool _hardToggled = false;
         public static bool _clanToggled = false;
+        public static bool _omniToggled = false;
         public static bool _neutralToggled = false;
         public static bool _normalToggled = false;
         public static bool _roamToggled = false;
@@ -48,7 +50,7 @@ namespace InfBuddy
         public static Identity Leader = Identity.None;
 
         public static bool DoubleReward = false;
-        private static bool Sitting = false;
+        private static bool _initSit = false;
 
         private static double _sitUpdateTimer;
         public static double _stateTimeOut;
@@ -88,6 +90,7 @@ namespace InfBuddy
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Neutral, NeutralMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Clan, ClanMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Omni, OmniMessage);
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Normal, NormalMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Roam, RoamMessage);
@@ -115,7 +118,7 @@ namespace InfBuddy
 
                 _settings["Toggle"] = false;
 
-                _settings["ModeSelection"]= (int)ModeSelection.Normal;
+                _settings["ModeSelection"] = (int)ModeSelection.Normal;
                 _settings["FactionSelection"] = (int)FactionSelection.Clan;
                 _settings["DifficultySelection"] = (int)DifficultySelection.Hard;
 
@@ -211,6 +214,11 @@ namespace InfBuddy
             _settings["FactionSelection"] = (int)FactionSelection.Clan;
         }
 
+        private void OmniMessage(int sender, IPCMessage msg)
+        {
+            _settings["FactionSelection"] = (int)FactionSelection.Omni;
+        }
+
         private void NormalMessage(int sender, IPCMessage msg)
         {
             _settings["ModeSelection"] = (int)ModeSelection.Normal;
@@ -228,7 +236,7 @@ namespace InfBuddy
 
             Selections();
 
-            if (Time.NormalTime > _sitUpdateTimer + 1)
+            if (Time.NormalTime > _sitUpdateTimer + 1.5)
             {
                 ListenerSit();
 
@@ -296,6 +304,11 @@ namespace InfBuddy
                     IPCChannel.Broadcast(new ClanMessage());
                     Clan = false;
                 }
+                if (Omni)
+                {
+                    IPCChannel.Broadcast(new OmniMessage());
+                    Omni = false;
+                }
                 if (Normal)
                 {
                     IPCChannel.Broadcast(new NormalMessage());
@@ -311,73 +324,157 @@ namespace InfBuddy
 
         public static void Selections()
         {
-            if (DifficultySelection.Easy == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_easyToggled)
+            switch ((DifficultySelection)_settings["DifficultySelection"].AsInt32())
             {
-                Easy = true;
-                Medium = false;
-                Hard = false;
-
-                _easyToggled = true;
-                _mediumToggled = false;
-                _hardToggled = false;
+                case DifficultySelection.Easy:
+                    Easy = true;
+                    Medium = false;
+                    Hard = false;
+                    _easyToggled = true;
+                    _mediumToggled = false;
+                    _hardToggled = false;
+                    break;
+                case DifficultySelection.Medium:
+                    Easy = false;
+                    Medium = true;
+                    Hard = false;
+                    _easyToggled = false;
+                    _mediumToggled = true;
+                    _hardToggled = false;
+                    break;
+                case DifficultySelection.Hard:
+                    Easy = false;
+                    Medium = false;
+                    Hard = true;
+                    _easyToggled = false;
+                    _mediumToggled = false;
+                    _hardToggled = true;
+                    break;
             }
-
-            if (DifficultySelection.Medium == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_mediumToggled)
+            switch ((FactionSelection)_settings["FactionSelection"].AsInt32())
             {
-                Easy = false;
-                Medium = true;
-                Hard = false;
-
-                _easyToggled = false;
-                _mediumToggled = true;
-                _hardToggled = false;
+                case FactionSelection.Neutral:
+                    Neutral = true;
+                    Clan = false;
+                    Omni = false;
+                    _neutralToggled = true;
+                    _clanToggled = false;
+                    _omniToggled = false;
+                    break;
+                case FactionSelection.Clan:
+                    Neutral = false;
+                    Clan = true;
+                    Omni = false;
+                    _neutralToggled = false;
+                    _clanToggled = true;
+                    _omniToggled = false;
+                    break;
+                case FactionSelection.Omni:
+                    Neutral = false;
+                    Clan = false;
+                    Omni = true;
+                    _neutralToggled = false;
+                    _clanToggled = false;
+                    _omniToggled = true;
+                    break;
             }
-
-            if (DifficultySelection.Hard == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_hardToggled)
+            switch ((ModeSelection)_settings["ModeSelection"].AsInt32())
             {
-                Easy = false;
-                Medium = false;
-                Hard = true;
-
-                _easyToggled = false;
-                _mediumToggled = false;
-                _hardToggled = true;
+                case ModeSelection.Normal:
+                    Normal = true;
+                    Roam = false;
+                    _normalToggled = true;
+                    _roamToggled = false;
+                    break;
+                case ModeSelection.Roam:
+                    Normal = false;
+                    Roam = true;
+                    _normalToggled = false;
+                    _roamToggled = true;
+                    break;
             }
+            //if (DifficultySelection.Easy == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_easyToggled)
+            //{
+            //    Easy = true;
+            //    Medium = false;
+            //    Hard = false;
 
-            if (FactionSelection.Neutral == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_neutralToggled)
-            {
-                Neutral = true;
-                Clan = false;
+            //    _easyToggled = true;
+            //    _mediumToggled = false;
+            //    _hardToggled = false;
+            //}
 
-                _neutralToggled = true;
-                _clanToggled = false;
-            }
+            //if (DifficultySelection.Medium == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_mediumToggled)
+            //{
+            //    Easy = false;
+            //    Medium = true;
+            //    Hard = false;
 
-            if (FactionSelection.Clan == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_clanToggled)
-            {
-                Neutral = false;
-                Clan = true;
+            //    _easyToggled = false;
+            //    _mediumToggled = true;
+            //    _hardToggled = false;
+            //}
 
-                _neutralToggled = false;
-                _clanToggled = true;
-            }
+            //if (DifficultySelection.Hard == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_hardToggled)
+            //{
+            //    Easy = false;
+            //    Medium = false;
+            //    Hard = true;
 
-            if (ModeSelection.Normal == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_normalToggled)
-            {
-                Normal = true;
-                Roam = false;
+            //    _easyToggled = false;
+            //    _mediumToggled = false;
+            //    _hardToggled = true;
+            //}
 
-                _normalToggled = true;
-                _roamToggled = false;
-            }
-            if (ModeSelection.Roam == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_roamToggled)
-            {
-                Normal = false;
-                Roam = true;
+            //if (FactionSelection.Neutral == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_neutralToggled)
+            //{
+            //    Neutral = true;
+            //    Clan = false;
+            //    Omni = false;
 
-                _normalToggled = false;
-                _roamToggled = true;
-            }
+            //    _neutralToggled = true;
+            //    _clanToggled = false;
+            //    _omniToggled = false;
+            //}
+
+            //if (FactionSelection.Clan == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_clanToggled)
+            //{
+            //    Neutral = false;
+            //    Clan = true;
+            //    Omni = false;
+
+            //    _neutralToggled = false;
+            //    _clanToggled = true;
+            //    _omniToggled = false;
+            //}
+
+            //if (FactionSelection.Omni == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_omniToggled)
+            //{
+            //    Neutral = false;
+            //    Clan = false;
+            //    Omni = true;
+
+            //    _neutralToggled = false;
+            //    _clanToggled = false;
+            //    _omniToggled = true;
+            //}
+
+            //if (ModeSelection.Normal == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_normalToggled)
+            //{
+            //    Normal = true;
+            //    Roam = false;
+
+            //    _normalToggled = true;
+            //    _roamToggled = false;
+            //}
+            //if (ModeSelection.Roam == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_roamToggled)
+            //{
+            //    Normal = false;
+            //    Roam = true;
+
+            //    _normalToggled = false;
+            //    _roamToggled = true;
+            //}
         }
 
         private bool CanUseSitKit()
@@ -386,7 +483,7 @@ namespace InfBuddy
                 if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
                                     && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
 
-            if (DynelManager.LocalPlayer.IsAlive && !Extensions.InCombat()
+            if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
                     && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
             {
                 List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
@@ -413,11 +510,11 @@ namespace InfBuddy
 
             if (kit == null) { return; }
 
-            if (spell != null)
+            if (_initSit == false && spell != null)
             {
                 if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
                 {
-                    if (spell != null && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
+                    if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment)
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                     {
                         if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
@@ -425,13 +522,14 @@ namespace InfBuddy
                             Task.Factory.StartNew(
                                async () =>
                                {
-                                   Sitting = true;
+                                   _initSit = true;
                                    await Task.Delay(400);
                                    NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                                   await Task.Delay(800);
+                                   await Task.Delay(1200);
                                    NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-                                   await Task.Delay(200);
-                                   Sitting = false;
+                                   await Task.Delay(400);
+                                   _initSit = false;
+                                   _sitUpdateTimer = Time.NormalTime;
                                });
                         }
                     }

@@ -10,7 +10,7 @@ namespace InfBuddy
     {
         private SimpleChar _target;
         private SimpleChar _charmMob;
-        public static Corpse _corpse;
+        private static Corpse _corpse;
 
         private static bool _charmMobAttacked = false;
         private static bool _missionsLoaded = false;
@@ -26,33 +26,30 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            _corpse = DynelManager.Corpses
+                .Where(c => c.Name.Contains("Remains of "))
+                .FirstOrDefault();
+
             if (Game.IsZoning) { return null; }
 
             if (Extensions.HasDied())
                 return new DiedState();
 
-
-            if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                InfBuddy._settings["Toggle"] = false;
-                InfBuddy.Toggle = false;
-                return new IdleState();
+                if (Extensions.CanExit(_missionsLoaded) || Extensions.IsClear())
+                    return new ExitMissionState();
+
+                if (_target != null)
+                    return new FightState(_target);
+
+                if (InfBuddy._settings["Looting"].AsBool()
+                    && _corpse != null
+                    && Extensions.IsNull(_target))
+                    return new LootingState();
             }
 
-            if (Extensions.CanExit(_missionsLoaded))
-                return new ExitMissionState();
-
-            if (_target != null)
-                return new FightState(_target);
-
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
-                 && InfBuddy._settings["Looting"].AsBool()
-                && _corpse != null
-                && Spell.List.Any(c => c.IsReady)
-                && !Spell.HasPendingCast)
-                return new LootingState();
-
-            if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
+            if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
                 return new IdleState();
 
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
@@ -84,10 +81,6 @@ namespace InfBuddy
                 .OrderBy(c => c.HealthPercent)
                 .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
-
-            _corpse = DynelManager.Corpses
-               .Where(c => c.Name.Contains("Remains of "))
-               .FirstOrDefault();
 
             if (mob != null)
             {
@@ -214,6 +207,6 @@ namespace InfBuddy
             else
                 HandleScan();
         }
-           
+
     }
 }
