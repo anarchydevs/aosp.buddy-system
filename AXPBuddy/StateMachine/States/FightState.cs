@@ -144,53 +144,79 @@ namespace AXPBuddy
         {
             if (_aggToolCounter >= 2)
             {
-                //Reason: If we get stuck on a mob path to it
                 if (_attackTimeout >= 1)
                 {
-                    AXPBuddy.NavMeshMovementController.SetDestination(target.Position);
+                    ALBBuddy.NavMeshMovementController.SetMovement(MovementAction.JumpStart);
+                    ALBBuddy.NavMeshMovementController.SetNavMeshDestination(target.Position);
                     _attackTimeout = 0;
                     _aggToolCounter = 0;
+                    return;
                 }
-                else
-                {
-                    _attackTimeout++;
-                    _aggToolCounter = 0;
-                }
+
+                _attackTimeout++;
+                _aggToolCounter = 0;
             }
-            else if (Inventory.Find(83920, 83919, out Item aggroTool))
+            else if (Inventory.Find(83920,, out Item aggroTool)) //Aggression Enhancer 
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
-                    AXPBuddy.NavMeshMovementController.Halt();
                     aggroTool.Use(target, true);
                     _aggToolCounter++;
+                    return;
                 }
             }
-            else if (Inventory.Find(83919, 83919, out Item aggroMultiTool)) //TODO: Could be wrong
+            else if (Inventory.Find(83919, out Item aggroMultiTool)) //Aggression Multiplier
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
-                    AXPBuddy.NavMeshMovementController.Halt();
                     aggroMultiTool.Use(target, true);
                     _aggToolCounter++;
+                    return;
                 }
             }
-            else if (Inventory.Find(253186, 253186, out Item EmertoLow))
+            else if (Inventory.Find(152029,, out Item JealousyTool)) //Aggression Enhancer (Jealousy Augmented) 
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
-                    AXPBuddy.NavMeshMovementController.Halt();
+                    JealousyTool.Use(target, true);
+                    _aggToolCounter++;
+                    return;
+                }
+            }
+            else if (Inventory.Find(152028, out Item JealousyMultiTool)) //Aggression Multiplier (Jealousy Augmented) 
+            {
+                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
+                {
+                    JealousyMultiTool.Use(target, true);
+                    _aggToolCounter++;
+                    return;
+                }
+            }
+            else if (Inventory.Find(244655, out Item scorpioTool)) //Scorpio's Aim of Anger
+            {
+                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
+                {
+                    scorpioTool.Use(target, true);
+                    _aggToolCounter++;
+                    return;
+                }
+            }
+            else if (Inventory.Find(253186, out Item EmertoLow))//Codex of the Insulting Emerto
+            {
+                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
+                {
                     EmertoLow.Use(target, true);
                     _aggToolCounter++;
+                    return;
                 }
             }
-            else if (Inventory.Find(253187, 253187, out Item EmertoHigh))
+            else if (Inventory.Find(253187, out Item EmertoHigh))//Codex of the Insulting Emerto
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
-                    AXPBuddy.NavMeshMovementController.Halt();
                     EmertoHigh.Use(target, true);
                     _aggToolCounter++;
+                    return;
                 }
             }
         }
