@@ -146,8 +146,8 @@ namespace AXPBuddy
             {
                 if (_attackTimeout >= 1)
                 {
-                    ALBBuddy.NavMeshMovementController.SetMovement(MovementAction.JumpStart);
-                    ALBBuddy.NavMeshMovementController.SetNavMeshDestination(target.Position);
+                    AXPBuddy.NavMeshMovementController.SetMovement(MovementAction.JumpStart);
+                    AXPBuddy.NavMeshMovementController.SetNavMeshDestination(target.Position);
                     _attackTimeout = 0;
                     _aggToolCounter = 0;
                     return;
@@ -156,7 +156,7 @@ namespace AXPBuddy
                 _attackTimeout++;
                 _aggToolCounter = 0;
             }
-            else if (Inventory.Find(83920,, out Item aggroTool)) //Aggression Enhancer 
+            else if (Inventory.Find(83920, out Item aggroTool)) //Aggression Enhancer 
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
@@ -174,7 +174,7 @@ namespace AXPBuddy
                     return;
                 }
             }
-            else if (Inventory.Find(152029,, out Item JealousyTool)) //Aggression Enhancer (Jealousy Augmented) 
+            else if (Inventory.Find(152029, out Item JealousyTool)) //Aggression Enhancer (Jealousy Augmented) 
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {

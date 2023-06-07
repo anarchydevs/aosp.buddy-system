@@ -98,7 +98,7 @@ namespace ALBBuddy
                 _attackTimeout++;
                 _aggToolCounter = 0;
             }
-            else if (Inventory.Find(83920,, out Item aggroTool)) //Aggression Enhancer 
+            else if (Inventory.Find(83920, out Item aggroTool)) //Aggression Enhancer 
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
@@ -116,7 +116,7 @@ namespace ALBBuddy
                     return;
                 }
             }
-            else if (Inventory.Find(152029,, out Item JealousyTool)) //Aggression Enhancer (Jealousy Augmented) 
+            else if (Inventory.Find(152029, out Item JealousyTool)) //Aggression Enhancer (Jealousy Augmented) 
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {

@@ -171,7 +171,7 @@ namespace DefendBuddy
                                 return;
                             }
                         }
-                        else if (Inventory.Find(83919,, out Item aggroMultiTool)) //Aggression Multiplier
+                        else if (Inventory.Find(83919, out Item aggroMultiTool)) //Aggression Multiplier
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
@@ -208,7 +208,7 @@ namespace DefendBuddy
                                 return;
                             }
                         }
-                        else if (Inventory.Find(253186 out Item EmertoLow))//Codex of the Insulting Emerto
+                        else if (Inventory.Find(253186, out Item EmertoLow))//Codex of the Insulting Emerto
                         {
                             if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                             {
