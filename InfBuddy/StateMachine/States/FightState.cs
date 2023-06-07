@@ -88,6 +88,17 @@ namespace InfBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning || !Team.IsInTeam) { return; }
+
+            if (Team.IsInTeam)
+            {
+                foreach (TeamMember member in Team.Members)
+                {
+                    if (!ReformState._teamCache.Contains(member.Identity))
+                        ReformState._teamCache.Add(member.Identity);
+                }
+            }
+
             if (Game.IsZoning || _target == null) { return; }
 
             _primevalSpinetooth = DynelManager.NPCs
