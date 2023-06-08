@@ -34,6 +34,7 @@ namespace VortexxBuddy
         {
             _atCorpse = false;
             _initCorpse = false;
+            VortexxBuddy.VortexxCorpse = false;
         }
 
         public void Tick()
