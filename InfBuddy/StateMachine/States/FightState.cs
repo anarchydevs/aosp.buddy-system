@@ -122,6 +122,9 @@ namespace InfBuddy
                 && !DynelManager.LocalPlayer.IsAttackPending)
                 DynelManager.LocalPlayer.Attack(_primevalSpinetooth);
 
+            if (!_target.IsMoving && _target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 20f)
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
+
             if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                 Extensions.HandlePathing(_target);
         }
