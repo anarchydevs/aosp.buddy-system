@@ -7,6 +7,7 @@ namespace AttackBuddy
         public static List<string> _ignores = new List<string>
         {
                     "Sprysi D'Lere",
+                    "Notum Bomb",
                     "Notum Erruption",
                     "Alien Fuel Tower",
                     "Kyr'Ozch Guardian",

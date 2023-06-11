@@ -136,7 +136,7 @@ namespace DB2Buddy
                     && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
             }
-            else if (_blueTower != null)
+            if (_blueTower != null && _redTower == null)
             {
                 if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) < 3f
@@ -148,7 +148,6 @@ namespace DB2Buddy
                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && !MovementController.Instance.IsNavigating)
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_blueTower.Position);
-
             }
         }
 
