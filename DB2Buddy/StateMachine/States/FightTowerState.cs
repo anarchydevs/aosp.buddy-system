@@ -77,6 +77,9 @@ namespace DB2Buddy
                     {
                         return new FightState();
                     }
+
+                    if (_aune == null)
+                        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
                 }
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)

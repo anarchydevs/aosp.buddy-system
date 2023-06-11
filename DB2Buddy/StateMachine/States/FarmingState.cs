@@ -20,9 +20,17 @@ namespace DB2Buddy
             if (!DB2Buddy._settings["Toggle"].AsBool())
                 DB2Buddy.NavMeshMovementController.Halt();
 
-            if (Playfield.ModelIdentity.Instance == Constants.PWId
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 30f)
-                return new ReformState();
+            if (Playfield.ModelIdentity.Instance == Constants.PWId)
+            {
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 30f)
+                    return new ReformState();
+            }
+
+            if (Playfield.ModelIdentity.Instance == Constants.DB2Id)
+            {
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
+                    return new FellState();
+            }
 
             return null;
         }

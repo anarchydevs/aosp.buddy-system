@@ -123,7 +123,7 @@ namespace AXPBuddy
                 if (!AXPBuddy._initMerge)
                     AXPBuddy._initMerge = true;
 
-                AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
+                AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos, out NavMeshPath path);
             }
 
             if (AXPBuddy._died)
