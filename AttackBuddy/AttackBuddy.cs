@@ -315,8 +315,8 @@ namespace AttackBuddy
                         && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
                         && c.MaxHealth >= 1000000)
                     .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                    .OrderByDescending(c => c.Name == "Right Hand of Madness")
                     .OrderByDescending(c => c.Name == "Left Hand of Insanity")
+                    .OrderByDescending(c => c.Name == "Right Hand of Madness")
 
                     .ToList();
 
@@ -324,7 +324,8 @@ namespace AttackBuddy
                     .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
                         && !Constants._ignores.Contains(c.Name)
                         && c.Health > 0
-                        && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c))
+                        && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                        && (!c.IsPet))
                     .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
                     .OrderBy(c => c.HealthPercent)
                     .OrderByDescending(c => c.Name == "Green Tower")

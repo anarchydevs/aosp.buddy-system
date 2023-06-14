@@ -10,7 +10,11 @@ namespace AttackBuddy
 <<<<<<< HEAD
 =======
                     "Notum Bomb",
+<<<<<<< HEAD
 >>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
+=======
+                    "Strange Mist",
+>>>>>>> 73349c32cdc7f33054ec7610053e55fc5d2ec980
                     "Notum Erruption",
                     "Alien Fuel Tower",
                     "Kyr'Ozch Guardian",
