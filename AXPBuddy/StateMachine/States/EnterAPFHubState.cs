@@ -7,10 +7,10 @@ namespace AXPBuddy
 {
     public class EnterAPFHubState : IState
     {
-        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
-
         public IState GetNextState()
         {
+            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return null; }
+
             if (Playfield.ModelIdentity.Instance == Constants.APFHubId
                 && Extensions.CanProceed())
                 return new EnterSectorState();
@@ -30,7 +30,7 @@ namespace AXPBuddy
 
         public void Tick()
         {
-            if (Game.IsZoning) { return; }
+            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return; }
 
             Dynel Lever = DynelManager.AllDynels
                 .Where(c => c.Name == "A Lever"
@@ -40,14 +40,15 @@ namespace AXPBuddy
             if (Lever != null)
             {
                 Lever.Use();
-                _cancellationToken.Cancel();
             }
             else if (!AXPBuddy.NavMeshMovementController.IsNavigating)
             {
-                Task.Delay(2 * 1000).ContinueWith(x =>
-                {
-                    AXPBuddy.NavMeshMovementController.SetPath(Constants.UnicornHubPath);
-                }, _cancellationToken.Token);
+                Task.Factory.StartNew(
+                   async () =>
+                   {
+                       await Task.Delay(2000);
+                       AXPBuddy.NavMeshMovementController.SetPath(Constants.UnicornHubPath);
+                   });
             }
         }
     }

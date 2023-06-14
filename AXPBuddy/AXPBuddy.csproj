@@ -37,11 +37,19 @@
   <ItemGroup>
     <Reference Include="AOSharp.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
+<<<<<<< HEAD
       <HintPath>..\packages\AOSharpSDK.1.0.25\lib\net48\AOSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AOSharpSDK.1.0.25\lib\net48\AOSharp.Core.dll</HintPath>
+=======
+      <HintPath>..\packages\AOSharpSDK.1.0.28\lib\net48\AOSharp.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="AOSharp.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\AOSharpSDK.1.0.28\lib\net48\AOSharp.Core.dll</HintPath>
+>>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
     </Reference>
     <Reference Include="AOSharp.Recast, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -107,6 +115,7 @@
     <Compile Include="StateMachine\States\FightState.cs" />
     <Compile Include="StateMachine\States\IdleState.cs" />
     <Compile Include="StateMachine\States\LeechState.cs" />
+    <Compile Include="StateMachine\States\GatherState.cs" />
     <Compile Include="StateMachine\States\RoamState.cs" />
     <Compile Include="StateMachine\States\PatrolState.cs" />
     <Compile Include="StateMachine\States\ReformState.cs" />
@@ -119,7 +128,6 @@
     <None Include="NavMeshes\4368.navmesh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="NavMeshes\4696.navmesh" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

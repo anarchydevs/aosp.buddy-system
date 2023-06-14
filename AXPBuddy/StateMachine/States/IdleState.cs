@@ -6,6 +6,8 @@ namespace AXPBuddy
     {
         public IState GetNextState()
         {
+            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return null; }
+
             if (AXPBuddy.Toggle == true && Team.IsInTeam && Team.IsRaid
                 && AXPBuddy._settings["Toggle"].AsBool())
             {
@@ -27,6 +29,7 @@ namespace AXPBuddy
 
         public void Tick()
         {
+            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return; }
         }
     }
 }
