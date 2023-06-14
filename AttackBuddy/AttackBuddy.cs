@@ -363,6 +363,7 @@ namespace AttackBuddy
                    .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
                    .OrderByDescending(c => c.Name == "Lost Thought")
                    .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
+                   .OrderByDescending(c => c.Name == "Ruinous Reverends")
                    .OrderByDescending(c => c.Name == "Alien Cocoon")
                    .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
                    .ToList();
@@ -395,6 +396,7 @@ namespace AttackBuddy
                     .OrderByDescending(c => c.Name == "Hacker'Uri")
                     .OrderByDescending(c => c.Name == "Hand of the Colonel")
                     .OrderByDescending(c => c.Name == "Corrupted Xan-Len")
+                   .OrderByDescending(c => c.Name == "Ruinous Reverends")
                     .OrderByDescending(c => c.Name == "Hallowed Acolyte")
                     .OrderByDescending(c => c.Name == "Devoted Fanatic")
                     .ToList();
