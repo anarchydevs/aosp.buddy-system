@@ -306,6 +306,31 @@ namespace AttackBuddy
                     .ToList();
 
             }
+            if(Playfield.ModelIdentity.Instance == 6015)
+            {
+                _bossMob = DynelManager.NPCs
+                    .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                        && !Constants._ignores.Contains(c.Name)
+                        && c.Health > 0 && c.IsInLineOfSight
+                        && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                        && c.MaxHealth >= 1000000)
+                    .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                    .OrderByDescending(c => c.Name == "Right Hand of Madness")
+                    .OrderByDescending(c => c.Name == "Left Hand of Insanity")
+
+                    .ToList();
+
+                _mob = DynelManager.Characters
+                    .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                        && !Constants._ignores.Contains(c.Name)
+                        && c.Health > 0
+                        && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c))
+                    .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                    .OrderBy(c => c.HealthPercent)
+                    .OrderByDescending(c => c.Name == "Green Tower")
+                    .OrderByDescending(c => c.Name == "Blue Tower")
+                    .ToList();
+            }
             else
             {
                 _bossMob = DynelManager.NPCs

@@ -130,6 +130,13 @@ namespace VortexxBuddy
                         DynelManager.LocalPlayer.Attack(_vortexx);
                 }
 
+<<<<<<< HEAD
+=======
+                if (_vortexx != null && _vortexx.HealthPercent < 63 && _vortexx.HealthPercent > 60
+                && !DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
+                    VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._redPodium);
+
+>>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
                 Network.ChatMessageReceived += (s, msg) =>
                 {
                     if (msg.PacketType != ChatMessageType.NpcMessage)

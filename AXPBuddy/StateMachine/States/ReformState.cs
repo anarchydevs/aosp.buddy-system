@@ -22,12 +22,14 @@ namespace AXPBuddy
 
         public IState GetNextState()
         {
-            if (Extensions.TimedOut(_reformStartedTime, ReformTimeout))
-                return new EnterSectorState();
+            if (Extensions.HasDied())
+                return new DiedState();
+
+            if (Extensions.TimedOut(_reformStartedTime, ReformTimeout)) { return new EnterSectorState(); }
 
             if (_phase == ReformPhase.Completed)
             {
-                if (!Team.IsRaid && Team.IsLeader
+                if (!Team.IsRaid && DynelManager.LocalPlayer.Identity == AXPBuddy.Leader
                     && !_init)
                 {
                     _init = true;

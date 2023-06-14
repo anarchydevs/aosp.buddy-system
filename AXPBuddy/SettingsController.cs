@@ -54,14 +54,22 @@ namespace AXPBuddy
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "AXPBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 
+                        if (settingsWindow.IsVisible) { return; }
+
                         foreach (string settingsName in settingsWindows.Keys)
                         {
                             AppendSettingsTab(settingsName, settingsWindow);
 
                             settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
+                            settingsWindow.FindView("LeaderBox", out TextInputView leaderInput);
+                            settingsWindow.FindView("TickBox", out TextInputView tickInput);
 
                             if (channelInput != null)
                                 channelInput.Text = $"{Config.CharSettings[Game.ClientInst].IPCChannel}";
+                            if (leaderInput != null)
+                                leaderInput.Text = $"{Config.CharSettings[Game.ClientInst].Leader}";
+                            if (tickInput != null)
+                                tickInput.Text = $"{Config.CharSettings[Game.ClientInst].Tick}";
                         }
                     }
                     catch (Exception e)

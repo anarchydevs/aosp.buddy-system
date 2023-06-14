@@ -1,11 +1,16 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
+using AOSharp.Pathfinding;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
-    public class PatrolState : IState
+    public class GatherState : IState
     {
         private SimpleChar _target;
 
@@ -30,12 +35,12 @@ namespace AXPBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("PatrolState::OnStateEnter");
+            //Chat.WriteLine("GatherState::OnStateEnter");
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("PatrolState::OnStateExit");
+            //Chat.WriteLine("GatherState::OnStateExit");
 
             _init = false;
         }
@@ -46,8 +51,8 @@ namespace AXPBuddy
                 .Where(c => c.Health > 0
                     && !Constants._ignores.Contains(c.Name)
                     && c.IsInLineOfSight
-                    && c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 35f)
-                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+                    && c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 60f)
+                .OrderByDescending(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                 .ThenBy(c => c.HealthPercent)
                 .FirstOrDefault();
 
@@ -118,7 +123,7 @@ namespace AXPBuddy
                 if (!AXPBuddy._initMerge)
                     AXPBuddy._initMerge = true;
 
-                AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos, out NavMeshPath path);
+                AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
             }
 
             if (AXPBuddy._died)
@@ -165,18 +170,10 @@ namespace AXPBuddy
                             Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
-<<<<<<< HEAD
-                    else
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 2f
-                        && Spell.List.Any(c => c.IsReady)
-                        && !Spell.HasPendingCast
-                        && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
-=======
 
                     if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
                         && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f)
                     {
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
                         AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
                     }
                 }

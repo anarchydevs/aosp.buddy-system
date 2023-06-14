@@ -42,6 +42,17 @@ namespace InfBuddy
         {
             if (Game.IsZoning || !Team.IsInTeam) { return; }
 
+            if (Game.IsZoning || !Team.IsInTeam) { return; }
+
+            if (Team.IsInTeam)
+            {
+                foreach (TeamMember member in Team.Members)
+                {
+                    if (!ReformState._teamCache.Contains(member.Identity))
+                        ReformState._teamCache.Add(member.Identity);
+                }
+            }
+
             Dynel _yutto = DynelManager.NPCs
                 .Where(c => c.Name == Constants.QuestGiverName)
                 .FirstOrDefault();

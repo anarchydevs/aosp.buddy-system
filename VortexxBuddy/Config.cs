@@ -14,7 +14,11 @@ namespace VortexxBuddy
         protected string _path;
 
         [JsonIgnore]
+<<<<<<< HEAD
         public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 46;
+=======
+        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 38;
+>>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
 
         public static Config Load(string path)
         {
@@ -64,7 +68,11 @@ namespace VortexxBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
+<<<<<<< HEAD
         private int _ipcChannel = 46;
+=======
+        private int _ipcChannel = 38;
+>>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
 
         //Breaking out auto-property
         public int IPCChannel
