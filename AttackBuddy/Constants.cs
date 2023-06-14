@@ -8,6 +8,7 @@ namespace AttackBuddy
         {
                     "Sprysi D'Lere",
                     "Notum Bomb",
+                    "Strange Mist",
                     "Notum Erruption",
                     "Alien Fuel Tower",
                     "Kyr'Ozch Guardian",
