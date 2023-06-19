@@ -59,7 +59,7 @@ namespace AttackBuddy
                 _settings = new Settings("AttackBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AttackBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AttackBuddy\\{Game.ClientInst}\\Config.json");
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
@@ -306,7 +306,7 @@ namespace AttackBuddy
                     .ToList();
 
             }
-            if(Playfield.ModelIdentity.Instance == 6015)
+            if (Playfield.ModelIdentity.Instance == 6015)
             {
                 _bossMob = DynelManager.NPCs
                     .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
@@ -315,9 +315,8 @@ namespace AttackBuddy
                         && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
                         && c.MaxHealth >= 1000000)
                     .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                    .OrderByDescending(c => c.Name == "Left Hand of Insanity")
                     .OrderByDescending(c => c.Name == "Right Hand of Madness")
-
+                    .OrderByDescending(c => c.Name == "Left Hand of Insanity")
                     .ToList();
 
                 _mob = DynelManager.Characters
@@ -363,6 +362,7 @@ namespace AttackBuddy
                    .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
                    .OrderByDescending(c => c.Name == "Lost Thought")
                    .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
+                   .OrderByDescending(c => c.Name == "Ruinous Reverends")
                    .OrderByDescending(c => c.Name == "Alien Cocoon")
                    .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
                    .ToList();
@@ -395,6 +395,7 @@ namespace AttackBuddy
                     .OrderByDescending(c => c.Name == "Hacker'Uri")
                     .OrderByDescending(c => c.Name == "Hand of the Colonel")
                     .OrderByDescending(c => c.Name == "Corrupted Xan-Len")
+                   .OrderByDescending(c => c.Name == "Ruinous Reverends")
                     .OrderByDescending(c => c.Name == "Hallowed Acolyte")
                     .OrderByDescending(c => c.Name == "Devoted Fanatic")
                     .ToList();
@@ -412,7 +413,7 @@ namespace AttackBuddy
 
                 return;
             }
-                
+
 
             if (Time.NormalTime > _refreshList + 0.5f
                 && Toggle == true)

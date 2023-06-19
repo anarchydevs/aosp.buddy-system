@@ -99,12 +99,9 @@ namespace DB2Buddy
                 {
                     return new IdleState();
                 }
-<<<<<<< HEAD
-=======
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
                     return new FellState();
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
             }
 
             return null;

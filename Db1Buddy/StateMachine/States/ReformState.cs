@@ -9,11 +9,7 @@ namespace Db1Buddy
 {
     public class ReformState : IState
     {
-<<<<<<< HEAD
-        private const float ReformTimeout = 100;
-=======
         private const float ReformTimeout = 5;
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
         private const float DisbandDelay = 10;
 
         private static double _reformStartedTime;

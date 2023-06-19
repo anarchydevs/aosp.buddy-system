@@ -64,7 +64,7 @@ namespace KHBuddy
                 Chat.WriteLine("KHBuddy Loaded!");
                 Chat.WriteLine("/khbuddy for settings.");
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KHBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\KHBuddy\\{Game.ClientInst}\\Config.json");
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[Game.ClientInst].IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.StartMode, OnStartMessage);

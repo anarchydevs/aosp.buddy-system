@@ -50,7 +50,7 @@ namespace Db1Buddy
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\Db1Buddy\\{Game.ClientInst}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\Db1Buddy\\{Game.ClientInst}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "Db1Buddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 

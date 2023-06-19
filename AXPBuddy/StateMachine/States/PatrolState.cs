@@ -1,7 +1,12 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
+using AOSharp.Pathfinding;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
@@ -165,18 +170,10 @@ namespace AXPBuddy
                             Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
-<<<<<<< HEAD
-                    else
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 2f
-                        && Spell.List.Any(c => c.IsReady)
-                        && !Spell.HasPendingCast
-                        && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
-=======
 
                     if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
                         && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 1.2f)
                     {
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
                         AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
                     }
                 }

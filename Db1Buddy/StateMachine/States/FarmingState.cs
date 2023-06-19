@@ -28,10 +28,7 @@ namespace Db1Buddy
 
         public void OnStateEnter()
         {
-<<<<<<< HEAD
-=======
             Db1Buddy.MikkelsenCorpse = false;
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
             Chat.WriteLine("Pause for looting, 10 sec");
 
         }

@@ -92,11 +92,7 @@ namespace DB2Buddy
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._warpPos) < 5f
                  && Team.IsInTeam
-<<<<<<< HEAD
-                 && Extensions.CanProceed()
-=======
                  //&& Extensions.CanProceed()
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
                  && !Team.Members.Any(c => c.Character == null)
                  && DB2Buddy._settings["Toggle"].AsBool())
                     return new PathToBossState();

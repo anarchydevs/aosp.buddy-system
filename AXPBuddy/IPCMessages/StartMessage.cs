@@ -1,4 +1,5 @@
-﻿using AOSharp.Core.IPC;
+﻿using System;
+using AOSharp.Core.IPC;
 using SmokeLounge.AOtomation.Messaging.Serialization.MappingAttributes;
 
 namespace AXPBuddy.IPCMessages

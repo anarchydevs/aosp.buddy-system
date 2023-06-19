@@ -9,14 +9,8 @@ namespace VortexxBuddy
 {
     public class ReformState : IState
     {
-<<<<<<< HEAD
-        private const float ReformTimeout = 100;
-        private const float DisbandDelay = 10;
-        private const float InviteDelay = 13;
-=======
         private const float ReformTimeout = 5;
         private const float DisbandDelay = 10;
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
 
         private static double _reformStartedTime;
         private double _inviting;
@@ -56,11 +50,7 @@ namespace VortexxBuddy
                 _phase = ReformPhase.Waiting;
             }
 
-<<<<<<< HEAD
-            VortexxBuddy._clearToEnter = false;
-=======
            
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
             FarmingState._initCorpse = false;
         }
 

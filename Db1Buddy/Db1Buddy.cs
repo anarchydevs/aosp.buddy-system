@@ -62,7 +62,7 @@ namespace Db1Buddy
                 _settings = new Settings("Db1Buddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\Db1Buddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\Db1Buddy\\{Game.ClientInst}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
