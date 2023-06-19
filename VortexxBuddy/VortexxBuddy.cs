@@ -61,7 +61,7 @@ namespace VortexxBuddy
                 _settings = new Settings("VortexxBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\VortexxBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\VortexxBuddy\\{Game.ClientInst}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
@@ -174,18 +174,7 @@ namespace VortexxBuddy
         private void EnterMessage(int sender, IPCMessage msg)
         {
             if (!(_stateMachine.CurrentState is EnterState))
-<<<<<<< HEAD
-                _stateMachine.SetState(new EnterState());
-
-            //if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-            //    &&DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
-            //{
-            //    NavMeshMovementController.SetDestination(Constants._entrance);
-            //    NavMeshMovementController.AppendDestination(Constants._reneterPos);
-            //}
-=======
                 _stateMachine.SetState(new EnterState()); 
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
         }
 
         private void HandleInfoViewClick(object s, ButtonBase button)
@@ -198,21 +187,12 @@ namespace VortexxBuddy
             _infoWindow.Show(true);
         }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
         private void OnUpdate(object s, float deltaTime)
         {
             if (Game.IsZoning)
                 return;
 
-<<<<<<< HEAD
-            
-
-=======
  
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
             if (Time.NormalTime > _sitUpdateTimer + 1)
             {
                 ListenerSit();
@@ -296,13 +276,9 @@ namespace VortexxBuddy
 
             if (spell != null)
             {
-<<<<<<< HEAD
-                if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && Extensions.CanUseSitKit())
-=======
                 if (!DynelManager.LocalPlayer.Buffs.Contains(280488) 
                     && !DynelManager.LocalPlayer.Buffs.Contains(Nanos.AncientMist)
                     && Extensions.CanUseSitKit())
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
                 {
                     if (spell != null && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
@@ -375,10 +351,7 @@ namespace VortexxBuddy
             public const int PulsatingGreenNanoInfusion = 280561;
             public const int GoldenNanoInfusion = 280562;
 
-<<<<<<< HEAD
-=======
             public const int AncientMist = 280799; // nano drain
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
             public const int EmptyHusk = 280731;
             public const int CreepingIllness = 280751;
             public const int FlamesofConsequence = 280753;

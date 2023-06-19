@@ -11,10 +11,7 @@ using System.Configuration;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections;
-<<<<<<< HEAD
-=======
 using AOSharp.Pathfinding;
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
 
 namespace DB2Buddy
 {
@@ -156,19 +153,11 @@ namespace DB2Buddy
                 }
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom (_aune.Position) > 20
-<<<<<<< HEAD
-                    && !MovementController.Instance.IsNavigating)
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
-
-                if (_aune.IsInLineOfSight && _aune.IsInAttackRange()
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) < 12)
-=======
                     || !_aune.IsInAttackRange())
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position, out NavMeshPath path);
 
                 if (_aune.IsInLineOfSight && _aune.IsInAttackRange()
                     && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 20)
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
                     DB2Buddy.NavMeshMovementController.Halt();
 
             }

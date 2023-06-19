@@ -1,23 +1,19 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Common.GameData.UI;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using AOSharp.Core;
-using AOSharp.Core.Inventory;
-using AOSharp.Core.IPC;
-using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using AOSharp.Core.Movement;
+using AOSharp.Core.IPC;
 using AOSharp.Pathfinding;
 using AXPBuddy.IPCMessages;
-<<<<<<< HEAD
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-=======
 using AOSharp.Common.GameData;
 using AOSharp.Core.Inventory;
 using AOSharp.Common.GameData.UI;
 using System.Security.Cryptography;
 using System.Threading;
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
 
 namespace AXPBuddy
 {
@@ -63,7 +59,7 @@ namespace AXPBuddy
                 _settings = new Settings("AXPBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AXPBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AXPBuddy\\{Game.ClientInst}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));

@@ -1,8 +1,11 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.Inventory;
+using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System;
+using System.Configuration;
+using System.Linq;
 
 namespace AXPBuddy
 {
@@ -105,14 +108,6 @@ namespace AXPBuddy
                     Chat.WriteLine($"Attacking {_target.Name}.");
                 }
             }
-<<<<<<< HEAD
-            else if (DynelManager.LocalPlayer.Identity == AXPBuddy.Leader
-                && AXPBuddy.ModeSelection.Normal == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-                HandleTaunting(_target);
-            else if (AXPBuddy.ModeSelection.Roam == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-                HandlePathing(_target);
-=======
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
         }
 
         public static CharacterWieldedWeapon GetWieldedWeapons(SimpleChar local) => (CharacterWieldedWeapon)local.GetStat(Stat.EquippedWeapons);

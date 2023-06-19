@@ -1,9 +1,12 @@
 ﻿using AOSharp.Common.GameData;
-using AOSharp.Common.GameData.UI;
-using AOSharp.Core;
 using AOSharp.Core.UI;
+using AOSharp.Core;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AOSharp.Common.GameData.UI;
 
 namespace AXPBuddy
 {
@@ -50,7 +53,7 @@ namespace AXPBuddy
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AXPBuddy\\{Game.ClientInst}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AXPBuddy\\{Game.ClientInst}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "AXPBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 

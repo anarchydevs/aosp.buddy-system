@@ -13,19 +13,19 @@
         {
             IState nextState = CurrentState.GetNextState();
 
-            if (nextState != null)
+            if(nextState != null)
                 SetState(nextState);
 
             CurrentState.Tick();
         }
         public void SetState(IState state, bool triggerEvents = true)
         {
-            if (CurrentState != null && triggerEvents)
+            if(CurrentState != null && triggerEvents)
                 CurrentState.OnStateExit();
 
             CurrentState = state;
 
-            if (triggerEvents)
+            if(triggerEvents)
                 state.OnStateEnter();
         }
     }
