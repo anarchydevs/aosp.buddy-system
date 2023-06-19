@@ -1,4 +1,4 @@
-﻿using AOSharp.Common.GameData;
+using AOSharp.Common.GameData;
 using AOSharp.Common.GameData.UI;
 using AOSharp.Core;
 using AOSharp.Core.Inventory;
@@ -7,17 +7,14 @@ using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
 using AXPBuddy.IPCMessages;
-<<<<<<< HEAD
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-=======
 using AOSharp.Common.GameData;
 using AOSharp.Core.Inventory;
 using AOSharp.Common.GameData.UI;
 using System.Security.Cryptography;
 using System.Threading;
->>>>>>> aab7ee3ccaa03c6ad6b10dee74da529f4148bb84
 
 namespace AXPBuddy
 {
