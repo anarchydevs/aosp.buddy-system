@@ -15,7 +15,7 @@ namespace AXPBuddy
         protected string _path;
 
         [JsonIgnore]
-        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 0;
+        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 37;
         [JsonIgnore]
         public float Tick => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].Tick : 0.7f;
         [JsonIgnore]
@@ -72,7 +72,7 @@ namespace AXPBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 0;
+        private int _ipcChannel = 37;
 
         //Breaking out auto-property
         public int IPCChannel
