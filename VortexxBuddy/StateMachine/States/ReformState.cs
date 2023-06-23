@@ -62,6 +62,7 @@ namespace VortexxBuddy
 
             _init = false;
 
+            VortexxBuddy._clearToEnter = false;
             FarmingState._initCorpse = false;
 
         }
