@@ -75,7 +75,6 @@ namespace AttackBuddy
                     "Pulsating Ice Obelisk",
                     "Unnatural Ice",
                     "Hacked Mechdog",
-                    "Harbinger of Pestilence",
                     "Pandemonium Idol",
                     "Laser Drone",
                     "Heatbeam",
@@ -101,13 +100,10 @@ namespace AttackBuddy
                     "Urban Defense Patroller",
                     "Unicorn Security Administrator",
                     "Alien Heavy Patroller",
-                    "Vergil Doppelganger",
                     "Alien Seeker",
-                    "Harbingers of Pestilence",
                     "Flaming Vengeance",
                     "Unstable Rift",
                     "Otacustes",
-                    "Curse Rot",
                     "John McLane"
         };
     }

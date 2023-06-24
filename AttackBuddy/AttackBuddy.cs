@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Policy;
 
 namespace AttackBuddy
 {
@@ -306,7 +307,7 @@ namespace AttackBuddy
                     .ToList();
 
             }
-            if (Playfield.ModelIdentity.Instance == 6015)
+            if (Playfield.ModelIdentity.Instance == 6015)// 12m
             {
                 _bossMob = DynelManager.NPCs
                     .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
@@ -330,6 +331,44 @@ namespace AttackBuddy
                     .OrderByDescending(c => c.Name == "Green Tower")
                     .OrderByDescending(c => c.Name == "Blue Tower")
                     .ToList();
+            }
+            if (Playfield.ModelIdentity.Instance == 9070)// subway
+            {
+                _bossMob = DynelManager.NPCs
+                       .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                           && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" ||c.Name == "Scalding Flames" 
+                           || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                           && c.Health > 0 && c.IsInLineOfSight
+                           && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                           && c.MaxHealth >= 1000000)
+                       .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                       .ToList();
+
+                _switchMob = DynelManager.NPCs
+                   .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                       && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
+                           || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                       && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                       && Extensions.IsFightingAny(c))
+                   .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                   .OrderBy(c => c.HealthPercent)
+                   .OrderByDescending(c => c.Name == "Stim Fiend")
+                   .OrderByDescending(c => c.Name == "Lost Thought")
+                   .ToList();
+
+                _mob = DynelManager.Characters
+                    .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                        && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
+                           || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                        && c.Health > 0
+                        && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                        && !c.IsPet)
+                    .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                    .OrderBy(c => c.HealthPercent)
+                    .OrderByDescending(c => c.Name == "Stim Fiend")
+                    .OrderByDescending(c => c.Name == "Lost Thought")
+                    .ToList();
+
             }
             else
             {
