@@ -549,6 +549,33 @@ namespace AttackBuddy
                         IPCChannel.Broadcast(new StopMessage());
                     }
                 }
+                switch (param[0].ToLower())
+                {
+                    case "ignore":
+                        if (param.Length > 1)
+                        {
+                            string name = string.Join(" ", param.Skip(1));
+
+                            if (!Constants._ignores.Contains(name))
+                            {
+                                Constants._ignores.Add(name);
+                                chatWindow.WriteLine($"Added \"{name}\" to ignored mob list");
+                            }
+                            else if (Constants._ignores.Contains(name))
+                            {
+                                Constants._ignores.Remove(name);
+                                chatWindow.WriteLine($"Removed \"{name}\" from ignored mob list");
+                            }
+                        }
+                        else
+                        {
+                            chatWindow.WriteLine("Please specify a name");
+                        }
+                        break;
+
+                    default:
+                        return;
+                }
 
                 Config.Save();
             }
