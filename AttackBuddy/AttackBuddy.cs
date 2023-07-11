@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Security.Policy;
 
 namespace AttackBuddy
 {
@@ -306,7 +307,7 @@ namespace AttackBuddy
                     .ToList();
 
             }
-            if (Playfield.ModelIdentity.Instance == 6015)
+            if (Playfield.ModelIdentity.Instance == 6015)// 12m
             {
                 _bossMob = DynelManager.NPCs
                     .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
@@ -319,17 +320,55 @@ namespace AttackBuddy
                     .OrderByDescending(c => c.Name == "Left Hand of Insanity")
                     .ToList();
 
+                _switchMob = DynelManager.NPCs
+                  .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                      && !Constants._ignores.Contains(c.Name)
+                      && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                      && Extensions.IsFightingAny(c))
+                  .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                  .OrderBy(c => c.HealthPercent)
+                  .OrderByDescending(c => c.Name == "Green Tower")
+                    .OrderByDescending(c => c.Name == "Blue Tower")
+                  .ToList();
+
+            }
+            if (Playfield.ModelIdentity.Instance == 9070)// subway
+            {
+                _bossMob = DynelManager.NPCs
+                       .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                           && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" ||c.Name == "Scalding Flames" 
+                           || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                           && c.Health > 0 && c.IsInLineOfSight
+                           && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                           && c.MaxHealth >= 1000000)
+                       .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                       .ToList();
+
+                _switchMob = DynelManager.NPCs
+                   .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                       && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
+                           || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                       && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                       && Extensions.IsFightingAny(c))
+                   .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                   .OrderBy(c => c.HealthPercent)
+                   .OrderByDescending(c => c.Name == "Stim Fiend")
+                   .OrderByDescending(c => c.Name == "Lost Thought")
+                   .ToList();
+
                 _mob = DynelManager.Characters
                     .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && !Constants._ignores.Contains(c.Name)
-                        && c.Health > 0
-                        && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
-                        && (!c.IsPet))
+                        && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
+                           || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                        && c.Health > 0 && c.IsInLineOfSight 
+                        && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                        && !c.IsPet)
                     .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
                     .OrderBy(c => c.HealthPercent)
-                    .OrderByDescending(c => c.Name == "Green Tower")
-                    .OrderByDescending(c => c.Name == "Blue Tower")
+                    .OrderByDescending(c => c.Name == "Stim Fiend")
+                    .OrderByDescending(c => c.Name == "Lost Thought")
                     .ToList();
+
             }
             else
             {
@@ -362,7 +401,7 @@ namespace AttackBuddy
                    .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
                    .OrderByDescending(c => c.Name == "Lost Thought")
                    .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
-                   .OrderByDescending(c => c.Name == "Ruinous Reverends")
+                   .OrderByDescending(c => c.Name == "Ruinous Reverend")
                    .OrderByDescending(c => c.Name == "Alien Cocoon")
                    .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
                    .ToList();
@@ -395,7 +434,7 @@ namespace AttackBuddy
                     .OrderByDescending(c => c.Name == "Hacker'Uri")
                     .OrderByDescending(c => c.Name == "Hand of the Colonel")
                     .OrderByDescending(c => c.Name == "Corrupted Xan-Len")
-                   .OrderByDescending(c => c.Name == "Ruinous Reverends")
+                   .OrderByDescending(c => c.Name == "Ruinous Reverend")
                     .OrderByDescending(c => c.Name == "Hallowed Acolyte")
                     .OrderByDescending(c => c.Name == "Devoted Fanatic")
                     .ToList();
@@ -548,6 +587,33 @@ namespace AttackBuddy
                         Chat.WriteLine("AttackBuddy disabled.");
                         IPCChannel.Broadcast(new StopMessage());
                     }
+                }
+                switch (param[0].ToLower())
+                {
+                    case "ignore":
+                        if (param.Length > 1)
+                        {
+                            string name = string.Join(" ", param.Skip(1));
+
+                            if (!Constants._ignores.Contains(name))
+                            {
+                                Constants._ignores.Add(name);
+                                chatWindow.WriteLine($"Added \"{name}\" to ignored mob list");
+                            }
+                            else if (Constants._ignores.Contains(name))
+                            {
+                                Constants._ignores.Remove(name);
+                                chatWindow.WriteLine($"Removed \"{name}\" from ignored mob list");
+                            }
+                        }
+                        else
+                        {
+                            chatWindow.WriteLine("Please specify a name");
+                        }
+                        break;
+
+                    default:
+                        return;
                 }
 
                 Config.Save();
