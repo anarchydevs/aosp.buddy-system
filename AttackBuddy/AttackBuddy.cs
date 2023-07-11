@@ -320,17 +320,17 @@ namespace AttackBuddy
                     .OrderByDescending(c => c.Name == "Left Hand of Insanity")
                     .ToList();
 
-                _mob = DynelManager.Characters
-                    .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && !Constants._ignores.Contains(c.Name)
-                        && c.Health > 0
-                        && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
-                        && (!c.IsPet))
-                    .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                    .OrderBy(c => c.HealthPercent)
-                    .OrderByDescending(c => c.Name == "Green Tower")
+                _switchMob = DynelManager.NPCs
+                  .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                      && !Constants._ignores.Contains(c.Name)
+                      && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                      && Extensions.IsFightingAny(c))
+                  .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                  .OrderBy(c => c.HealthPercent)
+                  .OrderByDescending(c => c.Name == "Green Tower")
                     .OrderByDescending(c => c.Name == "Blue Tower")
-                    .ToList();
+                  .ToList();
+
             }
             if (Playfield.ModelIdentity.Instance == 9070)// subway
             {
@@ -360,8 +360,8 @@ namespace AttackBuddy
                     .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
                         && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
                            || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
-                        && c.Health > 0
-                        && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                        && c.Health > 0 && c.IsInLineOfSight 
+                        && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
                         && !c.IsPet)
                     .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
                     .OrderBy(c => c.HealthPercent)
