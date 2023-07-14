@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace InfBuddy
@@ -54,6 +55,8 @@ namespace InfBuddy
 
         private static double _sitUpdateTimer;
         public static double _stateTimeOut;
+
+        private string previousErrorMessage = string.Empty;
 
         public static List<string> _namesToIgnore = new List<string>
         {
@@ -125,9 +128,16 @@ namespace InfBuddy
                 Chat.WriteLine("InfBuddy Loaded!");
                 Chat.WriteLine("/infbuddy for settings.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
 
@@ -393,88 +403,7 @@ namespace InfBuddy
                     _roamToggled = true;
                     break;
             }
-            //if (DifficultySelection.Easy == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_easyToggled)
-            //{
-            //    Easy = true;
-            //    Medium = false;
-            //    Hard = false;
 
-            //    _easyToggled = true;
-            //    _mediumToggled = false;
-            //    _hardToggled = false;
-            //}
-
-            //if (DifficultySelection.Medium == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_mediumToggled)
-            //{
-            //    Easy = false;
-            //    Medium = true;
-            //    Hard = false;
-
-            //    _easyToggled = false;
-            //    _mediumToggled = true;
-            //    _hardToggled = false;
-            //}
-
-            //if (DifficultySelection.Hard == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_hardToggled)
-            //{
-            //    Easy = false;
-            //    Medium = false;
-            //    Hard = true;
-
-            //    _easyToggled = false;
-            //    _mediumToggled = false;
-            //    _hardToggled = true;
-            //}
-
-            //if (FactionSelection.Neutral == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_neutralToggled)
-            //{
-            //    Neutral = true;
-            //    Clan = false;
-            //    Omni = false;
-
-            //    _neutralToggled = true;
-            //    _clanToggled = false;
-            //    _omniToggled = false;
-            //}
-
-            //if (FactionSelection.Clan == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_clanToggled)
-            //{
-            //    Neutral = false;
-            //    Clan = true;
-            //    Omni = false;
-
-            //    _neutralToggled = false;
-            //    _clanToggled = true;
-            //    _omniToggled = false;
-            //}
-
-            //if (FactionSelection.Omni == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_omniToggled)
-            //{
-            //    Neutral = false;
-            //    Clan = false;
-            //    Omni = true;
-
-            //    _neutralToggled = false;
-            //    _clanToggled = false;
-            //    _omniToggled = true;
-            //}
-
-            //if (ModeSelection.Normal == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_normalToggled)
-            //{
-            //    Normal = true;
-            //    Roam = false;
-
-            //    _normalToggled = true;
-            //    _roamToggled = false;
-            //}
-            //if (ModeSelection.Roam == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_roamToggled)
-            //{
-            //    Normal = false;
-            //    Roam = true;
-
-            //    _normalToggled = false;
-            //    _roamToggled = true;
-            //}
         }
 
         private bool CanUseSitKit()
@@ -614,6 +543,18 @@ namespace InfBuddy
             public static readonly int[] Kits = {
                 297274, 293296, 291084, 291083, 291082
             };
+        }
+
+        private int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
         }
     }
 }
