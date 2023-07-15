@@ -16,9 +16,11 @@ namespace DB2Buddy
 {
     public class FightTowerState : IState
     {
-        private static SimpleChar _aune;
-        private static SimpleChar _redTower;
-        private static SimpleChar _blueTower;
+        private SimpleChar _aune;
+        private SimpleChar _redTower;
+        private SimpleChar _blueTower;
+
+        public static Dictionary<Vector3, string> _towerPOS = new Dictionary<Vector3, string>();
 
         public IState GetNextState()
         {
@@ -70,7 +72,7 @@ namespace DB2Buddy
                     return new NotumState();
                 }
 
-                if (_redTower == null && _blueTower == null)
+                if (_redTower == null && _blueTower == null && _towerPOS.Count == 0)
                 {
                     if (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
                      && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
@@ -130,24 +132,71 @@ namespace DB2Buddy
                     && DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) < 3f
                     && DynelManager.LocalPlayer.FightingTarget == null
                     && !DynelManager.LocalPlayer.IsAttackPending)
+                {
                     DynelManager.LocalPlayer.Attack(_redTower);
 
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 3f
+                    if (_towerPOS.ContainsKey(_redTower.Position))
+                    {
+                        _towerPOS.Remove(_redTower.Position);
+                    }
+
+                }
+
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 5f
                     && !MovementController.Instance.IsNavigating)
+                {
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_redTower.Position);
+
+                    if (!_towerPOS.ContainsKey(_redTower.Position))
+                    {
+                        _towerPOS[_redTower.Position] = _redTower.Name;
+                    }
+                }
+
             }
-            if (_blueTower != null && _redTower == null)
+            else if (_blueTower != null)
             {
+
                 if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) < 3f
                     && DynelManager.LocalPlayer.FightingTarget == null
                     && !DynelManager.LocalPlayer.IsAttackPending)
+                {
                     DynelManager.LocalPlayer.Attack(_blueTower);
 
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 3f
+                    if (_towerPOS.ContainsKey(_blueTower.Position))
+                    {
+                        _towerPOS.Remove(_blueTower.Position);
+                    }
+                }
+
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) > 5f
                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && !MovementController.Instance.IsNavigating)
+                {
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_blueTower.Position);
+
+                    if (!_towerPOS.ContainsKey(_blueTower.Position))
+                    {
+                        _towerPOS[_blueTower.Position] = _blueTower.Name;
+                    }
+                }
+
+            }
+            else if (_towerPOS.Count > 0)
+            {
+                Vector3 towerPosition = _towerPOS.Keys.First();
+
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(towerPosition) > 5f)
+                {
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(towerPosition);
+                }
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(towerPosition) < 3f)
+                {
+                    _towerPOS.Remove(towerPosition);
+
+                }
+
             }
         }
 

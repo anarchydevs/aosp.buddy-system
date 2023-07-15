@@ -17,10 +17,10 @@ namespace DB2Buddy
 {
     public class FightState : IState
     {
-        private static SimpleChar _aune;
-        private static Corpse _auneCorpse;
-        private static SimpleChar _redTower;
-        private static SimpleChar _blueTower;
+        private SimpleChar _aune;
+        private Corpse _auneCorpse;
+        private SimpleChar _redTower;
+        private SimpleChar _blueTower;
 
         public IState GetNextState()
         {
@@ -74,13 +74,23 @@ namespace DB2Buddy
 
                 if (_aune != null)
                 {
-                    if (_redTower != null || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                    if (_redTower != null) //|| DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                     {
+                        if (!FightTowerState._towerPOS.ContainsKey(_redTower.Position))
+                        {
+                            FightTowerState._towerPOS[_redTower.Position] = _redTower.Name;
+                        }
+
                         return new FightTowerState();
                     }
 
-                    if (_blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
+                    if (_blueTower != null) // || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
                     {
+                        if (!FightTowerState._towerPOS.ContainsKey(_blueTower.Position))
+                        {
+                            FightTowerState._towerPOS[_blueTower.Position] = _blueTower.Name;
+                        }
+
                         if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                             return new FightTowerState();
                     }
@@ -101,7 +111,7 @@ namespace DB2Buddy
         public void OnStateEnter()
         {
             Chat.WriteLine($"FightBossState");
-            DB2Buddy.NavMeshMovementController.Halt();
+            //DB2Buddy.NavMeshMovementController.Halt();
         }
 
         public void OnStateExit()
@@ -139,7 +149,8 @@ namespace DB2Buddy
                     && !DynelManager.LocalPlayer.IsAttackPending
                     && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                     && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                    && _aune.IsInAttackRange()
+                    && _aune.IsInAttackRange(true)
+                    //&& DynelManager.LocalPlayer.IsInAttackRange(true)
                     && !MovementController.Instance.IsNavigating)
                     DynelManager.LocalPlayer.Attack(_aune);
 
@@ -153,10 +164,10 @@ namespace DB2Buddy
                 }
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom (_aune.Position) > 20
-                    || !_aune.IsInAttackRange())
+                    || !_aune.IsInAttackRange(true)) //&& DynelManager.LocalPlayer.IsInAttackRange(true)))
                     DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position, out NavMeshPath path);
 
-                if (_aune.IsInLineOfSight && _aune.IsInAttackRange()
+                if (_aune.IsInLineOfSight && _aune.IsInAttackRange(true) //&& DynelManager.LocalPlayer.IsInAttackRange(true)
                     && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 20)
                     DB2Buddy.NavMeshMovementController.Halt();
 

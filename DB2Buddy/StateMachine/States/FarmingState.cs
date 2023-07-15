@@ -11,9 +11,9 @@ namespace DB2Buddy
     {
         public static bool _initCorpse = false;
 
-        private static Corpse _auneCorpse;
+        private Corpse _auneCorpse;
 
-        public static Vector3 _auneCorpsePos = Vector3.Zero;
+        public Vector3 _auneCorpsePos = Vector3.Zero;
 
         public IState GetNextState()
         {
@@ -51,8 +51,6 @@ namespace DB2Buddy
                          .Where(c => c.Name.Contains("Remains of Ground Chief Aune"))
                              .FirstOrDefault();
 
-            _auneCorpsePos = (Vector3)_auneCorpse?.Position;
-
             foreach (TeamMember member in Team.Members)
             {
                 if (!ReformState._teamCache.Contains(member.Identity))
@@ -63,6 +61,7 @@ namespace DB2Buddy
                 && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) > 1.0f
                 && !MovementController.Instance.IsNavigating)
             {
+                _auneCorpsePos = (Vector3)_auneCorpse?.Position;
                 DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_auneCorpsePos);
             }
 

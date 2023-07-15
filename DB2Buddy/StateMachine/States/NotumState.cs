@@ -15,10 +15,10 @@ namespace DB2Buddy
 {
     public class NotumState : IState
     {
-        private static SimpleChar _aune;
-        private static SimpleChar _mist;
-        private static SimpleChar _redTower;
-        private static SimpleChar _blueTower;
+        private SimpleChar _aune;
+        private SimpleChar _mist;
+        private SimpleChar _redTower;
+        private SimpleChar _blueTower;
 
         public IState GetNextState()
         {
@@ -65,12 +65,12 @@ namespace DB2Buddy
 
                 if (_aune != null)
                 {
-                    if (_redTower != null || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                    if (_redTower != null) //|| DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                     {
                         return new FightTowerState();
                     }
 
-                    if (_blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
+                    if (_blueTower != null) //|| _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
                     {
                         if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                             return new FightTowerState();
@@ -115,7 +115,7 @@ namespace DB2Buddy
                     Task.Factory.StartNew(
                                async () =>
                                {
-                                   await Task.Delay(4000);
+                                   await Task.Delay(5000);
                                    DB2Buddy._taggedNotum = false;
                                });
                 }
@@ -128,7 +128,8 @@ namespace DB2Buddy
                                    await Task.Delay(1000);
                                    DynelManager.LocalPlayer.Position = _mist.Position;
                                    await Task.Delay(1000);
-                                   MovementController.Instance.SetMovement(MovementAction.Update);
+                                   MovementController.Instance.SetMovement(MovementAction.TurnRightStart);
+                                   MovementController.Instance.SetMovement(MovementAction.TurnRightStop);
                                    await Task.Delay(1000);
                                    MovementController.Instance.SetMovement(MovementAction.Update);
                                });
