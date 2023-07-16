@@ -107,6 +107,7 @@ namespace DB2Buddy
         public void OnStateEnter()
         {
             DB2Buddy.NavMeshMovementController.Halt();
+            DynelManager.LocalPlayer.StopAttack();
             Chat.WriteLine($"FightTowerState");
         }
 
