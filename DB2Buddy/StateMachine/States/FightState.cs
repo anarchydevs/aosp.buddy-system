@@ -74,7 +74,7 @@ namespace DB2Buddy
 
                 if (_aune != null)
                 {
-                    if (_redTower != null) //|| DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                    if (_redTower != null || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                     {
                         if (!FightTowerState._towerPOS.ContainsKey(_redTower.Position))
                         {
@@ -84,7 +84,7 @@ namespace DB2Buddy
                         return new FightTowerState();
                     }
 
-                    if (_blueTower != null) // || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
+                    if (_blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
                     {
                         if (!FightTowerState._towerPOS.ContainsKey(_blueTower.Position))
                         {
