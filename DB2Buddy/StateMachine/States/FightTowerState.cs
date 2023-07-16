@@ -80,7 +80,7 @@ namespace DB2Buddy
                     return new NotumState();
                 }
 
-                if (_redTower == null && _blueTower == null)// && _towerPOS.Count == 0)
+                if (_redTower == null && _blueTower == null && _towerPOS.Count == 0)
                 {
                     if (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
                      && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
@@ -170,7 +170,6 @@ namespace DB2Buddy
                 }
                 else if (_blueTower != null)
                 {
-
                     if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                         && DynelManager.LocalPlayer.Position.DistanceFrom(_blueTower.Position) < 3f
                         && DynelManager.LocalPlayer.FightingTarget == null
@@ -195,30 +194,27 @@ namespace DB2Buddy
                             _towerPOS[_blueTower.Position] = _blueTower.Name;
                         }
                     }
-
                 }
-                else if (_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients) 
-                    || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
+                else if (_towerPOS.Count > 0)
+                {
+                    Vector3 towerPosition = _towerPOS.Keys.First();
+
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(towerPosition) > 5f)
+                    {
+                        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(towerPosition);
+                    }
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(towerPosition) < 3f)
+                    {
+                        _towerPOS.Remove(towerPosition);
+                    }
+                }
+                else if (_redTower == null && _blueTower == null && _towerPOS.Count == 0 && 
+                       ((_aune != null && _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)) ||
+                           DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)))
                 {
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) > 2f)
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+                        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
                 }
-
-                //else if (_towerPOS.Count > 0)
-                //{
-                //    Vector3 towerPosition = _towerPOS.Keys.First();
-
-                //    if (DynelManager.LocalPlayer.Position.DistanceFrom(towerPosition) > 5f)
-                //    {
-                //        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(towerPosition);
-                //    }
-                //    if (DynelManager.LocalPlayer.Position.DistanceFrom(towerPosition) < 3f)
-                //    {
-                //        _towerPOS.Remove(towerPosition);
-
-                //    }
-
-                //}
             }
             catch (Exception ex)
             {
