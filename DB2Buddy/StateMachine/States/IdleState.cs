@@ -17,6 +17,7 @@ namespace DB2Buddy
         private static Corpse _auneCorpse;
         private static SimpleChar _redTower;
         private static SimpleChar _blueTower;
+        private Dynel _exitBeacon;
 
         public IState GetNextState()
         {
@@ -43,6 +44,10 @@ namespace DB2Buddy
                    && !c.Name.Contains("Remains of ")
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
+
+            _exitBeacon = DynelManager.AllDynels
+                .Where(c => c.Name.Contains("Dust Brigade Exit Beacon"))
+                .FirstOrDefault();
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
                 DB2Buddy.NavMeshMovementController.Halt();
@@ -112,9 +117,9 @@ namespace DB2Buddy
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
                         return new FellState();
 
-                    if (_auneCorpse != null
-                           && Extensions.CanProceed()
-                           && DB2Buddy._settings["Farming"].AsBool())
+                    if ((DB2Buddy.AuneCorpse || _exitBeacon != null)
+                       && Extensions.CanProceed()
+                       && DB2Buddy._settings["Farming"].AsBool())
                         return new FarmingState();
 
                 }
