@@ -14,6 +14,7 @@ namespace DB2Buddy
         public static bool _initCorpse = false;
 
         private Corpse _auneCorpse;
+        private Dynel _exitBeacon;
 
         public Vector3 _auneCorpsePos = Vector3.Zero;
 
@@ -53,9 +54,9 @@ namespace DB2Buddy
         {
             try
             {
-                _auneCorpse = DynelManager.Corpses
-                             .Where(c => c.Name.Contains("Remains of Ground Chief Aune"))
-                                 .FirstOrDefault();
+                _auneCorpse = DynelManager.Corpses.Where(c => c.Name.Contains("Remains of Ground Chief Aune")).FirstOrDefault();
+
+                _exitBeacon = DynelManager.AllDynels.Where(c => c.Name.Contains("Dust Brigade Exit Beacon")).FirstOrDefault();
 
                 foreach (TeamMember member in Team.Members)
                 {
@@ -73,7 +74,7 @@ namespace DB2Buddy
 
                 if (!_initCorpse && Team.IsInTeam && Playfield.ModelIdentity.Instance == Constants.DB2Id
                     && !MovementController.Instance.IsNavigating
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) < 1.0f)
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_exitBeacon.Position) < 1.0f)
                 {
                     Chat.WriteLine("Pause for looting, 20 sec");
                     Task.Factory.StartNew(

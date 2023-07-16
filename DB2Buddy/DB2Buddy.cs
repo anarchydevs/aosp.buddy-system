@@ -189,8 +189,6 @@ namespace DB2Buddy
         {
             try
             {
-
-
                 if (Game.IsZoning)
                     return;
 

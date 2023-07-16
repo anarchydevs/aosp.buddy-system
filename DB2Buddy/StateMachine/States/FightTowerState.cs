@@ -20,6 +20,7 @@ namespace DB2Buddy
         private SimpleChar _aune;
         private SimpleChar _redTower;
         private SimpleChar _blueTower;
+        private Dynel _exitBeacon;
 
         public static Dictionary<Vector3, string> _towerPOS = new Dictionary<Vector3, string>();
 
@@ -46,6 +47,10 @@ namespace DB2Buddy
                    && !c.Name.Contains("Remains of ")
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
+
+            _exitBeacon = DynelManager.AllDynels
+                .Where(c => c.Name.Contains("Dust Brigade Exit Beacon"))
+                .FirstOrDefault();
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
                 DB2Buddy.NavMeshMovementController.Halt();
@@ -75,7 +80,7 @@ namespace DB2Buddy
                     return new NotumState();
                 }
 
-                if (_redTower == null && _blueTower == null && _towerPOS.Count == 0)
+                if (_redTower == null && _blueTower == null)// && _towerPOS.Count == 0)
                 {
                     if (_aune != null && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
                      && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
@@ -89,6 +94,11 @@ namespace DB2Buddy
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
                     return new FellState();
+
+                if ((DB2Buddy.AuneCorpse || _exitBeacon != null)
+                        && Extensions.CanProceed()
+                        && DB2Buddy._settings["Farming"].AsBool())
+                    return new FarmingState();
             }
 
             return null;
@@ -144,7 +154,6 @@ namespace DB2Buddy
                         {
                             _towerPOS.Remove(_redTower.Position);
                         }
-
                     }
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(_redTower.Position) > 5f
@@ -188,21 +197,28 @@ namespace DB2Buddy
                     }
 
                 }
-                else if (_towerPOS.Count > 0)
+                else if (_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients) 
+                    || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                 {
-                    Vector3 towerPosition = _towerPOS.Keys.First();
-
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(towerPosition) > 5f)
-                    {
-                        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(towerPosition);
-                    }
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(towerPosition) < 3f)
-                    {
-                        _towerPOS.Remove(towerPosition);
-
-                    }
-
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._startPosition) > 2f)
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
                 }
+
+                //else if (_towerPOS.Count > 0)
+                //{
+                //    Vector3 towerPosition = _towerPOS.Keys.First();
+
+                //    if (DynelManager.LocalPlayer.Position.DistanceFrom(towerPosition) > 5f)
+                //    {
+                //        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(towerPosition);
+                //    }
+                //    if (DynelManager.LocalPlayer.Position.DistanceFrom(towerPosition) < 3f)
+                //    {
+                //        _towerPOS.Remove(towerPosition);
+
+                //    }
+
+                //}
             }
             catch (Exception ex)
             {

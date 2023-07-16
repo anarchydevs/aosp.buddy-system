@@ -22,6 +22,7 @@ namespace DB2Buddy
         private Corpse _auneCorpse;
         private SimpleChar _redTower;
         private SimpleChar _blueTower;
+        private Dynel _exitBeacon;
 
         private string previousErrorMessage = string.Empty;
 
@@ -46,6 +47,8 @@ namespace DB2Buddy
                    && !c.Name.Contains("Remains of ")
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
+
+            _exitBeacon = DynelManager.AllDynels.Where(c => c.Name.Contains("Dust Brigade Exit Beacon")).FirstOrDefault();
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
                 DB2Buddy.NavMeshMovementController.Halt();
@@ -102,7 +105,7 @@ namespace DB2Buddy
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
                     return new FellState();
 
-                if (DB2Buddy.AuneCorpse
+                if ((DB2Buddy.AuneCorpse || _exitBeacon != null)
                         && Extensions.CanProceed()
                         && DB2Buddy._settings["Farming"].AsBool())
                     return new FarmingState();
@@ -155,7 +158,6 @@ namespace DB2Buddy
                         && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
                         && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
                         && _aune.IsInAttackRange(true)
-                        //&& DynelManager.LocalPlayer.IsInAttackRange(true)
                         && !MovementController.Instance.IsNavigating)
                         DynelManager.LocalPlayer.Attack(_aune);
 
@@ -169,13 +171,12 @@ namespace DB2Buddy
                     }
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 20
-                        || !_aune.IsInAttackRange(true)) //&& DynelManager.LocalPlayer.IsInAttackRange(true)))
+                        || !_aune.IsInAttackRange(true))
                         DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position, out NavMeshPath path);
 
-                    if (_aune.IsInLineOfSight && _aune.IsInAttackRange(true) //&& DynelManager.LocalPlayer.IsInAttackRange(true)
+                    if (_aune.IsInLineOfSight && _aune.IsInAttackRange(true)
                         && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 20)
                         DB2Buddy.NavMeshMovementController.Halt();
-
                 }
             }
             catch (Exception ex)
