@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DB2Buddy
@@ -19,6 +20,8 @@ namespace DB2Buddy
         private SimpleChar _mist;
         private SimpleChar _redTower;
         private SimpleChar _blueTower;
+
+        private string previousErrorMessage = string.Empty;
 
         public IState GetNextState()
         {
@@ -102,46 +105,70 @@ namespace DB2Buddy
 
         public void Tick()
         {
-            if (Game.IsZoning) { return; }
-
-            _mist = DynelManager.NPCs
-               .Where(c => c.Name.Contains("Notum Irregularity"))
-               .FirstOrDefault();
-
-            if (_mist != null)
+            try
             {
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) < 0.6)
+                if (Game.IsZoning) { return; }
+
+                _mist = DynelManager.NPCs
+                   .Where(c => c.Name.Contains("Notum Irregularity"))
+                   .FirstOrDefault();
+
+                if (_mist != null)
                 {
-                    Task.Factory.StartNew(
-                               async () =>
-                               {
-                                   await Task.Delay(5000);
-                                   DB2Buddy._taggedNotum = false;
-                               });
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) < 0.6)
+                    {
+                        Task.Factory.StartNew(
+                                   async () =>
+                                   {
+                                       await Task.Delay(5000);
+                                       DB2Buddy._taggedNotum = false;
+                                   });
+                    }
+
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) > 0.5)
+                    {
+                        Task.Factory.StartNew(
+                                   async () =>
+                                   {
+                                       await Task.Delay(1000);
+                                       DynelManager.LocalPlayer.Position = _mist.Position;
+                                       await Task.Delay(1000);
+                                       MovementController.Instance.SetMovement(MovementAction.TurnRightStart);
+                                       MovementController.Instance.SetMovement(MovementAction.TurnRightStop);
+                                       await Task.Delay(1000);
+                                       MovementController.Instance.SetMovement(MovementAction.Update);
+                                   });
+
+                    }
                 }
 
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) > 0.5)
+                if (_mist == null)
                 {
-                    Task.Factory.StartNew(
-                               async () =>
-                               {
-                                   await Task.Delay(1000);
-                                   DynelManager.LocalPlayer.Position = _mist.Position;
-                                   await Task.Delay(1000);
-                                   MovementController.Instance.SetMovement(MovementAction.TurnRightStart);
-                                   MovementController.Instance.SetMovement(MovementAction.TurnRightStop);
-                                   await Task.Delay(1000);
-                                   MovementController.Instance.SetMovement(MovementAction.Update);
-                               });
-
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
                 }
             }
-
-            if (_mist == null)
+            catch (Exception ex)
             {
-                DB2Buddy.NavMeshMovementController.SetNavMeshDestination(Constants._startPosition);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
+        private int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
 
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
+        }
     }
 }

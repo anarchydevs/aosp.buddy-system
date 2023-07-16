@@ -2,8 +2,10 @@
 using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace DB2Buddy
 {
@@ -20,6 +22,8 @@ namespace DB2Buddy
 
         public static List<Identity> _teamCache = new List<Identity>();
         private static List<Identity> _invitedList = new List<Identity>();
+
+        private string previousErrorMessage = string.Empty;
 
         public IState GetNextState()
         {
@@ -66,37 +70,52 @@ namespace DB2Buddy
 
         public void Tick()
         {
-            if (Game.IsZoning) { return; }
-
-            if (_phase == ReformPhase.Disbanding && Time.NormalTime > _reformStartedTime + DisbandDelay)
+            try
             {
-                _phase = ReformPhase.Inviting;
+                if (Game.IsZoning) { return; }
 
-            }
-
-            if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count())
-            {
-                foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
+                if (_phase == ReformPhase.Disbanding && Time.NormalTime > _reformStartedTime + DisbandDelay)
                 {
-                    if (_invitedList.Contains(player.Identity)) { continue; }
+                    _phase = ReformPhase.Inviting;
 
-                    _invitedList.Add(player.Identity);
+                }
 
-                    if (player.Identity == DB2Buddy.Leader) { continue; }
+                if (_phase == ReformPhase.Inviting && _invitedList.Count() < _teamCache.Count())
+                {
+                    foreach (SimpleChar player in DynelManager.Players.Where(c => c.IsInPlay && !_invitedList.Contains(c.Identity) && _teamCache.Contains(c.Identity)))
+                    {
+                        if (_invitedList.Contains(player.Identity)) { continue; }
 
-                    Team.Invite(player.Identity);
+                        _invitedList.Add(player.Identity);
+
+                        if (player.Identity == DB2Buddy.Leader) { continue; }
+
+                        Team.Invite(player.Identity);
+
+                    }
+                }
+
+                if (_phase == ReformPhase.Inviting
+                    && Team.IsInTeam
+                    && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count()
+                    && _invitedList.Count() == _teamCache.Count())
+                {
+                    _phase = ReformPhase.Completed;
 
                 }
             }
-
-            if (_phase == ReformPhase.Inviting
-                && Team.IsInTeam
-                && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count()
-                && _invitedList.Count() == _teamCache.Count())
+            catch (Exception ex)
             {
-                _phase = ReformPhase.Completed;
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
 
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
+
         }
 
         private void OnTeamRequest(object s, TeamRequestEventArgs e)
@@ -114,6 +133,18 @@ namespace DB2Buddy
             Inviting,
             Waiting,
             Completed
+        }
+
+        private int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
         }
     }
 }

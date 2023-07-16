@@ -11,6 +11,7 @@ using AOSharp.Core.Inventory;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace DB2Buddy
 {
@@ -55,6 +56,7 @@ namespace DB2Buddy
 
         public static string PluginDir;
 
+        private string previousErrorMessage = string.Empty;
 
         public override void Run(string pluginDir)
         {
@@ -96,9 +98,16 @@ namespace DB2Buddy
 
                 Game.OnUpdate += OnUpdate;
             }
-            catch(Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
 
@@ -178,68 +187,84 @@ namespace DB2Buddy
 
         private void OnUpdate(object s, float deltaTime)
         {
-            if (Game.IsZoning)
-                return;
-
-            if (Time.NormalTime > _sitUpdateTimer + 1)
+            try
             {
-                ListenerSit();
 
-                _sitUpdateTimer = Time.NormalTime;
-            }
 
-            if (_settings["Toggle"].AsBool())
-            {
-                _stateMachine.Tick();
-            }
+                if (Game.IsZoning)
+                    return;
 
-            if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
-            {
-                SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
-
-                if (channelInput != null)
+                if (Time.NormalTime > _sitUpdateTimer + 1)
                 {
-                    if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                    ListenerSit();
+
+                    _sitUpdateTimer = Time.NormalTime;
+                }
+
+                if (_settings["Toggle"].AsBool())
+                {
+                    _stateMachine.Tick();
+                }
+
+                if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
+                {
+                    SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
+
+                    if (channelInput != null)
                     {
-                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        if (int.TryParse(channelInput.Text, out int channelValue)
+                            && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                        {
+                            Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        }
+                    }
+
+                    if (SettingsController.settingsWindow.FindView("DB2BuddyInfoView", out Button infoView))
+                    {
+                        infoView.Tag = SettingsController.settingsWindow;
+                        infoView.Clicked = HandleInfoViewClick;
+                    }
+
+                    if (!_settings["Toggle"].AsBool() && Toggle)
+                    {
+                        IPCChannel.Broadcast(new StopMessage());
+                        Toggle = false;
+                    }
+                    if (_settings["Toggle"].AsBool() && !Toggle)
+                    {
+                        IPCChannel.Broadcast(new StartMessage());
+                        if (Team.IsLeader)
+                        {
+                            IsLeader = true;
+                            Leader = DynelManager.LocalPlayer.Identity;
+                        }
+                        Toggle = true;
+                    }
+
+                    if (!_settings["Farming"].AsBool() && Farming) // Farming off
+                    {
+                        IPCChannel.Broadcast(new NoFarmingMessage());
+                        Chat.WriteLine("Farming disabled");
+                        farmingDisabled();
+                    }
+
+                    if (_settings["Farming"].AsBool() && !Farming) // farming on
+                    {
+                        IPCChannel.Broadcast(new FarmingMessage());
+                        Chat.WriteLine("Farming enabled.");
+                        farmingEnabled();
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
 
-                if (SettingsController.settingsWindow.FindView("DB2BuddyInfoView", out Button infoView))
+                if (errorMessage != previousErrorMessage)
                 {
-                    infoView.Tag = SettingsController.settingsWindow;
-                    infoView.Clicked = HandleInfoViewClick;
-                }
-
-                if (!_settings["Toggle"].AsBool() && Toggle)
-                {
-                    IPCChannel.Broadcast(new StopMessage());
-                    Toggle = false;
-                }
-                if (_settings["Toggle"].AsBool() && !Toggle)
-                {
-                    IPCChannel.Broadcast(new StartMessage());
-                    if (Team.IsLeader)
-                    {
-                        IsLeader = true;
-                        Leader = DynelManager.LocalPlayer.Identity;
-                    }
-                    Toggle = true;
-                }
-
-                if (!_settings["Farming"].AsBool() && Farming) // Farming off
-                {
-                    IPCChannel.Broadcast(new NoFarmingMessage());
-                    Chat.WriteLine("Farming disabled");
-                    farmingDisabled();
-                }
-
-                if (_settings["Farming"].AsBool() && !Farming) // farming on
-                {
-                    IPCChannel.Broadcast(new FarmingMessage());
-                    Chat.WriteLine("Farming enabled.");
-                    farmingEnabled();
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
                 }
             }
         }
@@ -328,6 +353,17 @@ namespace DB2Buddy
             public const int PathtoElevation3 = 277959;
             public const int PathtoElevation4 = 277952;
 
+        }
+        private int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
         }
     }
 }

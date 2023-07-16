@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 namespace DB2Buddy
 {
@@ -24,6 +25,8 @@ namespace DB2Buddy
         private static SimpleChar _aune;
         private static SimpleChar _redTower;
         private static SimpleChar _blueTower;
+
+        private string previousErrorMessage = string.Empty;
 
         public IState GetNextState()
         {
@@ -123,23 +126,48 @@ namespace DB2Buddy
 
         public void Tick()
         {
-            if (Game.IsZoning) { return; }
-
-            if (Playfield.ModelIdentity.Instance == Constants.PWId 
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance)< 5)
+            try
             {
-                DynelManager.LocalPlayer.Position = Constants._centerofentrance;
-                MovementController.Instance.SetMovement(MovementAction.Update);
-            }
+                if (Game.IsZoning) { return; }
 
-            if (Playfield.ModelIdentity.Instance == Constants.PWId
-                && Time.NormalTime > _time + 2f)
+                if (Playfield.ModelIdentity.Instance == Constants.PWId
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 5)
+                {
+                    DynelManager.LocalPlayer.Position = Constants._centerofentrance;
+                    MovementController.Instance.SetMovement(MovementAction.Update);
+                }
+
+                if (Playfield.ModelIdentity.Instance == Constants.PWId
+                    && Time.NormalTime > _time + 2f)
+                {
+                    _time = Time.NormalTime;
+
+                    DB2Buddy.NavMeshMovementController.SetDestination(Constants._entrance);
+                    DB2Buddy.NavMeshMovementController.AppendDestination(Constants._append);
+                }
+            }
+            catch (Exception ex)
             {
-                _time = Time.NormalTime;
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
 
-                DB2Buddy.NavMeshMovementController.SetDestination(Constants._entrance);
-                DB2Buddy.NavMeshMovementController.AppendDestination(Constants._append);
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
+        }
+        private int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
         }
     }
 }
