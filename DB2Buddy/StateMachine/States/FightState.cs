@@ -84,26 +84,19 @@ namespace DB2Buddy
                 {
                     if (_redTower != null || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                     {
-                        if (!FightTowerState._towerPOS.ContainsKey(_redTower.Position))
-                        {
-                            FightTowerState._towerPOS[_redTower.Position] = _redTower.Name;
-                        }
-
-                        if (DynelManager.LocalPlayer.FightingTarget != null
-                            && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
-                            DynelManager.LocalPlayer.StopAttack();
+                        //if (!FightTowerState._towerPOS.ContainsKey(_redTower.Position))
+                        //{
+                        //    FightTowerState._towerPOS[_redTower.Position] = _redTower.Name;
+                        //}
 
                         return new FightTowerState();
                     }
                     if (_blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
                     {
-                        if (!FightTowerState._towerPOS.ContainsKey(_blueTower.Position))
-                        {
-                            FightTowerState._towerPOS[_blueTower.Position] = _blueTower.Name;
-                        }
-                        if (DynelManager.LocalPlayer.FightingTarget != null
-                            && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
-                            DynelManager.LocalPlayer.StopAttack();
+                        //if (!FightTowerState._towerPOS.ContainsKey(_blueTower.Position))
+                        //{
+                        //    FightTowerState._towerPOS[_blueTower.Position] = _blueTower.Name;
+                        //}
 
                         if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                             return new FightTowerState();
@@ -180,7 +173,7 @@ namespace DB2Buddy
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 20
                         || !_aune.IsInAttackRange(true))
-                        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position, out NavMeshPath path);
+                        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
 
                     if (_aune.IsInLineOfSight && _aune.IsInAttackRange(true)
                         && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 20)
