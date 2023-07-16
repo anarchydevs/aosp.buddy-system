@@ -48,7 +48,9 @@ namespace DB2Buddy
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
 
-            _exitBeacon = DynelManager.AllDynels.Where(c => c.Name.Contains("Dust Brigade Exit Beacon")).FirstOrDefault();
+            _exitBeacon = DynelManager.AllDynels
+                .Where(c => c.Name.Contains("Dust Brigade Exit Beacon"))
+                .FirstOrDefault();
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
                 DB2Buddy.NavMeshMovementController.Halt();
@@ -87,15 +89,21 @@ namespace DB2Buddy
                             FightTowerState._towerPOS[_redTower.Position] = _redTower.Name;
                         }
 
+                        if (DynelManager.LocalPlayer.FightingTarget != null
+                            && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
+                            DynelManager.LocalPlayer.StopAttack();
+
                         return new FightTowerState();
                     }
-
                     if (_blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
                     {
                         if (!FightTowerState._towerPOS.ContainsKey(_blueTower.Position))
                         {
                             FightTowerState._towerPOS[_blueTower.Position] = _blueTower.Name;
                         }
+                        if (DynelManager.LocalPlayer.FightingTarget != null
+                            && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
+                            DynelManager.LocalPlayer.StopAttack();
 
                         if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                             return new FightTowerState();
