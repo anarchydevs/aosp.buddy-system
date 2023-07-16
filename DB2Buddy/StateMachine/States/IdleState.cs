@@ -13,10 +13,10 @@ namespace DB2Buddy
 {
     public class IdleState : IState
     {
-        private static SimpleChar _aune;
-        private static Corpse _auneCorpse;
-        private static SimpleChar _redTower;
-        private static SimpleChar _blueTower;
+        private SimpleChar _aune;
+        private Corpse _auneCorpse;
+        private SimpleChar _redTower;
+        private SimpleChar _blueTower;
         private Dynel _exitBeacon;
 
         public IState GetNextState()
