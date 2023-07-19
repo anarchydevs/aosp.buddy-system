@@ -27,9 +27,6 @@ namespace AXPBuddy
             if (Playfield.ModelIdentity.Instance == Constants.APFHubId && !Team.IsInTeam)
                 return new ReformState();
 
-            //if (_target != null && DynelManager.LocalPlayer.Identity == AXPBuddy.Leader)
-            //    return new FightState(_target);
-
             return null;
         }
 
@@ -62,9 +59,6 @@ namespace AXPBuddy
             {
                 Team.Disband();
             }
-
-            if (!AXPBuddy._died && Playfield.ModelIdentity.Instance == Constants.S13Id)
-                AXPBuddy._ourPos = DynelManager.LocalPlayer.Position;
 
             if (!AXPBuddy._initMerge && AXPBuddy._settings["Merge"].AsBool())
             {
@@ -103,9 +97,8 @@ namespace AXPBuddy
                         {
                             if (DynelManager.LocalPlayer.FightingTarget == null
                                 && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
-                            {    //_target = targetMob;
+                            {  
                                 DynelManager.LocalPlayer.Attack(targetMob);
-                                //Chat.WriteLine($"Found target: {_target.Name}");
                             }
                         }
                     }
@@ -116,18 +109,12 @@ namespace AXPBuddy
                         AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
                     }
                 }
-                //else
-                //    HandleScan();
-
+               
                 if (AXPBuddy._died)
                 {
                     if (AXPBuddy._leader == null)
                     {
-                        //if (!AXPBuddy.NavMeshMovementController.IsNavigating && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._ourPos) > 15f)
-                        //    AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._ourPos);
-
                         AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
-
                     }
 
                     if (AXPBuddy._leader != null && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leader.Position) < 15f)
