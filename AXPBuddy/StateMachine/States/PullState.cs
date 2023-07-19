@@ -81,7 +81,6 @@ namespace AXPBuddy
 
                     if (AXPBuddy._leader != null)
                     {
-                       
                         AXPBuddy._leaderPos = (Vector3)AXPBuddy._leader?.Position;
 
                         if (AXPBuddy._leader?.FightingTarget != null || AXPBuddy._leader?.IsAttacking == true)
@@ -107,8 +106,6 @@ namespace AXPBuddy
                             AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
                         }
                     }
-
-                    
                 }
                 else
                 {
@@ -121,18 +118,27 @@ namespace AXPBuddy
                     {
                         if (mob != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 10f)
                         {
-                            if (!mob.IsInAttackRange() && mob.IsInLineOfSight)
+                            if (!mob.IsInLineOfSight)
                             {
-                                HandleTaunting(mob);
+                                AXPBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
                             }
-                            if (mob.IsInAttackRange() && mob.IsInLineOfSight)
+
+                            else if (mob.IsInLineOfSight)
                             {
                                 AXPBuddy.NavMeshMovementController.Halt();
 
-                                if (DynelManager.LocalPlayer.FightingTarget == null
-                                        && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                                if (mob.IsInAttackRange())
                                 {
-                                    DynelManager.LocalPlayer.Attack(mob);
+                                    if (DynelManager.LocalPlayer.FightingTarget == null
+                                            && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                                    {
+                                        DynelManager.LocalPlayer.Attack(mob);
+                                    }
+                                }
+
+                                else if (!mob.IsInAttackRange())
+                                {
+                                    HandleTaunting(mob);
                                 }
                             }
                         }
