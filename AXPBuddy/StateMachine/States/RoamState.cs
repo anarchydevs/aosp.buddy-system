@@ -144,7 +144,7 @@ namespace AXPBuddy
 
             if (Team.Members.Any(c => c.Character != null))
             {
-                if (mob != null)
+                if (mob != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 10f)
                 {
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) > 5f)
                     {

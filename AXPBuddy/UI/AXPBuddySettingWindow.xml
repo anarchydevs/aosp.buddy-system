@@ -8,18 +8,14 @@
       <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
       <View v_alignment="TOP" h_alignment="CENTER" view_layout="horizontal" layout_borders="Rect(50,1,50,1)" max_size="Point(16000,-1)">
         <TextView value="Channel" layout_borders="Rect(5,2,15,2)"/>
-        <TextView value="Tick" layout_borders="Rect(5,2,18,2)"/>
       </View>
       <View v_alignment="TOP" h_alignment="CENTER" view_layout="horizontal" layout_borders="Rect(50,1,50,1)" max_size="Point(16000,-1)">
         <TextInputView name="ChannelBox" min_size="Point(30,14)" max_size="Point(30,14)" layout_borders="Rect(5,2,3,2)"/>
-        <TextInputView name="TickBox" min_size="Point(30,14)" max_size="Point(30,14)" layout_borders="Rect(5,2,3,2)"/>
       </View>
       <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
       <OptionCheckBox label="Enabled" opt_category="AOSharp" opt_type="variant" opt_variable="AXPBuddy__Toggle" layout_borders="Rect(5,0,0,2)"/>
       <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
       <View v_alignment="TOP" h_alignment="LEFT" view_layout="vertical" layout_borders="Rect(5,0,0,2)" max_size="Point(16000,-1)">
-        <TextView value="Leaders name*" layout_borders="Rect(5,0,0,2)"/>
-        <TextInputView name="LeaderBox" min_size="Point(115,14)" max_size="Point(115,14)" layout_borders="Rect(4,4,4,4)"/>
       </View>
       <OptionCheckBox label="Merge" opt_category="AOSharp" opt_type="variant" opt_variable="AXPBuddy__Merge" layout_borders="Rect(5,0,0,2)"/>
       <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
@@ -27,10 +23,9 @@
       <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
       <View v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" layout_borders="Rect(5,0,0,2)" max_size="Point(16000,-1)">
         <OptionRadioButtonGroup label="Mode" h_alignment="LEFT" layout_borders="Rect(5,0,0,2)" opt_type="variant" opt_variable="AXPBuddy__ModeSelection">
-          <RadioButton label="Patrol" value="0"/>
-          <RadioButton label="Roam" value="1"/>
-          <RadioButton label="Gather" value="2"/>
-          <RadioButton label="Leech" value="3"/>
+          <RadioButton label="Pull mobs" value="0"/>
+          <RadioButton label="Path to Mobs" value="1"/>
+          <RadioButton label="Leech" value="2"/>
         </OptionRadioButtonGroup>
       </View>
       <TextView value=" " layout_borders="Rect(0,0,0,2)"/>

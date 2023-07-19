@@ -27,13 +27,9 @@ namespace AXPBuddy
                     if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool() || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
                         return new LeechState();
 
-                if (AXPBuddy.ModeSelection.Roam == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                if (AXPBuddy.ModeSelection.Path == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
                     if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool() || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
                         return new RoamState();
-
-                if (AXPBuddy.ModeSelection.Gather == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-                    if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool() || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
-                        return new GatherState();
 
                 if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool() || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
                     return new PatrolState();

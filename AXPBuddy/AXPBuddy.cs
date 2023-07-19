@@ -80,7 +80,7 @@ namespace AXPBuddy
                 Game.OnUpdate += OnUpdate;
                 Game.TeleportEnded += OnEndZoned;
 
-                _settings.AddVariable("ModeSelection", (int)ModeSelection.Patrol);
+                _settings.AddVariable("ModeSelection", (int)ModeSelection.Path);
 
                 _settings.AddVariable("Toggle", false);
                 _settings.AddVariable("Merge", false);
@@ -341,7 +341,7 @@ namespace AXPBuddy
 
         public enum ModeSelection
         {
-            Patrol, Roam, Gather, Leech
+            Pull, Path, Leech
         }
 
         public static class RelevantItems

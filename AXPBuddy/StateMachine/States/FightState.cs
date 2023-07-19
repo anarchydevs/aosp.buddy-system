@@ -34,9 +34,7 @@ namespace AXPBuddy
             if (Extensions.IsNull(_target)
                 || Time.NormalTime > _fightStartTime + FightTimeout)
             {
-                if (AXPBuddy.ModeSelection.Gather == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-                    return new GatherState();
-                if (AXPBuddy.ModeSelection.Roam == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                if (AXPBuddy.ModeSelection.Path == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
                     return new RoamState();
 
                 return new PatrolState();
@@ -79,7 +77,7 @@ namespace AXPBuddy
 
             if (_target == null) { return; }
 
-            if (AXPBuddy.ModeSelection.Patrol == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+            if (AXPBuddy.ModeSelection.Pull == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
             {
                 if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 11f)
                 {
@@ -96,8 +94,7 @@ namespace AXPBuddy
                     HandleTaunting(_target);
             }
 
-            if (AXPBuddy.ModeSelection.Roam == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32()
-                || AXPBuddy.ModeSelection.Gather == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+            if (AXPBuddy.ModeSelection.Path == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
             {
                 HandlePathing(_target);
 
