@@ -27,8 +27,8 @@ namespace AXPBuddy
             if (Playfield.ModelIdentity.Instance == Constants.APFHubId && !Team.IsInTeam)
                 return new ReformState();
 
-            if (_target != null && DynelManager.LocalPlayer.Identity == AXPBuddy.Leader)
-                return new FightState(_target);
+            //if (_target != null && DynelManager.LocalPlayer.Identity == AXPBuddy.Leader)
+            //    return new FightState(_target);
 
             return null;
         }
@@ -151,47 +151,35 @@ namespace AXPBuddy
         private void HandleScan()
         {
             SimpleChar mob = DynelManager.NPCs
-                .Where(c => c.Health > 0
-                    //&& !Constants._ignores.Contains(c.Name)
-                    && c.IsInLineOfSight)
+                .Where(c => c.Health > 0)
                 .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-                //&& c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 60f)
-                //.OrderByDescending(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-                //.ThenBy(c => c.HealthPercent)
                 .FirstOrDefault();
 
-            if (mob != null)
+            if (Team.Members.Any(c => c.Character != null))
             {
-                if (!Team.Members.Any(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66))
-                    || Extensions.InCombat())
+                if (mob != null)
                 {
-                    _target = mob;
-                    Chat.WriteLine($"Found target: {_target.Name}");
-                }
-            }
-            else if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
-                    && Team.Members.Any(c => c.Character != null)
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
-            {
-                //if (Team.Members.Any(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66))
-                //    || Team.Members.Any(c => c.Character == null)) { return; }
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) > 5f)
+                    {
+                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
+                    }
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) < 7f && mob.IsInLineOfSight)
+                    {
+                        if (DynelManager.LocalPlayer.FightingTarget == null
+                                && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                        {
+                            DynelManager.LocalPlayer.Attack(mob);
 
-                //if (!AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
-                //{
-                //    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13FirstCorrectionPos) < 5f)
-                //        AXPBuddy._passedFirstCorrectionPos = true;
-                //    else
-                //        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13FirstCorrectionPos);
-                //}
-                //else if (AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
-                //{
-                //    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13SecondCorrectionPos) < 5f)
-                //        AXPBuddy._passedSecondCorrectionPos = true;
-                //    else
-                //        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13SecondCorrectionPos);
-                //}
-                //else
-                AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
+                        }
+                    }
+
+                }
+                else if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
+                        && Team.Members.Any(c => c.Character != null)
+                        && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
+                {
+                    AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
+                }
             }
         }
     }
