@@ -18,20 +18,38 @@ namespace AXPBuddy
     {
         public IState GetNextState()
         {
-            if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId
-                && Extensions.CanProceed())
-                return new EnterAPFHubState();
+            if (Playfield.ModelIdentity.Instance == Constants.S13Id && Team.Members.Any(c => c.Character != null))
+            {
+                switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                {
+                    case AXPBuddy.ModeSelection.Leech:
+                        if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                        {
+                            return new LeechState();
+                        }
+                        break;
 
-            if (Playfield.ModelIdentity.Instance == Constants.APFHubId
-                && Extensions.CanProceed())
-                return new EnterSectorState();
+                    case AXPBuddy.ModeSelection.Path:
+                        if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                        {
+                            return new PathState();
+                        }
+                        break;
+
+                    default:
+                        if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                        {
+                            return new PullState();
+                        }
+                        break;
+                }
+            }
 
             return null;
         }
 
         public void OnStateEnter()
         {
-            AXPBuddy._died = true;
 
             Chat.WriteLine($"DiedState::OnStateEnter");
         }
@@ -45,15 +63,45 @@ namespace AXPBuddy
         {
             if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return; }
 
-            //if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-            //    && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
-            //    AXPBuddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+            Dynel Lever = DynelManager.AllDynels
+                .Where(c => c.Name == "A Lever"
+                    && c.DistanceFrom(DynelManager.LocalPlayer) < 6f)
+                .FirstOrDefault();
 
             if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
                 && DynelManager.LocalPlayer.GetStat(Stat.TemporarySkillReduction) <= 1
                 && DynelManager.LocalPlayer.MovementState != MovementState.Sit
-                && Playfield.ModelIdentity.Instance == Constants.XanHubId && !AXPBuddy.NavMeshMovementController.IsNavigating)
-                AXPBuddy.NavMeshMovementController.SetDestination(Constants.XanHubPos);
+                && !AXPBuddy.NavMeshMovementController.IsNavigating)
+            {
+
+                if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
+                {
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.UnicornLever) > 6)
+                    {
+                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.UnicornLever);
+                    }
+
+                    else if (Lever != null)
+                    {
+                        AXPBuddy.NavMeshMovementController.Halt();
+                        Lever.Use();
+                    }
+                }
+                else if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
+                {
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13EntrancePos) > 6)
+                    {
+                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13EntrancePos);
+                    }
+                }
+                else if (Playfield.ModelIdentity.Instance == Constants.S13Id)
+                {
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 6)
+                    {
+                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
+                    }
+                }
+            }     
         }
     }
 }

@@ -24,7 +24,7 @@ namespace AXPBuddy
 
         public IState GetNextState()
         {
-            if (Extensions.HasDied())
+            if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
                 return new DiedState();
 
             if (Extensions.TimedOut(_reformStartedTime, ReformTimeout)) { return new EnterSectorState(); }

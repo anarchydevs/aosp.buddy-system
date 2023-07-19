@@ -92,17 +92,18 @@
     <Compile Include="StateMachine\IState.cs" />
     <Compile Include="StateMachine\StateMachine.cs" />
     <Compile Include="StateMachine\States\DiedState.cs" />
-    <Compile Include="StateMachine\States\EnterAPFHubState.cs" />
     <Compile Include="StateMachine\States\EnterSectorState.cs" />
-    <Compile Include="StateMachine\States\FightState.cs" />
     <Compile Include="StateMachine\States\IdleState.cs" />
     <Compile Include="StateMachine\States\LeechState.cs" />
-    <Compile Include="StateMachine\States\RoamState.cs" />
-    <Compile Include="StateMachine\States\PatrolState.cs" />
+    <Compile Include="StateMachine\States\PathState.cs" />
+    <Compile Include="StateMachine\States\PullState.cs" />
     <Compile Include="StateMachine\States\ReformState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="NavMeshes\4364.Navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="NavMeshes\4365.navmesh">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

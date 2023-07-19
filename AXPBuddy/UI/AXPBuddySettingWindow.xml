@@ -30,8 +30,6 @@
       </View>
       <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
       <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,5,0,5)"/>
-      <TextView value="*Leaders name for merge mode only. " layout_borders="Rect(5,0,0,2)"/>
-      <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,5,0,5)"/>
       <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
     </BorderView>
 </root>

@@ -23,18 +23,33 @@ namespace AXPBuddy
                 }
                 if (Playfield.ModelIdentity.Instance == Constants.S13Id)
                 {
-                    if (AXPBuddy.ModeSelection.Leech == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-                        //if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool())
-                            return new LeechState();
+                    switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                    {
+                        case AXPBuddy.ModeSelection.Leech:
+                            if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                            {
+                                return new LeechState();
+                            }
+                            break;
 
-                    if (AXPBuddy.ModeSelection.Path == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-                        //if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool() )
-                            return new RoamState();
+                        case AXPBuddy.ModeSelection.Path:
+                            if ( AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                            {
+                                return new PathState();
+                            }
+                            break;
 
-                    //if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool() )
-                    //    return new PatrolState();
+                        default:
+                            if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                            {
+                                return new PullState();
+                            }
+                            break;
+                    }
                 }
 
+                if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
+                    return new DiedState();
             }
 
             return null;
