@@ -140,6 +140,11 @@ namespace AXPBuddy
                                 {
                                     HandleTaunting(mob);
                                 }
+
+                                else if (mob.IsAttacking && !mob.IsInAttackRange())
+                                {
+                                    AXPBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
+                                }
                             }
                         }
                         else if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
@@ -166,13 +171,18 @@ namespace AXPBuddy
 
         public static void HandleTaunting(SimpleChar target)
         {
-            if (_aggToolCounter >= 2 && _attackTimeout >= 1)
+            if (_aggToolCounter >= 2)
             {
-                AXPBuddy.NavMeshMovementController.SetMovement(MovementAction.JumpStart);
-                AXPBuddy.NavMeshMovementController.SetNavMeshDestination(target.Position);
-                _attackTimeout = 0;
+                if (_attackTimeout >= 1)
+                {
+                    AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
+                    _attackTimeout = 0;
+                    _aggToolCounter = 0;
+                    return;
+                }
+
+                _attackTimeout++;
                 _aggToolCounter = 0;
-                return;
             }
 
             Item item = null;
