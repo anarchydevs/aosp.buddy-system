@@ -97,13 +97,16 @@ namespace AXPBuddy
                         SimpleChar targetMob = DynelManager.NPCs
                             .Where(c => c.Health > 0
                                 && c.Identity == (Identity)AXPBuddy._leader?.FightingTarget?.Identity)
-                            .FirstOrDefault(c => !Constants._ignores.Contains(c.Name));
+                            .FirstOrDefault();
 
                         if (targetMob != null)
                         {
-                            //_target = targetMob;
-                            DynelManager.LocalPlayer.Attack(targetMob);
-                            //Chat.WriteLine($"Found target: {_target.Name}");
+                            if (DynelManager.LocalPlayer.FightingTarget == null
+                                && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                            {    //_target = targetMob;
+                                DynelManager.LocalPlayer.Attack(targetMob);
+                                //Chat.WriteLine($"Found target: {_target.Name}");
+                            }
                         }
                     }
 
