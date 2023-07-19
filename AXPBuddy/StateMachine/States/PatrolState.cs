@@ -35,12 +35,12 @@ namespace AXPBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("PatrolState::OnStateEnter");
+            Chat.WriteLine("PatrolState::OnStateEnter");
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("PatrolState::OnStateExit");
+            Chat.WriteLine("PatrolState::OnStateExit");
 
             _init = false;
         }

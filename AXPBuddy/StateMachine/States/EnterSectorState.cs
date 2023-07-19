@@ -44,7 +44,7 @@ namespace AXPBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("EnterSectorState::OnStateEnter");
+            Chat.WriteLine("EnterSectorState::OnStateEnter");
 
             if (DynelManager.LocalPlayer.Identity == AXPBuddy.Leader)
             {
@@ -71,7 +71,7 @@ namespace AXPBuddy
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("EnterSectorState::OnStateExit");
+            Chat.WriteLine("EnterSectorState::OnStateExit");
         }
 
         public void Tick()

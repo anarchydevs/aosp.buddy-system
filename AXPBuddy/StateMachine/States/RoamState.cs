@@ -27,7 +27,7 @@ namespace AXPBuddy
             if (Playfield.ModelIdentity.Instance == Constants.APFHubId && !Team.IsInTeam)
                 return new ReformState();
 
-            if (_target != null)
+            if (_target != null && DynelManager.LocalPlayer.Identity == AXPBuddy.Leader)
                 return new FightState(_target);
 
             return null;
@@ -35,59 +35,7 @@ namespace AXPBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("RoamState::OnStateEnter");
-        }
-
-        public void OnStateExit()
-        {
-            //Chat.WriteLine("RoamState::OnStateExit");
-
-            _init = false;
-        }
-
-        private void HandleScan()
-        {
-            SimpleChar mob = DynelManager.NPCs
-                .Where(c => c.Health > 0
-                    && !Constants._ignores.Contains(c.Name)
-                    && c.IsInLineOfSight
-                    && c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 24f)
-                .OrderByDescending(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-                .ThenBy(c => c.HealthPercent)
-                .FirstOrDefault();
-
-            if (mob != null)
-            {
-                if (!Team.Members.Any(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66))
-                    || Extensions.InCombat())
-                {
-                    _target = mob;
-                    Chat.WriteLine($"Found target: {_target.Name}");
-                }
-            }
-            else if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
-            {
-                if (Team.Members.Any(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66))
-                    || Team.Members.Any(c => c.Character == null)) { return; }
-
-                if (!AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
-                {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13FirstCorrectionPos) < 5f)
-                        AXPBuddy._passedFirstCorrectionPos = true;
-                    else
-                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13FirstCorrectionPos);
-                }
-                else if (AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
-                {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13SecondCorrectionPos) < 5f)
-                        AXPBuddy._passedSecondCorrectionPos = true;
-                    else
-                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13SecondCorrectionPos);
-                }
-                else
-                    AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
-            }
+            Chat.WriteLine("RoamState::OnStateEnter");
         }
 
         public void Tick()
@@ -126,19 +74,6 @@ namespace AXPBuddy
                 AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
             }
 
-            if (AXPBuddy._died)
-            {
-                if (AXPBuddy._ourPos != Vector3.Zero)
-                {
-                    if (!AXPBuddy.NavMeshMovementController.IsNavigating && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._ourPos) > 15f)
-                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._ourPos);
-
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._ourPos) < 15f)
-                        if (AXPBuddy._died)
-                            AXPBuddy._died = false;
-                }
-            }
-
             if (DynelManager.LocalPlayer.Identity != AXPBuddy.Leader)
             {
                 AXPBuddy._leader = Team.Members
@@ -166,8 +101,9 @@ namespace AXPBuddy
 
                         if (targetMob != null)
                         {
-                            _target = targetMob;
-                            Chat.WriteLine($"Found target: {_target.Name}");
+                            //_target = targetMob;
+                            DynelManager.LocalPlayer.Attack(targetMob);
+                            //Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
 
@@ -177,11 +113,83 @@ namespace AXPBuddy
                         AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
                     }
                 }
-                else
-                    HandleScan();
+                //else
+                //    HandleScan();
+
+                if (AXPBuddy._died)
+                {
+                    if (AXPBuddy._leader == null)
+                    {
+                        //if (!AXPBuddy.NavMeshMovementController.IsNavigating && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._ourPos) > 15f)
+                        //    AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._ourPos);
+
+                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
+
+                    }
+
+                    if (AXPBuddy._leader != null && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leader.Position) < 15f)
+                    {
+                        if (AXPBuddy._died)
+                            AXPBuddy._died = false;
+                    }
+                }
             }
             else
                 HandleScan();
+        }
+
+        public void OnStateExit()
+        {
+            Chat.WriteLine("RoamState::OnStateExit");
+
+            _init = false;
+        }
+
+        private void HandleScan()
+        {
+            SimpleChar mob = DynelManager.NPCs
+                .Where(c => c.Health > 0
+                    //&& !Constants._ignores.Contains(c.Name)
+                    && c.IsInLineOfSight)
+                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+                //&& c.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 60f)
+                //.OrderByDescending(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+                //.ThenBy(c => c.HealthPercent)
+                .FirstOrDefault();
+
+            if (mob != null)
+            {
+                if (!Team.Members.Any(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66))
+                    || Extensions.InCombat())
+                {
+                    _target = mob;
+                    Chat.WriteLine($"Found target: {_target.Name}");
+                }
+            }
+            else if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
+                    && Team.Members.Any(c => c.Character != null)
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
+            {
+                //if (Team.Members.Any(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66))
+                //    || Team.Members.Any(c => c.Character == null)) { return; }
+
+                //if (!AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
+                //{
+                //    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13FirstCorrectionPos) < 5f)
+                //        AXPBuddy._passedFirstCorrectionPos = true;
+                //    else
+                //        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13FirstCorrectionPos);
+                //}
+                //else if (AXPBuddy._passedFirstCorrectionPos && !AXPBuddy._passedSecondCorrectionPos)
+                //{
+                //    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13SecondCorrectionPos) < 5f)
+                //        AXPBuddy._passedSecondCorrectionPos = true;
+                //    else
+                //        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13SecondCorrectionPos);
+                //}
+                //else
+                AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
+            }
         }
     }
 }

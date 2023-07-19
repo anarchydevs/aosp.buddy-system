@@ -116,7 +116,7 @@ namespace AXPBuddy
         {
             if (AXPBuddy.NavMeshMovementController.IsNavigating && target.IsInLineOfSight)
             {
-                if (target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 4f
+                if (target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= 9f
                     && (GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(CharacterWieldedWeapon.Melee)
                     || GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(CharacterWieldedWeapon.MartialArts)))
                     AXPBuddy.NavMeshMovementController.Halt();
@@ -126,7 +126,7 @@ namespace AXPBuddy
                     AXPBuddy.NavMeshMovementController.Halt();
             }
 
-            if (target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 4f
+            if (target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 9f
                 && (GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(CharacterWieldedWeapon.Melee)
                 || GetWieldedWeapons(DynelManager.LocalPlayer).HasFlag(CharacterWieldedWeapon.MartialArts)))
             {
