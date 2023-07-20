@@ -36,8 +36,6 @@ namespace AXPBuddy
         public static bool _initMerge = false;
         public static bool Toggle = false;
         public static bool _initSit = false;
-        public static bool _passedFirstCorrectionPos = false;
-        public static bool _passedSecondCorrectionPos = false;
 
         public static double _stateTimeOut;
         public static double _sitUpdateTimer;
