@@ -19,8 +19,8 @@ namespace AXPBuddy
         private ReformPhase _phase;
 
         private bool _init = false;
-        private HashSet<Identity> _teamCache = new HashSet<Identity>(); // Store the team members' identities
-        private HashSet<Identity> _invitedList = new HashSet<Identity>(); // Store the identities of players who have been invited
+        public static HashSet<Identity> _teamCache = new HashSet<Identity>(); // Store the team members' identities
+        public static HashSet<Identity> _invitedList = new HashSet<Identity>(); // Store the identities of players who have been invited
 
         public IState GetNextState()
         {
