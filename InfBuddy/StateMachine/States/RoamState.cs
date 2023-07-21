@@ -40,7 +40,6 @@ namespace InfBuddy
             {
                 if (Extensions.CanExit(_missionsLoaded) || Extensions.IsClear())
                     return new ExitMissionState();
-
             }
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
@@ -102,8 +101,6 @@ namespace InfBuddy
                         if (targetMob != null)
                         {
                             DynelManager.LocalPlayer.Attack(targetMob);
-                            //_target = targetMob;
-                            //Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
                     else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
@@ -119,7 +116,7 @@ namespace InfBuddy
                 SimpleChar mob = DynelManager.NPCs
                     .Where(c => c.Health > 0)
                     .OrderBy(c => c.HealthPercent)
-                    .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
+                    .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                     .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name));
 
                 if (mob != null)
@@ -128,7 +125,7 @@ namespace InfBuddy
                     {
                         InfBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
                     }
-                    if (mob.IsInAttackRange() && mob.IsInLineOfSight)
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) < 10 && mob.IsInLineOfSight)
                     {
                         InfBuddy.NavMeshMovementController.Halt();
 
@@ -141,21 +138,18 @@ namespace InfBuddy
                 }
                 else if (mob == null && _corpse != null && InfBuddy._settings["Looting"].AsBool())
                 {
-
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5f)
                         InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
-
                 }
                 else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
                 && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
                 {
-
-                    HoldPosition();
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.RoamPos) > 5)
+                    {
+                        InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.RoamPos);
+                    }
                 }
-                
-
             }
-
         }
         public void OnStateExit()
         {
