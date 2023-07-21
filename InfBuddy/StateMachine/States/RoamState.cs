@@ -8,16 +8,9 @@ namespace InfBuddy
 {
     public class RoamState : PositionHolder, IState
     {
-        private SimpleChar _target;
-        private SimpleChar _charmMob;
         private static Corpse _corpse;
 
-        private static bool _charmMobAttacked = false;
         private static bool _missionsLoaded = false;
-
-        private static double _charmMobAttacking;
-
-        private List<Identity> _charmMobs = new List<Identity>();
 
         public RoamState() : base(Constants.DefendPos, 2f, 1)
         {
@@ -38,7 +31,7 @@ namespace InfBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                if (Extensions.CanExit(_missionsLoaded) || Extensions.IsClear())
+                if (!Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                     return new ExitMissionState();
             }
 
@@ -55,7 +48,7 @@ namespace InfBuddy
         {
             //Chat.WriteLine("RoamState::OnStateEnter");
 
-            InfBuddy._stateTimeOut = Time.NormalTime;
+            //InfBuddy._stateTimeOut = Time.NormalTime;
         }
 
         public void Tick()
@@ -71,15 +64,15 @@ namespace InfBuddy
                 }
             }
 
-            if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-                _missionsLoaded = true;
+            //if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+            //    _missionsLoaded = true;
 
-            if (Time.NormalTime > InfBuddy._stateTimeOut + 210f)
-            {
-                InfBuddy._stateTimeOut = Time.NormalTime;
-                InfBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(184.5f, 1.0f, 242.9f));
-                InfBuddy.NavMeshMovementController.AppendNavMeshDestination(new Vector3(181.3f, 1.0f, 245.6f));
-            }
+            //if (Time.NormalTime > InfBuddy._stateTimeOut + 210f)
+            //{
+            //    InfBuddy._stateTimeOut = Time.NormalTime;
+            //    InfBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(184.5f, 1.0f, 242.9f));
+            //    InfBuddy.NavMeshMovementController.AppendNavMeshDestination(new Vector3(181.3f, 1.0f, 245.6f));
+            //}
 
             if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
             {
@@ -100,7 +93,12 @@ namespace InfBuddy
 
                         if (targetMob != null)
                         {
-                            DynelManager.LocalPlayer.Attack(targetMob);
+                            if (DynelManager.LocalPlayer.FightingTarget == null
+                                && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                            {
+                                DynelManager.LocalPlayer.Attack(targetMob);
+                            }
+                               
                         }
                     }
                     else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
@@ -155,7 +153,7 @@ namespace InfBuddy
         {
             //Chat.WriteLine("RoamState::OnStateExit");
 
-            _missionsLoaded = false;
+            //_missionsLoaded = false;
         }
 
     }
