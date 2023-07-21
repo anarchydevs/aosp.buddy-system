@@ -40,13 +40,6 @@ namespace InfBuddy
                 if (Extensions.CanExit(_missionsLoaded) || Extensions.IsClear())
                     return new ExitMissionState();
 
-                if (_target != null)
-                    return new FightState(_target);
-
-                if (InfBuddy._settings["Looting"].AsBool()
-                    && _corpse != null
-                    && Extensions.IsNull(_target))
-                    return new LootingState();
             }
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
@@ -63,72 +56,6 @@ namespace InfBuddy
             //Chat.WriteLine("RoamState::OnStateEnter");
 
             InfBuddy._stateTimeOut = Time.NormalTime;
-        }
-
-        public void OnStateExit()
-        {
-            //Chat.WriteLine("RoamState::OnStateExit");
-
-            _missionsLoaded = false;
-        }
-
-        private void HandleScan()
-        {
-            SimpleChar mob = DynelManager.NPCs
-                .Where(c => c.Health > 0
-                    //&& c.IsInLineOfSight
-                    && c.Position.DistanceFrom(Constants.DefendPos) <= 80f)
-                .OrderBy(c => c.HealthPercent)
-                .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
-                .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
-
-            if (mob != null)
-            {
-                if (Extensions.InCombat())
-                {
-                    _target = mob;
-                    //Chat.WriteLine($"Found target: {_target.Name}");
-                }
-                else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any())
-                {
-                    _target = mob;
-                    //Chat.WriteLine($"Found target: {_target.Name}");
-                }
-            }
-            else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
-                && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
-                HoldPosition();
-        }
-
-        private void HandleCharmScan()
-        {
-            _charmMob = DynelManager.NPCs
-                .Where(c => c.Buffs.Contains(NanoLine.CharmOther) || c.Buffs.Contains(NanoLine.Charm_Short))
-                .FirstOrDefault();
-
-            if (_charmMob != null)
-            {
-                if (!_charmMobs.Contains(_charmMob.Identity))
-                    _charmMobs.Add(_charmMob.Identity);
-
-                if (Time.NormalTime > _charmMobAttacking + 8
-                    && _charmMobAttacked == true)
-                {
-                    _charmMobAttacked = false;
-                    _charmMobs.Remove(_charmMob.Identity);
-                    _target = _charmMob;
-                    //Chat.WriteLine($"Found target: {_target.Name}.");
-                }
-
-                if (_charmMob.FightingTarget != null && _charmMob.IsAttacking
-                    && _charmMobs.Contains(_charmMob.Identity)
-                    && Team.Members.Select(c => c.Identity).Any(x => _charmMob.FightingTarget.Identity == x)
-                    && _charmMobAttacked == false)
-                {
-                    _charmMobAttacking = Time.NormalTime;
-                    _charmMobAttacked = true;
-                }
-            }
         }
 
         public void Tick()
@@ -154,16 +81,13 @@ namespace InfBuddy
                 InfBuddy.NavMeshMovementController.AppendNavMeshDestination(new Vector3(181.3f, 1.0f, 245.6f));
             }
 
-            if (DynelManager.LocalPlayer.Profession == Profession.Trader || DynelManager.LocalPlayer.Profession == Profession.Bureaucrat)
-                HandleCharmScan();
-
             if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
             {
                 InfBuddy._leader = Team.Members
-                    .Where(c => c.Character?.Health > 0
-                        && c.Character?.IsValid == true
-                        && c.IsLeader)
-                    .FirstOrDefault()?.Character;
+                        .Where(c => c.Character?.Health > 0
+                            && c.Character?.IsValid == true
+                            && (c.Identity == InfBuddy.Leader || c.IsLeader))
+                        .FirstOrDefault()?.Character;
 
                 if (InfBuddy._leader != null)
                 {
@@ -172,40 +96,71 @@ namespace InfBuddy
                         SimpleChar targetMob = DynelManager.NPCs
                             .Where(c => c.Health > 0
                                 && c.Identity == (Identity)InfBuddy._leader?.FightingTarget?.Identity)
-                            .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
+                            .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name));
 
                         if (targetMob != null)
                         {
-                            _target = targetMob;
-                            //Chat.WriteLine($"Found target: {_target.Name}");
-                        }
-                    }
-                    else if (DynelManager.NPCs.Any(c => c.FightingTarget != null && c.DistanceFrom(DynelManager.LocalPlayer) < 20f))
-                    {
-                        SimpleChar mob = DynelManager.NPCs
-                            .Where(c => c.Health > 0
-                                //&& c.IsInLineOfSight
-                                && c.Position.DistanceFrom(Constants.DefendPos) <= 20f)
-                            .OrderBy(c => c.HealthPercent)
-                            .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-                            .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
-
-                        if (mob != null)
-                        {
-                            _target = mob;
+                            DynelManager.LocalPlayer.Attack(targetMob);
+                            //_target = targetMob;
                             //Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
                     else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
-                        && DynelManager.LocalPlayer.Position.DistanceFrom((Vector3)InfBuddy._leader?.Position) > 3f)
+                        && DynelManager.LocalPlayer.Position.DistanceFrom((Vector3)InfBuddy._leader?.Position) > 1.2f)
+                    {
                         InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)InfBuddy._leader?.Position);
+                    }
                 }
-                else
-                    HandleScan();
             }
             else
-                HandleScan();
+            {
+                SimpleChar mob = DynelManager.NPCs
+                    .Where(c => c.Health > 0)
+                    .OrderBy(c => c.HealthPercent)
+                    .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
+                    .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name));
+
+                if (mob != null)
+                {
+                    if (!mob.IsInAttackRange() || !mob.IsInLineOfSight)
+                    {
+                        InfBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
+                    }
+                    if (mob.IsInAttackRange() && mob.IsInLineOfSight)
+                    {
+                        InfBuddy.NavMeshMovementController.Halt();
+
+                        if (DynelManager.LocalPlayer.FightingTarget == null
+                                && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                        {
+                            DynelManager.LocalPlayer.Attack(mob);
+                        }
+                    }
+                }
+                else if (mob == null && _corpse != null && InfBuddy._settings["Looting"].AsBool())
+                {
+
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5f)
+                        InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
+
+                }
+                else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
+                && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
+                {
+
+                    HoldPosition();
+                }
+                
+
+            }
+
+        }
+        public void OnStateExit()
+        {
+            //Chat.WriteLine("RoamState::OnStateExit");
+
+            _missionsLoaded = false;
         }
 
     }

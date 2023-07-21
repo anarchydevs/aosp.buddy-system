@@ -403,7 +403,7 @@ namespace InfBuddy
                     _roamToggled = true;
                     break;
             }
-
+            Config.Save();
         }
 
         private bool CanUseSitKit()
