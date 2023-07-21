@@ -28,6 +28,7 @@ namespace InfBuddy
         {
             _corpse = DynelManager.Corpses
                 .Where(c => c.Name.Contains("Remains of "))
+                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                 .FirstOrDefault();
 
             if (Game.IsZoning) { return null; }
@@ -96,7 +97,7 @@ namespace InfBuddy
                         SimpleChar targetMob = DynelManager.NPCs
                             .Where(c => c.Health > 0
                                 && c.Identity == (Identity)InfBuddy._leader?.FightingTarget?.Identity)
-                            .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name));
+                            .FirstOrDefault();
 
                         if (targetMob != null)
                         {
