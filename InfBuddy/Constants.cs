@@ -9,7 +9,7 @@ namespace InfBuddy
         public const string QuestGiverName = "The Retainer Of Ergo";
 
         public static Vector3 DefendPos = new Vector3(183.8f, 1.0f, 189.9f); // 180.7f, 1.0f, 184.5f
-        public static Vector3 RoamPos = new Vector3(184.5f, 1.0f, 242.9f); //Pos: 185.4, 189.5, 1.0
+        public static Vector3 RoamPos = new Vector3(185.4f, 1.0f, 189.5f); //Pos: 185.4, 189.5, 1.0
         public static Vector3 EntrancePos = new Vector3(2722.7f, 25.3f, 3333.2f); 
         public static Vector3 EntranceFinalPos = new Vector3(2729.4f, 25.5f, 3345.2f);
         public static Vector3 ExitPos = new Vector3(162.1f, 2.3f, 105.3f);
