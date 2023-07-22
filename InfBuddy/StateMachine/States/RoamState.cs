@@ -142,6 +142,8 @@ namespace InfBuddy
                 else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
                 && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
                 {
+                    //HoldPosition();
+
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.RoamPos) > 5)
                     {
                         InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.RoamPos);
