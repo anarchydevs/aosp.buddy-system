@@ -104,7 +104,7 @@ namespace InfBuddy
 
                 if (mob != null)
                 {
-                    if (!mob.IsInAttackRange() || !mob.IsInLineOfSight)
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) > 9 || !mob.IsInLineOfSight)
                     {
                         InfBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
                     }
