@@ -10,8 +10,6 @@ namespace InfBuddy
     {
         private static Corpse _corpse;
 
-        private static bool _missionsLoaded = false;
-
         public RoamState() : base(Constants.DefendPos, 2f, 1)
         {
 
@@ -24,16 +22,14 @@ namespace InfBuddy
                 .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                 .FirstOrDefault();
 
-            if (Game.IsZoning) { return null; }
+            if (Game.IsZoning)
+                return null;
 
             if (Extensions.HasDied())
                 return new DiedState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
-            {
-                if (!Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-                    return new ExitMissionState();
-            }
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId && !Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+                return new ExitMissionState();
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
                 return new IdleState();
@@ -47,13 +43,12 @@ namespace InfBuddy
         public void OnStateEnter()
         {
             //Chat.WriteLine("RoamState::OnStateEnter");
-
-            //InfBuddy._stateTimeOut = Time.NormalTime;
         }
 
         public void Tick()
         {
-            if (Game.IsZoning) { return; }
+            if (Game.IsZoning) 
+                return;
 
             if (Team.IsInTeam)
             {
@@ -63,16 +58,6 @@ namespace InfBuddy
                         ReformState._teamCache.Add(member.Identity);
                 }
             }
-
-            //if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-            //    _missionsLoaded = true;
-
-            //if (Time.NormalTime > InfBuddy._stateTimeOut + 210f)
-            //{
-            //    InfBuddy._stateTimeOut = Time.NormalTime;
-            //    InfBuddy.NavMeshMovementController.SetNavMeshDestination(new Vector3(184.5f, 1.0f, 242.9f));
-            //    InfBuddy.NavMeshMovementController.AppendNavMeshDestination(new Vector3(181.3f, 1.0f, 245.6f));
-            //}
 
             if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
             {
@@ -142,7 +127,6 @@ namespace InfBuddy
                 else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
                 && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
                 {
-                    //HoldPosition();
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.RoamPos) > 5)
                     {
@@ -154,9 +138,6 @@ namespace InfBuddy
         public void OnStateExit()
         {
             //Chat.WriteLine("RoamState::OnStateExit");
-
-            //_missionsLoaded = false;
         }
-
     }
 }
