@@ -87,28 +87,16 @@ namespace InfBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Easy, (sender, msg) => DifficultyMessage(sender, msg, DifficultySelection.Easy));
-                IPCChannel.RegisterCallback((int)IPCOpcode.Medium, (sender, msg) => DifficultyMessage(sender, msg, DifficultySelection.Medium));
-                IPCChannel.RegisterCallback((int)IPCOpcode.Hard, (sender, msg) => DifficultyMessage(sender, msg, DifficultySelection.Hard));
+                IPCChannel.RegisterCallback((int)IPCOpcode.Easy, EasyMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Medium, MediumMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Hard, HardMessage);
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Neutral, (sender, msg) => FactionMessage(sender, msg, FactionSelection.Neutral));
-                IPCChannel.RegisterCallback((int)IPCOpcode.Clan, (sender, msg) => FactionMessage(sender, msg, FactionSelection.Clan));
-                IPCChannel.RegisterCallback((int)IPCOpcode.Omni, (sender, msg) => FactionMessage(sender, msg, FactionSelection.Omni));
+                IPCChannel.RegisterCallback((int)IPCOpcode.Neutral, NeutralMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Clan, ClanMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Omni, OmniMessage);
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Normal, (sender, msg) => ModeMessage(sender, msg, ModeSelection.Normal));
-                IPCChannel.RegisterCallback((int)IPCOpcode.Roam, (sender, msg) => ModeMessage(sender, msg, ModeSelection.Roam));
-
-
-                //IPCChannel.RegisterCallback((int)IPCOpcode.Easy, EasyMessage);
-                //IPCChannel.RegisterCallback((int)IPCOpcode.Medium, MediumMessage);
-                //IPCChannel.RegisterCallback((int)IPCOpcode.Hard, HardMessage);
-
-                //IPCChannel.RegisterCallback((int)IPCOpcode.Neutral, NeutralMessage);
-                //IPCChannel.RegisterCallback((int)IPCOpcode.Clan, ClanMessage);
-                //IPCChannel.RegisterCallback((int)IPCOpcode.Omni, OmniMessage);
-
-                //IPCChannel.RegisterCallback((int)IPCOpcode.Normal, NormalMessage);
-                //IPCChannel.RegisterCallback((int)IPCOpcode.Roam, RoamMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Normal, NormalMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Roam, RoamMessage);
 
                 Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -215,61 +203,45 @@ namespace InfBuddy
             _settings[settingName] = value;
         }
 
-        private void DifficultyMessage(int sender, IPCMessage msg, DifficultySelection difficulty)
+        private void EasyMessage(int sender, IPCMessage msg)
         {
-            SetSettings("DifficultySelection", (int)difficulty);
+            _settings["DifficultySelection"] = (int)DifficultySelection.Easy;
         }
 
-        private void FactionMessage(int sender, IPCMessage msg, FactionSelection faction)
+        private void MediumMessage(int sender, IPCMessage msg)
         {
-            SetSettings("FactionSelection", (int)faction);
+            _settings["DifficultySelection"] = (int)DifficultySelection.Medium;
         }
 
-        private void ModeMessage(int sender, IPCMessage msg, ModeSelection mode)
+        private void HardMessage(int sender, IPCMessage msg)
         {
-            SetSettings("ModeSelection", (int)mode);
+            _settings["DifficultySelection"] = (int)DifficultySelection.Hard;
+
         }
 
+        private void NeutralMessage(int sender, IPCMessage msg)
+        {
+            _settings["FactionSelection"] = (int)FactionSelection.Neutral;
+        }
 
-        //private void EasyMessage(int sender, IPCMessage msg)
-        //{
-        //    _settings["DifficultySelection"] = (int)DifficultySelection.Easy;
-        //}
+        private void ClanMessage(int sender, IPCMessage msg)
+        {
+            _settings["FactionSelection"] = (int)FactionSelection.Clan;
+        }
 
-        //private void MediumMessage(int sender, IPCMessage msg)
-        //{
-        //    _settings["DifficultySelection"] = (int)DifficultySelection.Medium;
-        //}
+        private void OmniMessage(int sender, IPCMessage msg)
+        {
+            _settings["FactionSelection"] = (int)FactionSelection.Omni;
+        }
 
-        //private void HardMessage(int sender, IPCMessage msg)
-        //{
-        //    _settings["DifficultySelection"] = (int)DifficultySelection.Hard;
-
-        //}
-
-        //private void NeutralMessage(int sender, IPCMessage msg)
-        //{
-        //    _settings["FactionSelection"] = (int)FactionSelection.Neutral;
-        //}
-
-        //private void ClanMessage(int sender, IPCMessage msg)
-        //{
-        //    _settings["FactionSelection"] = (int)FactionSelection.Clan;
-        //}
-
-        //private void OmniMessage(int sender, IPCMessage msg)
-        //{
-        //    _settings["FactionSelection"] = (int)FactionSelection.Omni;
-        //}
-
-        //private void NormalMessage(int sender, IPCMessage msg)
-        //{
-        //    _settings["ModeSelection"] = (int)ModeSelection.Normal;
-        //}
-        //private void RoamMessage(int sender, IPCMessage msg)
-        //{
-        //    _settings["ModeSelection"] = (int)ModeSelection.Roam;
-        //}
+        private void NormalMessage(int sender, IPCMessage msg)
+        {
+            _settings["ModeSelection"] = (int)ModeSelection.Normal;
+        }
+        private void RoamMessage(int sender, IPCMessage msg)
+        {
+            _settings["ModeSelection"] = (int)ModeSelection.Roam;
+        }
 
         private void OnUpdate(object s, float deltaTime)
         {
