@@ -309,19 +309,20 @@ namespace VortexxBuddy
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Toggle"].AsBool() && !Toggle)
+                    if (param.Length < 1)
                     {
-
-                        if (DynelManager.LocalPlayer.Identity == Leader)
+                        if (!_settings["Toggle"].AsBool())
+                        {
+                            _settings["Toggle"] = true;
                             IPCChannel.Broadcast(new StartMessage());
-
-                        _settings["Toggle"] = true;
-                        Start();
-                    }
-                    else
-                    {
-                        IPCChannel.Broadcast(new StopMessage());
-                        Stop();
+                            Start();
+                        }
+                        else
+                        {
+                            _settings["Toggle"] = false;
+                            IPCChannel.Broadcast(new StopMessage());
+                            Stop();
+                        }
                     }
                 }
                 Config.Save();
