@@ -55,7 +55,7 @@ namespace VortexxBuddy
 
             if (_desecratedSpirits == null
                 && VortexxBuddy.VortexxCorpse
-                && Extensions.CanProceed()
+                //&& Extensions.CanProceed()
                 && VortexxBuddy._settings["Farming"].AsBool())
                 return new FarmingState();
 

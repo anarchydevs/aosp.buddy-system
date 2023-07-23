@@ -87,6 +87,7 @@ namespace VortexxBuddy
 
                 _settings.AddVariable("Toggle", false);
                 _settings.AddVariable("Farming", false);
+                _settings.AddVariable("Leader", false);
                 _settings.AddVariable("Immunity", false);
                 _settings.AddVariable("Clear", false);
 
@@ -115,6 +116,11 @@ namespace VortexxBuddy
         public static void Start()
         {
             Toggle = true;
+
+            if (_settings["Leader"].AsBool())
+            {
+                Leader = DynelManager.LocalPlayer.Identity;
+            }
 
             Chat.WriteLine("VortexxBuddy enabled.");
 
@@ -145,10 +151,6 @@ namespace VortexxBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            if (Leader == Identity.None
-                && DynelManager.LocalPlayer.Identity.Instance != sender)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
-
             _settings["Toggle"] = true;
             Start();
         }
@@ -226,7 +228,7 @@ namespace VortexxBuddy
                 }
                 if (_settings["Toggle"].AsBool() && !Toggle)
                 {
-                    Leader = DynelManager.LocalPlayer.Identity;
+                    
                     IPCChannel.Broadcast(new StartMessage());
                     Start();
                 }
@@ -244,7 +246,6 @@ namespace VortexxBuddy
                     Chat.WriteLine("Farming enabled.");
                     farmingEnabled();
                 }
-
             }
 
             if (_settings["Toggle"].AsBool())
@@ -310,8 +311,6 @@ namespace VortexxBuddy
                 {
                     if (!_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        
-                        Leader = DynelManager.LocalPlayer.Identity;
 
                         if (DynelManager.LocalPlayer.Identity == Leader)
                             IPCChannel.Broadcast(new StartMessage());
