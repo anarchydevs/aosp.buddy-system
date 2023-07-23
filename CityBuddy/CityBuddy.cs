@@ -46,7 +46,7 @@ namespace CityBuddy
                 _settings = new Settings("CityBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\CityBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\CityBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
@@ -54,7 +54,7 @@ namespace CityBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 SettingsController.RegisterSettingsWindow("CityBuddy", pluginDir + "\\UI\\CityBuddySettingWindow.xml", _settings);
 
@@ -128,9 +128,9 @@ namespace CityBuddy
                 if (channelInput != null)
                 {
                     if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                     {
-                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                     }
                 }
 

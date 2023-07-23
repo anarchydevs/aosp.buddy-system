@@ -62,7 +62,7 @@ namespace Db1Buddy
                 _settings = new Settings("Db1Buddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\Db1Buddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\Db1Buddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
@@ -73,7 +73,7 @@ namespace Db1Buddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Farming, FarmingMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.NoFarming, NoFarmingMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 Chat.RegisterCommand("buddy", BuddyCommand);
 
@@ -202,9 +202,9 @@ namespace Db1Buddy
                 if (channelInput != null)
                 {
                     if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                     {
-                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                     }
                 }
 

@@ -65,7 +65,7 @@ namespace DB2Buddy
                 _settings = new Settings("DB2Buddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\DB2Buddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\DB2Buddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
 
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
@@ -79,7 +79,7 @@ namespace DB2Buddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Farming, FarmingMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.NoFarming, NoFarmingMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 SettingsController.RegisterSettingsWindow("DB2Buddy", pluginDir + "\\UI\\DB2BuddySettingWindow.xml", _settings);
 
@@ -211,9 +211,9 @@ namespace DB2Buddy
                     if (channelInput != null)
                     {
                         if (int.TryParse(channelInput.Text, out int channelValue)
-                            && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                         {
-                            Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                         }
                     }
 

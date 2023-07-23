@@ -90,7 +90,7 @@ namespace RoamBuddy
 
                 if (Extensions.CanAttack())
                 {
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= RoamBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
+                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= RoamBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
                     {
                         if (RoamBuddy.ModeSelection.Path == (RoamBuddy.ModeSelection)RoamBuddy._settings["ModeSelection"].AsInt32())
                             MovementController.Instance.Halt();
@@ -155,7 +155,7 @@ namespace RoamBuddy
             {
                 if (Extensions.GetLeader(RoamBuddy.Leader) != null)
                 {
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > RoamBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
+                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > RoamBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
                     {
                         if (_aggToolCounter >= 5)
                         {
@@ -223,7 +223,7 @@ namespace RoamBuddy
             }
 
             if (!_target.IsMoving &&
-                _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > RoamBuddy.Config.CharSettings[Game.ClientInst].AttackRange
+                _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > RoamBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange
                 && RoamBuddy.ModeSelection.Path == (RoamBuddy.ModeSelection)RoamBuddy._settings["ModeSelection"].AsInt32())
             {
                 MovementController.Instance.SetDestination(_target.Position);

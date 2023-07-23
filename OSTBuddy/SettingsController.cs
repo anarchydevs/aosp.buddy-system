@@ -49,7 +49,7 @@ namespace OSTBuddy
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\OSTBuddy\\{Game.ClientInst}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\OSTBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "OSTBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 
@@ -60,7 +60,7 @@ namespace OSTBuddy
                             settingsWindow.FindView("RespawnDelayBox", out TextInputView respawnDelayInput);
 
                             if (respawnDelayInput != null)
-                                respawnDelayInput.Text = $"{Config.CharSettings[Game.ClientInst].RespawnDelay}";
+                                respawnDelayInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].RespawnDelay}";
                         }
                     }
                     catch (Exception e)

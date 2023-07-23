@@ -79,7 +79,7 @@ namespace AttackBuddy
                         //&& _target.Buffs.Contains(302745) == false
                         && _target.IsPlayer == false)
                     {
-                        if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= AttackBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
+                        if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= AttackBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
                         {
                             DynelManager.LocalPlayer.Attack(_target);
                             Chat.WriteLine($"Attacking {_target.Name}.");
@@ -196,7 +196,7 @@ namespace AttackBuddy
             {
                 if (Extensions.GetLeader(AttackBuddy.Leader) != null)
                 {
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > AttackBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
+                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > AttackBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
                     {
                         if (Inventory.Find(83920, out Item aggroTool)) //Aggression Enhancer 
                         {

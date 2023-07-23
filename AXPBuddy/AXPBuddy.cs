@@ -59,7 +59,7 @@ namespace AXPBuddy
                 _settings = new Settings("AXPBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\AXPBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\AXPBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
@@ -67,9 +67,9 @@ namespace AXPBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
-                Config.CharSettings[Game.ClientInst].LeaderChangedEvent += Leader_Changed;
-                Config.CharSettings[Game.ClientInst].TickChangedEvent += Tick_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].LeaderChangedEvent += Leader_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].TickChangedEvent += Tick_Changed;
 
                 Chat.RegisterCommand("buddy", AXPBuddyCommand);
 
@@ -90,8 +90,8 @@ namespace AXPBuddy
                 Chat.WriteLine("AXPBuddy Loaded!");
                 Chat.WriteLine("/axpbuddy for settings.");
 
-                LeaderName = Config.CharSettings[Game.ClientInst].Leader;
-                Tick = Config.CharSettings[Game.ClientInst].Tick;
+                LeaderName = Config.CharSettings[DynelManager.LocalPlayer.Name].Leader;
+                Tick = Config.CharSettings[DynelManager.LocalPlayer.Name].Tick;
             }
             catch (Exception ex)
             {
@@ -119,13 +119,13 @@ namespace AXPBuddy
 
         public static void Leader_Changed(object s, string e)
         {
-            Config.CharSettings[Game.ClientInst].Leader = e;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].Leader = e;
             LeaderName = e;
             Config.Save();
         }
         public static void Tick_Changed(object s, float e)
         {
-            Config.CharSettings[Game.ClientInst].Tick = e;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].Tick = e;
             Tick = e;
             Config.Save();
         }
@@ -230,18 +230,18 @@ namespace AXPBuddy
 
                     if (channelInput != null && !string.IsNullOrEmpty(channelInput.Text))
                         if (int.TryParse(channelInput.Text, out int channelValue)
-                            && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
-                            Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                     if (tickInput != null && !string.IsNullOrEmpty(tickInput.Text))
                         if (float.TryParse(tickInput.Text, out float tickValue)
-                            && Config.CharSettings[Game.ClientInst].Tick != tickValue)
-                            Config.CharSettings[Game.ClientInst].Tick = tickValue;
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].Tick != tickValue)
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].Tick = tickValue;
 
                     if (leaderInput != null && !string.IsNullOrEmpty(leaderInput.Text))
                     {
-                        if (Config.CharSettings[Game.ClientInst].Leader != leaderInput.Text)
+                        if (Config.CharSettings[DynelManager.LocalPlayer.Name].Leader != leaderInput.Text)
                         {
-                            Config.CharSettings[Game.ClientInst].Leader = leaderInput.Text;
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].Leader = leaderInput.Text;
                         }
                     }
 

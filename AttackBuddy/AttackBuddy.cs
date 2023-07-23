@@ -60,7 +60,7 @@ namespace AttackBuddy
                 _settings = new Settings("AttackBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\AttackBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\AttackBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
@@ -68,9 +68,9 @@ namespace AttackBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.AttackRange, OnAttackRangeMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.ScanRange, OnScanRangeMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
-                Config.CharSettings[Game.ClientInst].AttackRangeChangedEvent += AttackRange_Changed;
-                Config.CharSettings[Game.ClientInst].ScanRangeChangedEvent += ScanRange_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRangeChangedEvent += AttackRange_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRangeChangedEvent += ScanRange_Changed;
 
                 Chat.RegisterCommand("buddy", AttackBuddyCommand);
 
@@ -88,8 +88,8 @@ namespace AttackBuddy
                 Chat.WriteLine("AttackBuddy Loaded!");
                 Chat.WriteLine("/attackbuddy for settings.");
 
-                AttackRange = Config.CharSettings[Game.ClientInst].AttackRange;
-                ScanRange = Config.CharSettings[Game.ClientInst].ScanRange;
+                AttackRange = Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange;
+                ScanRange = Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange;
             }
             catch (Exception e)
             {
@@ -111,13 +111,13 @@ namespace AttackBuddy
         }
         public static void AttackRange_Changed(object s, int e)
         {
-            Config.CharSettings[Game.ClientInst].AttackRange = e;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = e;
             AttackRange = e;
             Config.Save();
         }
         public static void ScanRange_Changed(object s, int e)
         {
-            Config.CharSettings[Game.ClientInst].ScanRange = e;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = e;
             ScanRange = e;
             Config.Save();
         }
@@ -159,14 +159,14 @@ namespace AttackBuddy
         {
             AttackRangeMessage rangeMsg = (AttackRangeMessage)msg;
 
-            Config.CharSettings[Game.ClientInst].AttackRange = rangeMsg.Range;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = rangeMsg.Range;
         }
 
         private void OnScanRangeMessage(int sender, IPCMessage msg)
         {
             ScanRangeMessage rangeMsg = (ScanRangeMessage)msg;
 
-            Config.CharSettings[Game.ClientInst].ScanRange = rangeMsg.Range;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = rangeMsg.Range;
         }
 
         private void Start()
@@ -496,17 +496,17 @@ namespace AttackBuddy
                 if (channelInput != null)
                 {
                     if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                     {
-                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                     }
                 }
                 if (attackRangeInput != null && !string.IsNullOrEmpty(attackRangeInput.Text))
                 {
                     if (int.TryParse(attackRangeInput.Text, out int attackRangeInputValue)
-                        && Config.CharSettings[Game.ClientInst].AttackRange != attackRangeInputValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange != attackRangeInputValue)
                     {
-                        Config.CharSettings[Game.ClientInst].AttackRange = attackRangeInputValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = attackRangeInputValue;
                         IPCChannel.Broadcast(new AttackRangeMessage()
                         {
                             Range = attackRangeInputValue
@@ -516,9 +516,9 @@ namespace AttackBuddy
                 if (scanRangeInput != null && !string.IsNullOrEmpty(scanRangeInput.Text))
                 {
                     if (int.TryParse(scanRangeInput.Text, out int scanRangeInputValue)
-                        && Config.CharSettings[Game.ClientInst].ScanRange != scanRangeInputValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange != scanRangeInputValue)
                     {
-                        Config.CharSettings[Game.ClientInst].ScanRange = scanRangeInputValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = scanRangeInputValue;
                         IPCChannel.Broadcast(new ScanRangeMessage()
                         {
                             Range = scanRangeInputValue

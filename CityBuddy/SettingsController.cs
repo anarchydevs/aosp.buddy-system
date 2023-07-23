@@ -50,7 +50,7 @@ namespace CityBuddy
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\CityBuddy\\{Game.ClientInst}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\CityBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "CityBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 
@@ -61,7 +61,7 @@ namespace CityBuddy
                             settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
 
                             if (channelInput != null)
-                                channelInput.Text = $"{Config.CharSettings[Game.ClientInst].IPCChannel}";
+                                channelInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel}";
                         }
                     }
                     catch (Exception e)

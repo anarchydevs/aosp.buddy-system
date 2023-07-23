@@ -88,7 +88,7 @@ namespace DefendBuddy
 
                 if (Extensions.CanAttack())
                 {
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= DefendBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
+                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= DefendBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
                     {
                         if (DefendBuddy.ModeSelection.Path == (DefendBuddy.ModeSelection)DefendBuddy._settings["ModeSelection"].AsInt32())
                             MovementController.Instance.Halt();
@@ -154,7 +154,7 @@ namespace DefendBuddy
                 if (Extensions.GetLeader(DefendBuddy.Leader) != null)
                 {
 
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > DefendBuddy.Config.CharSettings[Game.ClientInst].AttackRange)
+                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > DefendBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
                     {
                         if (_aggToolCounter >= 5)
                         {
@@ -233,7 +233,7 @@ namespace DefendBuddy
             }
 
             if (!_target.IsMoving &&
-                _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > DefendBuddy.Config.CharSettings[Game.ClientInst].AttackRange
+                _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > DefendBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange
                 && DefendBuddy.ModeSelection.Path == (DefendBuddy.ModeSelection)DefendBuddy._settings["ModeSelection"].AsInt32())
             {
                 MovementController.Instance.SetDestination(_target.Position);

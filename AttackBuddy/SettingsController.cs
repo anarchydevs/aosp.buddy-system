@@ -61,7 +61,7 @@ namespace AttackBuddy
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\AttackBuddy\\{Game.ClientInst}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\AttackBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "AttackBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 
@@ -74,11 +74,11 @@ namespace AttackBuddy
                             settingsWindow.FindView("ScanRangeBox", out TextInputView scanRangeInput);
 
                             if (channelInput != null)
-                                channelInput.Text = $"{Config.CharSettings[Game.ClientInst].IPCChannel}";
+                                channelInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel}";
                             if (attackRangeInput != null)
-                                attackRangeInput.Text = $"{Config.CharSettings[Game.ClientInst].AttackRange}";
+                                attackRangeInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange}";
                             if (scanRangeInput != null)
-                                scanRangeInput.Text = $"{Config.CharSettings[Game.ClientInst].ScanRange}";
+                                scanRangeInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange}";
                         }
                     }
                     catch (Exception e)
