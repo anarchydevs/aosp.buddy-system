@@ -385,13 +385,15 @@ namespace MitaarBuddy
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Toggle"].AsBool() && !Toggle)
+                    if (!_settings["Toggle"].AsBool())
                     {
+                        _settings["Toggle"] = true;
                         IPCChannel.Broadcast(new StartMessage());
                         Start();
                     }
                     else
                     {
+                        _settings["Toggle"] = false;
                         IPCChannel.Broadcast(new StopMessage());
                         Stop();
                     }
