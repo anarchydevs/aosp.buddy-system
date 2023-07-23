@@ -95,7 +95,7 @@ namespace AXPBuddy
             }
             catch (Exception ex)
             {
-                var errorMessage = "An error occurred on line " + AXPBuddy.GetLineNumber(ex) + ": " + ex.Message;
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
 
                 if (errorMessage != previousErrorMessage)
                 {

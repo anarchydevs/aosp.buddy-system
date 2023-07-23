@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Security.Policy;
+using System.Text.RegularExpressions;
 
 namespace AttackBuddy
 {
@@ -53,6 +54,8 @@ namespace AttackBuddy
 
         public static List<string> _helpers = new List<string>();
 
+        public static string previousErrorMessage = string.Empty;
+
         public override void Run(string pluginDir)
         {
             try
@@ -91,9 +94,16 @@ namespace AttackBuddy
                 AttackRange = Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange;
                 ScanRange = Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
 
@@ -261,305 +271,329 @@ namespace AttackBuddy
 
         private void Scanning()
         {
-            if (Playfield.ModelIdentity.Instance == 6123)
+            try
             {
-                _switchMob = DynelManager.NPCs
-                    .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && !Constants._ignores.Contains(c.Name)
-                        && c.Name != "Alien Cocoon" && c.Name != "Alien Coccoon"
-                        && c.Name != "Zix"
-                        && c.Health > 0 && c.IsInLineOfSight && c.Name != "Kyr'Ozch Maid"
-                        && c.Name != "Kyr'Ozch Technician" && c.Name != "Defense Drone Tower"
-                        && c.Name != "Control Leech"
-                        && c.Name != "Alien Precision Tower" && c.Name != "Alien Charging Tower"
-                        && c.Name != "Alien Shield Tower" && c.Name != "Kyr'Ozch Technician"
-                        && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c))
-                    .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                    .OrderBy(c => c.HealthPercent)
-                    .OrderByDescending(c => c.Name == "Kyr'Ozch Nurse")
-                    .OrderByDescending(c => c.Name == "Kyr'Ozch Offspring")
-                    .OrderByDescending(c => c.Name == "Rimah Corsuezo")
-                    .ToList();
+                if (Playfield.ModelIdentity.Instance == 6123)
+                {
+                    _switchMob = DynelManager.NPCs
+                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && !Constants._ignores.Contains(c.Name)
+                            && c.Name != "Alien Cocoon" && c.Name != "Alien Coccoon"
+                            && c.Name != "Zix"
+                            && c.Health > 0 && c.IsInLineOfSight && c.Name != "Kyr'Ozch Maid"
+                            && c.Name != "Kyr'Ozch Technician" && c.Name != "Defense Drone Tower"
+                            && c.Name != "Control Leech"
+                            && c.Name != "Alien Precision Tower" && c.Name != "Alien Charging Tower"
+                            && c.Name != "Alien Shield Tower" && c.Name != "Kyr'Ozch Technician"
+                            && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c))
+                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                        .OrderBy(c => c.HealthPercent)
+                        .OrderByDescending(c => c.Name == "Kyr'Ozch Nurse")
+                        .OrderByDescending(c => c.Name == "Kyr'Ozch Offspring")
+                        .OrderByDescending(c => c.Name == "Rimah Corsuezo")
+                        .ToList();
 
-                _switchMobPrecision = DynelManager.NPCs
-                    .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && Extensions.BossHasCorrespondingBuff(287525) && c.Name == "Alien Precision Tower")
-                    .ToList();
+                    _switchMobPrecision = DynelManager.NPCs
+                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && Extensions.BossHasCorrespondingBuff(287525) && c.Name == "Alien Precision Tower")
+                        .ToList();
 
-                _switchMobCharging = DynelManager.NPCs
-                    .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && Extensions.BossHasCorrespondingBuff(287515) && c.Name == "Alien Charging Tower")
-                    .ToList();
+                    _switchMobCharging = DynelManager.NPCs
+                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && Extensions.BossHasCorrespondingBuff(287515) && c.Name == "Alien Charging Tower")
+                        .ToList();
 
-                _switchMobShield = DynelManager.NPCs
-                    .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && Extensions.BossHasCorrespondingBuff(287526) && c.Name == "Alien Shield Tower")
-                    .ToList();
+                    _switchMobShield = DynelManager.NPCs
+                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && Extensions.BossHasCorrespondingBuff(287526) && c.Name == "Alien Shield Tower")
+                        .ToList();
 
-                _mob = DynelManager.Characters
-                    .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && !Constants._ignores.Contains(c.Name)
-                        && c.Name != "Zix" && !c.Name.Contains("sapling") && c.Health > 0
-                        && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
-                        && (!c.IsPet || c.Name == "Drop Trooper - Ilari'Ra"))
-                    .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                    .OrderBy(c => c.HealthPercent)
-                    .ToList();
+                    _mob = DynelManager.Characters
+                        .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && !Constants._ignores.Contains(c.Name)
+                            && c.Name != "Zix" && !c.Name.Contains("sapling") && c.Health > 0
+                            && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                            && (!c.IsPet || c.Name == "Drop Trooper - Ilari'Ra"))
+                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                        .OrderBy(c => c.HealthPercent)
+                        .ToList();
 
-            }
-            if (Playfield.ModelIdentity.Instance == 6015)// 12m
-            {
-                _bossMob = DynelManager.NPCs
-                    .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && !Constants._ignores.Contains(c.Name)
-                        && c.Health > 0 && c.IsInLineOfSight
-                        && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
-                        && c.MaxHealth >= 1000000)
-                    .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                    .OrderByDescending(c => c.Name == "Right Hand of Madness")
-                    .OrderByDescending(c => c.Name == "Left Hand of Insanity")
-                    .ToList();
+                }
+                if (Playfield.ModelIdentity.Instance == 6015)// 12m
+                {
+                    _bossMob = DynelManager.NPCs
+                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && !Constants._ignores.Contains(c.Name)
+                            && c.Health > 0 && c.IsInLineOfSight
+                            && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                            && c.MaxHealth >= 1000000)
+                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                        .OrderByDescending(c => c.Name == "Right Hand of Madness")
+                        .OrderByDescending(c => c.Name == "Left Hand of Insanity")
+                        .ToList();
 
-                _switchMob = DynelManager.NPCs
-                  .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                      && !Constants._ignores.Contains(c.Name)
-                      && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
-                      && Extensions.IsFightingAny(c))
-                  .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                  .OrderBy(c => c.HealthPercent)
-                  .OrderByDescending(c => c.Name == "Green Tower")
-                    .OrderByDescending(c => c.Name == "Blue Tower")
-                  .ToList();
+                    _switchMob = DynelManager.NPCs
+                      .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                          && !Constants._ignores.Contains(c.Name)
+                          && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                          && Extensions.IsFightingAny(c))
+                      .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                      .OrderBy(c => c.HealthPercent)
+                      .OrderByDescending(c => c.Name == "Green Tower")
+                        .OrderByDescending(c => c.Name == "Blue Tower")
+                      .ToList();
 
-            }
-            if (Playfield.ModelIdentity.Instance == 9070)// subway
-            {
-                _bossMob = DynelManager.NPCs
+                }
+                if (Playfield.ModelIdentity.Instance == 9070)// subway
+                {
+                    _bossMob = DynelManager.NPCs
+                           .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                               && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
+                               || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                               && c.Health > 0 && c.IsInLineOfSight
+                               && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                               && c.MaxHealth >= 1000000)
+                           .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                           .ToList();
+
+                    _switchMob = DynelManager.NPCs
                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                           && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" ||c.Name == "Scalding Flames" 
-                           || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
-                           && c.Health > 0 && c.IsInLineOfSight
-                           && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
-                           && c.MaxHealth >= 1000000)
+                           && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
+                               || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                           && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                           && Extensions.IsFightingAny(c))
                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                       .OrderBy(c => c.HealthPercent)
+                       .OrderByDescending(c => c.Name == "Stim Fiend")
+                       .OrderByDescending(c => c.Name == "Lost Thought")
                        .ToList();
 
-                _switchMob = DynelManager.NPCs
-                   .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                       && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
-                           || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
-                       && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
-                       && Extensions.IsFightingAny(c))
-                   .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                   .OrderBy(c => c.HealthPercent)
-                   .OrderByDescending(c => c.Name == "Stim Fiend")
-                   .OrderByDescending(c => c.Name == "Lost Thought")
-                   .ToList();
+                    _mob = DynelManager.Characters
+                        .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
+                               || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                            && c.Health > 0 && c.IsInLineOfSight
+                            && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                            && !c.IsPet)
+                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                        .OrderBy(c => c.HealthPercent)
+                        .OrderByDescending(c => c.Name == "Stim Fiend")
+                        .OrderByDescending(c => c.Name == "Lost Thought")
+                        .ToList();
 
-                _mob = DynelManager.Characters
-                    .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
-                           || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
-                        && c.Health > 0 && c.IsInLineOfSight 
-                        && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
-                        && !c.IsPet)
-                    .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                    .OrderBy(c => c.HealthPercent)
-                    .OrderByDescending(c => c.Name == "Stim Fiend")
-                    .OrderByDescending(c => c.Name == "Lost Thought")
-                    .ToList();
+                }
+                else
+                {
+                    _bossMob = DynelManager.NPCs
+                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && !Constants._ignores.Contains(c.Name)
+                            && c.Health > 0 && c.IsInLineOfSight
+                            && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                            //&& !c.Buffs.Contains(302745)
+                            //&& !c.Buffs.Contains(NanoLine.ShovelBuffs)
+                            && c.MaxHealth >= 1000000)
+                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                        .OrderByDescending(c => c.Name == "Uklesh the Beguiling")
+                        .OrderByDescending(c => c.Name == "Khalum the Weaver of Flesh")
+                        .OrderByDescending(c => c.Name == "Field Support  - Cha'Khaz")
 
+                        .ToList();
+
+                    _switchMob = DynelManager.NPCs
+                       .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                           && !Constants._ignores.Contains(c.Name)
+                           && c.Name != "Zix" && !c.Name.Contains("sapling")
+                           && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                           && Extensions.IsFightingAny(c) && (c.Name == "Devoted Fanatic" || c.Name == "Hallowed Acolyte" || c.Name == "Hand of the Colonel"
+                        || c.Name == "Hacker'Uri" || c.Name == "The Sacrifice" || c.Name == "Corrupted Xan-Len"
+                         || c.Name == "Blue Tower" || c.Name == "Green Tower" || c.Name == "Drone Harvester - Jaax'Sinuh"
+                          || c.Name == "Support Sentry - Ilari'Uri" || c.Name == "Fanatic" || c.Name == "Alien Coccoon" || c.Name == "Alien Cocoon" || c.Name == "Stasis Containment Field"))
+                       .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                       .OrderBy(c => c.HealthPercent)
+                       .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
+                       .OrderByDescending(c => c.Name == "Lost Thought")
+                       .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
+                       .OrderByDescending(c => c.Name == "Ruinous Reverend")
+                       .OrderByDescending(c => c.Name == "Alien Cocoon")
+                       .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
+                       .ToList();
+
+                    _mob = DynelManager.Characters
+                        .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && !Constants._ignores.Contains(c.Name)
+                            && c.Name != "Zix" && !c.Name.Contains("sapling") && c.Health > 0
+                            && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                            && (!c.IsPet || c.Name == "Drop Trooper - Ilari'Ra"))
+                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                        .OrderBy(c => c.HealthPercent)
+                        .OrderByDescending(c => c.Name == "Corrupted Hiisi Berserker")
+                        .OrderByDescending(c => c.Name == "Corrupted Xan-Cur")
+                        .OrderByDescending(c => c.Name == "Corrupted Xan-Kuir")
+                        .OrderByDescending(c => c.Name == "Cultist Silencer")
+                        .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
+                        .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
+                        .OrderByDescending(c => c.Name == "Alien Cocoon")
+                        .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
+                        .OrderByDescending(c => c.Name == "Stim Fiend")
+                        .OrderByDescending(c => c.Name == "Lost Thought")
+                        .OrderByDescending(c => c.Name == "Masked Operator")
+                        .OrderByDescending(c => c.Name == "Masked Technician")
+                        .OrderByDescending(c => c.Name == "Masked Engineer")
+                        .OrderByDescending(c => c.Name == "Masked Superior Commando")
+                        .OrderByDescending(c => c.Name == "Green Tower")
+                        .OrderByDescending(c => c.Name == "Blue Tower")
+                        .OrderByDescending(c => c.Name == "The Sacrifice")
+                        .OrderByDescending(c => c.Name == "Hacker'Uri")
+                        .OrderByDescending(c => c.Name == "Hand of the Colonel")
+                        .OrderByDescending(c => c.Name == "Corrupted Xan-Len")
+                       .OrderByDescending(c => c.Name == "Ruinous Reverend")
+                        .OrderByDescending(c => c.Name == "Hallowed Acolyte")
+                        .OrderByDescending(c => c.Name == "Devoted Fanatic")
+                        .ToList();
+                }
+                _refreshList = Time.NormalTime;
             }
-            else
+            catch (Exception ex)
             {
-                _bossMob = DynelManager.NPCs
-                    .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && !Constants._ignores.Contains(c.Name)
-                        && c.Health > 0 && c.IsInLineOfSight
-                        && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
-                        //&& !c.Buffs.Contains(302745)
-                        //&& !c.Buffs.Contains(NanoLine.ShovelBuffs)
-                        && c.MaxHealth >= 1000000)
-                    .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                    .OrderByDescending(c => c.Name == "Uklesh the Beguiling")
-                    .OrderByDescending(c => c.Name == "Khalum the Weaver of Flesh")
-                    .OrderByDescending(c => c.Name == "Field Support  - Cha'Khaz")
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
 
-                    .ToList();
-
-                _switchMob = DynelManager.NPCs
-                   .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                       && !Constants._ignores.Contains(c.Name)
-                       && c.Name != "Zix" && !c.Name.Contains("sapling")
-                       && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
-                       && Extensions.IsFightingAny(c) && (c.Name == "Devoted Fanatic" || c.Name == "Hallowed Acolyte" || c.Name == "Hand of the Colonel"
-                    || c.Name == "Hacker'Uri" || c.Name == "The Sacrifice" || c.Name == "Corrupted Xan-Len"
-                     || c.Name == "Blue Tower" || c.Name == "Green Tower" || c.Name == "Drone Harvester - Jaax'Sinuh"
-                      || c.Name == "Support Sentry - Ilari'Uri" || c.Name == "Fanatic" || c.Name == "Alien Coccoon" || c.Name == "Alien Cocoon" || c.Name == "Stasis Containment Field"))
-                   .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                   .OrderBy(c => c.HealthPercent)
-                   .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
-                   .OrderByDescending(c => c.Name == "Lost Thought")
-                   .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
-                   .OrderByDescending(c => c.Name == "Ruinous Reverend")
-                   .OrderByDescending(c => c.Name == "Alien Cocoon")
-                   .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
-                   .ToList();
-
-                _mob = DynelManager.Characters
-                    .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                        && !Constants._ignores.Contains(c.Name)
-                        && c.Name != "Zix" && !c.Name.Contains("sapling") && c.Health > 0
-                        && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
-                        && (!c.IsPet || c.Name == "Drop Trooper - Ilari'Ra"))
-                    .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                    .OrderBy(c => c.HealthPercent)
-                    .OrderByDescending(c => c.Name == "Corrupted Hiisi Berserker")
-                    .OrderByDescending(c => c.Name == "Corrupted Xan-Cur")
-                    .OrderByDescending(c => c.Name == "Corrupted Xan-Kuir")
-                    .OrderByDescending(c => c.Name == "Cultist Silencer")
-                    .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
-                    .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
-                    .OrderByDescending(c => c.Name == "Alien Cocoon")
-                    .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
-                    .OrderByDescending(c => c.Name == "Stim Fiend")
-                    .OrderByDescending(c => c.Name == "Lost Thought")
-                    .OrderByDescending(c => c.Name == "Masked Operator")
-                    .OrderByDescending(c => c.Name == "Masked Technician")
-                    .OrderByDescending(c => c.Name == "Masked Engineer")
-                    .OrderByDescending(c => c.Name == "Masked Superior Commando")
-                    .OrderByDescending(c => c.Name == "Green Tower")
-                    .OrderByDescending(c => c.Name == "Blue Tower")
-                    .OrderByDescending(c => c.Name == "The Sacrifice")
-                    .OrderByDescending(c => c.Name == "Hacker'Uri")
-                    .OrderByDescending(c => c.Name == "Hand of the Colonel")
-                    .OrderByDescending(c => c.Name == "Corrupted Xan-Len")
-                   .OrderByDescending(c => c.Name == "Ruinous Reverend")
-                    .OrderByDescending(c => c.Name == "Hallowed Acolyte")
-                    .OrderByDescending(c => c.Name == "Devoted Fanatic")
-                    .ToList();
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
-
-            _refreshList = Time.NormalTime;
         }
 
         private void OnUpdate(object s, float deltaTime)
         {
-            if (Game.IsZoning)
+            try
             {
-                Toggle = false;
-                _settings["Toggle"] = false;
-
-                return;
-            }
-
-
-            if (Time.NormalTime > _refreshList + 0.5f
-                && Toggle == true)
-                Scanning();
-
-            var window = SettingsController.FindValidWindow(_windows);
-
-            if (window != null && window.IsValid)
-            {
-                if (window.FindView("AttackBuddyAddHelper", out Button addHelperView))
+                if (Game.IsZoning)
                 {
-                    addHelperView.Tag = window;
-                    addHelperView.Clicked = HandleAddHelperViewClick;
+                    Toggle = false;
+                    _settings["Toggle"] = false;
+
+                    return;
                 }
 
-                if (window.FindView("AttackBuddyRemoveHelper", out Button removeHelperView))
-                {
-                    removeHelperView.Tag = window;
-                    removeHelperView.Clicked = HandleRemoveHelperViewClick;
-                }
+                if (Time.NormalTime > _refreshList + 0.5f
+                    && Toggle == true)
+                    Scanning();
 
-                if (window.FindView("AttackBuddyClearHelpers", out Button clearHelpersView))
-                {
-                    clearHelpersView.Tag = window;
-                    clearHelpersView.Clicked = HandleClearHelpersViewClick;
-                }
+                var window = SettingsController.FindValidWindow(_windows);
 
-                if (window.FindView("AttackBuddyPrintHelpers", out Button printHelpersView))
+                if (window != null && window.IsValid)
                 {
-                    printHelpersView.Tag = window;
-                    printHelpersView.Clicked = HandlePrintHelpersViewClick;
-                }
-            }
-
-            if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
-            {
-                SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
-                SettingsController.settingsWindow.FindView("AttackRangeBox", out TextInputView attackRangeInput);
-                SettingsController.settingsWindow.FindView("ScanRangeBox", out TextInputView scanRangeInput);
-
-                if (channelInput != null)
-                {
-                    if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
+                    if (window.FindView("AttackBuddyAddHelper", out Button addHelperView))
                     {
-                        Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
+                        addHelperView.Tag = window;
+                        addHelperView.Clicked = HandleAddHelperViewClick;
+                    }
+
+                    if (window.FindView("AttackBuddyRemoveHelper", out Button removeHelperView))
+                    {
+                        removeHelperView.Tag = window;
+                        removeHelperView.Clicked = HandleRemoveHelperViewClick;
+                    }
+
+                    if (window.FindView("AttackBuddyClearHelpers", out Button clearHelpersView))
+                    {
+                        clearHelpersView.Tag = window;
+                        clearHelpersView.Clicked = HandleClearHelpersViewClick;
+                    }
+
+                    if (window.FindView("AttackBuddyPrintHelpers", out Button printHelpersView))
+                    {
+                        printHelpersView.Tag = window;
+                        printHelpersView.Clicked = HandlePrintHelpersViewClick;
                     }
                 }
-                if (attackRangeInput != null && !string.IsNullOrEmpty(attackRangeInput.Text))
+
+                if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
                 {
-                    if (int.TryParse(attackRangeInput.Text, out int attackRangeInputValue)
-                        && Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange != attackRangeInputValue)
+                    SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
+                    SettingsController.settingsWindow.FindView("AttackRangeBox", out TextInputView attackRangeInput);
+                    SettingsController.settingsWindow.FindView("ScanRangeBox", out TextInputView scanRangeInput);
+
+                    if (channelInput != null)
                     {
-                        Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = attackRangeInputValue;
-                        IPCChannel.Broadcast(new AttackRangeMessage()
+                        if (int.TryParse(channelInput.Text, out int channelValue)
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                         {
-                            Range = attackRangeInputValue
-                        });
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
+                        }
                     }
-                }
-                if (scanRangeInput != null && !string.IsNullOrEmpty(scanRangeInput.Text))
-                {
-                    if (int.TryParse(scanRangeInput.Text, out int scanRangeInputValue)
-                        && Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange != scanRangeInputValue)
+                    if (attackRangeInput != null && !string.IsNullOrEmpty(attackRangeInput.Text))
                     {
-                        Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = scanRangeInputValue;
-                        IPCChannel.Broadcast(new ScanRangeMessage()
+                        if (int.TryParse(attackRangeInput.Text, out int attackRangeInputValue)
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange != attackRangeInputValue)
                         {
-                            Range = scanRangeInputValue
-                        });
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = attackRangeInputValue;
+                            IPCChannel.Broadcast(new AttackRangeMessage()
+                            {
+                                Range = attackRangeInputValue
+                            });
+                        }
                     }
+                    if (scanRangeInput != null && !string.IsNullOrEmpty(scanRangeInput.Text))
+                    {
+                        if (int.TryParse(scanRangeInput.Text, out int scanRangeInputValue)
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange != scanRangeInputValue)
+                        {
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = scanRangeInputValue;
+                            IPCChannel.Broadcast(new ScanRangeMessage()
+                            {
+                                Range = scanRangeInputValue
+                            });
+                        }
+                    }
+
+                    if (SettingsController.settingsWindow.FindView("AttackBuddyInfoView", out Button infoView))
+                    {
+                        infoView.Tag = SettingsController.settingsWindow;
+                        infoView.Clicked = HandleInfoViewClick;
+                    }
+
+                    if (SettingsController.settingsWindow.FindView("AttackBuddyHelpersView", out Button helperView))
+                    {
+                        helperView.Tag = SettingsController.settingsWindow;
+                        helperView.Clicked = HandleHelpersViewClick;
+                    }
+
+                    if (_settings["Toggle"].AsBool() && !Toggle)
+                    {
+                        IsLeader = true;
+                        Leader = DynelManager.LocalPlayer.Identity;
+
+                        if (DynelManager.LocalPlayer.Identity == Leader)
+                            IPCChannel.Broadcast(new StartMessage());
+
+                        Chat.WriteLine("AttackBuddy enabled.");
+                        Start();
+                    }
+                    if (!_settings["Toggle"].AsBool() && Toggle)
+                    {
+                        Stop();
+                        Chat.WriteLine("AttackBuddy disabled.");
+                        IPCChannel.Broadcast(new StopMessage());
+                    }
+
                 }
-
-                if (SettingsController.settingsWindow.FindView("AttackBuddyInfoView", out Button infoView))
-                {
-                    infoView.Tag = SettingsController.settingsWindow;
-                    infoView.Clicked = HandleInfoViewClick;
-                }
-
-                if (SettingsController.settingsWindow.FindView("AttackBuddyHelpersView", out Button helperView))
-                {
-                    helperView.Tag = SettingsController.settingsWindow;
-                    helperView.Clicked = HandleHelpersViewClick;
-                }
-
-                if (_settings["Toggle"].AsBool() && !Toggle)
-                {
-                    IsLeader = true;
-                    Leader = DynelManager.LocalPlayer.Identity;
-
-                    if (DynelManager.LocalPlayer.Identity == Leader)
-                        IPCChannel.Broadcast(new StartMessage());
-
-                    Chat.WriteLine("AttackBuddy enabled.");
-                    Start();
-                }
-                if (!_settings["Toggle"].AsBool() && Toggle)
-                {
-                    Stop();
-                    Chat.WriteLine("AttackBuddy disabled.");
-                    IPCChannel.Broadcast(new StopMessage());
-                }
-
+                _stateMachine.Tick();
             }
+            catch (Exception ex)
+            {
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
 
-            _stateMachine.Tick();
-
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
+            }
         }
 
         private void AttackBuddyCommand(string command, string[] param, ChatWindow chatWindow)
@@ -577,17 +611,18 @@ namespace AttackBuddy
                             IPCChannel.Broadcast(new StartMessage());
 
                         _settings["Toggle"] = true;
-                        Chat.WriteLine("AttackBuddy enabled.");
+                        chatWindow.WriteLine("AttackBuddy enabled.");
                         Start();
-
                     }
                     else
                     {
                         Stop();
-                        Chat.WriteLine("AttackBuddy disabled.");
+                        chatWindow.WriteLine("AttackBuddy disabled.");
                         IPCChannel.Broadcast(new StopMessage());
                     }
+                    return; // Add an early return here
                 }
+
                 switch (param[0].ToLower())
                 {
                     case "ignore":
@@ -615,13 +650,32 @@ namespace AttackBuddy
                     default:
                         return;
                 }
-
                 Config.Save();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    chatWindow.WriteLine(errorMessage);
+                    chatWindow.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
+        }
+
+
+        public static int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
         }
     }
 }

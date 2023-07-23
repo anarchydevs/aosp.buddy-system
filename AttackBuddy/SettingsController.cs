@@ -57,7 +57,7 @@ namespace AttackBuddy
         {
             if (!IsCommandRegistered)
             {
-                Chat.RegisterCommand("attackbuddy", (string command, string[] param, ChatWindow chatWindow) =>
+                Chat.RegisterCommand("attackbuddy", (string command, string[] param, ChatWindow Chat) =>
                 {
                     try
                     {
@@ -81,9 +81,16 @@ namespace AttackBuddy
                                 scanRangeInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange}";
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Chat.WriteLine(e);
+                        var errorMessage = "An error occurred on line " + AttackBuddy.GetLineNumber(ex) + ": " + ex.Message;
+
+                        if (errorMessage != AttackBuddy.previousErrorMessage)
+                        {
+                            Chat.WriteLine(errorMessage);
+                            Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                            AttackBuddy.previousErrorMessage = errorMessage;
+                        }
                     }
                 });
 
