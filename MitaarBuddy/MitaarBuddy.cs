@@ -155,9 +155,9 @@ namespace MitaarBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            if (Leader == Identity.None
-                && DynelManager.LocalPlayer.Identity.Instance != sender)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
+            //if (Leader == Identity.None
+            //    && DynelManager.LocalPlayer.Identity.Instance != sender)
+            //    Leader = new Identity(IdentityType.SimpleChar, sender);
 
             _settings["Toggle"] = true;
             Start();
@@ -247,7 +247,7 @@ namespace MitaarBuddy
                 }
                 if (_settings["Toggle"].AsBool() && !Toggle)
                 {
-                    Leader = DynelManager.LocalPlayer.Identity;
+                    //Leader = DynelManager.LocalPlayer.Identity;
                     IPCChannel.Broadcast(new StartMessage());
                     Start();
                 }
@@ -387,7 +387,7 @@ namespace MitaarBuddy
                 {
                     if (!_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        Leader = DynelManager.LocalPlayer.Identity;
+                        //Leader = DynelManager.LocalPlayer.Identity;
                         IPCChannel.Broadcast(new StartMessage());
                         Start();
                     }
