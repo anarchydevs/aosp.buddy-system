@@ -24,13 +24,13 @@ namespace MitaarBuddy
 
         public IState GetNextState()
         {
-            if (Extensions.TimedOut(_reformStartedTime, ReformTimeout))
-                return new IdleState();
+            //if (Extensions.TimedOut(_reformStartedTime, ReformTimeout))
+            //    return new IdleState();
 
             if (_phase == ReformPhase.Completed)
             {
                 if (Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
-                    return new IdleState();
+                    return new EnterState();
             }
 
             return null;
