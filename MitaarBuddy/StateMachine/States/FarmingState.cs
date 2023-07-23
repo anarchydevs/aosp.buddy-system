@@ -55,10 +55,13 @@ namespace MitaarBuddy
                              .Where(c => c.Name.Contains("Remains of Technomaster Sinuh"))
                                  .FirstOrDefault();
 
-                _sinuhCorpsePos = (Vector3)_sinuhCorpse?.Position;
+                
 
                 if (_sinuhCorpse != null)
-                { //Path to corpse
+                {
+                    _sinuhCorpsePos = (Vector3)_sinuhCorpse?.Position;
+
+                    //Path to corpse
                     if (!_atCorpse && DynelManager.LocalPlayer.Position.DistanceFrom(_sinuhCorpsePos) > 1.0f)
                     {
                         MovementController.Instance.SetDestination(_sinuhCorpsePos);
@@ -86,21 +89,14 @@ namespace MitaarBuddy
 
                 if (_sinuhCorpse == null)
                 {
-                    Chat.WriteLine("Pause for looting, 10 sec");
-                    Task.Factory.StartNew(
-                        async () =>
-                        {
-                            await Task.Delay(10000);
-                            Chat.WriteLine("Done, Leaving");
 
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._strangeAlienDevice) > 1)
-                                MovementController.Instance.SetDestination(Constants._strangeAlienDevice);
-
-                        });
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._strangeAlienDevice) > 1)
+                    {
+                        MovementController.Instance.SetDestination(Constants._strangeAlienDevice);
+                    }
 
                     _initCorpse = true;
                     _atCorpse = true;
-
                 }
 
                 if (Device != null && _initCorpse && _atCorpse)
