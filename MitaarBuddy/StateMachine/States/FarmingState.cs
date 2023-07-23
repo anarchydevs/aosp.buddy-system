@@ -20,7 +20,8 @@ namespace MitaarBuddy
         public IState GetNextState()
         {
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
+                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20
+                && Team.Members.Any(c => c.Character != null))
             {
                 return new ReformState();
             }

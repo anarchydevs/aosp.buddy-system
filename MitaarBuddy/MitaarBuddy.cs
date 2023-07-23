@@ -90,9 +90,11 @@ namespace MitaarBuddy
 
                 _settings.AddVariable("Toggle", false);
                 _settings.AddVariable("Farming", false);
+                _settings.AddVariable("Leader", false);
 
                 _settings["Toggle"] = false;
                 _settings["Farming"] = false;
+                
 
                 _settings["DifficultySelection"] = (int)DifficultySelection.Easy;
 
@@ -117,6 +119,11 @@ namespace MitaarBuddy
 
         public static void Start()
         {
+            if (_settings["Leader"].AsBool())
+            {
+                Leader = DynelManager.LocalPlayer.Identity;
+            }
+
             Toggle = true;
 
             Chat.WriteLine("MitaarBuddy enabled.");
