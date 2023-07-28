@@ -1,4 +1,4 @@
-﻿using AOSharp.Common.GameData;
+using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
@@ -124,7 +124,7 @@ namespace AXPBuddy
                                 AXPBuddy.NavMeshMovementController.Halt();
 
                                 if (DynelManager.LocalPlayer.FightingTarget == null
-                                        && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                                        && !DynelManager.LocalPlayer.IsAttacking)
                                 {
                                     DynelManager.LocalPlayer.Attack(mob);
                                 }
