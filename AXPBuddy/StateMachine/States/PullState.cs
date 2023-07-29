@@ -24,8 +24,13 @@ namespace AXPBuddy
             if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
                 return new DiedState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.APFHubId && !Team.IsInTeam)
-                return new ReformState();
+            if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
+            {
+                if (!Team.IsInTeam)
+                    return new ReformState();
+                else
+                    return new IdleState();
+            }
 
             return null;
         }
