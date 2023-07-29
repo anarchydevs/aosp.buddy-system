@@ -120,11 +120,7 @@ namespace AXPBuddy
                     {
                         if (mob != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 10f)
                         {
-                            if (!mob.IsInAttackRange())
-                            {
-                                AXPBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
-                            }
-                            if (mob.IsInAttackRange() && mob.IsInLineOfSight)
+                            if (mob.IsInAttackRange(true) && mob.IsInLineOfSight)
                             {
                                 AXPBuddy.NavMeshMovementController.Halt();
 
@@ -133,6 +129,10 @@ namespace AXPBuddy
                                 {
                                     DynelManager.LocalPlayer.Attack(mob);
                                 }
+                            }
+                            else
+                            {
+                                AXPBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
                             }
                         }
                         else if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
