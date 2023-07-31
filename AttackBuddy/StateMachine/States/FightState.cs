@@ -198,63 +198,26 @@ namespace AttackBuddy
                 {
                     if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > AttackBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
                     {
-                        if (Inventory.Find(83920, out Item aggroTool)) //Aggression Enhancer 
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                aggroTool.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(83919, out Item aggroMultiTool)) //Aggression Multiplier
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                aggroMultiTool.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(152029, out Item JealousyTool)) //Aggression Enhancer (Jealousy Augmented) 
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                JealousyTool.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(152028, out Item JealousyMultiTool)) //Aggression Multiplier (Jealousy Augmented) 
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                JealousyMultiTool.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(244655, out Item scorpioTool)) //Scorpio's Aim of Anger
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                scorpioTool.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(253186, out Item EmertoLow))//Codex of the Insulting Emerto
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                EmertoLow.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(253187, out Item EmertoHigh))//Codex of the Insulting Emerto
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                EmertoHigh.Use(_target, true);
-                                return;
-                            }
-                        }
+                        HandleTaunting(_target);
                     }
+                }
+            }
+        }
+        public static void HandleTaunting(SimpleChar target)
+        {
+            Item item = null;
+
+            if (Inventory.Find(83920, out item) || // Aggression Enhancer 
+                Inventory.Find(83919, out item) || // Aggression Multiplier
+                Inventory.Find(152029, out item) || // Aggression Enhancer (Jealousy Augmented) 
+                Inventory.Find(152028, out item) || // Aggression Multiplier (Jealousy Augmented) 
+                Inventory.Find(244655, out item) || // Scorpio's Aim of Anger
+                Inventory.Find(253186, out item) || // Codex of the Insulting Emerto (Low)
+                Inventory.Find(253187, out item))   // Codex of the Insulting Emerto (High)
+            {
+                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
+                {
+                    item.Use(target, true);
                 }
             }
         }

@@ -18,7 +18,6 @@ namespace AttackBuddy
     public class AttackBuddy : AOPluginEntry
     {
         public static StateMachine _stateMachine;
-        public static NavMeshMovementController NavMeshMovementController { get; private set; }
         public static IPCChannel IPCChannel { get; private set; }
         public static Config Config { get; private set; }
 
@@ -161,8 +160,7 @@ namespace AttackBuddy
 
             if (DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.StopAttack();
-            if (MovementController.Instance.IsNavigating)
-                MovementController.Instance.Halt();
+            
         }
 
         private void OnAttackRangeMessage(int sender, IPCMessage msg)
@@ -197,8 +195,6 @@ namespace AttackBuddy
 
             if (DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.StopAttack();
-            if (MovementController.Instance.IsNavigating)
-                MovementController.Instance.Halt();
         }
 
         private void HandleInfoViewClick(object s, ButtonBase button)
@@ -664,7 +660,6 @@ namespace AttackBuddy
                 }
             }
         }
-
 
         public static int GetLineNumber(Exception ex)
         {
