@@ -8,11 +8,6 @@ namespace AttackBuddy
 {
     public static class Extensions
     {
-        public static void AddRandomness(this ref Vector3 pos, int entropy)
-        {
-            pos.X += Next(-entropy, entropy);
-            pos.Z += Next(-entropy, entropy);
-        }
         public static int Next(int min, int max)
         {
             if (min >= max)

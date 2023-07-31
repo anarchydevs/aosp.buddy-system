@@ -160,7 +160,7 @@ namespace AttackBuddy
 
             if (DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.StopAttack();
-            
+
         }
 
         private void OnAttackRangeMessage(int sender, IPCMessage msg)
@@ -267,199 +267,26 @@ namespace AttackBuddy
 
         private void Scanning()
         {
-            try
+            switch (Playfield.ModelIdentity.Instance)
             {
-                if (Playfield.ModelIdentity.Instance == 6123)
-                {
-                    _switchMob = DynelManager.NPCs
-                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                            && !Constants._ignores.Contains(c.Name)
-                            && c.Name != "Alien Cocoon" && c.Name != "Alien Coccoon"
-                            && c.Name != "Zix"
-                            && c.Health > 0 && c.IsInLineOfSight && c.Name != "Kyr'Ozch Maid"
-                            && c.Name != "Kyr'Ozch Technician" && c.Name != "Defense Drone Tower"
-                            && c.Name != "Control Leech"
-                            && c.Name != "Alien Precision Tower" && c.Name != "Alien Charging Tower"
-                            && c.Name != "Alien Shield Tower" && c.Name != "Kyr'Ozch Technician"
-                            && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c))
-                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                        .OrderBy(c => c.HealthPercent)
-                        .OrderByDescending(c => c.Name == "Kyr'Ozch Nurse")
-                        .OrderByDescending(c => c.Name == "Kyr'Ozch Offspring")
-                        .OrderByDescending(c => c.Name == "Rimah Corsuezo")
-                        .ToList();
+                case 6123:
+                    ScanningInstance6123();
+                    break;
 
-                    _switchMobPrecision = DynelManager.NPCs
-                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                            && Extensions.BossHasCorrespondingBuff(287525) && c.Name == "Alien Precision Tower")
-                        .ToList();
+                case 6015:
+                    ScanningInstance6015();
+                    break;
 
-                    _switchMobCharging = DynelManager.NPCs
-                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                            && Extensions.BossHasCorrespondingBuff(287515) && c.Name == "Alien Charging Tower")
-                        .ToList();
+                case 9070:
+                    ScanningInstance9070();
+                    break;
 
-                    _switchMobShield = DynelManager.NPCs
-                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                            && Extensions.BossHasCorrespondingBuff(287526) && c.Name == "Alien Shield Tower")
-                        .ToList();
-
-                    _mob = DynelManager.Characters
-                        .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                            && !Constants._ignores.Contains(c.Name)
-                            && c.Name != "Zix" && !c.Name.Contains("sapling") && c.Health > 0
-                            && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
-                            && (!c.IsPet || c.Name == "Drop Trooper - Ilari'Ra"))
-                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                        .OrderBy(c => c.HealthPercent)
-                        .ToList();
-
-                }
-                if (Playfield.ModelIdentity.Instance == 6015)// 12m
-                {
-                    _bossMob = DynelManager.NPCs
-                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                            && !Constants._ignores.Contains(c.Name)
-                            && c.Health > 0 && c.IsInLineOfSight
-                            && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
-                            && c.MaxHealth >= 1000000)
-                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                        .OrderByDescending(c => c.Name == "Right Hand of Madness")
-                        .OrderByDescending(c => c.Name == "Left Hand of Insanity")
-                        .ToList();
-
-                    _switchMob = DynelManager.NPCs
-                      .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                          && !Constants._ignores.Contains(c.Name)
-                          && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
-                          && Extensions.IsFightingAny(c))
-                      .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                      .OrderBy(c => c.HealthPercent)
-                      .OrderByDescending(c => c.Name == "Green Tower")
-                        .OrderByDescending(c => c.Name == "Blue Tower")
-                      .ToList();
-
-                }
-                if (Playfield.ModelIdentity.Instance == 9070)// subway
-                {
-                    _bossMob = DynelManager.NPCs
-                           .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                               && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
-                               || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
-                               && c.Health > 0 && c.IsInLineOfSight
-                               && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
-                               && c.MaxHealth >= 1000000)
-                           .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                           .ToList();
-
-                    _switchMob = DynelManager.NPCs
-                       .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                           && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
-                               || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
-                           && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
-                           && Extensions.IsFightingAny(c))
-                       .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                       .OrderBy(c => c.HealthPercent)
-                       .OrderByDescending(c => c.Name == "Stim Fiend")
-                       .OrderByDescending(c => c.Name == "Lost Thought")
-                       .ToList();
-
-                    _mob = DynelManager.Characters
-                        .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                            && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
-                               || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
-                            && c.Health > 0 && c.IsInLineOfSight
-                            && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
-                            && !c.IsPet)
-                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                        .OrderBy(c => c.HealthPercent)
-                        .OrderByDescending(c => c.Name == "Stim Fiend")
-                        .OrderByDescending(c => c.Name == "Lost Thought")
-                        .ToList();
-
-                }
-                else
-                {
-                    _bossMob = DynelManager.NPCs
-                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                            && !Constants._ignores.Contains(c.Name)
-                            && c.Health > 0 && c.IsInLineOfSight
-                            && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
-                            //&& !c.Buffs.Contains(302745)
-                            //&& !c.Buffs.Contains(NanoLine.ShovelBuffs)
-                            && c.MaxHealth >= 1000000)
-                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                        .OrderByDescending(c => c.Name == "Uklesh the Beguiling")
-                        .OrderByDescending(c => c.Name == "Khalum the Weaver of Flesh")
-                        .OrderByDescending(c => c.Name == "Field Support  - Cha'Khaz")
-
-                        .ToList();
-
-                    _switchMob = DynelManager.NPCs
-                       .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                           && !Constants._ignores.Contains(c.Name)
-                           && c.Name != "Zix" && !c.Name.Contains("sapling")
-                           && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
-                           && Extensions.IsFightingAny(c) && (c.Name == "Devoted Fanatic" || c.Name == "Hallowed Acolyte" || c.Name == "Hand of the Colonel"
-                        || c.Name == "Hacker'Uri" || c.Name == "The Sacrifice" || c.Name == "Corrupted Xan-Len"
-                         || c.Name == "Blue Tower" || c.Name == "Green Tower" || c.Name == "Drone Harvester - Jaax'Sinuh"
-                          || c.Name == "Support Sentry - Ilari'Uri" || c.Name == "Fanatic" || c.Name == "Alien Coccoon" || c.Name == "Alien Cocoon" || c.Name == "Stasis Containment Field"))
-                       .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                       .OrderBy(c => c.HealthPercent)
-                       .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
-                       .OrderByDescending(c => c.Name == "Lost Thought")
-                       .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
-                       .OrderByDescending(c => c.Name == "Ruinous Reverend")
-                       .OrderByDescending(c => c.Name == "Alien Cocoon")
-                       .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
-                       .ToList();
-
-                    _mob = DynelManager.Characters
-                        .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
-                            && !Constants._ignores.Contains(c.Name)
-                            && c.Name != "Zix" && !c.Name.Contains("sapling") && c.Health > 0
-                            && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
-                            && (!c.IsPet || c.Name == "Drop Trooper - Ilari'Ra"))
-                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                        .OrderBy(c => c.HealthPercent)
-                        .OrderByDescending(c => c.Name == "Corrupted Hiisi Berserker")
-                        .OrderByDescending(c => c.Name == "Corrupted Xan-Cur")
-                        .OrderByDescending(c => c.Name == "Corrupted Xan-Kuir")
-                        .OrderByDescending(c => c.Name == "Cultist Silencer")
-                        .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
-                        .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
-                        .OrderByDescending(c => c.Name == "Alien Cocoon")
-                        .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
-                        .OrderByDescending(c => c.Name == "Stim Fiend")
-                        .OrderByDescending(c => c.Name == "Lost Thought")
-                        .OrderByDescending(c => c.Name == "Masked Operator")
-                        .OrderByDescending(c => c.Name == "Masked Technician")
-                        .OrderByDescending(c => c.Name == "Masked Engineer")
-                        .OrderByDescending(c => c.Name == "Masked Superior Commando")
-                        .OrderByDescending(c => c.Name == "Green Tower")
-                        .OrderByDescending(c => c.Name == "Blue Tower")
-                        .OrderByDescending(c => c.Name == "The Sacrifice")
-                        .OrderByDescending(c => c.Name == "Hacker'Uri")
-                        .OrderByDescending(c => c.Name == "Hand of the Colonel")
-                        .OrderByDescending(c => c.Name == "Corrupted Xan-Len")
-                       .OrderByDescending(c => c.Name == "Ruinous Reverend")
-                        .OrderByDescending(c => c.Name == "Hallowed Acolyte")
-                        .OrderByDescending(c => c.Name == "Devoted Fanatic")
-                        .ToList();
-                }
-                _refreshList = Time.NormalTime;
+                default:
+                    ScanningDefault();
+                    break;
             }
-            catch (Exception ex)
-            {
-                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
 
-                if (errorMessage != previousErrorMessage)
-                {
-                    Chat.WriteLine(errorMessage);
-                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
-                    previousErrorMessage = errorMessage;
-                }
-            }
+            _refreshList = Time.NormalTime;
         }
 
         private void OnUpdate(object s, float deltaTime)
@@ -660,6 +487,190 @@ namespace AttackBuddy
                 }
             }
         }
+
+        // Separate voids for each instance
+        private void ScanningInstance6123()
+        {
+            _switchMob = DynelManager.NPCs
+                        .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && !Constants._ignores.Contains(c.Name)
+                            && c.Name != "Alien Cocoon" && c.Name != "Alien Coccoon"
+                            && c.Name != "Zix"
+                            && c.Health > 0 && c.IsInLineOfSight && c.Name != "Kyr'Ozch Maid"
+                            && c.Name != "Kyr'Ozch Technician" && c.Name != "Defense Drone Tower"
+                            && c.Name != "Control Leech"
+                            && c.Name != "Alien Precision Tower" && c.Name != "Alien Charging Tower"
+                            && c.Name != "Alien Shield Tower" && c.Name != "Kyr'Ozch Technician"
+                            && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c))
+                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                        .OrderBy(c => c.HealthPercent)
+                        .OrderByDescending(c => c.Name == "Kyr'Ozch Nurse")
+                        .OrderByDescending(c => c.Name == "Kyr'Ozch Offspring")
+                        .OrderByDescending(c => c.Name == "Rimah Corsuezo")
+                        .ToList();
+
+            _switchMobPrecision = DynelManager.NPCs
+                .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                    && Extensions.BossHasCorrespondingBuff(287525) && c.Name == "Alien Precision Tower")
+                .ToList();
+
+            _switchMobCharging = DynelManager.NPCs
+                .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                    && Extensions.BossHasCorrespondingBuff(287515) && c.Name == "Alien Charging Tower")
+                .ToList();
+
+            _switchMobShield = DynelManager.NPCs
+                .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                    && Extensions.BossHasCorrespondingBuff(287526) && c.Name == "Alien Shield Tower")
+                .ToList();
+
+            _mob = DynelManager.Characters
+                .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                    && !Constants._ignores.Contains(c.Name)
+                    && c.Name != "Zix" && !c.Name.Contains("sapling") && c.Health > 0
+                    && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                    && (!c.IsPet || c.Name == "Drop Trooper - Ilari'Ra"))
+                .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                .OrderBy(c => c.HealthPercent)
+                .ToList();
+
+        }
+
+        private void ScanningInstance6015() //12m
+        {
+            _bossMob = DynelManager.NPCs
+                       .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                           && !Constants._ignores.Contains(c.Name)
+                           && c.Health > 0 && c.IsInLineOfSight
+                           && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                           && c.MaxHealth >= 1000000)
+                       .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                       .OrderByDescending(c => c.Name == "Right Hand of Madness")
+                       .OrderByDescending(c => c.Name == "Left Hand of Insanity")
+                       .ToList();
+
+            _switchMob = DynelManager.NPCs
+              .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                  && !Constants._ignores.Contains(c.Name)
+                  && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                  && Extensions.IsFightingAny(c))
+              .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+              .OrderBy(c => c.HealthPercent)
+              .OrderByDescending(c => c.Name == "Green Tower")
+                .OrderByDescending(c => c.Name == "Blue Tower")
+              .ToList();
+
+        }
+
+        private void ScanningInstance9070()//Subway
+        {
+            _bossMob = DynelManager.NPCs
+                          .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                              && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
+                              || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                              && c.Health > 0 && c.IsInLineOfSight
+                              && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                              && c.MaxHealth >= 1000000)
+                          .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                          .ToList();
+
+            _switchMob = DynelManager.NPCs
+               .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                   && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
+                       || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                   && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                   && Extensions.IsFightingAny(c))
+               .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+               .OrderBy(c => c.HealthPercent)
+               .OrderByDescending(c => c.Name == "Stim Fiend")
+               .OrderByDescending(c => c.Name == "Lost Thought")
+               .ToList();
+
+            _mob = DynelManager.Characters
+                .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                    && !(c.Name == "Harbinger of Pestilence" || c.Name == "Curse Rot" || c.Name == "Scalding Flames"
+                       || c.Name == "Searing Flames" || c.Name == "Vergil Doppelganger" || c.Name == "Oblivion" || c.Name == "Ire of Gilgamesh")
+                    && c.Health > 0 && c.IsInLineOfSight
+                    && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                    && !c.IsPet)
+                .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                .OrderBy(c => c.HealthPercent)
+                .OrderByDescending(c => c.Name == "Stim Fiend")
+                .OrderByDescending(c => c.Name == "Lost Thought")
+                .ToList();
+        }
+
+        private void ScanningDefault()
+        {
+            _bossMob = DynelManager.NPCs
+                       .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                           && !Constants._ignores.Contains(c.Name)
+                           && c.Health > 0 && c.IsInLineOfSight
+                           && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                           //&& !c.Buffs.Contains(302745)
+                           //&& !c.Buffs.Contains(NanoLine.ShovelBuffs)
+                           && c.MaxHealth >= 1000000)
+                       .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                       .OrderByDescending(c => c.Name == "Uklesh the Beguiling")
+                       .OrderByDescending(c => c.Name == "Khalum the Weaver of Flesh")
+                       .OrderByDescending(c => c.Name == "Field Support  - Cha'Khaz")
+
+                       .ToList();
+
+            _switchMob = DynelManager.NPCs
+               .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                   && !Constants._ignores.Contains(c.Name)
+                   && c.Name != "Zix" && !c.Name.Contains("sapling")
+                   && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                   && Extensions.IsFightingAny(c) && (c.Name == "Devoted Fanatic" || c.Name == "Hallowed Acolyte" || c.Name == "Hand of the Colonel"
+                || c.Name == "Hacker'Uri" || c.Name == "The Sacrifice" || c.Name == "Corrupted Xan-Len"
+                 || c.Name == "Blue Tower" || c.Name == "Green Tower" || c.Name == "Drone Harvester - Jaax'Sinuh"
+                  || c.Name == "Support Sentry - Ilari'Uri" || c.Name == "Fanatic" || c.Name == "Alien Coccoon" || c.Name == "Alien Cocoon" || c.Name == "Stasis Containment Field"))
+               .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+               .OrderBy(c => c.HealthPercent)
+               .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
+               .OrderByDescending(c => c.Name == "Lost Thought")
+               .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
+               .OrderByDescending(c => c.Name == "Ruinous Reverend")
+               .OrderByDescending(c => c.Name == "Alien Cocoon")
+               .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
+               .ToList();
+
+            _mob = DynelManager.Characters
+                .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                    && !Constants._ignores.Contains(c.Name)
+                    && c.Name != "Zix" && !c.Name.Contains("sapling") && c.Health > 0
+                    && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                    && (!c.IsPet || c.Name == "Drop Trooper - Ilari'Ra"))
+                .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                .OrderBy(c => c.HealthPercent)
+                .OrderByDescending(c => c.Name == "Corrupted Hiisi Berserker")
+                .OrderByDescending(c => c.Name == "Corrupted Xan-Cur")
+                .OrderByDescending(c => c.Name == "Corrupted Xan-Kuir")
+                .OrderByDescending(c => c.Name == "Cultist Silencer")
+                .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
+                .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
+                .OrderByDescending(c => c.Name == "Alien Cocoon")
+                .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
+                .OrderByDescending(c => c.Name == "Stim Fiend")
+                .OrderByDescending(c => c.Name == "Lost Thought")
+                .OrderByDescending(c => c.Name == "Masked Operator")
+                .OrderByDescending(c => c.Name == "Masked Technician")
+                .OrderByDescending(c => c.Name == "Masked Engineer")
+                .OrderByDescending(c => c.Name == "Masked Superior Commando")
+                .OrderByDescending(c => c.Name == "Green Tower")
+                .OrderByDescending(c => c.Name == "Blue Tower")
+                .OrderByDescending(c => c.Name == "The Sacrifice")
+                .OrderByDescending(c => c.Name == "Hacker'Uri")
+                .OrderByDescending(c => c.Name == "Hand of the Colonel")
+                .OrderByDescending(c => c.Name == "Corrupted Xan-Len")
+               .OrderByDescending(c => c.Name == "Ruinous Reverend")
+                .OrderByDescending(c => c.Name == "Hallowed Acolyte")
+                .OrderByDescending(c => c.Name == "Devoted Fanatic")
+                .ToList();
+        }
+
+
 
         public static int GetLineNumber(Exception ex)
         {
