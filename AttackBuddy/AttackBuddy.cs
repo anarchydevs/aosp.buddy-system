@@ -28,7 +28,6 @@ namespace AttackBuddy
         public static bool _init = false;
 
         public static Identity Leader = Identity.None;
-        //public static bool IsLeader = false;
 
         public static double _stateTimeOut = Time.NormalTime;
 
@@ -151,8 +150,6 @@ namespace AttackBuddy
         {
             Enable = false;
 
-            //_stateMachine.SetState(new IdleState());
-
             Chat.WriteLine("AttackBuddy disabled.");
 
             if (!(_stateMachine.CurrentState is IdleState))
@@ -164,20 +161,13 @@ namespace AttackBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            //if (DynelManager.LocalPlayer.Identity == Leader)
-            //    return;
-
             Start();
-
             _settings["Enable"] = true;
         }
 
         private void OnStopMessage(int sender, IPCMessage msg)
         {
-            //StopMessage stopMsg = (StopMessage)msg;
-
             Stop();
-
             _settings["Enable"] = false;
         }
 
