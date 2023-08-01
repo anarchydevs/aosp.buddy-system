@@ -250,7 +250,12 @@ namespace AttackBuddy
             SimpleChar target = null;
 
             // Check if any valid target is available in priority order
-            if (AttackBuddy._mob.Count > 0 && AttackBuddy._mob.First().Health > 0)
+
+            if (AttackBuddy._switchMob.Count > 0 && AttackBuddy._switchMob.First().Health > 0)
+            {
+                target = AttackBuddy._switchMob.First();
+            }
+            else if (AttackBuddy._mob.Count > 0 && AttackBuddy._mob.First().Health > 0)
             {
                 target = AttackBuddy._mob.First();
             }
