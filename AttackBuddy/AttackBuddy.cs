@@ -24,11 +24,11 @@ namespace AttackBuddy
         public static int AttackRange;
         public static int ScanRange;
 
-        public static bool Toggle = false;
+        public static bool Enable = false;
         public static bool _init = false;
 
         public static Identity Leader = Identity.None;
-        public static bool IsLeader = false;
+        //public static bool IsLeader = false;
 
         public static double _stateTimeOut = Time.NormalTime;
 
@@ -82,10 +82,11 @@ namespace AttackBuddy
 
                 Game.OnUpdate += OnUpdate;
 
-                _settings.AddVariable("Toggle", false);
+                _settings.AddVariable("Enable", false);
                 _settings.AddVariable("Taunt", false);
+                _settings.AddVariable("Leader", false);
 
-                _settings["Toggle"] = false;
+                _settings["Enable"] = false;
 
                 Chat.WriteLine("AttackBuddy Loaded!");
                 Chat.WriteLine("/attackbuddy for settings.");
@@ -131,36 +132,53 @@ namespace AttackBuddy
             Config.Save();
         }
 
-        private void OnStartMessage(int sender, IPCMessage msg)
+        private void Start()
         {
-            if (DynelManager.LocalPlayer.Identity == Leader)
-                return;
+            Enable = true;
 
-            Toggle = true;
+            if (_settings["Leader"].AsBool())
+            {
+                Leader = DynelManager.LocalPlayer.Identity;
+            }
 
-            _settings["Toggle"] = true;
-
-
-            Leader = new Identity(IdentityType.SimpleChar, sender);
+            Chat.WriteLine("AttackBuddy enabled.");
 
             if (!(_stateMachine.CurrentState is IdleState))
                 _stateMachine.SetState(new IdleState());
         }
 
-        private void OnStopMessage(int sender, IPCMessage msg)
+        private void Stop()
         {
-            StopMessage stopMsg = (StopMessage)msg;
+            Enable = false;
 
-            Toggle = false;
+            //_stateMachine.SetState(new IdleState());
 
-            _settings["Toggle"] = false;
+            Chat.WriteLine("AttackBuddy disabled.");
 
-            _stateMachine.SetState(new IdleState());
-
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
 
             if (DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.StopAttack();
+        }
 
+        private void OnStartMessage(int sender, IPCMessage msg)
+        {
+            //if (DynelManager.LocalPlayer.Identity == Leader)
+            //    return;
+
+            Start();
+
+            _settings["Enable"] = true;
+        }
+
+        private void OnStopMessage(int sender, IPCMessage msg)
+        {
+            //StopMessage stopMsg = (StopMessage)msg;
+
+            Stop();
+
+            _settings["Enable"] = false;
         }
 
         private void OnAttackRangeMessage(int sender, IPCMessage msg)
@@ -177,25 +195,7 @@ namespace AttackBuddy
             Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = rangeMsg.Range;
         }
 
-        private void Start()
-        {
-            Toggle = true;
-
-            if (!(_stateMachine.CurrentState is IdleState))
-                _stateMachine.SetState(new IdleState());
-        }
-
-        private void Stop()
-        {
-            Toggle = false;
-
-            _settings["Toggle"] = false;
-
-            _stateMachine.SetState(new IdleState());
-
-            if (DynelManager.LocalPlayer.IsAttacking)
-                DynelManager.LocalPlayer.StopAttack();
-        }
+        
 
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
@@ -295,16 +295,17 @@ namespace AttackBuddy
             {
                 if (Game.IsZoning)
                 {
-                    Toggle = false;
-                    _settings["Toggle"] = false;
+                    Enable = false;
+                    _settings["Enable"] = false;
 
                     return;
                 }
 
                 if (Time.NormalTime > _refreshList + 0.5f
-                    && Toggle == true)
+                    && Enable == true)
                     Scanning();
 
+                #region UI
                 var window = SettingsController.FindValidWindow(_windows);
 
                 if (window != null && window.IsValid)
@@ -385,23 +386,20 @@ namespace AttackBuddy
                         helperView.Clicked = HandleHelpersViewClick;
                     }
 
-                    if (_settings["Toggle"].AsBool() && !Toggle)
+                    if (!_settings["Enable"].AsBool() && Enable)
                     {
-                        IsLeader = true;
-                        Leader = DynelManager.LocalPlayer.Identity;
-
-                        if (DynelManager.LocalPlayer.Identity == Leader)
+                        
+                        IPCChannel.Broadcast(new StopMessage());
+                        Stop();
+                    }
+                    if (_settings["Enable"].AsBool() && !Enable)
+                    {
+                        //if (DynelManager.LocalPlayer.Identity == Leader)
                             IPCChannel.Broadcast(new StartMessage());
-
-                        Chat.WriteLine("AttackBuddy enabled.");
                         Start();
                     }
-                    if (!_settings["Toggle"].AsBool() && Toggle)
-                    {
-                        Stop();
-                        Chat.WriteLine("AttackBuddy disabled.");
-                        IPCChannel.Broadcast(new StopMessage());
-                    }
+                    
+                    #endregion
 
                 }
                 _stateMachine.Tick();
@@ -425,22 +423,23 @@ namespace AttackBuddy
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Toggle"].AsBool() && !Toggle)
+                    if (!_settings["Enable"].AsBool())// && !Enable)
                     {
-                        IsLeader = true;
-                        Leader = DynelManager.LocalPlayer.Identity;
+                        //IsLeader = true;
+                        //Leader = DynelManager.LocalPlayer.Identity;
 
-                        if (DynelManager.LocalPlayer.Identity == Leader)
+                       // if (DynelManager.LocalPlayer.Identity == Leader)
                             IPCChannel.Broadcast(new StartMessage());
 
-                        _settings["Toggle"] = true;
-                        chatWindow.WriteLine("AttackBuddy enabled.");
+                        _settings["Enable"] = true;
+                        //chatWindow.WriteLine("AttackBuddy enabled.");
                         Start();
                     }
                     else
                     {
                         Stop();
-                        chatWindow.WriteLine("AttackBuddy disabled.");
+                        _settings["Enable"] = false;
+                        //chatWindow.WriteLine("AttackBuddy disabled.");
                         IPCChannel.Broadcast(new StopMessage());
                     }
                     return; // Add an early return here
@@ -669,8 +668,6 @@ namespace AttackBuddy
                 .OrderByDescending(c => c.Name == "Devoted Fanatic")
                 .ToList();
         }
-
-
 
         public static int GetLineNumber(Exception ex)
         {

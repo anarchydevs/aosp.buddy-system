@@ -8,22 +8,6 @@ namespace AttackBuddy
 {
     public static class Extensions
     {
-        public static int Next(int min, int max)
-        {
-            if (min >= max)
-            {
-                throw new ArgumentException("Min value is greater or equals than Max value.");
-            }
-
-            byte[] intBytes = new byte[4];
-            using (RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider())
-            {
-                rng.GetNonZeroBytes(intBytes);
-            }
-
-            return min + Math.Abs(BitConverter.ToInt32(intBytes, 0)) % (max - min + 1);
-        }
-
         public static bool IsFightingAny(SimpleChar mob)
         {
             if (mob?.FightingTarget == null) { return true; }
@@ -48,43 +32,6 @@ namespace AttackBuddy
                     && mob.FightingTarget?.PetOwnerId == DynelManager.LocalPlayer.Identity.Instance);
         }
 
-        //public static bool IsFightingAny(SimpleChar target)
-        //{
-        //    if (Team.IsInTeam)
-        //    {
-        //        if (target?.FightingTarget == null) { return true; }
-
-        //        if (target?.FightingTarget != null
-        //            && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name
-        //                || AttackBuddy._helpers.Contains(target?.FightingTarget.Name)
-        //                || Team.Members.Any(c => c.Name == target?.FightingTarget?.Name))) { return true; }
-
-        //        if (target?.FightingTarget?.Name == "Guardian Spirit of Purification"
-        //            || target?.FightingTarget?.Name == "Rookie Alien Hunter"
-        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Alpha"
-        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Delta"
-        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Gamma") { return true; }
-
-        //        return false;
-        //    }
-        //    else
-        //    {
-        //        if (target?.FightingTarget == null) { return true; }
-
-        //        if (target?.FightingTarget != null
-        //            && (target?.FightingTarget.Name == DynelManager.LocalPlayer.Name
-        //                || AttackBuddy._helpers.Contains(target?.FightingTarget.Name)
-        //                || DynelManager.LocalPlayer.Pets.Any(c => target?.FightingTarget?.Name == c.Character?.Name))) { return true; }
-
-        //        if (target?.FightingTarget?.Name == "Guardian Spirit of Purification"
-        //            || target?.FightingTarget?.Name == "Rookie Alien Hunter"
-        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Alpha"
-        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Delta"
-        //            || target?.FightingTarget?.Name == "Unicorn Service Tower Gamma") { return true; }
-
-        //        return false;
-        //    }
-        //}
         public static SimpleChar GetLeader(Identity leader)
         {
             if (!DynelManager.Players
@@ -143,13 +90,15 @@ namespace AttackBuddy
         {
             return _target?.IsInLineOfSight == true
                 && !DynelManager.LocalPlayer.IsMoving
-                && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending;
+                && !DynelManager.LocalPlayer.IsAttacking
+                && !DynelManager.LocalPlayer.IsAttackPending;
         }
 
         public static bool CanAttack()
         {
             return DynelManager.LocalPlayer.FightingTarget == null
-                    && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending;
+                    && !DynelManager.LocalPlayer.IsAttacking
+                    && !DynelManager.LocalPlayer.IsAttackPending;
         }
     }
 }

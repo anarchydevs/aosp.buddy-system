@@ -19,20 +19,28 @@ namespace AttackBuddy
 
         public IState GetNextState()
         {
-            if (_target != null || !AttackBuddy._settings["Toggle"].AsBool())
+
+            if (!AttackBuddy._settings["Enable"].AsBool())
+            {
+                return new IdleState();
+            }
+
+            if (_target != null)
+            {
                 return new FightState(_target);
+            }
 
             return null;
         }
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("ScanState::OnStateEnter");
+            Chat.WriteLine("ScanState::OnStateEnter");
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("ScanState::OnStateExit");
+            Chat.WriteLine("ScanState::OnStateExit");
         }
 
         private void HandleCharmScan()
@@ -70,45 +78,91 @@ namespace AttackBuddy
         {
             if (Extensions.GetLeader(AttackBuddy.Leader) != null)
             {
-                if (DynelManager.LocalPlayer.Profession == Profession.Trader || DynelManager.LocalPlayer.Profession == Profession.Bureaucrat)
+                if (DynelManager.LocalPlayer.Profession == Profession.Trader
+                    || DynelManager.LocalPlayer.Profession == Profession.Bureaucrat)
+                {
                     HandleCharmScan();
-
-                if (AttackBuddy._mob.Count >= 1)
-                {
-                    if (AttackBuddy._mob.FirstOrDefault().Health == 0) { return; }
-
-                    _target = AttackBuddy._mob.FirstOrDefault();
-                    Chat.WriteLine($"Found target: {_target.Name}.");
                 }
-                else if (AttackBuddy._bossMob.Count >= 1)
-                {
-                    if (AttackBuddy._bossMob.FirstOrDefault().Health == 0) { return; }
 
-                    _target = AttackBuddy._bossMob.FirstOrDefault();
-                    Chat.WriteLine($"Found target: {_target.Name}.");
-                }
-                else if (AttackBuddy._switchMobPrecision.Count >= 1)
-                {
-                    if (AttackBuddy._switchMobPrecision.FirstOrDefault().Health == 0) { return; }
+                SelectTarget();
 
-                    _target = AttackBuddy._switchMobPrecision.FirstOrDefault();
-                    Chat.WriteLine($"Found target: {_target.Name}.");
-                }
-                else if (AttackBuddy._switchMobCharging.Count >= 1)
-                {
-                    if (AttackBuddy._switchMobCharging.FirstOrDefault().Health == 0) { return; }
+                //if (AttackBuddy._mob.Count >= 1)
+                //{
+                //    if (AttackBuddy._mob.FirstOrDefault().Health == 0) { return; }
 
-                    _target = AttackBuddy._switchMobCharging.FirstOrDefault();
-                    Chat.WriteLine($"Found target: {_target.Name}.");
-                }
-                else if (AttackBuddy._switchMobShield.Count >= 1)
-                {
-                    if (AttackBuddy._switchMobShield.FirstOrDefault().Health == 0) { return; }
+                //    _target = AttackBuddy._mob.FirstOrDefault();
+                //    Chat.WriteLine($"Found target: {_target.Name}.");
+                //}
+                //else if (AttackBuddy._bossMob.Count >= 1)
+                //{
+                //    if (AttackBuddy._bossMob.FirstOrDefault().Health == 0) { return; }
 
-                    _target = AttackBuddy._switchMobShield.FirstOrDefault();
-                    Chat.WriteLine($"Found target: {_target.Name}.");
-                }
+                //    _target = AttackBuddy._bossMob.FirstOrDefault();
+                //    Chat.WriteLine($"Found target: {_target.Name}.");
+                //}
+                //else if (AttackBuddy._switchMobPrecision.Count >= 1)
+                //{
+                //    if (AttackBuddy._switchMobPrecision.FirstOrDefault().Health == 0) { return; }
+
+                //    _target = AttackBuddy._switchMobPrecision.FirstOrDefault();
+                //    Chat.WriteLine($"Found target: {_target.Name}.");
+                //}
+                //else if (AttackBuddy._switchMobCharging.Count >= 1)
+                //{
+                //    if (AttackBuddy._switchMobCharging.FirstOrDefault().Health == 0) { return; }
+
+                //    _target = AttackBuddy._switchMobCharging.FirstOrDefault();
+                //    Chat.WriteLine($"Found target: {_target.Name}.");
+                //}
+                //else if (AttackBuddy._switchMobShield.Count >= 1)
+                //{
+                //    if (AttackBuddy._switchMobShield.FirstOrDefault().Health == 0) { return; }
+
+                //    _target = AttackBuddy._switchMobShield.FirstOrDefault();
+                //    Chat.WriteLine($"Found target: {_target.Name}.");
+                //}
             }
+        }
+
+        private void SelectTarget()
+        {
+            _target = null;
+
+            switch (true)
+            {
+                case var _ when AttackBuddy._mob.Count >= 1 && AttackBuddy._mob.First().Health > 0:
+                    _target = AttackBuddy._mob.First();
+                    break;
+
+                case var _ when AttackBuddy._switchMob.Count >= 1 && AttackBuddy._mob.First().Health > 0:
+                    _target = AttackBuddy._mob.First();
+                    break;
+
+                case var _ when AttackBuddy._bossMob.Count >= 1 && AttackBuddy._bossMob.First().Health > 0:
+                    _target = AttackBuddy._bossMob.First();
+                    break;
+
+                case var _ when AttackBuddy._switchMobPrecision.Count >= 1 && AttackBuddy._switchMobPrecision.First().Health > 0:
+                    _target = AttackBuddy._switchMobPrecision.First();
+                    break;
+
+                case var _ when AttackBuddy._switchMobCharging.Count >= 1 && AttackBuddy._switchMobCharging.First().Health > 0:
+                    _target = AttackBuddy._switchMobCharging.First();
+                    break;
+
+                case var _ when AttackBuddy._switchMobShield.Count >= 1 && AttackBuddy._switchMobShield.First().Health > 0:
+                    _target = AttackBuddy._switchMobShield.First();
+                    break;
+
+                default:
+                    break;
+            }
+
+            if (_target != null)
+            {
+                Chat.WriteLine($"Found target: {_target.Name}.");
+            }
+
         }
     }
 }
