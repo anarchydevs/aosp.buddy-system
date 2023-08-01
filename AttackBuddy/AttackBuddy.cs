@@ -413,23 +413,17 @@ namespace AttackBuddy
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Enable"].AsBool())// && !Enable)
+                    if (!_settings["Enable"].AsBool())
                     {
-                        //IsLeader = true;
-                        //Leader = DynelManager.LocalPlayer.Identity;
-
-                       // if (DynelManager.LocalPlayer.Identity == Leader)
                             IPCChannel.Broadcast(new StartMessage());
 
                         _settings["Enable"] = true;
-                        //chatWindow.WriteLine("AttackBuddy enabled.");
                         Start();
                     }
                     else
                     {
                         Stop();
                         _settings["Enable"] = false;
-                        //chatWindow.WriteLine("AttackBuddy disabled.");
                         IPCChannel.Broadcast(new StopMessage());
                     }
                     return; // Add an early return here
