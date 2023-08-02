@@ -244,7 +244,7 @@ namespace AttackBuddy
 
         private SimpleChar GetValidAttackTarget()
         {
-            SimpleChar _target = null;
+             _target = null;
 
             // Check if any valid _target is available in priority order
 
