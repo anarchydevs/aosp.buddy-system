@@ -60,7 +60,7 @@ namespace AttackBuddy
                     _charmMobAttacked = false;
                     _charmMobs.Remove(_charmMob.Identity);
                     _target = _charmMob;
-                    Chat.WriteLine($"Found target: {_target.Name}.");
+                    Chat.WriteLine($"Found _target: {_target.Name}.");
                 }
 
                 if (_charmMob.FightingTarget != null && _charmMob.IsAttacking
@@ -91,35 +91,35 @@ namespace AttackBuddy
                 //    if (AttackBuddy._mob.FirstOrDefault().Health == 0) { return; }
 
                 //    _target = AttackBuddy._mob.FirstOrDefault();
-                //    Chat.WriteLine($"Found target: {_target.Name}.");
+                //    Chat.WriteLine($"Found _target: {_target.Name}.");
                 //}
                 //else if (AttackBuddy._bossMob.Count >= 1)
                 //{
                 //    if (AttackBuddy._bossMob.FirstOrDefault().Health == 0) { return; }
 
                 //    _target = AttackBuddy._bossMob.FirstOrDefault();
-                //    Chat.WriteLine($"Found target: {_target.Name}.");
+                //    Chat.WriteLine($"Found _target: {_target.Name}.");
                 //}
                 //else if (AttackBuddy._switchMobPrecision.Count >= 1)
                 //{
                 //    if (AttackBuddy._switchMobPrecision.FirstOrDefault().Health == 0) { return; }
 
                 //    _target = AttackBuddy._switchMobPrecision.FirstOrDefault();
-                //    Chat.WriteLine($"Found target: {_target.Name}.");
+                //    Chat.WriteLine($"Found _target: {_target.Name}.");
                 //}
                 //else if (AttackBuddy._switchMobCharging.Count >= 1)
                 //{
                 //    if (AttackBuddy._switchMobCharging.FirstOrDefault().Health == 0) { return; }
 
                 //    _target = AttackBuddy._switchMobCharging.FirstOrDefault();
-                //    Chat.WriteLine($"Found target: {_target.Name}.");
+                //    Chat.WriteLine($"Found _target: {_target.Name}.");
                 //}
                 //else if (AttackBuddy._switchMobShield.Count >= 1)
                 //{
                 //    if (AttackBuddy._switchMobShield.FirstOrDefault().Health == 0) { return; }
 
                 //    _target = AttackBuddy._switchMobShield.FirstOrDefault();
-                //    Chat.WriteLine($"Found target: {_target.Name}.");
+                //    Chat.WriteLine($"Found _target: {_target.Name}.");
                 //}
             }
         }
@@ -130,11 +130,11 @@ namespace AttackBuddy
 
             switch (true)
             {
-                case var _ when AttackBuddy._mob.Count >= 1 && AttackBuddy._mob.First().Health > 0:
-                    _target = AttackBuddy._mob.First();
-                    break;
 
                 case var _ when AttackBuddy._switchMob.Count >= 1 && AttackBuddy._mob.First().Health > 0:
+                    _target = AttackBuddy._mob.First();
+                    break;
+                case var _ when AttackBuddy._mob.Count >= 1 && AttackBuddy._mob.First().Health > 0:
                     _target = AttackBuddy._mob.First();
                     break;
 
@@ -160,7 +160,7 @@ namespace AttackBuddy
 
             if (_target != null)
             {
-                Chat.WriteLine($"Found target: {_target.Name}.");
+                Chat.WriteLine($"Found _target: {_target.Name}.");
             }
 
         }

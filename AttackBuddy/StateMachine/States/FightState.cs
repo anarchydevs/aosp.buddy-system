@@ -22,9 +22,9 @@ namespace AttackBuddy
 
         private SimpleChar _target;
 
-        public FightState(SimpleChar target)
+        public FightState(SimpleChar _target)
         {
-            _target = target;
+            _target = _target;
         }
 
         public IState GetNextState()
@@ -131,7 +131,7 @@ namespace AttackBuddy
 
             //                        _target = AttackBuddy._switchMobPrecision.FirstOrDefault();
             //                        DynelManager.LocalPlayer.Attack(_target);
-            //                        Chat.WriteLine($"Switching to target {_target.Name}.");
+            //                        Chat.WriteLine($"Switching to _target {_target.Name}.");
             //                        _fightStartTime = Time.NormalTime;
             //                        return;
             //                    }
@@ -148,7 +148,7 @@ namespace AttackBuddy
 
             //                        _target = AttackBuddy._switchMobCharging.FirstOrDefault();
             //                        DynelManager.LocalPlayer.Attack(_target);
-            //                        Chat.WriteLine($"Switching to target {_target.Name}.");
+            //                        Chat.WriteLine($"Switching to _target {_target.Name}.");
             //                        _fightStartTime = Time.NormalTime;
             //                        return;
             //                    }
@@ -165,7 +165,7 @@ namespace AttackBuddy
 
             //                        _target = AttackBuddy._switchMobShield.FirstOrDefault();
             //                        DynelManager.LocalPlayer.Attack(_target);
-            //                        Chat.WriteLine($"Switching to target {_target.Name}.");
+            //                        Chat.WriteLine($"Switching to _target {_target.Name}.");
             //                        _fightStartTime = Time.NormalTime;
             //                        return;
             //                    }
@@ -179,7 +179,7 @@ namespace AttackBuddy
 
             //                    _target = AttackBuddy._switchMob.FirstOrDefault();
             //                    DynelManager.LocalPlayer.Attack(_target);
-            //                    Chat.WriteLine($"Switching to target {_target.Name}.");
+            //                    Chat.WriteLine($"Switching to _target {_target.Name}.");
             //                    _fightStartTime = Time.NormalTime;
             //                    return;
             //                }
@@ -192,7 +192,7 @@ namespace AttackBuddy
 
             //                    _target = AttackBuddy._mob.FirstOrDefault();
             //                    DynelManager.LocalPlayer.Attack(_target);
-            //                    Chat.WriteLine($"Switching to target {_target.Name}.");
+            //                    Chat.WriteLine($"Switching to _target {_target.Name}.");
             //                    _fightStartTime = Time.NormalTime;
             //                    return;
             //                }
@@ -206,7 +206,7 @@ namespace AttackBuddy
 
             //                _target = AttackBuddy._switchMob.FirstOrDefault();
             //                DynelManager.LocalPlayer.Attack(_target);
-            //                Chat.WriteLine($"Switching to target {_target.Name}.");
+            //                Chat.WriteLine($"Switching to _target {_target.Name}.");
             //                _fightStartTime = Time.NormalTime;
             //                return;
             //            }
@@ -217,16 +217,13 @@ namespace AttackBuddy
             if (Extensions.ShouldTaunt(_target)
                 && AttackBuddy._settings["Taunt"].AsBool())
             {
-                if (Extensions.GetLeader(AttackBuddy.Leader) != null)
+                if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > AttackBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
                 {
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > AttackBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
-                    {
-                        HandleTaunting(_target);
-                    }
+                    HandleTaunting(_target);
                 }
             }
         }
-        public static void HandleTaunting(SimpleChar target)
+        public static void HandleTaunting(SimpleChar _target)
         {
             Item item = null;
 
@@ -240,43 +237,43 @@ namespace AttackBuddy
             {
                 if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
                 {
-                    item.Use(target, true);
+                    item.Use(_target, true);
                 }
             }
         }
 
         private SimpleChar GetValidAttackTarget()
         {
-            SimpleChar target = null;
+            SimpleChar _target = null;
 
-            // Check if any valid target is available in priority order
+            // Check if any valid _target is available in priority order
 
             if (AttackBuddy._switchMob.Count > 0 && AttackBuddy._switchMob.First().Health > 0)
             {
-                target = AttackBuddy._switchMob.First();
+                _target = AttackBuddy._switchMob.First();
             }
             else if (AttackBuddy._mob.Count > 0 && AttackBuddy._mob.First().Health > 0)
             {
-                target = AttackBuddy._mob.First();
+                _target = AttackBuddy._mob.First();
             }
             else if (AttackBuddy._bossMob.Count > 0 && AttackBuddy._bossMob.First().Health > 0)
             {
-                target = AttackBuddy._bossMob.First();
+                _target = AttackBuddy._bossMob.First();
             }
             else if (AttackBuddy._switchMobPrecision.Count > 0 && AttackBuddy._switchMobPrecision.First().Health > 0)
             {
-                target = AttackBuddy._switchMobPrecision.First();
+                _target = AttackBuddy._switchMobPrecision.First();
             }
             else if (AttackBuddy._switchMobCharging.Count > 0 && AttackBuddy._switchMobCharging.First().Health > 0)
             {
-                target = AttackBuddy._switchMobCharging.First();
+                _target = AttackBuddy._switchMobCharging.First();
             }
             else if (AttackBuddy._switchMobShield.Count > 0 && AttackBuddy._switchMobShield.First().Health > 0)
             {
-                target = AttackBuddy._switchMobShield.First();
+                _target = AttackBuddy._switchMobShield.First();
             }
 
-            return target;
+            return _target;
         }
 
     }
