@@ -404,11 +404,11 @@ namespace AttackBuddy
                            && (c.Name == "Devoted Fanatic" 
                            || c.Name == "Hallowed Acolyte" 
                            || c.Name == "Fanatic"
+                           || c.Name == "Turbulent Windcaller"
                            || c.Name == "Ruinous Reverend"))
                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
                        .OrderBy(c => c.HealthPercent)
-                       //.OrderByDescending(c => c.Name == "Ruinous Reverend")
-                       //.OrderByDescending(c => c.Name == "Devoted Fanatic")
+                       .OrderByDescending(c => c.Name == "Devoted Fanatic")
                        .ToList();
 
                     _mob = DynelManager.Characters

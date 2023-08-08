@@ -185,7 +185,7 @@ namespace AttackBuddy
             Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = rangeMsg.Range;
         }
 
-        
+
 
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
@@ -269,6 +269,10 @@ namespace AttackBuddy
 
                 case 9070:
                     ScanningInstance9070();
+                    break;
+
+                case 9061:
+                    ScanningInstance9061();
                     break;
 
                 default:
@@ -378,17 +382,17 @@ namespace AttackBuddy
 
                     if (!_settings["Enable"].AsBool() && Enable)
                     {
-                        
+
                         IPCChannel.Broadcast(new StopMessage());
                         Stop();
                     }
                     if (_settings["Enable"].AsBool() && !Enable)
                     {
                         //if (DynelManager.LocalPlayer.Identity == Leader)
-                            IPCChannel.Broadcast(new StartMessage());
+                        IPCChannel.Broadcast(new StartMessage());
                         Start();
                     }
-                    
+
                     #endregion
 
                 }
@@ -415,7 +419,7 @@ namespace AttackBuddy
                 {
                     if (!_settings["Enable"].AsBool())
                     {
-                            IPCChannel.Broadcast(new StartMessage());
+                        IPCChannel.Broadcast(new StartMessage());
 
                         _settings["Enable"] = true;
                         Start();
@@ -545,7 +549,7 @@ namespace AttackBuddy
 
         }
 
-        private void ScanningInstance9070()//Subway
+        private void ScanningInstance9070()//Subway Raid
         {
             _bossMob = DynelManager.NPCs
                           .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
@@ -583,6 +587,54 @@ namespace AttackBuddy
                 .ToList();
         }
 
+        private void ScanningInstance9061()//TOTW Raid
+        {
+            {
+                _bossMob = DynelManager.NPCs
+                   .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                       && !Constants._ignores.Contains(c.Name)
+                       && c.Health > 0 && c.IsInLineOfSight
+                       && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                       && c.MaxHealth >= 1000000)
+                   .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                   .OrderByDescending(c => c.Name == "Uklesh the Beguiling")
+                   .OrderByDescending(c => c.Name == "Khalum the Weaver of Flesh")
+
+                   .ToList();
+
+                _switchMob = DynelManager.NPCs
+                   .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                                   && !Constants._ignores.Contains(c.Name)
+                                   && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                                   && Extensions.IsFightingAny(c)
+                                   && (c.Name == "Devoted Fanatic"
+                                   || c.Name == "Hallowed Acolyte"
+                                   || c.Name == "Fanatic"
+                                   || c.Name == "Turbulent Windcaller"
+                                   || c.Name == "Ruinous Reverend"))
+                               .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                               .OrderBy(c => c.HealthPercent)
+                               .OrderByDescending(c => c.Name == "Devoted Fanatic")
+                               .ToList();
+
+                _mob = DynelManager.Characters
+                    .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                                    && !Constants._ignores.Contains(c.Name) && c.Health > 0
+                                    && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                                    && !c.IsPet)
+                                .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                                .OrderBy(c => c.HealthPercent)
+                                .OrderByDescending(c => c.Name == "Faithful Cultist")
+                                .OrderByDescending(c => c.Name == "Ruinous Reverend")
+                                .OrderByDescending(c => c.Name == "Hallowed Acolyte")
+                                .OrderByDescending(c => c.Name == "Turbulent Windcaller")
+                                .OrderByDescending(c => c.Name == "Seraphic Exarch")
+                                .OrderByDescending(c => c.Name == "Cultist Silencer")
+                                .OrderByDescending(c => c.Name == "Devoted Fanatic")
+                                .ToList();
+            }
+        }
+
         private void ScanningDefault()
         {
             _bossMob = DynelManager.NPCs
@@ -594,8 +646,6 @@ namespace AttackBuddy
                            //&& !c.Buffs.Contains(NanoLine.ShovelBuffs)
                            && c.MaxHealth >= 1000000)
                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
-                       .OrderByDescending(c => c.Name == "Uklesh the Beguiling")
-                       .OrderByDescending(c => c.Name == "Khalum the Weaver of Flesh")
                        .OrderByDescending(c => c.Name == "Field Support  - Cha'Khaz")
 
                        .ToList();
@@ -605,16 +655,15 @@ namespace AttackBuddy
                    && !Constants._ignores.Contains(c.Name)
                    && c.Name != "Zix" && !c.Name.Contains("sapling")
                    && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
-                   && Extensions.IsFightingAny(c) && (c.Name == "Devoted Fanatic" || c.Name == "Hallowed Acolyte" || c.Name == "Hand of the Colonel"
+                   && Extensions.IsFightingAny(c) && ( c.Name == "Hand of the Colonel"
                 || c.Name == "Hacker'Uri" || c.Name == "The Sacrifice" || c.Name == "Corrupted Xan-Len"
-                 || c.Name == "Blue Tower" || c.Name == "Green Tower" || c.Name == "Drone Harvester - Jaax'Sinuh"
-                  || c.Name == "Support Sentry - Ilari'Uri" || c.Name == "Fanatic" || c.Name == "Alien Coccoon" || c.Name == "Alien Cocoon" || c.Name == "Stasis Containment Field"))
+                 || c.Name == "Drone Harvester - Jaax'Sinuh"
+                  || c.Name == "Support Sentry - Ilari'Uri" ||c.Name == "Alien Coccoon" || c.Name == "Alien Cocoon" || c.Name == "Stasis Containment Field"))
                .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
                .OrderBy(c => c.HealthPercent)
                .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
                .OrderByDescending(c => c.Name == "Lost Thought")
                .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
-               .OrderByDescending(c => c.Name == "Ruinous Reverend")
                .OrderByDescending(c => c.Name == "Alien Cocoon")
                .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
                .ToList();
@@ -635,21 +684,14 @@ namespace AttackBuddy
                 .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
                 .OrderByDescending(c => c.Name == "Alien Cocoon")
                 .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
-                .OrderByDescending(c => c.Name == "Stim Fiend")
-                .OrderByDescending(c => c.Name == "Lost Thought")
                 .OrderByDescending(c => c.Name == "Masked Operator")
                 .OrderByDescending(c => c.Name == "Masked Technician")
                 .OrderByDescending(c => c.Name == "Masked Engineer")
                 .OrderByDescending(c => c.Name == "Masked Superior Commando")
-                .OrderByDescending(c => c.Name == "Green Tower")
-                .OrderByDescending(c => c.Name == "Blue Tower")
                 .OrderByDescending(c => c.Name == "The Sacrifice")
                 .OrderByDescending(c => c.Name == "Hacker'Uri")
                 .OrderByDescending(c => c.Name == "Hand of the Colonel")
                 .OrderByDescending(c => c.Name == "Corrupted Xan-Len")
-               .OrderByDescending(c => c.Name == "Ruinous Reverend")
-                .OrderByDescending(c => c.Name == "Hallowed Acolyte")
-                .OrderByDescending(c => c.Name == "Devoted Fanatic")
                 .ToList();
         }
 
