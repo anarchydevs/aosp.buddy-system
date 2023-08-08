@@ -344,7 +344,7 @@ namespace AttackBuddy
                       .ToList();
 
                 }
-                if (Playfield.ModelIdentity.Instance == 9070)// subway
+                if (Playfield.ModelIdentity.Instance == 9070)// subway raid
                 {
                     _bossMob = DynelManager.NPCs
                            .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
@@ -382,6 +382,51 @@ namespace AttackBuddy
                         .ToList();
 
                 }
+                if (Playfield.ModelIdentity.Instance == 9061)// TOTW raid
+                {
+                    _bossMob = DynelManager.NPCs
+                       .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                           && !Constants._ignores.Contains(c.Name)
+                           && c.Health > 0 && c.IsInLineOfSight
+                           && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                           && c.MaxHealth >= 1000000)
+                       .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                       .OrderByDescending(c => c.Name == "Uklesh the Beguiling")
+                       .OrderByDescending(c => c.Name == "Khalum the Weaver of Flesh")
+
+                       .ToList();
+
+                    _switchMob = DynelManager.NPCs
+                       .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                           && !Constants._ignores.Contains(c.Name)
+                           && c.Health > 0 && c.IsInLineOfSight && c.MaxHealth < 1000000
+                           && Extensions.IsFightingAny(c) 
+                           && (c.Name == "Devoted Fanatic" 
+                           || c.Name == "Hallowed Acolyte" 
+                           || c.Name == "Fanatic"
+                           || c.Name == "Ruinous Reverend"))
+                       .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                       .OrderBy(c => c.HealthPercent)
+                       //.OrderByDescending(c => c.Name == "Ruinous Reverend")
+                       //.OrderByDescending(c => c.Name == "Devoted Fanatic")
+                       .ToList();
+
+                    _mob = DynelManager.Characters
+                        .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                            && !Constants._ignores.Contains(c.Name)&& c.Health > 0
+                            && c.IsInLineOfSight && c.MaxHealth < 1000000 && Extensions.IsFightingAny(c)
+                            && !c.IsPet)
+                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                        .OrderBy(c => c.HealthPercent)
+                        .OrderByDescending(c => c.Name == "Faithful Cultist")
+                        .OrderByDescending(c => c.Name == "Ruinous Reverend")
+                        .OrderByDescending(c => c.Name == "Hallowed Acolyte")
+                        .OrderByDescending(c => c.Name == "Turbulent Windcaller")
+                        .OrderByDescending(c => c.Name == "Seraphic Exarch")
+                        .OrderByDescending(c => c.Name == "Cultist Silencer")
+                        .OrderByDescending(c => c.Name == "Devoted Fanatic")
+                        .ToList();
+                }
                 else
                 {
                     _bossMob = DynelManager.NPCs
@@ -413,7 +458,7 @@ namespace AttackBuddy
                        .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
                        .OrderByDescending(c => c.Name == "Lost Thought")
                        .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
-                       .OrderByDescending(c => c.Name == "Ruinous Reverend")
+                       .OrderByDescending(c => c.Name == "Ruinous Reverend")//Ruinous Reverend
                        .OrderByDescending(c => c.Name == "Alien Cocoon")
                        .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
                        .ToList();
