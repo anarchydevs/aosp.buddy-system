@@ -83,6 +83,7 @@ namespace AttackBuddy
                     "Automated Defense System",
                     "Scalding Flame",
                     "Ju-Ju Doll",
+                    "Ju-Ju Mannequin",
                     "Temporal Vortex",
                     "Gateway to the Past",
                     "Gateway to the Present",
