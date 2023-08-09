@@ -83,9 +83,6 @@ namespace AttackBuddy
                 {
                     HandleCharmScan();
                 }
-
-                //SelectTarget();
-
                 if (AttackBuddy._mob.Count >= 1)
                 {
                     if (AttackBuddy._mob.FirstOrDefault().Health == 0) { return; }
@@ -122,47 +119,6 @@ namespace AttackBuddy
                     Chat.WriteLine($"Found _target: {_target.Name}.");
                 }
             }
-        }
-
-        private void SelectTarget()
-        {
-            _target = null;
-
-            switch (true)
-            {
-
-                case var _ when AttackBuddy._switchMob.Count >= 1 && AttackBuddy._switchMob.First().Health > 0:
-                    _target = AttackBuddy._switchMob.First();
-                    break;
-                case var _ when AttackBuddy._mob.Count >= 1 && AttackBuddy._mob.First().Health > 0:
-                    _target = AttackBuddy._mob.First();
-                    break;
-
-                case var _ when AttackBuddy._bossMob.Count >= 1 && AttackBuddy._bossMob.First().Health > 0:
-                    _target = AttackBuddy._bossMob.First();
-                    break;
-
-                case var _ when AttackBuddy._switchMobPrecision.Count >= 1 && AttackBuddy._switchMobPrecision.First().Health > 0:
-                    _target = AttackBuddy._switchMobPrecision.First();
-                    break;
-
-                case var _ when AttackBuddy._switchMobCharging.Count >= 1 && AttackBuddy._switchMobCharging.First().Health > 0:
-                    _target = AttackBuddy._switchMobCharging.First();
-                    break;
-
-                case var _ when AttackBuddy._switchMobShield.Count >= 1 && AttackBuddy._switchMobShield.First().Health > 0:
-                    _target = AttackBuddy._switchMobShield.First();
-                    break;
-
-                default:
-                    break;
-            }
-
-            if (_target != null)
-            {
-                Chat.WriteLine($"Found _target: {_target.Name}.");
-            }
-
         }
     }
 }

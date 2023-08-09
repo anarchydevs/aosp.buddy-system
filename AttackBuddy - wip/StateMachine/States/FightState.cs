@@ -65,7 +65,6 @@ namespace AttackBuddy
             if (_target == null)
                 return;
 
-            //_target.Buffs.contans(shovebuffs)
             if (Extensions.ShouldStopAttack())
             {
                 DynelManager.LocalPlayer.StopAttack();
@@ -73,142 +72,76 @@ namespace AttackBuddy
                 return;
             }
 
-            //if (Extensions.GetLeader(AttackBuddy.Leader) == null)
-            //    return;
-
-            //if (!Extensions.CanAttack())
-            //    return;
-
-            //if (_target == null || _target.Buffs.Contains(253953) || _target.IsPlayer)
-            //{
-            //    _target = GetValidAttackTarget();
-            //    if (_target == null)
-            //        return;
-            //}
-
-            //if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= AttackBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
-            //{
-            //    DynelManager.LocalPlayer.Attack(_target);
-            //    Chat.WriteLine($"Attacking {_target.Name}.");
-            //    _fightStartTime = Time.NormalTime;
-            //}
-
             if (Extensions.GetLeader(AttackBuddy.Leader) != null)
             {
                 if (Extensions.CanAttack())
                 {
-                    if (_target.Buffs.Contains(253953) == false
-                         && _target.Buffs.Contains(NanoLine.ShovelBuffs) == false
-                        && _target.Buffs.Contains(302745) == false
-                        && _target.IsPlayer == false)
+                    bool validTargetConditions =
+                        !_target.Buffs.Contains(253953) &&
+                        !_target.Buffs.Contains(NanoLine.ShovelBuffs) &&
+                        !_target.Buffs.Contains(302745) &&
+                        !_target.IsPlayer &&
+                        _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= AttackBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange;
+
+                    if (validTargetConditions)
                     {
-                        if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= AttackBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
+                        DynelManager.LocalPlayer.Attack(_target);
+                        Chat.WriteLine($"Attacking {_target.Name}.");
+
+                        if (Targeting.TargetChar != null)
                         {
-                            DynelManager.LocalPlayer.Attack(_target);
-                            Chat.WriteLine($"Attacking {_target.Name}.");
+                            Chat.WriteLine($"{Targeting.TargetChar?.Health}");
+                        }
 
-                            if (Targeting.TargetChar != null)
+                        _fightStartTime = Time.NormalTime;
+                    }
+                }
+                else if (Extensions.IsBoss(_target))
+                {
+                    bool shouldSwitch =
+                        _target != AttackBuddy._switchMobPrecision.FirstOrDefault() &&
+                        _target != AttackBuddy._switchMobCharging.FirstOrDefault() &&
+                        _target != AttackBuddy._switchMobShield.FirstOrDefault();
+
+                    if (shouldSwitch)
+                    {
+                        List<SimpleChar> switchList = null;
+
+                        if (AttackBuddy._switchMobPrecision.Count >= 1)
+                            switchList = AttackBuddy._switchMobPrecision;
+                        else if (AttackBuddy._switchMobCharging.Count >= 1)
+                            switchList = AttackBuddy._switchMobCharging;
+                        else if (AttackBuddy._switchMobShield.Count >= 1)
+                            switchList = AttackBuddy._switchMobShield;
+                        else if (AttackBuddy._switchMob.Count >= 1)
+                            switchList = AttackBuddy._switchMob;
+                        else if (AttackBuddy._mob.Count >= 1)
+                            switchList = AttackBuddy._mob;
+
+                        if (switchList != null && DynelManager.LocalPlayer.FightingTarget != null)
+                        {
+                            SimpleChar switchTarget = switchList.FirstOrDefault();
+                            if (switchTarget != null && switchTarget.Health > 0)
                             {
-                                Chat.WriteLine($"{Targeting.TargetChar?.Health}");
+                                _target = switchTarget;
+                                DynelManager.LocalPlayer.Attack(_target);
+                                Chat.WriteLine($"Switching to _target {_target.Name}.");
+                                _fightStartTime = Time.NormalTime;
                             }
-
-                            _fightStartTime = Time.NormalTime;
                         }
                     }
                 }
-                else
+                else if (AttackBuddy._switchMob.Count >= 1 && _target.Name != AttackBuddy._switchMob.FirstOrDefault().Name)
                 {
-                    if (Extensions.IsBoss(_target))
+                    if (DynelManager.LocalPlayer.FightingTarget != null)
                     {
-                        if (AttackBuddy._switchMobPrecision.Count >= 1)
+                        SimpleChar switchTarget = AttackBuddy._switchMob.FirstOrDefault();
+                        if (switchTarget != null && switchTarget.Health > 0)
                         {
-                            if (DynelManager.LocalPlayer.FightingTarget != null)
-                            {
-                                if (_target != AttackBuddy._switchMobPrecision.FirstOrDefault()
-                                     && _target != AttackBuddy._switchMobCharging.FirstOrDefault() && _target != AttackBuddy._switchMobShield.FirstOrDefault())
-                                {
-                                    if (AttackBuddy._switchMobPrecision.FirstOrDefault().Health == 0) { return; }
-
-                                    _target = AttackBuddy._switchMobPrecision.FirstOrDefault();
-                                    DynelManager.LocalPlayer.Attack(_target);
-                                    Chat.WriteLine($"Switching to _target {_target.Name}.");
-                                    _fightStartTime = Time.NormalTime;
-                                    return;
-                                }
-                            }
-                        }
-                        else if (AttackBuddy._switchMobCharging.Count >= 1)
-                        {
-                            if (DynelManager.LocalPlayer.FightingTarget != null)
-                            {
-                                if (_target != AttackBuddy._switchMobPrecision.FirstOrDefault()
-                                    && _target != AttackBuddy._switchMobCharging.FirstOrDefault() && _target != AttackBuddy._switchMobShield.FirstOrDefault())
-                                {
-                                    if (AttackBuddy._switchMobCharging.FirstOrDefault().Health == 0) { return; }
-
-                                    _target = AttackBuddy._switchMobCharging.FirstOrDefault();
-                                    DynelManager.LocalPlayer.Attack(_target);
-                                    Chat.WriteLine($"Switching to _target {_target.Name}.");
-                                    _fightStartTime = Time.NormalTime;
-                                    return;
-                                }
-                            }
-                        }
-                        else if (AttackBuddy._switchMobShield.Count >= 1)
-                        {
-                            if (DynelManager.LocalPlayer.FightingTarget != null)
-                            {
-                                if (_target != AttackBuddy._switchMobPrecision.FirstOrDefault()
-                                       && _target != AttackBuddy._switchMobCharging.FirstOrDefault() && _target != AttackBuddy._switchMobShield.FirstOrDefault())
-                                {
-                                    if (AttackBuddy._switchMobShield.FirstOrDefault().Health == 0) { return; }
-
-                                    _target = AttackBuddy._switchMobShield.FirstOrDefault();
-                                    DynelManager.LocalPlayer.Attack(_target);
-                                    Chat.WriteLine($"Switching to _target {_target.Name}.");
-                                    _fightStartTime = Time.NormalTime;
-                                    return;
-                                }
-                            }
-                        }
-                        else if (AttackBuddy._switchMob.Count >= 1)
-                        {
-                            if (DynelManager.LocalPlayer.FightingTarget != null)
-                            {
-                                if (AttackBuddy._switchMob.FirstOrDefault().Health == 0) { return; }
-
-                                _target = AttackBuddy._switchMob.FirstOrDefault();
-                                DynelManager.LocalPlayer.Attack(_target);
-                                Chat.WriteLine($"Switching to _target {_target.Name}.");
-                                _fightStartTime = Time.NormalTime;
-                                return;
-                            }
-                        }
-                        else if (AttackBuddy._mob.Count >= 1)
-                        {
-                            if (DynelManager.LocalPlayer.FightingTarget != null)
-                            {
-                                if (AttackBuddy._mob.FirstOrDefault().Health == 0) { return; }
-
-                                _target = AttackBuddy._mob.FirstOrDefault();
-                                DynelManager.LocalPlayer.Attack(_target);
-                                Chat.WriteLine($"Switching to _target {_target.Name}.");
-                                _fightStartTime = Time.NormalTime;
-                                return;
-                            }
-                        }
-                    }
-                    else if (AttackBuddy._switchMob.Count >= 1 && _target.Name != AttackBuddy._switchMob.FirstOrDefault().Name)
-                    {
-                        if (DynelManager.LocalPlayer.FightingTarget != null)
-                        {
-                            if (AttackBuddy._switchMob.FirstOrDefault().Health == 0) { return; }
-
-                            _target = AttackBuddy._switchMob.FirstOrDefault();
+                            _target = switchTarget;
                             DynelManager.LocalPlayer.Attack(_target);
                             Chat.WriteLine($"Switching to _target {_target.Name}.");
                             _fightStartTime = Time.NormalTime;
-                            return;
                         }
                     }
                 }
@@ -240,40 +173,6 @@ namespace AttackBuddy
                     item.Use(_target, true);
                 }
             }
-        }
-
-        private SimpleChar GetValidAttackTarget()
-        {
-             _target = null;
-
-            // Check if any valid _target is available in priority order
-
-            if (AttackBuddy._switchMob.Count > 1 && AttackBuddy._switchMob.First().Health > 0)
-            {
-                _target = AttackBuddy._switchMob.First();
-            }
-            else if (AttackBuddy._mob.Count > 1 && AttackBuddy._mob.First().Health > 0)
-            {
-                _target = AttackBuddy._mob.First();
-            }
-            else if (AttackBuddy._bossMob.Count > 1 && AttackBuddy._bossMob.First().Health > 0)
-            {
-                _target = AttackBuddy._bossMob.First();
-            }
-            else if (AttackBuddy._switchMobPrecision.Count > 1 && AttackBuddy._switchMobPrecision.First().Health > 0)
-            {
-                _target = AttackBuddy._switchMobPrecision.First();
-            }
-            else if (AttackBuddy._switchMobCharging.Count > 1 && AttackBuddy._switchMobCharging.First().Health > 0)
-            {
-                _target = AttackBuddy._switchMobCharging.First();
-            }
-            else if (AttackBuddy._switchMobShield.Count > 1 && AttackBuddy._switchMobShield.First().Health > 0)
-            {
-                _target = AttackBuddy._switchMobShield.First();
-            }
-
-            return _target;
         }
 
     }
