@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VortexxBuddy", "VortexxBudd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB2Buddy", "DB2Buddy\DB2Buddy.csproj", "{FAB40EE4-B3E7-47D2-8BA3-954C495224A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LEBuddy", "LeBuddy\LEBuddy.csproj", "{DC06A28A-0061-4E3E-BF32-A6CF830BEDD9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{FAB40EE4-B3E7-47D2-8BA3-954C495224A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FAB40EE4-B3E7-47D2-8BA3-954C495224A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FAB40EE4-B3E7-47D2-8BA3-954C495224A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC06A28A-0061-4E3E-BF32-A6CF830BEDD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC06A28A-0061-4E3E-BF32-A6CF830BEDD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC06A28A-0061-4E3E-BF32-A6CF830BEDD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC06A28A-0061-4E3E-BF32-A6CF830BEDD9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
