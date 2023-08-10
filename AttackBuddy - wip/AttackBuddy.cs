@@ -277,6 +277,7 @@ namespace AttackBuddy
 
                 case 4389:
                 case 4328:
+                case 4391:
                     ScanningInstance4389();
                     break;
 
