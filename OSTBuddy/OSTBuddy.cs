@@ -45,7 +45,7 @@ namespace OSTBuddy
                 _settings = new Settings("OSTBuddy");
                 PluginDirectory = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\OSTBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\OSTBuddy\\{Game.ClientInst}\\Config.json");
 
                 Config.CharSettings[Game.ClientInst].RespawnDelayChangedEvent += RespawnDelay_Changed;
 

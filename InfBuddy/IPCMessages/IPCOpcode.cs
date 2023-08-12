@@ -9,6 +9,7 @@
         Hard = 1005,
         Neutral = 1006,
         Clan = 1007,
+        Omni = 1008,
         Normal = 1009,
         Roam = 1010
     }

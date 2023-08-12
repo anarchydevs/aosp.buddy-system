@@ -18,25 +18,25 @@ namespace Db1Buddy
                 && Db1Buddy._settings["Toggle"].AsBool())
                 return new EnterState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.DB1Id
-                && !Team.Members.Any(c => c.Character == null)
+            if (Playfield.ModelIdentity.Instance == Constants.DB1Id)
+            {
+                if (!Team.Members.Any(c => c.Character == null)
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) < 20f)
-                return new StartState();
+                    return new StartState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.DB1Id
-                && !DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients)
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) > 40f)
-                return new GetBuffState();
+                if (!DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients)
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) > 40f)
+                    return new GetBuffState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.DB1Id
-                && DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients)
-                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) > 40f)
-                return new FightState();
+                if (DynelManager.LocalPlayer.Buffs.Contains(Db1Buddy.Nanos.ThriceBlessedbytheAncients)
+                     && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._atDoor) > 40f)
+                    return new FightState();
 
-            if (Db1Buddy.MikkelsenCorpse
-               && Extensions.CanProceed()
-               && Db1Buddy._settings["Farming"].AsBool())
-                return new FarmingState();
+                if (Db1Buddy.MikkelsenCorpse
+                   && Extensions.CanProceed()
+                   && Db1Buddy._settings["Farming"].AsBool())
+                    return new FarmingState();
+            }
 
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return new SitState();

@@ -7,6 +7,9 @@ namespace AttackBuddy
         public static List<string> _ignores = new List<string>
         {
                     "Sprysi D'Lere",
+                    "Notum Bomb",
+                    "Runic Detonation",
+                    "Strange Mist",
                     "Notum Erruption",
                     "Alien Fuel Tower",
                     "Kyr'Ozch Guardian",
@@ -54,6 +57,7 @@ namespace AttackBuddy
                     "Unicorn Service Tower Alpha",
                     "Unicorn Service Tower Delta",
                     "Unicorn Service Tower Gamma",
+                    "North Alien Signal Tower",
                     "Sean Powell",
                     "Unicorn Guard",
                     "Essence Fragment",
@@ -71,7 +75,6 @@ namespace AttackBuddy
                     "Pulsating Ice Obelisk",
                     "Unnatural Ice",
                     "Hacked Mechdog",
-                    "Harbinger of Pestilence",
                     "Pandemonium Idol",
                     "Laser Drone",
                     "Heatbeam",
@@ -97,10 +100,11 @@ namespace AttackBuddy
                     "Urban Defense Patroller",
                     "Unicorn Security Administrator",
                     "Alien Heavy Patroller",
-                    "Vergil Doppelganger",
                     "Alien Seeker",
-                    "Harbingers of Pestilence",
-                    "Otacustes"
+                    "Flaming Vengeance",
+                    "Unstable Rift",
+                    "Otacustes",
+                    "John McLane"
         };
     }
 }

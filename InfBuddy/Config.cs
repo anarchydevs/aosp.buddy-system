@@ -14,7 +14,7 @@ namespace InfBuddy
         protected string _path;
 
         [JsonIgnore]
-        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 0;
+        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 42;
 
         public static Config Load(string path)
         {
@@ -52,11 +52,14 @@ namespace InfBuddy
             if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
                 Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
 
-            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\InfBuddy"))
-                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\InfBuddy");
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP");
 
-            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\InfBuddy\\{Game.ClientInst}"))
-                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\InfBuddy\\{Game.ClientInst}");
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\InfBuddy"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\InfBuddy");
+
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\InfBuddy\\{Game.ClientInst}"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\InfBuddy\\{Game.ClientInst}");
 
             File.WriteAllText(_path, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
@@ -65,7 +68,7 @@ namespace InfBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 0;
+        private int _ipcChannel = 42;
 
         //Breaking out auto-property
         public int IPCChannel

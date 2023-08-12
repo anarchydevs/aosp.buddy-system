@@ -14,7 +14,7 @@ namespace KHBuddy
         protected string _path;
 
         [JsonIgnore]
-        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 0;
+        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 41;
 
         public static Config Load(string path)
         {
@@ -51,11 +51,14 @@ namespace KHBuddy
             if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
                 Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
 
-            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KHBuddy"))
-                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KHBuddy");
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP");
 
-            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KHBuddy\\{Game.ClientInst}"))
-                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KHBuddy\\{Game.ClientInst}");
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\KHBuddy"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\KHBuddy");
+
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\KHBuddy\\{Game.ClientInst}"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\KHBuddy\\{Game.ClientInst}");
 
             File.WriteAllText(_path, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
@@ -64,7 +67,7 @@ namespace KHBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 8;
+        private int _ipcChannel = 41;
 
         //Breaking out auto-property
         public int IPCChannel

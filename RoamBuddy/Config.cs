@@ -14,7 +14,7 @@ namespace RoamBuddy
         protected string _path;
 
         [JsonIgnore]
-        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 0;
+        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 39;
         [JsonIgnore]
         public int AttackRange => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].AttackRange : 10;
         [JsonIgnore]
@@ -54,11 +54,14 @@ namespace RoamBuddy
             if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
                 Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
 
-            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\RoamBuddy"))
-                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\RoamBuddy");
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP");
 
-            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\RoamBuddy\\{Game.ClientInst}"))
-                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\RoamBuddy\\{Game.ClientInst}");
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy");
+
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\{Game.ClientInst}"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\{Game.ClientInst}");
 
             File.WriteAllText(_path, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
@@ -67,7 +70,7 @@ namespace RoamBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 9;
+        private int _ipcChannel = 39;
 
         //Breaking out auto-property
         public int IPCChannel

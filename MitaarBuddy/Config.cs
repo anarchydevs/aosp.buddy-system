@@ -14,7 +14,7 @@ namespace MitaarBuddy
         protected string _path;
 
         [JsonIgnore]
-        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 48;
+        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 40;
 
         public static Config Load(string path)
         {
@@ -51,11 +51,14 @@ namespace MitaarBuddy
             if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
                 Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
 
-            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\MitaarBuddy"))
-                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\MitaarBuddy");
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP");
 
-            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\MitaarBuddy\\{Game.ClientInst}"))
-                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\MitaarBuddy\\{Game.ClientInst}");
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\MitaarBuddy"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\MitaarBuddy");
+
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\MitaarBuddy\\{Game.ClientInst}"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\MitaarBuddy\\{Game.ClientInst}");
 
             File.WriteAllText(_path, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
@@ -64,7 +67,7 @@ namespace MitaarBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 48;
+        private int _ipcChannel = 40;
 
         //Breaking out auto-property
         public int IPCChannel

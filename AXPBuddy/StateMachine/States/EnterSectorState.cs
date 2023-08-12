@@ -1,6 +1,12 @@
-﻿using AOSharp.Core;
+﻿using AOSharp.Common.GameData;
+using AOSharp.Core;
+using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -8,23 +14,28 @@ namespace AXPBuddy
 {
     public class EnterSectorState : IState
     {
-        private const int MinWait = 8;
-        private const int MaxWait = 10;
-        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+        private const int MinWait = 3;
+        private const int MaxWait = 7;
 
         public IState GetNextState()
         {
+            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return null; }
+
             if (Playfield.ModelIdentity.Instance == Constants.S13Id)
             {
                 if (AXPBuddy.ModeSelection.Leech == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-                    if (AXPBuddy._died || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
+                    if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool() || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
                         return new LeechState();
 
                 if (AXPBuddy.ModeSelection.Roam == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-                    if (AXPBuddy._died || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
+                    if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool() || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
                         return new RoamState();
 
-                if (AXPBuddy._died || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
+                if (AXPBuddy.ModeSelection.Gather == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                    if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool() || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
+                        return new GatherState();
+
+                if (AXPBuddy._died || AXPBuddy._settings["Merge"].AsBool() || (!AXPBuddy._died && !Team.Members.Any(c => c.Character == null)))
                     return new PatrolState();
             }
 
@@ -37,50 +48,35 @@ namespace AXPBuddy
 
             if (DynelManager.LocalPlayer.Identity == AXPBuddy.Leader)
             {
-                Task.Delay(2 * 1000).ContinueWith(x =>
-                {
-                    AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13EntrancePos);
-                }, _cancellationToken.Token);
-            }
-            else if (AXPBuddy.ModeSelection.Leech == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
-            {
-                if (!AXPBuddy._settings["Merge"].AsBool())
-                {
-                    Task.Delay(5 * 1000).ContinueWith(x =>
-                    {
-                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13EntrancePos);
-                    }, _cancellationToken.Token);
-                }
-                else
-                {
-                    Task.Delay(7 * 1000).ContinueWith(x =>
-                    {
-                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13EntrancePos);
-                    }, _cancellationToken.Token);
-                }
+                Task.Factory.StartNew(
+                   async () =>
+                   {
+                       await Task.Delay(2000);
+                       AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13EntrancePos);
+                   });
             }
             else
             {
                 int randomWait = Extensions.Next(MinWait, MaxWait);
                 Chat.WriteLine($"Idling for {randomWait} seconds..");
 
-                Task.Delay(randomWait * 1000).ContinueWith(x =>
-                {
-                    AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13EntrancePos);
-                }, _cancellationToken.Token);
+                Task.Factory.StartNew(
+                   async () =>
+                   {
+                       await Task.Delay(randomWait * 1000);
+                       AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13EntrancePos);
+                   });
             }
         }
 
         public void OnStateExit()
         {
             //Chat.WriteLine("EnterSectorState::OnStateExit");
-
-            _cancellationToken.Cancel();
         }
 
         public void Tick()
         {
-            if (Game.IsZoning) { return; }
+            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return; }
         }
     }
 }

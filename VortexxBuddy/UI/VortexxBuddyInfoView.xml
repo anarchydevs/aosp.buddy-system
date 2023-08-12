@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" standalone="yes"?>
+<root>
+	<BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="InfoView" layout_borders="Rect(0,0,0,2)" max_size="Point(16000,-1)">
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="VortexxBuddy" layout_borders="Rect(0,0,0,2)"/>
+		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="Inject VortexxBuddy and Handlers on each toon, add lootmanager if farming." layout_borders="Rect(5,5,5,5)"/>
+		<TextView value="Nothing else is required." layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="Farming: Paths to corpse, leaves team after 10 seconds," layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" If not farming, wait for the debuffs before exiting or disbanding." layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="*Not Immune: Characters with this toggled will wait outside until it's safe" layout_borders="Rect(5,5,5,5)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="*Get Immunity: Toggle on characters that need Immunity" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" The crystals need to be in their inventory" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" Slow DD, leave some toons outside" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+	</BorderView>
+</root>

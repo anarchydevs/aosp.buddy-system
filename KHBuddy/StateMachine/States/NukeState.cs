@@ -170,11 +170,15 @@ namespace KHBuddy
 
                     if (_hecksAtPosBeach.Count >= 1)
                     {
-                        if (DynelManager.LocalPlayer.FightingTarget == null &&
-                            (DynelManager.LocalPlayer.NanoPercent >= 66 || DynelManager.LocalPlayer.HealthPercent >= 66))
+                        if (DynelManager.LocalPlayer.FightingTarget == null && !KHBuddy.Sitting  &&
+                            (DynelManager.LocalPlayer.NanoPercent >= 31 || DynelManager.LocalPlayer.HealthPercent >= 66))
                         {
                             DynelManager.LocalPlayer.Attack(_hecksAtPosBeach.FirstOrDefault());
                             KHBuddy._stateTimeOut = Time.NormalTime;
+                        }
+                        if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
+                        {
+                            DynelManager.LocalPlayer.StopAttack();
                         }
                     }
                 }
@@ -194,11 +198,15 @@ namespace KHBuddy
 
                     if (_hecksAtPosWest.Count >= 1)
                     {
-                        if (DynelManager.LocalPlayer.FightingTarget == null &&
-                            (DynelManager.LocalPlayer.NanoPercent >= 66 || DynelManager.LocalPlayer.HealthPercent >= 66))
+                        if (DynelManager.LocalPlayer.FightingTarget == null && !KHBuddy.Sitting  &&
+                            (DynelManager.LocalPlayer.NanoPercent >= 31 || DynelManager.LocalPlayer.HealthPercent >= 66))
                         {
                             DynelManager.LocalPlayer.Attack(_hecksAtPosWest.FirstOrDefault());
                             KHBuddy._stateTimeOut = Time.NormalTime;
+                        }
+                        if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
+                        {
+                            DynelManager.LocalPlayer.StopAttack();
                         }
                     }
                 }
@@ -217,11 +225,15 @@ namespace KHBuddy
 
                     if (_hecksAtPosEast.Count >= 1)
                     {
-                        if (DynelManager.LocalPlayer.FightingTarget == null &&
-                            (DynelManager.LocalPlayer.NanoPercent >= 66 || DynelManager.LocalPlayer.HealthPercent >= 66))
+                        if (DynelManager.LocalPlayer.FightingTarget == null && !KHBuddy.Sitting  &&
+                            (DynelManager.LocalPlayer.NanoPercent >= 31 || DynelManager.LocalPlayer.HealthPercent >= 66))
                         {
                             DynelManager.LocalPlayer.Attack(_hecksAtPosEast.FirstOrDefault());
                             KHBuddy._stateTimeOut = Time.NormalTime;
+                        }
+                        if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
+                        {
+                            DynelManager.LocalPlayer.StopAttack();
                         }
                     }
                 }

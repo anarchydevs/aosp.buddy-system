@@ -1,10 +1,12 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
-using AOSharp.Core.Inventory;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
+using System.Threading.Tasks;
+using AOSharp.Common.GameData;
+using AOSharp.Core.Inventory;
+using AOSharp.Core;
 
 namespace AXPBuddy
 {
@@ -37,17 +39,25 @@ namespace AXPBuddy
             return DynelManager.LocalPlayer.Buffs.Contains(NanoLine.Root)
                 || DynelManager.LocalPlayer.Buffs.Contains(NanoLine.AOERoot);
         }
-
         public static bool InCombat()
         {
+            if (DynelManager.LocalPlayer.FightingTarget != null 
+                || DynelManager.LocalPlayer.IsAttacking
+                || DynelManager.LocalPlayer.IsAttackPending
+                || DynelManager.LocalPlayer.GetStat(Stat.NumFightingOpponents) > 0) { return true; }
+
             if (Team.IsInTeam)
             {
                 return DynelManager.Characters
-                    .Any(c => c.FightingTarget != null && Team.Members.Select(m => m.Name).Contains(c.FightingTarget?.Name));
+                    .Any(c => c.Health > 0
+                        && c.FightingTarget != null
+                        && Team.Members.Select(m => m.Name).Contains(c.FightingTarget?.Name));
             }
 
             return DynelManager.Characters
-                    .Any(c => c.FightingTarget != null && c.FightingTarget?.Name == DynelManager.LocalPlayer.Name);
+                    .Any(c => c.Health > 0
+                        && c.FightingTarget != null
+                        && c.FightingTarget?.Name == DynelManager.LocalPlayer.Name);
         }
 
         public static bool HasDied()
@@ -83,7 +93,7 @@ namespace AXPBuddy
                 if (DynelManager.LocalPlayer.Health > 0 && !InCombat()
                                     && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
 
-            if (DynelManager.LocalPlayer.IsAlive && !InCombat()
+            if (DynelManager.LocalPlayer.Health > 0 && !InCombat()
                     && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
             {
                 List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();

@@ -1,15 +1,19 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Common.GameData.UI;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using AOSharp.Core;
-using AOSharp.Core.Inventory;
-using AOSharp.Core.IPC;
-using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using AOSharp.Core.Movement;
+using AOSharp.Core.IPC;
 using AOSharp.Pathfinding;
 using AXPBuddy.IPCMessages;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
+using AOSharp.Common.GameData;
+using AOSharp.Core.Inventory;
+using AOSharp.Common.GameData.UI;
+using System.Security.Cryptography;
+using System.Threading;
 
 namespace AXPBuddy
 {
@@ -21,19 +25,24 @@ namespace AXPBuddy
         public static Config Config { get; private set; }
 
         public static Identity Leader = Identity.None;
+        public static string LeaderName = string.Empty;
         public static SimpleChar _leader;
         public static Vector3 _leaderPos = Vector3.Zero;
         public static Vector3 _ourPos = Vector3.Zero;
 
+        public static float Tick = 0;
+
         public static bool _initMerge = false;
         public static bool Toggle = false;
-        public static bool Sitting = false;
+        public static bool _initSit = false;
         public static bool _died = false;
         public static bool _passedFirstCorrectionPos = false;
         public static bool _passedSecondCorrectionPos = false;
 
         public static double _stateTimeOut;
         public static double _sitUpdateTimer;
+        public static double _mainUpdate;
+        public static double _lastZonedTime = Time.NormalTime;
 
         public static Vector3 _pos = Vector3.Zero;
 
@@ -50,7 +59,7 @@ namespace AXPBuddy
                 _settings = new Settings("AXPBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AXPBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AXPBuddy\\{Game.ClientInst}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
@@ -59,6 +68,8 @@ namespace AXPBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
 
                 Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[Game.ClientInst].LeaderChangedEvent += Leader_Changed;
+                Config.CharSettings[Game.ClientInst].TickChangedEvent += Tick_Changed;
 
                 Chat.RegisterCommand("buddy", AXPBuddyCommand);
 
@@ -66,10 +77,10 @@ namespace AXPBuddy
 
                 _stateMachine = new StateMachine(new IdleState());
 
-                Team.TeamRequest += OnTeamRequest;
                 Game.OnUpdate += OnUpdate;
+                Game.TeleportEnded += OnEndZoned;
 
-                _settings.AddVariable("ModeSelection", (int)ModeSelection.Normal);
+                _settings.AddVariable("ModeSelection", (int)ModeSelection.Patrol);
 
                 _settings.AddVariable("Toggle", false);
                 _settings.AddVariable("Merge", false);
@@ -78,6 +89,9 @@ namespace AXPBuddy
 
                 Chat.WriteLine("AXPBuddy Loaded!");
                 Chat.WriteLine("/axpbuddy for settings.");
+
+                LeaderName = Config.CharSettings[Game.ClientInst].Leader;
+                Tick = Config.CharSettings[Game.ClientInst].Tick;
             }
             catch (Exception e)
             {
@@ -89,17 +103,30 @@ namespace AXPBuddy
         {
             SettingsController.CleanUp();
         }
+
         public static void IPCChannel_Changed(object s, int e)
         {
             IPCChannel.SetChannelId(Convert.ToByte(e));
             Config.Save();
         }
 
-        public static void Start()
+        public static void Leader_Changed(object s, string e)
+        {
+            Config.CharSettings[Game.ClientInst].Leader = e;
+            LeaderName = e;
+            Config.Save();
+        }
+        public static void Tick_Changed(object s, float e)
+        {
+            Config.CharSettings[Game.ClientInst].Tick = e;
+            Tick = e;
+            Config.Save();
+        }
+        private void Start()
         {
             Toggle = true;
 
-            Chat.WriteLine("AXPBuddy enabled.");
+            Chat.WriteLine("Buddy enabled.");
 
             if (!(_stateMachine.CurrentState is IdleState))
                 _stateMachine.SetState(new IdleState());
@@ -109,27 +136,54 @@ namespace AXPBuddy
         {
             Toggle = false;
 
-            Chat.WriteLine("AXPBuddy disabled.");
+            Chat.WriteLine("Buddy disabled.");
 
             if (!(_stateMachine.CurrentState is IdleState))
                 _stateMachine.SetState(new IdleState());
 
-            NavMeshMovementController.Halt();
+            if (DynelManager.LocalPlayer.IsAttacking)
+                DynelManager.LocalPlayer.StopAttack();
+            if (MovementController.Instance.IsNavigating)
+                MovementController.Instance.Halt();
         }
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            if (!_settings["Merge"].AsBool())
+            if (!_settings["Merge"].AsBool() && Leader == Identity.None)
                 Leader = new Identity(IdentityType.SimpleChar, sender);
 
+            if (DynelManager.LocalPlayer.Identity == Leader || _settings["Merge"].AsBool())
+                return;
+
+            Chat.WriteLine("Buddy enabled.");
             _settings["Toggle"] = true;
-            Start();
+
+            Toggle = true;
+
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
         }
 
         private void OnStopMessage(int sender, IPCMessage msg)
         {
+            if (Leader == Identity.None)
+                Leader = new Identity(IdentityType.SimpleChar, sender);
+
+            if (DynelManager.LocalPlayer.Identity == Leader || _settings["Merge"].AsBool())
+                return;
+
+            Toggle = false;
+
             _settings["Toggle"] = false;
-            Stop();
+            Chat.WriteLine("Buddy disabled.");
+
+            if (DynelManager.LocalPlayer.IsAttacking)
+                DynelManager.LocalPlayer.StopAttack();
+            if (MovementController.Instance.IsNavigating)
+                MovementController.Instance.Halt();
+
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
         }
 
         private void HandleInfoViewClick(object s, ButtonBase button)
@@ -142,29 +196,43 @@ namespace AXPBuddy
             _infoWindow.Show(true);
         }
 
-
         private void OnUpdate(object s, float deltaTime)
         {
-            if (Game.IsZoning)
-                return;
+            if (Game.IsZoning || Time.NormalTime < _lastZonedTime + 2f) { return; }
 
-            if (Time.NormalTime > _sitUpdateTimer + 1)
+            if (Time.NormalTime > _mainUpdate + Tick)
             {
-                ListenerSit();
+                if (Time.NormalTime > _sitUpdateTimer + 1.5f)
+                {
+                    ListenerSit();
+                }
 
-                _sitUpdateTimer = Time.NormalTime;
+                _stateMachine.Tick();
+                _mainUpdate = Time.NormalTime;
             }
+
+            #region UI Update
 
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {
                 SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
+                SettingsController.settingsWindow.FindView("LeaderBox", out TextInputView leaderInput);
+                SettingsController.settingsWindow.FindView("TickBox", out TextInputView tickInput);
 
-                if (channelInput != null)
-                {
+                if (channelInput != null && !string.IsNullOrEmpty(channelInput.Text))
                     if (int.TryParse(channelInput.Text, out int channelValue)
                         && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
-                    {
                         Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                if (tickInput != null && !string.IsNullOrEmpty(tickInput.Text))
+                    if (float.TryParse(tickInput.Text, out float tickValue)
+                        && Config.CharSettings[Game.ClientInst].Tick != tickValue)
+                        Config.CharSettings[Game.ClientInst].Tick = tickValue;
+
+                if (leaderInput != null && !string.IsNullOrEmpty(leaderInput.Text))
+                {
+                    if (Config.CharSettings[Game.ClientInst].Leader != leaderInput.Text)
+                    {
+                        Config.CharSettings[Game.ClientInst].Leader = leaderInput.Text;
                     }
                 }
 
@@ -174,35 +242,33 @@ namespace AXPBuddy
                     infoView.Clicked = HandleInfoViewClick;
                 }
 
-                if (!_settings["Toggle"].AsBool() && Toggle)
-                {
-                    IPCChannel.Broadcast(new StopMessage());
-                    Stop();
-                }
+
                 if (_settings["Toggle"].AsBool() && !Toggle)
                 {
-                    if (!_settings["Merge"].AsBool())
+                    if (!_settings["Merge"].AsBool() && Leader == Identity.None)
                         Leader = DynelManager.LocalPlayer.Identity;
 
-                    IPCChannel.Broadcast(new StartMessage());
+                    if (DynelManager.LocalPlayer.Identity == Leader)
+                        IPCChannel.Broadcast(new StartMessage());
+
                     Start();
+                }
+
+                if (!_settings["Toggle"].AsBool() && Toggle)
+                {
+                    Stop();
+
+                    if (DynelManager.LocalPlayer.Identity == Leader)
+                        IPCChannel.Broadcast(new StopMessage());
                 }
             }
 
-            _stateMachine.Tick();
+            #endregion
         }
 
-        private void OnTeamRequest(object s, TeamRequestEventArgs e)
+        private void OnEndZoned(object s, EventArgs e)
         {
-            if (e.Requester != Leader)
-            {
-                if (Toggle)
-                    e.Ignore();
-
-                return;
-            }
-
-            e.Accept();
+            _lastZonedTime = Time.NormalTime;
         }
 
         private void ListenerSit()
@@ -213,11 +279,11 @@ namespace AXPBuddy
 
             if (kit == null) { return; }
 
-            if (spell != null)
+            if (_initSit == false && spell != null)
             {
                 if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && Extensions.CanUseSitKit())
                 {
-                    if (spell != null && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
+                    if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && _initSit == false
                         && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                     {
                         if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
@@ -225,13 +291,14 @@ namespace AXPBuddy
                             Task.Factory.StartNew(
                                async () =>
                                {
-                                   Sitting = true;
+                                   _initSit = true;
                                    await Task.Delay(400);
                                    NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                                   await Task.Delay(800);
+                                   await Task.Delay(1200);
                                    NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-                                   await Task.Delay(200);
-                                   Sitting = false;
+                                   await Task.Delay(400);
+                                   _initSit = false;
+                                   _sitUpdateTimer = Time.NormalTime;
                                });
                         }
                     }
@@ -247,16 +314,21 @@ namespace AXPBuddy
                 {
                     if (!_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        if (!_settings["Merge"].AsBool())
+                        if (!_settings["Merge"].AsBool() && Leader == Identity.None)
                             Leader = DynelManager.LocalPlayer.Identity;
 
-                        IPCChannel.Broadcast(new StartMessage());
+                        if (DynelManager.LocalPlayer.Identity == Leader)
+                            IPCChannel.Broadcast(new StartMessage());
+
+                        _settings["Toggle"] = true;
                         Start();
+
                     }
                     else
                     {
-                        IPCChannel.Broadcast(new StopMessage());
                         Stop();
+                        _settings["Toggle"] = false;
+                        IPCChannel.Broadcast(new StopMessage());
                     }
                 }
                 Config.Save();
@@ -269,7 +341,7 @@ namespace AXPBuddy
 
         public enum ModeSelection
         {
-            Normal, Roam, Leech
+            Patrol, Roam, Gather, Leech
         }
 
         public static class RelevantItems

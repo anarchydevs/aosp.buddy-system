@@ -1,6 +1,8 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
+using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -22,12 +24,14 @@ namespace AXPBuddy
 
         public IState GetNextState()
         {
-            if (Extensions.TimedOut(_reformStartedTime, ReformTimeout))
-                return new EnterSectorState();
+            if (Extensions.HasDied())
+                return new DiedState();
+
+            if (Extensions.TimedOut(_reformStartedTime, ReformTimeout)) { return new EnterSectorState(); }
 
             if (_phase == ReformPhase.Completed)
             {
-                if (!Team.IsRaid && Team.IsLeader
+                if (!Team.IsRaid && DynelManager.LocalPlayer.Identity == AXPBuddy.Leader
                     && !_init)
                 {
                     _init = true;

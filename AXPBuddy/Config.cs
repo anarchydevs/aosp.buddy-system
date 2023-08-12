@@ -1,9 +1,10 @@
-﻿using AOSharp.Core;
-using AOSharp.Core.UI;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using AOSharp.Core;
+using Newtonsoft.Json;
+using AOSharp.Core.UI;
+using AOSharp.Common.GameData;
 
 namespace AXPBuddy
 {
@@ -14,7 +15,11 @@ namespace AXPBuddy
         protected string _path;
 
         [JsonIgnore]
-        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 0;
+        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].IPCChannel : 37;
+        [JsonIgnore]
+        public float Tick => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].Tick : 0.7f;
+        [JsonIgnore]
+        public string Leader => CharSettings != null && CharSettings.ContainsKey(Game.ClientInst) ? CharSettings[Game.ClientInst].Leader : string.Empty;
 
         public static Config Load(string path)
         {
@@ -51,11 +56,14 @@ namespace AXPBuddy
             if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
                 Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
 
-            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AXPBuddy"))
-                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AXPBuddy");
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP");
 
-            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AXPBuddy\\{Game.ClientInst}"))
-                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AXPBuddy\\{Game.ClientInst}");
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AXPBuddy"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AXPBuddy");
+
+            if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AXPBuddy\\{Game.ClientInst}"))
+                Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AXPBuddy\\{Game.ClientInst}");
 
             File.WriteAllText(_path, JsonConvert.SerializeObject(this, Formatting.Indented));
         }
@@ -64,7 +72,7 @@ namespace AXPBuddy
     public class CharacterSettings
     {
         public event EventHandler<int> IPCChannelChangedEvent;
-        private int _ipcChannel = 5;
+        private int _ipcChannel = 37;
 
         //Breaking out auto-property
         public int IPCChannel
@@ -79,6 +87,43 @@ namespace AXPBuddy
                 {
                     _ipcChannel = value;
                     IPCChannelChangedEvent?.Invoke(this, value);
+                }
+            }
+        }
+        public event EventHandler<float> TickChangedEvent;
+        private float _tick = 0.7f;
+
+        public float Tick
+        {
+            get
+            {
+                return _tick;
+            }
+            set
+            {
+                if (_tick != value)
+                {
+                    _tick = value;
+                    TickChangedEvent?.Invoke(this, value);
+                }
+            }
+        }
+        public event EventHandler<string> LeaderChangedEvent;
+        private string _leader = string.Empty;
+
+        //Breaking out auto-property
+        public string Leader
+        {
+            get
+            {
+                return _leader;
+            }
+            set
+            {
+                if (_leader != value)
+                {
+                    _leader = value;
+                    LeaderChangedEvent?.Invoke(this, value);
                 }
             }
         }

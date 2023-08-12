@@ -51,7 +51,7 @@ namespace DefendBuddy
                 _settings = new Settings("DefendBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\DefendBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\DefendBuddy\\{Game.ClientInst}\\Config.json");
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);

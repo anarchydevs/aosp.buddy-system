@@ -206,7 +206,7 @@ namespace KHBuddy
                 if (KHBuddy._doingEast && !KHBuddy._doingWest)
                 {
                     if (DynelManager.LocalPlayer.Profession == Profession.Enforcer
-                        && (Time.NormalTime > KHBuddy._timer + 580f || !KHBuddy._init))
+                        && (Time.NormalTime > KHBuddy._timer + 120f || !KHBuddy._init))
                     {
                         if (!MovementController.Instance.IsNavigating)
                         {
@@ -245,7 +245,7 @@ namespace KHBuddy
                 if (!KHBuddy._doingEast && KHBuddy._doingWest)
                 {
                     if (DynelManager.LocalPlayer.Profession == Profession.Enforcer
-                        && Time.NormalTime > KHBuddy._timer + 580f)
+                        && Time.NormalTime > KHBuddy._timer + 10f)
                     {
                         if (!MovementController.Instance.IsNavigating)
                         {

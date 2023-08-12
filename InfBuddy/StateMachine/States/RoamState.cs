@@ -10,7 +10,7 @@ namespace InfBuddy
     {
         private SimpleChar _target;
         private SimpleChar _charmMob;
-        public static Corpse _corpse;
+        private static Corpse _corpse;
 
         private static bool _charmMobAttacked = false;
         private static bool _missionsLoaded = false;
@@ -26,31 +26,31 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            _corpse = DynelManager.Corpses
+                .Where(c => c.Name.Contains("Remains of "))
+                .FirstOrDefault();
+
             if (Game.IsZoning) { return null; }
 
             if (Extensions.HasDied())
                 return new DiedState();
 
-
-            if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                InfBuddy._settings["Toggle"] = false;
-                InfBuddy.Toggle = false;
-                return new IdleState();
+                if (Extensions.CanExit(_missionsLoaded) || Extensions.IsClear())
+                    return new ExitMissionState();
+
+                if (_target != null)
+                    return new FightState(_target);
+
+                if (InfBuddy._settings["Looting"].AsBool()
+                    && _corpse != null
+                    && Extensions.IsNull(_target))
+                    return new LootingState();
             }
 
-            if (Extensions.CanExit(_missionsLoaded))
-                return new ExitMissionState();
-
-            if (_target != null)
-                return new FightState(_target);
-
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
-                 && InfBuddy._settings["Looting"].AsBool()
-                && _corpse != null
-                && Spell.List.Any(c => c.IsReady)
-                && !Spell.HasPendingCast)
-                return new LootingState();
+            if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
+                return new IdleState();
 
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return new SitState();
@@ -60,14 +60,14 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("RoamState::OnStateEnter");
+            //Chat.WriteLine("RoamState::OnStateEnter");
 
             InfBuddy._stateTimeOut = Time.NormalTime;
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("RoamState::OnStateExit");
+            //Chat.WriteLine("RoamState::OnStateExit");
 
             _missionsLoaded = false;
         }
@@ -82,21 +82,17 @@ namespace InfBuddy
                 .ThenBy(c => c.Position.DistanceFrom(Constants.DefendPos))
                 .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name) && !_charmMobs.Contains(c.Identity));
 
-            _corpse = DynelManager.Corpses
-               .Where(c => c.Name.Contains("Remains of "))
-               .FirstOrDefault();
-
             if (mob != null)
             {
                 if (Extensions.InCombat())
                 {
                     _target = mob;
-                    Chat.WriteLine($"Found target: {_target.Name}");
+                    //Chat.WriteLine($"Found target: {_target.Name}");
                 }
                 else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any())
                 {
                     _target = mob;
-                    Chat.WriteLine($"Found target: {_target.Name}");
+                    //Chat.WriteLine($"Found target: {_target.Name}");
                 }
             }
             else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
@@ -121,7 +117,7 @@ namespace InfBuddy
                     _charmMobAttacked = false;
                     _charmMobs.Remove(_charmMob.Identity);
                     _target = _charmMob;
-                    Chat.WriteLine($"Found target: {_target.Name}.");
+                    //Chat.WriteLine($"Found target: {_target.Name}.");
                 }
 
                 if (_charmMob.FightingTarget != null && _charmMob.IsAttacking
@@ -138,6 +134,15 @@ namespace InfBuddy
         public void Tick()
         {
             if (Game.IsZoning) { return; }
+
+            if (Team.IsInTeam)
+            {
+                foreach (TeamMember member in Team.Members)
+                {
+                    if (!ReformState._teamCache.Contains(member.Identity))
+                        ReformState._teamCache.Add(member.Identity);
+                }
+            }
 
             if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 _missionsLoaded = true;
@@ -172,7 +177,7 @@ namespace InfBuddy
                         if (targetMob != null)
                         {
                             _target = targetMob;
-                            Chat.WriteLine($"Found target: {_target.Name}");
+                            //Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
                     else if (DynelManager.NPCs.Any(c => c.FightingTarget != null && c.DistanceFrom(DynelManager.LocalPlayer) < 20f))
@@ -188,7 +193,7 @@ namespace InfBuddy
                         if (mob != null)
                         {
                             _target = mob;
-                            Chat.WriteLine($"Found target: {_target.Name}");
+                            //Chat.WriteLine($"Found target: {_target.Name}");
                         }
                     }
                     else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
@@ -202,6 +207,6 @@ namespace InfBuddy
             else
                 HandleScan();
         }
-           
+
     }
 }

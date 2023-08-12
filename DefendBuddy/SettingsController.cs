@@ -50,7 +50,7 @@ namespace DefendBuddy
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\DefendBuddy\\{Game.ClientInst}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\DefendBuddy\\{Game.ClientInst}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "DefendBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 

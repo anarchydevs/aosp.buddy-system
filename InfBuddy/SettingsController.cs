@@ -51,7 +51,7 @@ namespace InfBuddy
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\InfBuddy\\{Game.ClientInst}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\InfBuddy\\{Game.ClientInst}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "InfBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 
