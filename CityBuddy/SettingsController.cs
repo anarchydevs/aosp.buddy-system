@@ -50,7 +50,7 @@ namespace CityBuddy
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\CityBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\CityBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "CityBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 

@@ -65,7 +65,7 @@ namespace DB2Buddy
                 _settings = new Settings("DB2Buddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\DB2Buddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\DB2Buddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
 
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
