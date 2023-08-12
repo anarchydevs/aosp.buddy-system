@@ -2,7 +2,9 @@
 using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DB2Buddy
@@ -11,9 +13,12 @@ namespace DB2Buddy
     {
         public static bool _initCorpse = false;
 
-        private static Corpse _auneCorpse;
+        private Corpse _auneCorpse;
+        private Dynel _exitBeacon;
 
-        public static Vector3 _auneCorpsePos = Vector3.Zero;
+        public Vector3 _auneCorpsePos = Vector3.Zero;
+
+        private string previousErrorMessage = string.Empty;
 
         public IState GetNextState()
         {
@@ -47,41 +52,65 @@ namespace DB2Buddy
 
         public void Tick()
         {
-            _auneCorpse = DynelManager.Corpses
-                         .Where(c => c.Name.Contains("Remains of Ground Chief Aune"))
-                             .FirstOrDefault();
-
-            _auneCorpsePos = (Vector3)_auneCorpse?.Position;
-
-            foreach (TeamMember member in Team.Members)
+            try
             {
-                if (!ReformState._teamCache.Contains(member.Identity))
-                    ReformState._teamCache.Add(member.Identity);
+                _auneCorpse = DynelManager.Corpses.Where(c => c.Name.Contains("Remains of Ground Chief Aune")).FirstOrDefault();
+
+                _exitBeacon = DynelManager.AllDynels.Where(c => c.Name.Contains("Dust Brigade Exit Beacon")).FirstOrDefault();
+
+                foreach (TeamMember member in Team.Members)
+                {
+                    if (!ReformState._teamCache.Contains(member.Identity))
+                        ReformState._teamCache.Add(member.Identity);
+                }
+
+                if (_auneCorpse != null && !DynelManager.LocalPlayer.Buffs.Contains(NanoLine.Stun)
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) > 1.0f
+                    && !MovementController.Instance.IsNavigating)
+                {
+                    _auneCorpsePos = (Vector3)_auneCorpse?.Position;
+                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_auneCorpsePos);
+                }
+
+                if (!_initCorpse && Team.IsInTeam && Playfield.ModelIdentity.Instance == Constants.DB2Id
+                    && !MovementController.Instance.IsNavigating
+                    && DynelManager.LocalPlayer.Position.DistanceFrom(_exitBeacon.Position) < 1.0f)
+                {
+                    Chat.WriteLine("Pause for looting, 20 sec");
+                    Task.Factory.StartNew(
+                        async () =>
+                        {
+                            await Task.Delay(20000);
+                            Chat.WriteLine("Done, Disbanding");
+                            Team.Disband();
+                        });
+
+                    _initCorpse = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
 
-            if (_auneCorpse != null && !DynelManager.LocalPlayer.Buffs.Contains(NanoLine.Stun)
-                && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) > 1.0f
-                && !MovementController.Instance.IsNavigating)
-            {
-                DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_auneCorpsePos);
-            }
+        }
+        private int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
 
-            if (!_initCorpse && Team.IsInTeam && Playfield.ModelIdentity.Instance == Constants.DB2Id
-                && !MovementController.Instance.IsNavigating
-                && DynelManager.LocalPlayer.Position.DistanceFrom(_auneCorpsePos) < 1.0f)
-            {
-                Chat.WriteLine("Pause for looting, 20 sec");
-                Task.Factory.StartNew(
-                    async () =>
-                    {
-                        await Task.Delay(20000);
-                        Chat.WriteLine("Done, Disbanding");
-                        Team.Disband();
-                    });
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
 
-                _initCorpse = true;
-            }
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
 
+            return lineNumber;
         }
     }
 }

@@ -12,15 +12,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Collections;
 using AOSharp.Pathfinding;
+using System.Text.RegularExpressions;
 
 namespace DB2Buddy
 {
     public class FightState : IState
     {
-        private static SimpleChar _aune;
-        private static Corpse _auneCorpse;
-        private static SimpleChar _redTower;
-        private static SimpleChar _blueTower;
+        private SimpleChar _aune;
+        private Corpse _auneCorpse;
+        private SimpleChar _redTower;
+        private SimpleChar _blueTower;
+        private Dynel _exitBeacon;
+
+        private string previousErrorMessage = string.Empty;
 
         public IState GetNextState()
         {
@@ -43,6 +47,10 @@ namespace DB2Buddy
                    && !c.Name.Contains("Remains of ")
                    && !c.Buffs.Contains(274119))
                .FirstOrDefault();
+
+            _exitBeacon = DynelManager.AllDynels
+                .Where(c => c.Name.Contains("Dust Brigade Exit Beacon"))
+                .FirstOrDefault();
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
                 DB2Buddy.NavMeshMovementController.Halt();
@@ -76,11 +84,20 @@ namespace DB2Buddy
                 {
                     if (_redTower != null || DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                     {
+                        //if (!FightTowerState._towerPOS.ContainsKey(_redTower.Position))
+                        //{
+                        //    FightTowerState._towerPOS[_redTower.Position] = _redTower.Name;
+                        //}
+
                         return new FightTowerState();
                     }
-
                     if (_blueTower != null || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients))
                     {
+                        //if (!FightTowerState._towerPOS.ContainsKey(_blueTower.Position))
+                        //{
+                        //    FightTowerState._towerPOS[_blueTower.Position] = _blueTower.Name;
+                        //}
+
                         if (!DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy))
                             return new FightTowerState();
                     }
@@ -89,7 +106,7 @@ namespace DB2Buddy
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.first) < 60)
                     return new FellState();
 
-                if (DB2Buddy.AuneCorpse
+                if ((DB2Buddy.AuneCorpse || _exitBeacon != null)
                         && Extensions.CanProceed()
                         && DB2Buddy._settings["Farming"].AsBool())
                     return new FarmingState();
@@ -101,7 +118,7 @@ namespace DB2Buddy
         public void OnStateEnter()
         {
             Chat.WriteLine($"FightBossState");
-            DB2Buddy.NavMeshMovementController.Halt();
+            //DB2Buddy.NavMeshMovementController.Halt();
         }
 
         public void OnStateExit()
@@ -112,56 +129,80 @@ namespace DB2Buddy
 
         public void Tick()
         {
-            if (Game.IsZoning) { return; }
-
-            foreach (TeamMember member in Team.Members)
+            try
             {
-                if (!ReformState._teamCache.Contains(member.Identity))
-                    ReformState._teamCache.Add(member.Identity);
-            }
+                if (Game.IsZoning) { return; }
 
-            _aune = DynelManager.NPCs
-               .Where(c => c.Health > 0
-                   && c.Name.Contains("Ground Chief Aune")
-                   && !c.Name.Contains("Remains of "))
-               .FirstOrDefault();
-
-            _auneCorpse = DynelManager.Corpses
-               .Where(c => c.Name.Contains("Remains of Ground Chief Aune"))
-               .FirstOrDefault();
-
-            if (_auneCorpse != null)
-                DB2Buddy.AuneCorpse = true;
-
-            if (_aune != null)
-            {
-                if (DynelManager.LocalPlayer.FightingTarget == null
-                    && !DynelManager.LocalPlayer.IsAttackPending
-                    && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                    && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                    && _aune.IsInAttackRange()
-                    && !MovementController.Instance.IsNavigating)
-                    DynelManager.LocalPlayer.Attack(_aune);
-
-                if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
-                    || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
-                    || MovementController.Instance.IsNavigating)
+                foreach (TeamMember member in Team.Members)
                 {
-                    if (DynelManager.LocalPlayer.FightingTarget != null
-                        && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
-                        DynelManager.LocalPlayer.StopAttack();
+                    if (!ReformState._teamCache.Contains(member.Identity))
+                        ReformState._teamCache.Add(member.Identity);
                 }
 
-                if (DynelManager.LocalPlayer.Position.DistanceFrom (_aune.Position) > 20
-                    || !_aune.IsInAttackRange())
-                    DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position, out NavMeshPath path);
+                _aune = DynelManager.NPCs
+                   .Where(c => c.Health > 0
+                       && c.Name.Contains("Ground Chief Aune")
+                       && !c.Name.Contains("Remains of "))
+                   .FirstOrDefault();
 
-                if (_aune.IsInLineOfSight && _aune.IsInAttackRange()
-                    && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 20)
-                    DB2Buddy.NavMeshMovementController.Halt();
+                _auneCorpse = DynelManager.Corpses
+                   .Where(c => c.Name.Contains("Remains of Ground Chief Aune"))
+                   .FirstOrDefault();
 
+                if (_auneCorpse != null)
+                    DB2Buddy.AuneCorpse = true;
+
+                if (_aune != null)
+                {
+                    if (DynelManager.LocalPlayer.FightingTarget == null
+                        && !DynelManager.LocalPlayer.IsAttackPending
+                        && !DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
+                        && !_aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+                        && _aune.IsInAttackRange(true)
+                        && !MovementController.Instance.IsNavigating)
+                        DynelManager.LocalPlayer.Attack(_aune);
+
+                    if (DynelManager.LocalPlayer.Buffs.Contains(DB2Buddy.Nanos.XanBlessingoftheEnemy)
+                        || _aune.Buffs.Contains(DB2Buddy.Nanos.StrengthOfTheAncients)
+                        || MovementController.Instance.IsNavigating)
+                    {
+                        if (DynelManager.LocalPlayer.FightingTarget != null
+                            && DynelManager.LocalPlayer.FightingTarget.Name == _aune.Name)
+                            DynelManager.LocalPlayer.StopAttack();
+                    }
+
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_aune.Position) > 20
+                        || !_aune.IsInAttackRange(true))
+                        DB2Buddy.NavMeshMovementController.SetNavMeshDestination(_aune.Position);
+
+                    if (_aune.IsInLineOfSight && _aune.IsInAttackRange(true)
+                        && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._centerPosition) < 20)
+                        DB2Buddy.NavMeshMovementController.Halt();
+                }
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
-       
+        private int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
+        }
+
     }
 }

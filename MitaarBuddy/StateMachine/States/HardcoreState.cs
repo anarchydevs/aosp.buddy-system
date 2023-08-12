@@ -2,6 +2,7 @@
 using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace MitaarBuddy
@@ -19,8 +20,6 @@ namespace MitaarBuddy
         private static SimpleChar _redXanSpirit;
         private static SimpleChar _blueXanSpirit;
         private static SimpleChar _yellowXanSpirit;
-
-
 
         public IState GetNextState()
         {
@@ -179,6 +178,7 @@ namespace MitaarBuddy
                        && DynelManager.LocalPlayer.Buffs.Find(MitaarBuddy.SpiritNanos.BlessingofTheLight, out Buff yellowbuff) && yellowbuff.RemainingTime < 2)
                         MovementController.Instance.SetDestination(Constants._yellowPodium);
                 }
+
             }
         }
     }

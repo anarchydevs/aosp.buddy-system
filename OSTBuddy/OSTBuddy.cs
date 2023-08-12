@@ -45,9 +45,9 @@ namespace OSTBuddy
                 _settings = new Settings("OSTBuddy");
                 PluginDirectory = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\OSTBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\OSTBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
 
-                Config.CharSettings[Game.ClientInst].RespawnDelayChangedEvent += RespawnDelay_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].RespawnDelayChangedEvent += RespawnDelay_Changed;
 
                 Chat.RegisterCommand("buddy", OSTBuddyCommand); Chat.RegisterCommand("buddy", OSTBuddyCommand);
 
@@ -66,7 +66,7 @@ namespace OSTBuddy
                 Chat.WriteLine("OSTBuddy Loaded!");
                 Chat.WriteLine("/ostbuddy for settings.");
 
-                RespawnDelay = Config.CharSettings[Game.ClientInst].RespawnDelay;
+                RespawnDelay = Config.CharSettings[DynelManager.LocalPlayer.Name].RespawnDelay;
             }
             catch (Exception e)
             {
@@ -81,7 +81,7 @@ namespace OSTBuddy
 
         public static void RespawnDelay_Changed(object s, int e)
         {
-            Config.CharSettings[Game.ClientInst].RespawnDelay = e;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].RespawnDelay = e;
             Config.Save();
         }
 
@@ -139,9 +139,9 @@ namespace OSTBuddy
 
                 // Use this as reference for all others good template for the event handlers
                 if (int.TryParse(_respawnDelayInput.Text, out int _respawnDelayValue)
-                    && Config.CharSettings[Game.ClientInst].RespawnDelay != _respawnDelayValue)
+                    && Config.CharSettings[DynelManager.LocalPlayer.Name].RespawnDelay != _respawnDelayValue)
                 {
-                    Config.CharSettings[Game.ClientInst].RespawnDelay = _respawnDelayValue;
+                    Config.CharSettings[DynelManager.LocalPlayer.Name].RespawnDelay = _respawnDelayValue;
                     RespawnDelay = _respawnDelayValue;
                 }
 
