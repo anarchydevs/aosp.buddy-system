@@ -617,9 +617,14 @@ namespace AttackBuddy
                                    || c.Name == "Hallowed Acolyte"
                                    || c.Name == "Fanatic"
                                    || c.Name == "Turbulent Windcaller"
-                                   || c.Name == "Ruinous Reverend"))
+                                   || c.Name == "Ruinous Reverend"
+                                   || c.Name == "Eternal Guardian"
+                                   || c.Name == "Defensive Drone"
+                                   || c.Name == "Confounding Bloated Carcass"))
                                .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
                                .OrderBy(c => c.HealthPercent)
+                               .OrderByDescending(c => c.Name == "Hallowed Acolyte")
+                               .OrderByDescending(c => c.Name == "Confounding Bloated Carcass")
                                .OrderByDescending(c => c.Name == "Devoted Fanatic")
                                .ToList();
 
