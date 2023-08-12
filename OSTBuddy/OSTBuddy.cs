@@ -45,7 +45,7 @@ namespace OSTBuddy
                 _settings = new Settings("OSTBuddy");
                 PluginDirectory = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\OSTBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\OSTBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].RespawnDelayChangedEvent += RespawnDelay_Changed;
 

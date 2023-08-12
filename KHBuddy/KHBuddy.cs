@@ -64,7 +64,7 @@ namespace KHBuddy
                 Chat.WriteLine("KHBuddy Loaded!");
                 Chat.WriteLine("/khbuddy for settings.");
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\KHBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\KHBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.StartMode, OnStartMessage);
