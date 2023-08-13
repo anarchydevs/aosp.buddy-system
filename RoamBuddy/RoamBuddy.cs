@@ -59,7 +59,7 @@ namespace RoamBuddy
                 _settings = new Settings("RoamBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
@@ -67,9 +67,9 @@ namespace RoamBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.AttackRange, OnAttackRangeMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.ScanRange, OnScanRangeMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
-                Config.CharSettings[Game.ClientInst].AttackRangeChangedEvent += AttackRange_Changed;
-                Config.CharSettings[Game.ClientInst].ScanRangeChangedEvent += ScanRange_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRangeChangedEvent += AttackRange_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRangeChangedEvent += ScanRange_Changed;
 
                 Chat.RegisterCommand("buddy", RoamBuddyCommand);
 
@@ -89,8 +89,8 @@ namespace RoamBuddy
                 Chat.WriteLine("RoamBuddy Loaded!");
                 Chat.WriteLine("/roambuddy for settings.");
 
-                AttackRange = Config.CharSettings[Game.ClientInst].AttackRange;
-                ScanRange = Config.CharSettings[Game.ClientInst].ScanRange;
+                AttackRange = Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange;
+                ScanRange = Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange;
             }
             catch (Exception e)
             {
@@ -112,13 +112,13 @@ namespace RoamBuddy
         }
         public static void AttackRange_Changed(object s, int e)
         {
-            Config.CharSettings[Game.ClientInst].AttackRange = e;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = e;
             AttackRange = e;
             Config.Save();
         }
         public static void ScanRange_Changed(object s, int e)
         {
-            Config.CharSettings[Game.ClientInst].ScanRange = e;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = e;
             ScanRange = e;
             Config.Save();
         }
@@ -160,14 +160,14 @@ namespace RoamBuddy
         {
             AttackRangeMessage rangeMsg = (AttackRangeMessage)msg;
 
-            Config.CharSettings[Game.ClientInst].AttackRange = rangeMsg.Range;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = rangeMsg.Range;
         }
 
         private void OnScanRangeMessage(int sender, IPCMessage msg)
         {
             ScanRangeMessage rangeMsg = (ScanRangeMessage)msg;
 
-            Config.CharSettings[Game.ClientInst].ScanRange = rangeMsg.Range;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = rangeMsg.Range;
         }
 
         private void Start()
@@ -240,11 +240,11 @@ namespace RoamBuddy
                     if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
                         Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
 
-                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy"))
-                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy");
+                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy"))
+                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy");
 
-                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\Exports"))
-                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\Exports");
+                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports"))
+                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports");
 
                     string _exportPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\AOSharp\RoamBuddy\Exports\{nameInput.Text}.txt";
 
@@ -281,11 +281,11 @@ namespace RoamBuddy
                     if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
                         Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
 
-                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy"))
-                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy");
+                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy"))
+                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy");
 
-                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\Exports"))
-                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\Exports");
+                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports"))
+                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports");
 
                     string _loadPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\AOSharp\RoamBuddy\Exports\{nameInput.Text}.txt";
 
@@ -461,17 +461,17 @@ namespace RoamBuddy
                 if (channelInput != null)
                 {
                     if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                     {
-                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                     }
                 }
                 if (attackRangeInput != null && !string.IsNullOrEmpty(attackRangeInput.Text))
                 {
                     if (int.TryParse(attackRangeInput.Text, out int attackRangeInputValue)
-                        && Config.CharSettings[Game.ClientInst].AttackRange != attackRangeInputValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange != attackRangeInputValue)
                     {
-                        Config.CharSettings[Game.ClientInst].AttackRange = attackRangeInputValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = attackRangeInputValue;
                         IPCChannel.Broadcast(new AttackRangeMessage()
                         {
                             Range = attackRangeInputValue
@@ -481,9 +481,9 @@ namespace RoamBuddy
                 if (scanRangeInput != null && !string.IsNullOrEmpty(scanRangeInput.Text))
                 {
                     if (int.TryParse(scanRangeInput.Text, out int scanRangeInputValue)
-                        && Config.CharSettings[Game.ClientInst].ScanRange != scanRangeInputValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange != scanRangeInputValue)
                     {
-                        Config.CharSettings[Game.ClientInst].ScanRange = scanRangeInputValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = scanRangeInputValue;
                         IPCChannel.Broadcast(new ScanRangeMessage()
                         {
                             Range = scanRangeInputValue
@@ -588,11 +588,11 @@ namespace RoamBuddy
                         if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
                             Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
 
-                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy"))
-                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy");
+                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy"))
+                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy");
 
-                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\Exports"))
-                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\Exports");
+                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports"))
+                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports");
 
                         string _loadPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\AOSharp\RoamBuddy\Exports\{param[1]}.txt";
 
@@ -637,11 +637,11 @@ namespace RoamBuddy
                         if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
                             Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
 
-                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy"))
-                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy");
+                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy"))
+                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy");
 
-                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\Exports"))
-                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\RoamBuddy\\Exports");
+                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports"))
+                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports");
 
                         string _exportPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\AOSharp\RoamBuddy\Exports\{param[1]}.txt";
 

@@ -51,7 +51,7 @@ namespace InfBuddy
 
                     if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                     {
-                        Constants.RoamPos = new Vector3(184.5f, 1.0f, 242.9f);
+                        //Constants.RoamPos = new Vector3(184.5f, 1.0f, 242.9f);
                         return new RoamState();
                     }
 

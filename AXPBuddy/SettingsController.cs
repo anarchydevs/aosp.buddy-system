@@ -53,7 +53,7 @@ namespace AXPBuddy
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AXPBuddy\\{Game.ClientInst}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\AXPBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "AXPBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 
@@ -68,11 +68,11 @@ namespace AXPBuddy
                             settingsWindow.FindView("TickBox", out TextInputView tickInput);
 
                             if (channelInput != null)
-                                channelInput.Text = $"{Config.CharSettings[Game.ClientInst].IPCChannel}";
+                                channelInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel}";
                             if (leaderInput != null)
-                                leaderInput.Text = $"{Config.CharSettings[Game.ClientInst].Leader}";
+                                leaderInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].Leader}";
                             if (tickInput != null)
-                                tickInput.Text = $"{Config.CharSettings[Game.ClientInst].Tick}";
+                                tickInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].Tick}";
                         }
                     }
                     catch (Exception e)

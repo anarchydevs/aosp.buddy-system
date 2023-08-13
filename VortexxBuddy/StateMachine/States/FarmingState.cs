@@ -20,7 +20,8 @@ namespace VortexxBuddy
 
         public IState GetNextState()
         {
-            if (Playfield.ModelIdentity.Instance == Constants.XanHubId)
+            if (Playfield.ModelIdentity.Instance == Constants.XanHubId
+                 && !Team.Members.Any(c => c.Character == null))
                 return new ReformState();
 
             return null;
@@ -48,31 +49,47 @@ namespace VortexxBuddy
                    .Where(c => c.Name.Contains("Remains of Ground Chief Vortexx"))
                        .FirstOrDefault();
 
-            _vortexxCorpsePos = (Vector3)_vortexxCorpse?.Position;
+
 
             //Path to corpse
-            if (!_atCorpse && DynelManager.LocalPlayer.Position.DistanceFrom(_vortexxCorpsePos) > 1)
+            if (_vortexxCorpse != null)
             {
-                VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(_vortexxCorpsePos);
+                _vortexxCorpsePos = (Vector3)_vortexxCorpse?.Position;
+                if (!_atCorpse && DynelManager.LocalPlayer.Position.DistanceFrom(_vortexxCorpsePos) > 1)
+                {
+                    VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(_vortexxCorpsePos);
 
-                _atCorpse = true;
+                    _atCorpse = true;
+                }
+
+                if (!_initCorpse && _atCorpse)
+                {
+                    Chat.WriteLine("Pause for looting, 10 sec");
+                    Task.Factory.StartNew(
+                        async () =>
+                        {
+                            await Task.Delay(10000);
+                            Chat.WriteLine("Done, Leaving");
+
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._BeaconPos) > 1)
+                                VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._BeaconPos);
+
+                        });
+
+                    _initCorpse = true;
+                }
             }
 
-            if (!_initCorpse && _atCorpse)
+            if (_vortexxCorpse == null)
             {
-                Chat.WriteLine("Pause for looting, 10 sec");
-                Task.Factory.StartNew(
-                    async () =>
-                    {
-                        await Task.Delay(10000);
-                        Chat.WriteLine("Done, Leaving");
 
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._BeaconPos) > 1)
-                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._BeaconPos);
-
-                    });
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._BeaconPos) > 1)
+                {
+                    MovementController.Instance.SetDestination(Constants._BeaconPos);
+                }
 
                 _initCorpse = true;
+                _atCorpse = true;
             }
 
             if (Beacon != null && _initCorpse && 
