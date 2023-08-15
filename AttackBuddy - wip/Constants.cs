@@ -14,7 +14,7 @@ namespace AttackBuddy
                     "Notum Erruption",
                     "Alien Fuel Tower",
                     "Kyr'Ozch Guardian",
-                    "Engorged Sacrificial Husks",
+                    "Engorged Sacrificial Husk",
                     "Honor Guard - Ilari'Uri",
                     "Unicorn Recon Agent Chittick",
                     "Representative of IPS",
