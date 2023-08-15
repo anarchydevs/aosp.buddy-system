@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace InfBuddy
@@ -55,6 +56,8 @@ namespace InfBuddy
         private static double _sitUpdateTimer;
         public static double _stateTimeOut;
 
+        private string previousErrorMessage = string.Empty;
+
         public static List<string> _namesToIgnore = new List<string>
         {
                     "One Who Obeys Precepts",
@@ -76,10 +79,10 @@ namespace InfBuddy
                 _settings = new Settings("InfBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\InfBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\InfBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
-                IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[Game.ClientInst].IPCChannel));
+                IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
@@ -95,7 +98,7 @@ namespace InfBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Normal, NormalMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Roam, RoamMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 Chat.RegisterCommand("buddy", InfBuddyCommand);
 
@@ -125,9 +128,16 @@ namespace InfBuddy
                 Chat.WriteLine("InfBuddy Loaded!");
                 Chat.WriteLine("/infbuddy for settings.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
 
@@ -186,6 +196,11 @@ namespace InfBuddy
         {
             _settings["Toggle"] = false;
             Stop();
+        }
+
+        private void SetSettings(string settingName, int value)
+        {
+            _settings[settingName] = value;
         }
 
         private void EasyMessage(int sender, IPCMessage msg)
@@ -250,9 +265,9 @@ namespace InfBuddy
                 if (channelInput != null)
                 {
                     if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                     {
-                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                     }
                 }
 
@@ -393,88 +408,7 @@ namespace InfBuddy
                     _roamToggled = true;
                     break;
             }
-            //if (DifficultySelection.Easy == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_easyToggled)
-            //{
-            //    Easy = true;
-            //    Medium = false;
-            //    Hard = false;
-
-            //    _easyToggled = true;
-            //    _mediumToggled = false;
-            //    _hardToggled = false;
-            //}
-
-            //if (DifficultySelection.Medium == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_mediumToggled)
-            //{
-            //    Easy = false;
-            //    Medium = true;
-            //    Hard = false;
-
-            //    _easyToggled = false;
-            //    _mediumToggled = true;
-            //    _hardToggled = false;
-            //}
-
-            //if (DifficultySelection.Hard == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_hardToggled)
-            //{
-            //    Easy = false;
-            //    Medium = false;
-            //    Hard = true;
-
-            //    _easyToggled = false;
-            //    _mediumToggled = false;
-            //    _hardToggled = true;
-            //}
-
-            //if (FactionSelection.Neutral == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_neutralToggled)
-            //{
-            //    Neutral = true;
-            //    Clan = false;
-            //    Omni = false;
-
-            //    _neutralToggled = true;
-            //    _clanToggled = false;
-            //    _omniToggled = false;
-            //}
-
-            //if (FactionSelection.Clan == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_clanToggled)
-            //{
-            //    Neutral = false;
-            //    Clan = true;
-            //    Omni = false;
-
-            //    _neutralToggled = false;
-            //    _clanToggled = true;
-            //    _omniToggled = false;
-            //}
-
-            //if (FactionSelection.Omni == (FactionSelection)_settings["FactionSelection"].AsInt32() && !_omniToggled)
-            //{
-            //    Neutral = false;
-            //    Clan = false;
-            //    Omni = true;
-
-            //    _neutralToggled = false;
-            //    _clanToggled = false;
-            //    _omniToggled = true;
-            //}
-
-            //if (ModeSelection.Normal == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_normalToggled)
-            //{
-            //    Normal = true;
-            //    Roam = false;
-
-            //    _normalToggled = true;
-            //    _roamToggled = false;
-            //}
-            //if (ModeSelection.Roam == (ModeSelection)_settings["ModeSelection"].AsInt32() && !_roamToggled)
-            //{
-            //    Normal = false;
-            //    Roam = true;
-
-            //    _normalToggled = false;
-            //    _roamToggled = true;
-            //}
+            Config.Save();
         }
 
         private bool CanUseSitKit()
@@ -614,6 +548,18 @@ namespace InfBuddy
             public static readonly int[] Kits = {
                 297274, 293296, 291084, 291083, 291082
             };
+        }
+
+        public int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
         }
     }
 }

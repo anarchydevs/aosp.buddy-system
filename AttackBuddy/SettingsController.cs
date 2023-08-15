@@ -57,11 +57,11 @@ namespace AttackBuddy
         {
             if (!IsCommandRegistered)
             {
-                Chat.RegisterCommand("attackbuddy", (string command, string[] param, ChatWindow chatWindow) =>
+                Chat.RegisterCommand("attackbuddy", (string command, string[] param, ChatWindow Chat) =>
                 {
                     try
                     {
-                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AttackBuddy\\{Game.ClientInst}\\Config.json");
+                        Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\AttackBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
 
                         settingsWindow = Window.Create(new Rect(50, 50, 300, 300), "AttackBuddy", "Settings", WindowStyle.Default, WindowFlags.AutoScale);
 
@@ -74,16 +74,23 @@ namespace AttackBuddy
                             settingsWindow.FindView("ScanRangeBox", out TextInputView scanRangeInput);
 
                             if (channelInput != null)
-                                channelInput.Text = $"{Config.CharSettings[Game.ClientInst].IPCChannel}";
+                                channelInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel}";
                             if (attackRangeInput != null)
-                                attackRangeInput.Text = $"{Config.CharSettings[Game.ClientInst].AttackRange}";
+                                attackRangeInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange}";
                             if (scanRangeInput != null)
-                                scanRangeInput.Text = $"{Config.CharSettings[Game.ClientInst].ScanRange}";
+                                scanRangeInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange}";
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Chat.WriteLine(e);
+                        var errorMessage = "An error occurred on line " + AttackBuddy.GetLineNumber(ex) + ": " + ex.Message;
+
+                        if (errorMessage != AttackBuddy.previousErrorMessage)
+                        {
+                            Chat.WriteLine(errorMessage);
+                            Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                            AttackBuddy.previousErrorMessage = errorMessage;
+                        }
                     }
                 });
 

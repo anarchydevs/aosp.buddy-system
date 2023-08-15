@@ -29,7 +29,7 @@ namespace OSTBuddy
                     return new IdleState();
                 }
 
-                if (Time.NormalTime > _timer + OSTBuddy.Config.CharSettings[Game.ClientInst].RespawnDelay && OSTBuddy.MobsAllDead)
+                if (Time.NormalTime > _timer + OSTBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].RespawnDelay && OSTBuddy.MobsAllDead)
                 {
                     OSTBuddy.MobsAllDead = false;
                     return new PullState();

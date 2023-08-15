@@ -22,7 +22,7 @@ namespace AXPBuddy
         {
             if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return null; }
 
-            if (Extensions.HasDied())
+            if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
                 return new DiedState();
 
             if (Playfield.ModelIdentity.Instance == Constants.APFHubId
@@ -63,7 +63,7 @@ namespace AXPBuddy
                 _initTeam = true;
             }
 
-            if (!AXPBuddy._died && Playfield.ModelIdentity.Instance == Constants.S13Id)
+            if (Playfield.ModelIdentity.Instance == Constants.S13Id)
                 AXPBuddy._ourPos = DynelManager.LocalPlayer.Position;
 
             if (!AXPBuddy._initMerge && AXPBuddy._settings["Merge"].AsBool())
@@ -72,28 +72,6 @@ namespace AXPBuddy
                     AXPBuddy._initMerge = true;
 
                 AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
-            }
-
-            if (AXPBuddy._died)
-            {
-                if (AXPBuddy._ourPos != Vector3.Zero)
-                {
-                    if (AXPBuddy.NavMeshMovementController.IsNavigating && Time.NormalTime > _stuck + 30f)
-                    {
-                        DynelManager.LocalPlayer.Position = new Vector3(DynelManager.LocalPlayer.Position.X, DynelManager.LocalPlayer.Position.Y, DynelManager.LocalPlayer.Position.Z + 4f);
-                        _stuck = Time.NormalTime;
-                    }
-
-                    if (!AXPBuddy.NavMeshMovementController.IsNavigating && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._ourPos) > 15f)
-                    {
-                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._ourPos);
-                        _stuck = Time.NormalTime;
-                    }
-
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._ourPos) < 15f)
-                        if (AXPBuddy._died)
-                            AXPBuddy._died = false;
-                }
             }
 
             AXPBuddy._leader = Team.Members
@@ -107,9 +85,6 @@ namespace AXPBuddy
 
             if (AXPBuddy._leader != null)
             {
-                if (AXPBuddy._died)
-                    AXPBuddy._died = false;
-
                 AXPBuddy._leaderPos = (Vector3)AXPBuddy._leader?.Position;
 
                 //Reason: Edge correction

@@ -61,7 +61,7 @@ namespace VortexxBuddy
                 _settings = new Settings("VortexxBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\VortexxBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\VortexxBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
@@ -74,7 +74,7 @@ namespace VortexxBuddy
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Enter, EnterMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 Chat.RegisterCommand("buddy", BuddyCommand);
 
@@ -87,6 +87,7 @@ namespace VortexxBuddy
 
                 _settings.AddVariable("Toggle", false);
                 _settings.AddVariable("Farming", false);
+                _settings.AddVariable("Leader", false);
                 _settings.AddVariable("Immunity", false);
                 _settings.AddVariable("Clear", false);
 
@@ -115,6 +116,11 @@ namespace VortexxBuddy
         public static void Start()
         {
             Toggle = true;
+
+            if (_settings["Leader"].AsBool())
+            {
+                Leader = DynelManager.LocalPlayer.Identity;
+            }
 
             Chat.WriteLine("VortexxBuddy enabled.");
 
@@ -145,10 +151,6 @@ namespace VortexxBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            if (Leader == Identity.None
-                && DynelManager.LocalPlayer.Identity.Instance != sender)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
-
             _settings["Toggle"] = true;
             Start();
         }
@@ -207,9 +209,9 @@ namespace VortexxBuddy
                 if (channelInput != null)
                 {
                     if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                     {
-                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                     }
                 }
 
@@ -226,7 +228,7 @@ namespace VortexxBuddy
                 }
                 if (_settings["Toggle"].AsBool() && !Toggle)
                 {
-                    Leader = DynelManager.LocalPlayer.Identity;
+                    
                     IPCChannel.Broadcast(new StartMessage());
                     Start();
                 }
@@ -244,7 +246,6 @@ namespace VortexxBuddy
                     Chat.WriteLine("Farming enabled.");
                     farmingEnabled();
                 }
-
             }
 
             if (_settings["Toggle"].AsBool())
@@ -308,21 +309,20 @@ namespace VortexxBuddy
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Toggle"].AsBool() && !Toggle)
+                    if (param.Length < 1)
                     {
-                        
-                        Leader = DynelManager.LocalPlayer.Identity;
-
-                        if (DynelManager.LocalPlayer.Identity == Leader)
+                        if (!_settings["Toggle"].AsBool())
+                        {
+                            _settings["Toggle"] = true;
                             IPCChannel.Broadcast(new StartMessage());
-
-                        _settings["Toggle"] = true;
-                        Start();
-                    }
-                    else
-                    {
-                        IPCChannel.Broadcast(new StopMessage());
-                        Stop();
+                            Start();
+                        }
+                        else
+                        {
+                            _settings["Toggle"] = false;
+                            IPCChannel.Broadcast(new StopMessage());
+                            Stop();
+                        }
                     }
                 }
                 Config.Save();

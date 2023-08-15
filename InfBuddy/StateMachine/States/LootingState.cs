@@ -2,7 +2,9 @@
 using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace InfBuddy
@@ -14,11 +16,13 @@ namespace InfBuddy
 
         private SimpleChar _target;
 
-        private static Corpse _corpse;
+        private Corpse _corpse;
 
         private static Vector3 _corpsePos = Vector3.Zero;
 
         private double looting;
+
+        private string previousErrorMessage = string.Empty;
 
         public IState GetNextState()
         {
@@ -55,26 +59,44 @@ namespace InfBuddy
 
         public void Tick()
         {
-
-            _corpse = DynelManager.Corpses
-                .Where(c => c.Name.Contains("Remains of "))
-                .FirstOrDefault();
-
-            _corpsePos = (Vector3)_corpse?.Position;
-
-            //if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-            //    _missionsLoaded = true;
-
-            if (_corpse != null)//Path to corpse
+            try
             {
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) > 5f)
-                    InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
+                _corpse = DynelManager.Corpses
+                    .Where(c => c.Name.Contains("Remains of "))
+                    .FirstOrDefault();
 
-                //if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) < 5f && Time.NormalTime > looting + 10f)
-                //{
-                //    _initCorpse = true;
-                //}
+                if (Game.IsZoning || _corpse == null) { return; }
+
+                if (_corpse != null)//Path to corpse
+                {
+                    _corpsePos = (Vector3)_corpse?.Position;
+
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpsePos) > 5f)
+                        InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
+                }
             }
+            catch (Exception ex)
+            {
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
+            }
+        }
+        private int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
         }
     }
 }

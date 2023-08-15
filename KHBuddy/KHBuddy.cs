@@ -64,8 +64,8 @@ namespace KHBuddy
                 Chat.WriteLine("KHBuddy Loaded!");
                 Chat.WriteLine("/khbuddy for settings.");
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\KHBuddy\\{Game.ClientInst}\\Config.json");
-                IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[Game.ClientInst].IPCChannel));
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\KHBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
+                IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.StartMode, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.StopMode, OnStopMessage);
@@ -77,7 +77,7 @@ namespace KHBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.West, WestMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.EastandWest, EastAndWestMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 //Chat.RegisterCommand("buddy", KHBuddyCommand);
 
@@ -281,10 +281,10 @@ namespace KHBuddy
                 {
                     if (int.TryParse(channelBox.Text, out int channelValue))
                     {
-                        if (Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                        if (Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                         {
                             IPCChannel.SetChannelId(Convert.ToByte(channelValue));
-                            Config.CharSettings[Game.ClientInst].IPCChannel = Convert.ToByte(channelValue);
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = Convert.ToByte(channelValue);
                             Config.Save();
                         }
                     }

@@ -60,7 +60,7 @@ namespace MitaarBuddy
                 _settings = new Settings("MitaarBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\MitaarBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\MitaarBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
@@ -75,7 +75,7 @@ namespace MitaarBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.MediumMode, MediumMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.HardcoreMode, HardcoreMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
                 Chat.RegisterCommand("buddy", MitaarBuddyCommand);
 
@@ -90,9 +90,11 @@ namespace MitaarBuddy
 
                 _settings.AddVariable("Toggle", false);
                 _settings.AddVariable("Farming", false);
+                _settings.AddVariable("Leader", false);
 
                 _settings["Toggle"] = false;
                 _settings["Farming"] = false;
+                
 
                 _settings["DifficultySelection"] = (int)DifficultySelection.Easy;
 
@@ -117,6 +119,11 @@ namespace MitaarBuddy
 
         public static void Start()
         {
+            if (_settings["Leader"].AsBool())
+            {
+                Leader = DynelManager.LocalPlayer.Identity;
+            }
+
             Toggle = true;
 
             Chat.WriteLine("MitaarBuddy enabled.");
@@ -148,9 +155,9 @@ namespace MitaarBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            if (Leader == Identity.None
-                && DynelManager.LocalPlayer.Identity.Instance != sender)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
+            //if (Leader == Identity.None
+            //    && DynelManager.LocalPlayer.Identity.Instance != sender)
+            //    Leader = new Identity(IdentityType.SimpleChar, sender);
 
             _settings["Toggle"] = true;
             Start();
@@ -221,9 +228,9 @@ namespace MitaarBuddy
                 if (channelInput != null)
                 {
                     if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
+                        && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                     {
-                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
+                        Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                     }
                 }
 
@@ -240,7 +247,7 @@ namespace MitaarBuddy
                 }
                 if (_settings["Toggle"].AsBool() && !Toggle)
                 {
-                    Leader = DynelManager.LocalPlayer.Identity;
+                    //Leader = DynelManager.LocalPlayer.Identity;
                     IPCChannel.Broadcast(new StartMessage());
                     Start();
                 }
@@ -378,14 +385,15 @@ namespace MitaarBuddy
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Toggle"].AsBool() && !Toggle)
+                    if (!_settings["Toggle"].AsBool())
                     {
-                        Leader = DynelManager.LocalPlayer.Identity;
+                        _settings["Toggle"] = true;
                         IPCChannel.Broadcast(new StartMessage());
                         Start();
                     }
                     else
                     {
+                        _settings["Toggle"] = false;
                         IPCChannel.Broadcast(new StopMessage());
                         Stop();
                     }

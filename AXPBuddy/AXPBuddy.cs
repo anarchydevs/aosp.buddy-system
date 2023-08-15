@@ -14,6 +14,7 @@ using AOSharp.Core.Inventory;
 using AOSharp.Common.GameData.UI;
 using System.Security.Cryptography;
 using System.Threading;
+using System.Text.RegularExpressions;
 
 namespace AXPBuddy
 {
@@ -35,9 +36,6 @@ namespace AXPBuddy
         public static bool _initMerge = false;
         public static bool Toggle = false;
         public static bool _initSit = false;
-        public static bool _died = false;
-        public static bool _passedFirstCorrectionPos = false;
-        public static bool _passedSecondCorrectionPos = false;
 
         public static double _stateTimeOut;
         public static double _sitUpdateTimer;
@@ -52,6 +50,8 @@ namespace AXPBuddy
 
         public static string PluginDir;
 
+        public static string previousErrorMessage = string.Empty;
+
         public override void Run(string pluginDir)
         {
             try
@@ -59,7 +59,7 @@ namespace AXPBuddy
                 _settings = new Settings("AXPBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\AOSP\\AXPBuddy\\{Game.ClientInst}\\Config.json");
+                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\AXPBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
@@ -67,9 +67,9 @@ namespace AXPBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
 
-                Config.CharSettings[Game.ClientInst].IPCChannelChangedEvent += IPCChannel_Changed;
-                Config.CharSettings[Game.ClientInst].LeaderChangedEvent += Leader_Changed;
-                Config.CharSettings[Game.ClientInst].TickChangedEvent += Tick_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].LeaderChangedEvent += Leader_Changed;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].TickChangedEvent += Tick_Changed;
 
                 Chat.RegisterCommand("buddy", AXPBuddyCommand);
 
@@ -80,7 +80,7 @@ namespace AXPBuddy
                 Game.OnUpdate += OnUpdate;
                 Game.TeleportEnded += OnEndZoned;
 
-                _settings.AddVariable("ModeSelection", (int)ModeSelection.Patrol);
+                _settings.AddVariable("ModeSelection", (int)ModeSelection.Path);
 
                 _settings.AddVariable("Toggle", false);
                 _settings.AddVariable("Merge", false);
@@ -90,12 +90,19 @@ namespace AXPBuddy
                 Chat.WriteLine("AXPBuddy Loaded!");
                 Chat.WriteLine("/axpbuddy for settings.");
 
-                LeaderName = Config.CharSettings[Game.ClientInst].Leader;
-                Tick = Config.CharSettings[Game.ClientInst].Tick;
+                LeaderName = Config.CharSettings[DynelManager.LocalPlayer.Name].Leader;
+                Tick = Config.CharSettings[DynelManager.LocalPlayer.Name].Tick;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
 
@@ -112,13 +119,13 @@ namespace AXPBuddy
 
         public static void Leader_Changed(object s, string e)
         {
-            Config.CharSettings[Game.ClientInst].Leader = e;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].Leader = e;
             LeaderName = e;
             Config.Save();
         }
         public static void Tick_Changed(object s, float e)
         {
-            Config.CharSettings[Game.ClientInst].Tick = e;
+            Config.CharSettings[DynelManager.LocalPlayer.Name].Tick = e;
             Tick = e;
             Config.Save();
         }
@@ -198,72 +205,86 @@ namespace AXPBuddy
 
         private void OnUpdate(object s, float deltaTime)
         {
-            if (Game.IsZoning || Time.NormalTime < _lastZonedTime + 2f) { return; }
-
-            if (Time.NormalTime > _mainUpdate + Tick)
+            try
             {
-                if (Time.NormalTime > _sitUpdateTimer + 1.5f)
+                if (Game.IsZoning || Time.NormalTime < _lastZonedTime + 2f) { return; }
+
+                if (Time.NormalTime > _mainUpdate + Tick)
                 {
-                    ListenerSit();
-                }
-
-                _stateMachine.Tick();
-                _mainUpdate = Time.NormalTime;
-            }
-
-            #region UI Update
-
-            if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
-            {
-                SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
-                SettingsController.settingsWindow.FindView("LeaderBox", out TextInputView leaderInput);
-                SettingsController.settingsWindow.FindView("TickBox", out TextInputView tickInput);
-
-                if (channelInput != null && !string.IsNullOrEmpty(channelInput.Text))
-                    if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[Game.ClientInst].IPCChannel != channelValue)
-                        Config.CharSettings[Game.ClientInst].IPCChannel = channelValue;
-                if (tickInput != null && !string.IsNullOrEmpty(tickInput.Text))
-                    if (float.TryParse(tickInput.Text, out float tickValue)
-                        && Config.CharSettings[Game.ClientInst].Tick != tickValue)
-                        Config.CharSettings[Game.ClientInst].Tick = tickValue;
-
-                if (leaderInput != null && !string.IsNullOrEmpty(leaderInput.Text))
-                {
-                    if (Config.CharSettings[Game.ClientInst].Leader != leaderInput.Text)
+                    if (Time.NormalTime > _sitUpdateTimer + 1.5f)
                     {
-                        Config.CharSettings[Game.ClientInst].Leader = leaderInput.Text;
+                        ListenerSit();
                     }
+
+                    _stateMachine.Tick();
+                    _mainUpdate = Time.NormalTime;
                 }
 
-                if (SettingsController.settingsWindow.FindView("AXPBuddyInfoView", out Button infoView))
+                #region UI Update
+
+                if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
                 {
-                    infoView.Tag = SettingsController.settingsWindow;
-                    infoView.Clicked = HandleInfoViewClick;
-                }
+                    SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
+                    SettingsController.settingsWindow.FindView("LeaderBox", out TextInputView leaderInput);
+                    SettingsController.settingsWindow.FindView("TickBox", out TextInputView tickInput);
+
+                    if (channelInput != null && !string.IsNullOrEmpty(channelInput.Text))
+                        if (int.TryParse(channelInput.Text, out int channelValue)
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
+                    if (tickInput != null && !string.IsNullOrEmpty(tickInput.Text))
+                        if (float.TryParse(tickInput.Text, out float tickValue)
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].Tick != tickValue)
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].Tick = tickValue;
+
+                    if (leaderInput != null && !string.IsNullOrEmpty(leaderInput.Text))
+                    {
+                        if (Config.CharSettings[DynelManager.LocalPlayer.Name].Leader != leaderInput.Text)
+                        {
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].Leader = leaderInput.Text;
+                        }
+                    }
+
+                    if (SettingsController.settingsWindow.FindView("AXPBuddyInfoView", out Button infoView))
+                    {
+                        infoView.Tag = SettingsController.settingsWindow;
+                        infoView.Clicked = HandleInfoViewClick;
+                    }
 
 
-                if (_settings["Toggle"].AsBool() && !Toggle)
-                {
-                    if (!_settings["Merge"].AsBool() && Leader == Identity.None)
-                        Leader = DynelManager.LocalPlayer.Identity;
+                    if (_settings["Toggle"].AsBool() && !Toggle)
+                    {
+                        if (!_settings["Merge"].AsBool() && Leader == Identity.None)
+                            Leader = DynelManager.LocalPlayer.Identity;
 
-                    if (DynelManager.LocalPlayer.Identity == Leader)
-                        IPCChannel.Broadcast(new StartMessage());
+                        if (DynelManager.LocalPlayer.Identity == Leader)
+                            IPCChannel.Broadcast(new StartMessage());
 
-                    Start();
-                }
+                        Start();
+                    }
 
-                if (!_settings["Toggle"].AsBool() && Toggle)
-                {
-                    Stop();
+                    if (!_settings["Toggle"].AsBool() && Toggle)
+                    {
+                        Stop();
 
-                    if (DynelManager.LocalPlayer.Identity == Leader)
-                        IPCChannel.Broadcast(new StopMessage());
+                        if (DynelManager.LocalPlayer.Identity == Leader)
+                            IPCChannel.Broadcast(new StopMessage());
+                    }
                 }
             }
 
             #endregion
+            catch (Exception ex)
+            {
+                var errorMessage = "An error occurred on line " + AXPBuddy.GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
+            }
         }
 
         private void OnEndZoned(object s, EventArgs e)
@@ -333,15 +354,22 @@ namespace AXPBuddy
                 }
                 Config.Save();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + AXPBuddy.GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
 
         public enum ModeSelection
         {
-            Patrol, Roam, Gather, Leech
+            Pull, Path, Leech
         }
 
         public static class RelevantItems
@@ -349,6 +377,17 @@ namespace AXPBuddy
             public static readonly int[] Kits = {
                 297274, 293296, 291084, 291083, 291082
             };
+        }
+        public static int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
         }
     }
 }

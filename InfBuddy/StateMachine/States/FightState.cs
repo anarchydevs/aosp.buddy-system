@@ -1,7 +1,9 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
+using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace InfBuddy
 {
@@ -13,6 +15,7 @@ namespace InfBuddy
         private SimpleChar _primevalSpinetooth;
         private static Corpse _corpse;
 
+        private string previousErrorMessage = string.Empty;
 
         private double _fightStartTime;
 
@@ -88,45 +91,69 @@ namespace InfBuddy
 
         public void Tick()
         {
-            if (Game.IsZoning || !Team.IsInTeam) { return; }
-
-            if (Team.IsInTeam)
+            try
             {
-                foreach (TeamMember member in Team.Members)
+                if (Game.IsZoning || !Team.IsInTeam || _target == null) { return; }
+
+                if (Team.IsInTeam)
                 {
-                    if (!ReformState._teamCache.Contains(member.Identity))
-                        ReformState._teamCache.Add(member.Identity);
+                    foreach (TeamMember member in Team.Members)
+                    {
+                        if (!ReformState._teamCache.Contains(member.Identity))
+                            ReformState._teamCache.Add(member.Identity);
+                    }
+                }
+
+                _primevalSpinetooth = DynelManager.NPCs
+                 .Where(c => c.Health > 0
+                     && c.Name.Contains("Primeval Spinetooth")
+                     && !c.Name.Contains("Remains of "))
+                 .FirstOrDefault();
+
+                if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+                    _missionsLoaded = true;
+
+                LineOfSightLogic();
+
+                if (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 20f
+                    && !DynelManager.LocalPlayer.IsAttackPending
+                    && !DynelManager.LocalPlayer.IsAttacking/* && _target.Name != "Guardian Spirit of Purification"*/)
+                    DynelManager.LocalPlayer.Attack(_target);
+
+                if (_primevalSpinetooth != null
+                    && DynelManager.LocalPlayer.FightingTarget == null
+                    && !DynelManager.LocalPlayer.IsAttackPending)
+                    DynelManager.LocalPlayer.Attack(_primevalSpinetooth);
+
+                if (!_target.IsMoving && _target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 20f)
+                    InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
+
+                if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                    Extensions.HandlePathing(_target);
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
                 }
             }
+        }
 
-            if (Game.IsZoning || _target == null) { return; }
+        private int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
 
-            _primevalSpinetooth = DynelManager.NPCs
-             .Where(c => c.Health > 0
-                 && c.Name.Contains("Primeval Spinetooth")
-                 && !c.Name.Contains("Remains of "))
-             .FirstOrDefault();
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
 
-            if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-                _missionsLoaded = true;
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
 
-            LineOfSightLogic();
-
-            if (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 20f
-                && !DynelManager.LocalPlayer.IsAttackPending
-                && !DynelManager.LocalPlayer.IsAttacking/* && _target.Name != "Guardian Spirit of Purification"*/)
-                DynelManager.LocalPlayer.Attack(_target);
-
-            if (_primevalSpinetooth != null
-                && DynelManager.LocalPlayer.FightingTarget == null
-                && !DynelManager.LocalPlayer.IsAttackPending)
-                DynelManager.LocalPlayer.Attack(_primevalSpinetooth);
-
-            if (!_target.IsMoving && _target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 20f)
-                InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
-
-            if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                Extensions.HandlePathing(_target);
+            return lineNumber;
         }
     }
 }

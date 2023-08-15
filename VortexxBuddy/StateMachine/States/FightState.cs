@@ -35,6 +35,8 @@ namespace VortexxBuddy
         private static Corpse _vortexxCorpse;
         private static Corpse _releasedSpiritCorpse;
 
+        bool _shout = false;
+
         public IState GetNextState()
         {
             _desecratedSpirits = DynelManager.NPCs
@@ -55,7 +57,7 @@ namespace VortexxBuddy
 
             if (_desecratedSpirits == null
                 && VortexxBuddy.VortexxCorpse
-                && Extensions.CanProceed()
+                //&& Extensions.CanProceed()
                 && VortexxBuddy._settings["Farming"].AsBool())
                 return new FarmingState();
 
@@ -109,7 +111,7 @@ namespace VortexxBuddy
 
                 _notum = DynelManager.NPCs
                    .Where(c => c.Name.Contains("Notum Erruption"))
-                   .FirstOrDefault();
+                      .FirstOrDefault();
 
                 //return to center
                 if (_vortexx != null || _desecratedSpirits != null)
@@ -144,8 +146,23 @@ namespace VortexxBuddy
                     string[] triggerMsg = new string[4] { "Flee you pathetic insects", "Fear my power", "I will have your head", "Breathe in the terror" };
 
                     if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
-                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(_notum.Position);
+                    {
+                        _shout = true;
+                    }
+
                 };
+
+                if (_shout && _notum != null)
+                {
+                    if (!DynelManager.LocalPlayer.Buffs.Contains(VortexxBuddy.Nanos.NanoInfusion))
+                    {
+                        VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(_notum.Position);
+                    }
+                    else
+                    {
+                        _shout = false;
+                    }
+                }
 
 
                 if (_releasedSpiritCorpse != null)
@@ -171,7 +188,7 @@ namespace VortexxBuddy
                 //Attacking adds
                 if (_desecratedSpirits != null && _vortexx == null)
                 {
-                    if (DynelManager.LocalPlayer.FightingTarget == null 
+                    if (DynelManager.LocalPlayer.FightingTarget == null
                         && !DynelManager.LocalPlayer.IsAttackPending
                         && !MovementController.Instance.IsNavigating)
                     {

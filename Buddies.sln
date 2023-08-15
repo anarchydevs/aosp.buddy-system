@@ -1,3 +1,4 @@
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
@@ -24,7 +25,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Db1Buddy", "Db1Buddy\Db1Bud
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VortexxBuddy", "VortexxBuddy\VortexxBuddy.csproj", "{DC776535-2D9E-4C0B-9FF1-B9B7BBE84412}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB2Buddy", "DB2Buddy\DB2Buddy.csproj", "{202A0300-0D8F-465E-B8D4-5A21E8EEB215}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DB2Buddy", "DB2Buddy\DB2Buddy.csproj", "{FAB40EE4-B3E7-47D2-8BA3-954C495224A5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LEBuddy", "LeBuddy\LEBuddy.csproj", "{DC06A28A-0061-4E3E-BF32-A6CF830BEDD9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9A125468-7D1D-4BBD-9C86-FCC4FB51A53B}"
+	ProjectSection(SolutionItems) = preProject
+		CommonParameters.cs = CommonParameters.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -76,10 +84,14 @@ Global
 		{DC776535-2D9E-4C0B-9FF1-B9B7BBE84412}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC776535-2D9E-4C0B-9FF1-B9B7BBE84412}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC776535-2D9E-4C0B-9FF1-B9B7BBE84412}.Release|Any CPU.Build.0 = Release|Any CPU
-		{202A0300-0D8F-465E-B8D4-5A21E8EEB215}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{202A0300-0D8F-465E-B8D4-5A21E8EEB215}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{202A0300-0D8F-465E-B8D4-5A21E8EEB215}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{202A0300-0D8F-465E-B8D4-5A21E8EEB215}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAB40EE4-B3E7-47D2-8BA3-954C495224A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAB40EE4-B3E7-47D2-8BA3-954C495224A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAB40EE4-B3E7-47D2-8BA3-954C495224A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAB40EE4-B3E7-47D2-8BA3-954C495224A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC06A28A-0061-4E3E-BF32-A6CF830BEDD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC06A28A-0061-4E3E-BF32-A6CF830BEDD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC06A28A-0061-4E3E-BF32-A6CF830BEDD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC06A28A-0061-4E3E-BF32-A6CF830BEDD9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
