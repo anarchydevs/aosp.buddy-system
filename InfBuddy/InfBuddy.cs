@@ -185,8 +185,8 @@ namespace InfBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            //if (!_settings["Merge"].AsBool())
-            //    Leader = new Identity(IdentityType.SimpleChar, sender);
+            if (!_settings["Merge"].AsBool())
+                Leader = new Identity(IdentityType.SimpleChar, sender);
 
             _settings["Toggle"] = true;
             Start();
@@ -291,8 +291,8 @@ namespace InfBuddy
                 }
                 if (_settings["Toggle"].AsBool() && !Toggle)
                 {
-                    //if (!_settings["Merge"].AsBool())
-                    //    Leader = DynelManager.LocalPlayer.Identity;
+                    if (!_settings["Merge"].AsBool())
+                        Leader = DynelManager.LocalPlayer.Identity;
 
                     IPCChannel.Broadcast(new StartMessage());
                     Start();
@@ -512,7 +512,7 @@ namespace InfBuddy
                 {
                     if (!_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        //Leader = DynelManager.LocalPlayer.Identity;
+                        Leader = DynelManager.LocalPlayer.Identity;
 
                         IPCChannel.Broadcast(new StartMessage());
                         Start();
