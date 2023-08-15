@@ -185,8 +185,8 @@ namespace InfBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            if (!_settings["Merge"].AsBool())
-                Leader = new Identity(IdentityType.SimpleChar, sender);
+            //if (!_settings["Merge"].AsBool())
+            //    Leader = new Identity(IdentityType.SimpleChar, sender);
 
             _settings["Toggle"] = true;
             Start();
@@ -258,6 +258,13 @@ namespace InfBuddy
                 _sitUpdateTimer = Time.NormalTime;
             }
 
+            if (Leader == Identity.None)
+            {
+                SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
+
+                Leader = teamLeader?.Identity ?? Identity.None;
+            }
+
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {
                 SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
@@ -284,8 +291,8 @@ namespace InfBuddy
                 }
                 if (_settings["Toggle"].AsBool() && !Toggle)
                 {
-                    if (!_settings["Merge"].AsBool())
-                        Leader = DynelManager.LocalPlayer.Identity;
+                    //if (!_settings["Merge"].AsBool())
+                    //    Leader = DynelManager.LocalPlayer.Identity;
 
                     IPCChannel.Broadcast(new StartMessage());
                     Start();
@@ -440,34 +447,28 @@ namespace InfBuddy
         {
             Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
 
-            Item kit = Inventory.Items.Where(x => RelevantItems.Kits.Contains(x.Id)).FirstOrDefault();
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
 
-            if (kit == null) { return; }
-
-            if (_initSit == false && spell != null)
+            if (kit == null || spell == null)
             {
-                if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
+                return;
+            }
+
+            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            {
+                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
+                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                 {
-                    if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment)
-                        && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
                     {
-                        if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
-                        {
-                            Task.Factory.StartNew(
-                               async () =>
-                               {
-                                   _initSit = true;
-                                   await Task.Delay(400);
-                                   NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                                   await Task.Delay(1200);
-                                   NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-                                   await Task.Delay(400);
-                                   _initSit = false;
-                                   _sitUpdateTimer = Time.NormalTime;
-                               });
-                        }
+                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
                     }
                 }
+            }
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+
             }
         }
 
@@ -511,7 +512,7 @@ namespace InfBuddy
                 {
                     if (!_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        Leader = DynelManager.LocalPlayer.Identity;
+                        //Leader = DynelManager.LocalPlayer.Identity;
 
                         IPCChannel.Broadcast(new StartMessage());
                         Start();

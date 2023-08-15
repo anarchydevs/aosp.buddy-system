@@ -524,36 +524,33 @@ namespace KHBuddy
 
         private void ListenerSit()
         {
-            Item kit = Inventory.Items.Where(x => RelevantItems.Kits.Contains(x.Id)).FirstOrDefault();
+            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
 
-            if (kit == null) { return; }
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
 
-            if (CanUseSitKit())
+            if (kit == null || spell == null)
             {
-                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
-                    && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                return;
+            }
+
+            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            {
+                if (DynelManager.LocalPlayer.IsAttacking)
+                    DynelManager.LocalPlayer.StopAttack();
+
+                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
+                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                 {
-                    if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
+                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
                     {
-                        Task.Factory.StartNew(
-                           async () =>
-                           {
-                               Sitting = true;
-
-                               if (DynelManager.LocalPlayer.IsAttacking)
-                                   DynelManager.LocalPlayer.StopAttack();
-
-                               await Task.Delay(400);
-                               NavMeshMovementController.Instance.SetMovement(MovementAction.SwitchToSit);
-                               await Task.Delay(800);
-                               NavMeshMovementController.Instance.SetMovement(MovementAction.LeaveSit);
-                               await Task.Delay(200);
-
-                               if (DynelManager.LocalPlayer.NanoPercent > 30 || DynelManager.LocalPlayer.HealthPercent > 65)
-                                   Sitting = false;
-                           });
+                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
                     }
                 }
+            }
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+
             }
         }
 
