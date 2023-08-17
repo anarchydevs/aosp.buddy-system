@@ -7,13 +7,14 @@ namespace AttackBuddy
         public static List<string> _ignores = new List<string>
         {
                     "Sprysi D'Lere",
+                    "Ramon Bauer",
                     "Notum Bomb",
                     "Runic Detonation",
                     "Strange Mist",
                     "Notum Erruption",
                     "Alien Fuel Tower",
                     "Kyr'Ozch Guardian",
-                    "Engorged Sacrificial Husks",
+                    "Engorged Sacrificial Husk",
                     "Honor Guard - Ilari'Uri",
                     "Unicorn Recon Agent Chittick",
                     "Representative of IPS",
@@ -82,6 +83,7 @@ namespace AttackBuddy
                     "Automated Defense System",
                     "Scalding Flame",
                     "Ju-Ju Doll",
+                    "Ju-Ju Mannequin",
                     "Temporal Vortex",
                     "Gateway to the Past",
                     "Gateway to the Present",

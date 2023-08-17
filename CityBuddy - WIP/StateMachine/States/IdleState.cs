@@ -1,14 +1,20 @@
-﻿using AOSharp.Core.UI;
+﻿using AOSharp.Core;
 
-namespace AttackBuddy
+namespace CityBuddy
 {
     public class IdleState : IState
     {
         public IState GetNextState()
         {
-            if (AttackBuddy._settings["Enable"].AsBool())
+            if (CityBuddy._settings["Toggle"].AsBool()
+                && CityBuddy.Toggle)
             {
-                return new ScanState();
+                CityBuddy.ParkPos = DynelManager.LocalPlayer.Position;
+
+                if (Team.IsLeader)
+                    return new ToggleState();
+                else
+                    return new AttackState();
             }
 
             return null;
