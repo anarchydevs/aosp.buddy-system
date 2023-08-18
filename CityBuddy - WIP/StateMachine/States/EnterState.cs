@@ -72,9 +72,9 @@ namespace CityBuddy
             Dynel shipntrance = DynelManager.AllDynels.FirstOrDefault(c => c.Name == "Door");
 
             if (DynelManager.LocalPlayer.Position.DistanceFrom(shipntrance.Position) > 1
-                && !CityBuddy.NavMeshMovementController.IsNavigating)
+                && MovementController.Instance.IsNavigating == false)
             {
-                CityBuddy.NavMeshMovementController.SetNavMeshDestination(shipntrance.Position);
+                MovementController.Instance.SetDestination(shipntrance.Position);
             }
 
 
