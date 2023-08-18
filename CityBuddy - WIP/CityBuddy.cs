@@ -7,14 +7,19 @@ using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
 using CityBuddy.IPCMessages;
+using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CityBuddy
 {
     public class CityBuddy : AOPluginEntry
     {
+
         public static StateMachine _stateMachine;
         public static NavMeshMovementController NavMeshMovementController { get; private set; }
         public static IPCChannel IPCChannel { get; private set; }
@@ -22,7 +27,7 @@ namespace CityBuddy
 
         public static DateTime cloakTime;
 
-        public static Vector3 ParkPos;
+        //public static Vector3 ParkPos;
 
         public static double _combatTime;
         public static double _cloakTime;
@@ -31,13 +36,40 @@ namespace CityBuddy
         public static bool Toggle = false;
         public static bool Sitting = false;
 
-        public static string PluginDirectory;
+        public static SimpleChar _leader;
+        public static Identity Leader = Identity.None;
+        public static Vector3 _leaderPos = Vector3.Zero;
+
+        public static Dynel Entrance;
+
+        
 
         public static Window _infoWindow;
 
         public static Settings _settings;
 
         public static string PluginDir;
+
+        public const int MontroyalCity = 5002;
+        public const int SerenityIslands = 6010;
+        public const int PlayadelDesierto = 5001;
+        public const int ICCHQ = 655;
+
+        public static Vector3 _iCCReclaim = new Vector3(3232.2f, 35.2f, 923.2f);
+        public static Vector3 _iCCTeleportUp = new Vector3(3160.4f, 36.3f, 866.9f);
+        public static Vector3 _iCCCenterofCities = new Vector3(3138.6f, 52.1f, 826.0f);
+
+        public static Door _exitDoor;
+
+        public static List<string> _ignores = new List<string>
+        {
+            //"Zix",
+            "Nanovoider",
+            "Alien Coccoon"
+        };
+
+
+        public static string previousErrorMessage = string.Empty;
 
         public override void Run(string pluginDir)
         {
@@ -53,6 +85,9 @@ namespace CityBuddy
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Enter, EnterMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.SelectedMemberUpdate, HandleSelectedMemberUpdate);
+                IPCChannel.RegisterCallback((int)IPCOpcode.ClearSelectedMember, HandleClearSelectedMember);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -71,9 +106,16 @@ namespace CityBuddy
 
                 Game.OnUpdate += OnUpdate;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
 
@@ -99,6 +141,29 @@ namespace CityBuddy
             _settings["Toggle"] = false;
         }
 
+        private void EnterMessage(int sender, IPCMessage msg)
+        {
+            if (!(_stateMachine.CurrentState is EnterState))
+            {
+                Chat.WriteLine("enter");
+                _stateMachine.SetState(new EnterState());
+            }
+        }
+
+        private void HandleSelectedMemberUpdate(int sender, IPCMessage msg)
+        {
+            SelectedMemberUpdateMessage message = msg as SelectedMemberUpdateMessage;
+            if (message != null)
+            {
+                // Find the team member with the received identity and set as selectedMember
+                CityAttackState.selectedMember = Team.Members.FirstOrDefault(m => m.Identity == message.SelectedMemberIdentity);
+            }
+        }
+        private void HandleClearSelectedMember(int sender, IPCMessage msg)
+        {
+            CityAttackState.selectedMember = null;
+        }
+
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
             _infoWindow = Window.CreateFromXml("Info", PluginDir + "\\UI\\CityBuddyInfoView.xml",
@@ -114,13 +179,20 @@ namespace CityBuddy
             if (Game.IsZoning)
                 return;
 
-            if (Time.NormalTime > _sitUpdateTimer + 1)
+            if (Leader == Identity.None)
             {
+                SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
+
+                Leader = teamLeader?.Identity ?? Identity.None;
+            }
+
+            //if (Time.NormalTime > _sitUpdateTimer + 1)
+            //{
                 ListenerSit();
 
                 _sitUpdateTimer = Time.NormalTime;
-            }
-
+            //}
+            #region UI
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {
                 SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
@@ -151,6 +223,7 @@ namespace CityBuddy
                     Toggle = true;
                 }
             }
+            #endregion
 
             _stateMachine.Tick();
         }
@@ -159,34 +232,54 @@ namespace CityBuddy
         {
             Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
 
-            Item kit = Inventory.Items.Where(x => RelevantItems.Kits.Contains(x.Id)).FirstOrDefault();
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
 
-            if (kit == null) { return; }
-
-            if (spell != null)
+            if (kit == null || spell == null)
             {
-                if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && Extensions.CanUseSitKit())
+                return;
+            }
+
+            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            {
+                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
+                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                 {
-                    if (spell != null && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
-                        && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
                     {
-                        if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
-                        {
-                            Task.Factory.StartNew(
-                               async () =>
-                               {
-                                   Sitting = true;
-                                   await Task.Delay(400);
-                                   NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                                   await Task.Delay(800);
-                                   NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-                                   await Task.Delay(200);
-                                   Sitting = false;
-                               });
-                        }
+                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
                     }
                 }
             }
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+
+            }
+        }
+
+        private bool CanUseSitKit()
+        {
+            if (Inventory.Find(297274, out Item premSitKit))
+                if (DynelManager.LocalPlayer.Health > 0 && !CityBuddy.InCombat()
+                                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
+
+            if (DynelManager.LocalPlayer.Health > 0 && !CityBuddy.InCombat()
+                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
+            {
+                List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
+
+                if (!sitKits.Any()) { return false; }
+
+                foreach (Item sitKit in sitKits.OrderBy(x => x.QualityLevel))
+                {
+                    int skillReq = (sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f));
+
+                    if (DynelManager.LocalPlayer.GetStat(Stat.FirstAid) >= skillReq || DynelManager.LocalPlayer.GetStat(Stat.Treatment) >= skillReq)
+                        return true;
+                }
+            }
+
+            return false;
         }
 
         private void CityBuddyCommand(string command, string[] param, ChatWindow chatWindow)
@@ -209,9 +302,16 @@ namespace CityBuddy
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
 
@@ -220,6 +320,50 @@ namespace CityBuddy
             public static readonly int[] Kits = {
                 297274, 293296, 291084, 291083, 291082
             };
+        }
+
+        public static bool CanProceed()
+        {
+            return DynelManager.LocalPlayer.HealthPercent > 65
+                && DynelManager.LocalPlayer.NanoPercent > 65
+                && DynelManager.LocalPlayer.GetStat(Stat.TemporarySkillReduction) <= 1
+                && DynelManager.LocalPlayer.MovementState != MovementState.Sit
+                && Spell.List.Any(c => c.IsReady)
+                && !Spell.HasPendingCast;
+        }
+
+        public static bool InCombat()
+        {
+            if (Team.IsInTeam)
+            {
+                return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null && Team.Members.Select(m => m.Name).Contains(c.FightingTarget?.Name));
+            }
+
+            return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null && c.FightingTarget?.Name == DynelManager.LocalPlayer.Name);
+        }
+
+        public static void ToggleCloak()
+        {
+            Chat.WriteLine("Toggling cloak.");
+            Network.Send(new ToggleCloakMessage()
+            {
+                Unknown1 = 49152,
+            });
+            _cloakTime = Time.NormalTime;
+        }
+
+        public static int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
         }
     }
 }
