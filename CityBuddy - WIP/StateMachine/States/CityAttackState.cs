@@ -14,10 +14,10 @@ namespace CityBuddy
 
         private static Random rand = new Random();
 
-        Dynel shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
-
         public IState GetNextState()
         {
+            Dynel shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
+
             if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader
                 && Time.NormalTime > CityBuddy._cloakTime + 3660f
                 && !DynelManager.NPCs.Any(c => c.Health > 0))
@@ -25,9 +25,10 @@ namespace CityBuddy
                 return new CityControllerState();
             }
 
+
             if (shipentrance != null)
             {
-                Chat.WriteLine("Ship entrance not null");
+                //Chat.WriteLine("Ship entrance not null");
 
                 if (Team.IsInTeam && selectedMember == null && DynelManager.LocalPlayer.Identity == CityBuddy.Leader
                 && !Team.Members.Any(c => c.Character == null))
