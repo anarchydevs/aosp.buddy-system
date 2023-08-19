@@ -10,9 +10,6 @@ namespace CityBuddy
 {
     public class IdleState : IState
     {
-        
-
-        //public static List<string> EntranceNames = new List<string>();
 
         public IState GetNextState()
         {
@@ -25,12 +22,15 @@ namespace CityBuddy
                 {
                     //CityBuddy.ParkPos = DynelManager.LocalPlayer.Position;
 
-                    if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
-                        return new CityControllerState();
-                    else if (DynelManager.LocalPlayer.Identity != CityBuddy.Leader)
+                    //if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
+                    //    return new CityControllerState();
+                    //else if (DynelManager.LocalPlayer.Identity != CityBuddy.Leader)
                         return new CityAttackState();
+                }
 
-
+                if (Playfield.IsDungeon)
+                {
+                    return new PathState();
                 }
             }
 
@@ -52,14 +52,7 @@ namespace CityBuddy
 
         public void Tick()
         {
-            //if (Entrance != null)
-            //{
-            //    if (!EntranceNames.Contains(Entrance.Name))
-            //    {
-            //        EntranceNames.Add(Entrance.Name);
-            //        Chat.WriteLine($"Added {Entrance.Name} to EntranceNames.");
-            //    }
-            //}
+            
         }
     }
 }

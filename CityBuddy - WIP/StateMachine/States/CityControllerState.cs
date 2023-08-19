@@ -66,7 +66,7 @@ namespace CityBuddy
                     await Task.Delay(3000);
                     CityBuddy.ToggleCloak();
                     await Task.Delay(1500);
-                    //MovementController.Instance.SetDestination(CityBuddy.ParkPos);
+                    MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos);
                     _toggled = true;
                 });
         }

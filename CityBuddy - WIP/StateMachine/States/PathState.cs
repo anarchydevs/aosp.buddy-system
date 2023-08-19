@@ -36,10 +36,10 @@ namespace CityBuddy
 
             if (Game.IsZoning) { return null; }
 
-            if (!CityBuddy._settings["Enable"].AsBool() || !Playfield.IsDungeon)
+            if (!CityBuddy._settings["Toggle"].AsBool() || !Playfield.IsDungeon)
                 return new IdleState();
 
-            if (CityBuddy._settings["Enable"].AsBool())
+            if (CityBuddy._settings["Toggle"].AsBool())
             {
                 if (DynelManager.LocalPlayer.Room.Name == "Mothership_bossroom")
                     return new BossRoomState();
@@ -89,7 +89,7 @@ namespace CityBuddy
                 _downButton = GetButton("Button (down)");
                 _bossButton = GetButton("Button (boss)");
 
-                if (_exitDoor != null && DynelManager.LocalPlayer.Room.Name == "Mothership_entrance")
+                if (_exitDoor != null && DynelManager.LocalPlayer.Room.Name == "AI_entrance")
                 {
                     if (ButtonExitState._exitDoorLocation == Vector3.Zero)
                     {

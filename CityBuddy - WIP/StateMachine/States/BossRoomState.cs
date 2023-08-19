@@ -38,7 +38,7 @@ namespace CityBuddy
             _allMobs = DynelManager.NPCs.Where(c => c.Health > 0 && !c.Name.Contains("Nanovoider") && c.IsInLineOfSight).FirstOrDefault();
             _corpse = DynelManager.Corpses.OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position)).FirstOrDefault();
 
-            if (!CityBuddy._settings["Enable"].AsBool() || !Playfield.IsDungeon 
+            if (!CityBuddy._settings["Toggle"].AsBool() || !Playfield.IsDungeon 
                 || DynelManager.LocalPlayer.Room.Name != "Mothership_bossroom")
                 return new IdleState();
 

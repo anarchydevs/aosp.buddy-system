@@ -18,12 +18,12 @@ namespace CityBuddy
         {
             Dynel shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
 
-            if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader
-                && Time.NormalTime > CityBuddy._cloakTime + 3660f
-                && !DynelManager.NPCs.Any(c => c.Health > 0))
-            {
-                return new CityControllerState();
-            }
+            //if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader
+            //    && Time.NormalTime > CityBuddy._cloakTime + 3660f
+            //    && !DynelManager.NPCs.Any(c => c.Health > 0))
+            //{
+            //    return new CityControllerState();
+            //}
 
 
             if (shipentrance != null)
@@ -59,12 +59,13 @@ namespace CityBuddy
 
         public void OnStateEnter()
         {
+            MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos);
             Chat.WriteLine("City attack state");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exit city attack staye");
+            Chat.WriteLine("Exit city attack state");
         }
 
         public void Tick()
