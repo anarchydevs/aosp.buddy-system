@@ -11,8 +11,10 @@ namespace CityBuddy
     {
 
         public static TeamMember selectedMember = null;
+
         private static Random rand = new Random();
-        Dynel shipntrance = DynelManager.AllDynels.FirstOrDefault(c => c.Name == "Door");
+
+        Dynel shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
 
         public IState GetNextState()
         {
@@ -23,8 +25,9 @@ namespace CityBuddy
                 return new CityControllerState();
             }
 
-            if (shipntrance != null)
+            if (shipentrance != null)
             {
+                Chat.WriteLine("Ship entrance not null");
 
                 if (Team.IsInTeam && selectedMember == null && DynelManager.LocalPlayer.Identity == CityBuddy.Leader
                 && !Team.Members.Any(c => c.Character == null))
@@ -79,7 +82,7 @@ namespace CityBuddy
 
             if (_genCorpse != null
                 && !CityBuddy.InCombat()
-                && MovementController.Instance.IsNavigating == false
+                && !MovementController.Instance.IsNavigating// == false
                 && DynelManager.LocalPlayer.Position.DistanceFrom(_genCorpse.Position) > 2f)
             {
                 MovementController.Instance.SetDestination(_genCorpse.Position);
