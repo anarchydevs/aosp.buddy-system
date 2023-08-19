@@ -30,6 +30,9 @@ namespace CityBuddy
 
                 if (Playfield.IsDungeon)
                 {
+                    if (DynelManager.LocalPlayer.Room.Name == "AI_bossroom")
+                        return new BossRoomState();
+                    else
                     return new PathState();
                 }
             }

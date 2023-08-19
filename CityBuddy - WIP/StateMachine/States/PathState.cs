@@ -41,7 +41,7 @@ namespace CityBuddy
 
             if (CityBuddy._settings["Toggle"].AsBool())
             {
-                if (DynelManager.LocalPlayer.Room.Name == "Mothership_bossroom")
+                if (DynelManager.LocalPlayer.Room.Name == "AI_bossroom")
                     return new BossRoomState();
             }
 
