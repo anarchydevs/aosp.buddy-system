@@ -60,7 +60,6 @@ namespace CityBuddy
                 }
             }
 
-
             return null;
         }
 
@@ -109,7 +108,6 @@ namespace CityBuddy
                 {
                     if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
                     {
-
                         if (_target != null)
                         {
                             if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
