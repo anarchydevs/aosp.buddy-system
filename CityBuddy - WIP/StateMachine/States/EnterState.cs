@@ -17,11 +17,10 @@ namespace CityBuddy
 
     public class EnterState : IState
     {
-        private static double _time;
 
         public static bool NavGenSuccessful;
 
-        private bool _destinationSet = false;
+        private Dynel shipentrance;
 
         public IState GetNextState()
         {
@@ -29,7 +28,7 @@ namespace CityBuddy
             if (!CityBuddy._settings["Toggle"].AsBool())
                 return new IdleState();
 
-            if (DynelManager.LocalPlayer.Room.Name == "AI_entrance")
+            if (Playfield.IsDungeon && DynelManager.LocalPlayer.Room.Name == "AI_entrance")
             {
                 if (CityAttackState.selectedMember != null)
                 {
@@ -67,7 +66,7 @@ namespace CityBuddy
             {
                 if (Game.IsZoning) { return; }
 
-                Dynel shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
+                shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
 
                 if (shipentrance != null)
                 {
