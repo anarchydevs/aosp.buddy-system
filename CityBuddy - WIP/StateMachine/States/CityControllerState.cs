@@ -2,18 +2,23 @@
 using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using System;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace CityBuddy
 {
     public class CityControllerState : IState
     {
+        private static DateTime _lastCloakToggleTime;
+
         public IState GetNextState()
         {
             if (!CityBuddy._settings["Toggle"].AsBool())
                 return new IdleState();
 
-            if (CityController.CloakState != CloakStatus.Unknown && CityController.Charge == 100.0f)
+            if (CityController.CloakState != CloakStatus.Unknown && CityController.Charge >= 0.5f
+                && !CityController.CanToggleCloak())
             {
                 return new CityAttackState();
             }
@@ -53,110 +58,46 @@ namespace CityBuddy
 
         private static void ExecuteCityControllerActions(Dynel cc)
         {
-            // If cloak status is unknown, use the city controller to update it
             if (CityController.CloakState == CloakStatus.Unknown)
             {
                 CityController.Use();
             }
-
-            // Check and use CRU if the charge is less than 75%
-            if (CityController.Charge < 75.0f)
+            else if (CityController.CloakState != CloakStatus.Unknown)
             {
-                Chat.WriteLine($"Current city controller charge is {CityController.Charge}%.");
+                if (CityController.Charge < 0.50f)
+                {
+                    Item cru = null;
 
-                //if (Inventory.Find(257110, out Item cru))
-                //{
-                //    cru.UseOn(cc.Identity);
-                //}
+                    foreach (var id in ControllerRecompilerUnit.Crus)
+                    {
+                        if (Inventory.Find(id, out cru))
+                        {
+                            break;
+                        }
+                    }
+
+                    if (cru != null)
+                    {
+                        cru.UseOn(cc.Identity);
+                    }
+                    else
+                    {
+                        Chat.WriteLine("No usable items found.");
+                    }
+                }
             }
 
-            // Check if cloak can be toggled
             if (CityController.CanToggleCloak())
             {
-                if (CityController.CloakState == CloakStatus.Enabled)
-                {
-                    // Disable cloak
-                    CityController.ToggleCloak();
-                }
-                else if (CityController.CloakState == CloakStatus.Disabled)
-                {
-                    // Enable cloak
-                    CityController.ToggleCloak();
-                }
+                CityController.ToggleCloak();
             }
+        }
+
+        public static class ControllerRecompilerUnit
+        {
+            public static readonly int[] Crus = {
+                257110, 254364, 305225, 254367, 254359, 258522, 254350, 254329, 254328, 254327, 254326
+            };
         }
     }
 }
-
-
-
-//namespace CityBuddy
-//{
-//    public class CityControllerState : IState
-//    {
-//        public static bool _init = false;
-//        public static bool _toggled = false;
-
-
-//        public IState GetNextState()
-//        {
-//            if (!CityBuddy._settings["Toggle"].AsBool())
-//                return new IdleState();
-
-//            if (_toggled == true)
-//                return new CityAttackState();
-
-//            return null;
-//        }
-
-//        public void OnStateEnter()
-//        {
-//            Chat.WriteLine("City controller state.");
-//        }
-
-//        public void OnStateExit()
-//        {
-//            Chat.WriteLine("Exit city controller state");
-//            _init = false;
-//            _toggled = false;
-//        }
-
-//        public void Tick()
-//        {
-//            Dynel citycontroller = DynelManager.AllDynels
-//                .Where(c => c.Name == "City Controller")
-//                .FirstOrDefault();
-
-//            if (citycontroller != null)
-//            {
-//                if (citycontroller?.DistanceFrom(DynelManager.LocalPlayer) < 5f
-//                    && !_init)
-//                {
-//                    MovementController.Instance.Halt();
-//                    _init = true;
-//                    Logic(citycontroller);
-//                }
-//                else if (citycontroller?.DistanceFrom(DynelManager.LocalPlayer) > 5f && MovementController.Instance.IsNavigating == false)
-//                    MovementController.Instance.SetDestination(citycontroller.Position);
-//            }
-//        }
-
-//        private static void Logic(Dynel cc)
-//        {
-//            Task.Factory.StartNew(
-//                async () =>
-//                {
-//                    await Task.Delay(3000);
-//                    cc.Use();
-//                    await Task.Delay(2000);
-//                    if (Inventory.Find(257110, out Item cru))
-//                        cru.UseOn(cc.Identity);
-//                    await Task.Delay(3000);
-//                    CityBuddy.ToggleCloak();
-//                    await Task.Delay(1500);
-//                    //MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos);
-//                    _toggled = true;
-//                });
-//        }
-//    }
-//}

@@ -17,7 +17,7 @@ namespace CityBuddy
 
     public class EnterState : IState
     {
-
+        private bool hasReachedEntrance = false;
         public static bool NavGenSuccessful;
 
         private Dynel shipentrance;
@@ -70,9 +70,31 @@ namespace CityBuddy
 
                 if (shipentrance != null)
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(shipentrance.Position) > 1)
+                    float distance = DynelManager.LocalPlayer.Position.DistanceFrom(shipentrance.Position);
+
+                    if (distance > 1 && !hasReachedEntrance)
                     {
-                        MovementController.Instance.SetDestination(new Vector3 (586.9f, 160.6f, 633.8f).Randomize(1f));
+                        // Move to ship entrance
+                        MovementController.Instance.SetDestination(shipentrance.Position);
+                        if (distance <= 1) // Assuming the Update method is called frequently
+                        {
+                            hasReachedEntrance = true;
+                        }
+                    }
+                    else if (hasReachedEntrance)
+                    {
+                        // Randomly move around ship entrance
+                        Random rand = new Random();
+                        float xOffset = (float)(rand.NextDouble() - 0.5); // Between -0.5 and 0.5
+                        float yOffset = (float)(rand.NextDouble() - 0.5); // Between -0.5 and 0.5
+
+                        Vector3 randomizedPosition = new Vector3(
+                            shipentrance.Position.X + xOffset,
+                            shipentrance.Position.Y + yOffset,
+                            shipentrance.Position.Z  // Keep the Z coordinate the same
+                        );
+
+                        MovementController.Instance.SetDestination(randomizedPosition);
                     }
                 }
             }

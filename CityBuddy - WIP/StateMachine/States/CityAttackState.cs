@@ -27,9 +27,16 @@ namespace CityBuddy
 
             shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
 
+            //if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader
+            //    && Time.NormalTime > CityBuddy._cloakTime + 3660f
+            //    && !DynelManager.NPCs.Any(c => c.Health > 0))
+            //{
+            //    return new CityControllerState();
+            //}
+
             if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader
-                && Time.NormalTime > CityBuddy._cloakTime + 3660f
-                && !DynelManager.NPCs.Any(c => c.Health > 0))
+                && !DynelManager.NPCs.Any(c => c.Health > 0)
+                && (CityController.CloakState == CloakStatus.Unknown || CityController.CanToggleCloak()))
             {
                 return new CityControllerState();
             }
