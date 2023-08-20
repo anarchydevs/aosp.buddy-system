@@ -59,7 +59,7 @@ namespace CityBuddy
         public static Vector3 _iCCTeleportUp = new Vector3(3160.4f, 36.3f, 866.9f);
         public static Vector3 _iCCCenterofCities = new Vector3(3138.6f, 52.1f, 826.0f);
 
-        public static Vector3 _montroyalGaurdPos = new Vector3(585.4f, 160.7f, 648.3f);
+        public static Vector3 _montroyalGaurdPos = new Vector3(586.9f, 160.6f, 633.8f);
 
         public static Door _exitDoor;
 
