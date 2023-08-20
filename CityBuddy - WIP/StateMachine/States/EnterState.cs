@@ -70,9 +70,9 @@ namespace CityBuddy
 
                 if (shipentrance != null)
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(shipentrance.Position) > 2)
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(shipentrance.Position) > 1)
                     {
-                        MovementController.Instance.SetDestination(shipentrance.Position);
+                        MovementController.Instance.SetDestination(new Vector3 (586.9f, 160.6f, 633.8f).Randomize(1f));
                     }
                 }
             }
