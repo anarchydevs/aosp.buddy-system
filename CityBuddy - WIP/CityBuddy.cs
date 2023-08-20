@@ -59,7 +59,7 @@ namespace CityBuddy
         public static Vector3 _iCCTeleportUp = new Vector3(3160.4f, 36.3f, 866.9f);
         public static Vector3 _iCCCenterofCities = new Vector3(3138.6f, 52.1f, 826.0f);
 
-        public static Vector3 _montroyalGaurdPos = new Vector3(586.9f, 160.6f, 633.8f);
+        public static Vector3 _montroyalGaurdPos = new Vector3(587.1f, 160.7f, 649.4f);
 
         public static Door _exitDoor;
 
@@ -101,6 +101,7 @@ namespace CityBuddy
                 _stateMachine = new StateMachine(new IdleState());
 
                 _settings.AddVariable("Toggle", false);
+                _settings.AddVariable("Leader", false);
 
                 _settings["Toggle"] = false;
 
@@ -133,6 +134,11 @@ namespace CityBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
+            if (Leader == Identity.None && DynelManager.LocalPlayer.Identity.Instance != sender)
+            {
+                Leader = _settings["Leader"].AsBool() ? DynelManager.LocalPlayer.Identity : new Identity(IdentityType.SimpleChar, sender);
+            }
+
             Toggle = true;
             _settings["Toggle"] = true;
         }
