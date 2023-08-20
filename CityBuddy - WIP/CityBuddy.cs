@@ -188,12 +188,8 @@ namespace CityBuddy
                 Leader = teamLeader?.Identity ?? Identity.None;
             }
 
-            //if (Time.NormalTime > _sitUpdateTimer + 1)
-            //{
             ListenerSit();
 
-            _sitUpdateTimer = Time.NormalTime;
-            //}
             #region UI
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {
