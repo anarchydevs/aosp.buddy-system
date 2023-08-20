@@ -71,13 +71,13 @@ namespace CityBuddy
 
                 if (shipentrance != null)
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(shipentrance.Position) > 1
-                        && !MovementController.Instance.IsNavigating)
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(shipentrance.Position) > 2)
                     {
                         MovementController.Instance.SetDestination(shipentrance.Position);
                     }
                 }
             }
+
             catch (Exception ex)
             {
                 var errorMessage = "An error occurred on line " + CityBuddy.GetLineNumber(ex) + ": " + ex.Message;
