@@ -42,7 +42,7 @@ namespace CityBuddy
 
         public static Dynel Entrance;
 
-        
+
 
         public static Window _infoWindow;
 
@@ -190,9 +190,9 @@ namespace CityBuddy
 
             //if (Time.NormalTime > _sitUpdateTimer + 1)
             //{
-                ListenerSit();
+            ListenerSit();
 
-                _sitUpdateTimer = Time.NormalTime;
+            _sitUpdateTimer = Time.NormalTime;
             //}
             #region UI
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)

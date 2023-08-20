@@ -25,27 +25,27 @@ namespace CityBuddy
 
         public IState GetNextState()
         {
-            
-                if (!CityBuddy._settings["Toggle"].AsBool())
-                    return new IdleState();
 
-                if (DynelManager.LocalPlayer.Room.Name == "AI_entrance")
+            if (!CityBuddy._settings["Toggle"].AsBool())
+                return new IdleState();
+
+            if (DynelManager.LocalPlayer.Room.Name == "AI_entrance")
+            {
+                if (CityAttackState.selectedMember != null)
                 {
-                    if (CityAttackState.selectedMember != null)
+                    if (DynelManager.LocalPlayer.Identity == CityAttackState.selectedMember.Identity)
                     {
-                        if (DynelManager.LocalPlayer.Identity == CityAttackState.selectedMember.Identity)
-                        {
-                            if (!NavGenSuccessful)
-                                return new NavGenState();
-                            if (NavGenSuccessful && !Team.Members.Any(c => c.Character == null))
-                                return new PathState();
-                        }
+                        if (!NavGenSuccessful)
+                            return new NavGenState();
+                        if (NavGenSuccessful && !Team.Members.Any(c => c.Character == null))
+                            return new PathState();
                     }
 
                     if (DynelManager.LocalPlayer.Identity != CityAttackState.selectedMember.Identity
-                        && Team.Members.Any(c => c.Character != null))
+                    && Team.Members.Any(c => c.Character != null))
                         return new PathState();
                 }
+            }
 
             return null;
         }

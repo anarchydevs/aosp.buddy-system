@@ -20,11 +20,9 @@ namespace CityBuddy
                     || Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands
                     || Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
                 {
-                    //CityBuddy.ParkPos = DynelManager.LocalPlayer.Position;
-
-                    //if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
-                    //    return new CityControllerState();
-                    //else if (DynelManager.LocalPlayer.Identity != CityBuddy.Leader)
+                    if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
+                        return new CityControllerState();
+                    else if (DynelManager.LocalPlayer.Identity != CityBuddy.Leader)
                         return new CityAttackState();
                 }
 

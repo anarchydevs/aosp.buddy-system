@@ -95,15 +95,15 @@ namespace CityBuddy
                     }
                 }
 
-                else if (_exitDoorLocation != Vector3.Zero && DynelManager.LocalPlayer.Room.Name != "Mothership_entrance")
+                else if (_exitDoorLocation != Vector3.Zero && DynelManager.LocalPlayer.Room.Name != "AI_entrance")
                 {
                     CityBuddy.NavMeshMovementController.SetNavMeshDestination(_exitDoorLocation);
                 }
-                else if (DynelManager.LocalPlayer.Room.Name == "Mothership_entrance")
+                else if (DynelManager.LocalPlayer.Room.Name == "AI_entrance")
                 {
                     MoveToExit();
                 }
-                
+
             }
             catch (Exception ex)
             {

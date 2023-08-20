@@ -15,6 +15,9 @@ namespace CityBuddy
 
         public IState GetNextState()
         {
+            if (!CityBuddy._settings["Toggle"].AsBool())
+                return new IdleState();
+
             if (_toggled == true)
                 return new CityAttackState();
 
