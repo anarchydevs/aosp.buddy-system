@@ -72,18 +72,15 @@ namespace CityBuddy
             {
                 if (Game.IsZoning || !Team.IsInTeam) { return; }
 
-                _exitDevice = DynelManager.AllDynels.FirstOrDefault(c => c.Name == "Exit Device");
-
-                _target = DynelManager.NPCs
+               _target = DynelManager.NPCs
                .Where(c => c.Health > 0 && !CityBuddy._ignores.Contains(c.Name) && c.IsInLineOfSight)
                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                .ThenBy(c => c.HealthPercent)
                .FirstOrDefault();
 
-                _corpse = DynelManager.Corpses
-                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-                .FirstOrDefault();
-
+               _corpse = DynelManager.Corpses
+               .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+               .FirstOrDefault();
 
                 if (_target != null)
                 {
@@ -108,14 +105,13 @@ namespace CityBuddy
                             if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
                             {
                                 CityBuddy.NavMeshMovementController.SetNavMeshDestination(_target.Position);
-                            }
-
-                            else if (_target == null && _corpse != null)
+                            } 
+                        }
+                        else if (_target == null && _corpse != null)
+                        {
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 2f)
                             {
-                                if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 2f)
-                                {
-                                    CityBuddy.NavMeshMovementController.SetNavMeshDestination(_corpse.Position);
-                                }
+                                CityBuddy.NavMeshMovementController.SetNavMeshDestination(_corpse.Position);
                             }
                         }
                     }
