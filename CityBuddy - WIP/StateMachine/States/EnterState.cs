@@ -72,11 +72,11 @@ namespace CityBuddy
                 {
                     float distance = DynelManager.LocalPlayer.Position.DistanceFrom(shipentrance.Position);
 
-                    if (distance > 1 && !hasReachedEntrance)
+                    if (distance > 2 && !hasReachedEntrance)
                     {
                         // Move to ship entrance
                         MovementController.Instance.SetDestination(shipentrance.Position);
-                        if (distance <= 1) // Assuming the Update method is called frequently
+                        if (distance <= 1)
                         {
                             hasReachedEntrance = true;
                         }
@@ -91,7 +91,7 @@ namespace CityBuddy
                         Vector3 randomizedPosition = new Vector3(
                             shipentrance.Position.X + xOffset,
                             shipentrance.Position.Y + yOffset,
-                            shipentrance.Position.Z  // Keep the Z coordinate the same
+                            shipentrance.Position.Z
                         );
 
                         MovementController.Instance.SetDestination(randomizedPosition);
