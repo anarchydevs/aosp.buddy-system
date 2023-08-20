@@ -84,7 +84,7 @@ namespace CityBuddy
             {
                 shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
 
-                _target = DynelManager.NPCs.Where(c => c.Health > 0 && c.DistanceFrom(DynelManager.LocalPlayer) < 30f)
+                _target = DynelManager.NPCs.Where(c => c.Health > 0 && c.DistanceFrom(DynelManager.LocalPlayer) < 40f)
                     .OrderByDescending(c => c.Name.Contains("Hacker"))
                     .FirstOrDefault();
 
