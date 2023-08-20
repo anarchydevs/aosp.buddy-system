@@ -75,6 +75,7 @@ namespace CityBuddy
                _target = DynelManager.NPCs
                .Where(c => c.Health > 0 && !CityBuddy._ignores.Contains(c.Name) && c.IsInLineOfSight)
                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+               .OrderByDescending(c => c.Name.Contains("Fighter Pilot"))
                .ThenBy(c => c.HealthPercent)
                .FirstOrDefault();
 
