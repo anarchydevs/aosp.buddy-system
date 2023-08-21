@@ -123,15 +123,31 @@ namespace CityBuddy
             {
                 Leader = _settings["Leader"].AsBool() ? DynelManager.LocalPlayer.Identity : new Identity(IdentityType.SimpleChar, sender);
             }
-
-            Toggle = true;
+             Toggle = true;
             _settings["Toggle"] = true;
+
+            Chat.WriteLine("CityBuddy enabled.");
+
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
         }
 
         private void OnStopMessage(int sender, IPCMessage msg)
         {
-            Toggle = false;
             _settings["Toggle"] = false;
+            Toggle = false;
+
+            Chat.WriteLine("CityBuddy disabled.");
+
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
+
+            NavMeshMovementController.Halt();
+
+            if (MovementController.Instance.IsNavigating)
+            {
+                MovementController.Instance.Halt();
+            }
         }
 
         private void EnterMessage(int sender, IPCMessage msg)
@@ -281,15 +297,17 @@ namespace CityBuddy
                     {
                         _settings["Toggle"] = true;
                         Toggle = true;
-                        Chat.WriteLine("Bot enabled.");
+                        IPCChannel.Broadcast(new StartMessage());
+
                     }
-                    else if (_settings["Toggle"].AsBool())
+                    else
                     {
                         _settings["Toggle"] = false;
                         Toggle = false;
-                        Chat.WriteLine("Bot disabled.");
+                        IPCChannel.Broadcast(new StopMessage());
                     }
                 }
+                Config.Save();
             }
             catch (Exception ex)
             {
