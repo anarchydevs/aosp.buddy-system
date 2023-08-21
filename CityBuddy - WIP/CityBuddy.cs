@@ -25,24 +25,11 @@ namespace CityBuddy
         public static IPCChannel IPCChannel { get; private set; }
         public static Config Config { get; private set; }
 
-        public static DateTime cloakTime;
-
-        //public static Vector3 ParkPos;
-
-        public static double _combatTime;
-        public static double _cloakTime;
-        public static double _sitUpdateTimer;
-
         public static bool Toggle = false;
-        public static bool Sitting = false;
 
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
         public static Vector3 _leaderPos = Vector3.Zero;
-
-        public static Dynel Entrance;
-
-
 
         public static Window _infoWindow;
 
@@ -65,8 +52,6 @@ namespace CityBuddy
 
         public static List<string> _ignores = new List<string>
         {
-            //"Zix",
-            "Nanovoider",
             "Alien Coccoon"
         };
 
@@ -346,16 +331,6 @@ namespace CityBuddy
 
             return DynelManager.Characters
                     .Any(c => c.FightingTarget != null && c.FightingTarget?.Name == DynelManager.LocalPlayer.Name);
-        }
-
-        public static void ToggleCloak()
-        {
-            Chat.WriteLine("Toggling cloak.");
-            Network.Send(new ToggleCloakMessage()
-            {
-                Unknown1 = 49152,
-            });
-            _cloakTime = Time.NormalTime;
         }
 
         public static int GetLineNumber(Exception ex)
