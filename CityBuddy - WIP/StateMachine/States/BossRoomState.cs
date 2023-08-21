@@ -14,6 +14,7 @@ namespace CityBuddy
         private Dynel _downButton;
         private Dynel _exitDevice;
 
+        private SimpleChar _fleetAdmiral;
         private SimpleChar _target;
         private static Corpse _corpse;
 
@@ -72,18 +73,23 @@ namespace CityBuddy
             {
                 if (Game.IsZoning || !Team.IsInTeam) { return; }
 
+                _fleetAdmiral = DynelManager.NPCs
+                 .Where(c => c.Health > 0 && c.Name.Contains("Fleet Admiral"))
+                 .FirstOrDefault();
+
                 _target = DynelManager.NPCs
-                 .Where(c => c.Health > 0 && !CityBuddy._ignores.Contains(c.Name))// && c.IsInLineOfSight)
-                 .OrderByDescending(c => c.Name.Contains("Fighter Pilot"))
+                 .Where(c => c.Health > 0 && !CityBuddy._ignores.Contains(c.Name) && c.IsInLineOfSight)
+                 .OrderByDescending(c => c.Name.Contains("Fighter Pilot") || c.Name.Contains("Alien Reproduction Technician"))
                  .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                  .ThenBy(c => c.HealthPercent)
                  .FirstOrDefault();
 
                 _corpse = DynelManager.Corpses
+                    .Where(c => !c.Name.Contains("Coccoon"))
                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                .FirstOrDefault();
 
-                if (_target != null)
+                if (_target != null || _fleetAdmiral != null)
                 {
                     if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 10f)
                     {
@@ -101,7 +107,7 @@ namespace CityBuddy
                 {
                     if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
                     {
-                        if (_target != null)
+                        if (_target != null || _fleetAdmiral != null)
                         {
                             if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
                             {
