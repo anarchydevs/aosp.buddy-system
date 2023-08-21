@@ -166,7 +166,7 @@ namespace CityBuddy
             CityBuddy._leaderPos = (Vector3)CityBuddy._leader?.Position;
 
             if (CityBuddy._leaderPos == Vector3.Zero
-                || DynelManager.LocalPlayer.Position.DistanceFrom(CityBuddy._leaderPos) <= 1.6f
+                || DynelManager.LocalPlayer.Position.DistanceFrom(CityBuddy._leaderPos) <= 5f
                 || DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return;
 
