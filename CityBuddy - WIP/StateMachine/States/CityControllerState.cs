@@ -2,6 +2,7 @@
 using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using SmokeLounge.AOtomation.Messaging.GameData;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -10,8 +11,8 @@ namespace CityBuddy
 {
     public class CityControllerState : IState
     {
-        private static DateTime _lastCloakToggleTime;
 
+        private static DateTime _lastCruUseTime;
         public IState GetNextState()
         {
             if (!CityBuddy._settings["Toggle"].AsBool())
@@ -58,13 +59,14 @@ namespace CityBuddy
 
         private static void ExecuteCityControllerActions(Dynel cc)
         {
+
             if (CityController.CloakState == CloakStatus.Unknown)
             {
                 CityController.Use();
             }
             else if (CityController.CloakState != CloakStatus.Unknown)
             {
-                if (CityController.Charge < 0.50f)
+                if ((DateTime.Now - _lastCruUseTime).TotalSeconds >= 5)  // 5 seconds cooldown
                 {
                     Item cru = null;
 
@@ -78,6 +80,7 @@ namespace CityBuddy
 
                     if (cru != null)
                     {
+                        _lastCruUseTime = DateTime.Now;  // Update the last used time
                         cru.UseOn(cc.Identity);
                     }
                     else
