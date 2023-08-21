@@ -22,6 +22,10 @@ namespace CityBuddy
 
         private Dynel shipentrance;
 
+        private State currentState = State.PathingToEntrance;
+        private double forwardStartTime;
+        private Vector3 initialPosition;
+
         public IState GetNextState()
         {
 
@@ -66,35 +70,46 @@ namespace CityBuddy
             {
                 if (Game.IsZoning) { return; }
 
-                shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
+                Dynel shipEntrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
 
-                if (shipentrance != null)
+                if (shipEntrance != null)
                 {
-                    float distance = DynelManager.LocalPlayer.Position.DistanceFrom(shipentrance.Position);
+                    float distanceToDoor = DynelManager.LocalPlayer.Position.DistanceFrom(shipEntrance.Position);
 
-                    if (distance > 2 && !hasReachedEntrance)
+                    switch (currentState)
                     {
-                        // Move to ship entrance
-                        MovementController.Instance.SetDestination(shipentrance.Position);
-                        if (distance <= 1)
-                        {
-                            hasReachedEntrance = true;
-                        }
-                    }
-                    else if (hasReachedEntrance)
-                    {
-                        // Randomly move around ship entrance
-                        Random rand = new Random();
-                        float xOffset = (float)(rand.NextDouble() - 0.5); // Between -0.5 and 0.5
-                        float yOffset = (float)(rand.NextDouble() - 0.5); // Between -0.5 and 0.5
+                        case State.PathingToEntrance:
+                            if (distanceToDoor > 1)
+                            {
+                                MovementController.Instance.SetDestination(shipEntrance.Position); // Path to door
+                            }
+                            else
+                            {
+                                MovementController.Instance.SetMovement(MovementAction.ForwardStop); // Stop moving
+                                currentState = State.ArrivedAtEntrance;
+                            }
+                            break;
 
-                        Vector3 randomizedPosition = new Vector3(
-                            shipentrance.Position.X + xOffset,
-                            shipentrance.Position.Y + yOffset,
-                            shipentrance.Position.Z
-                        );
+                        case State.ArrivedAtEntrance:
+                            // Start moving forward for 2 seconds
+                            MovementController.Instance.SetMovement(MovementAction.ForwardStart);
+                            forwardStartTime = Time.NormalTime;
+                            currentState = State.MovingForward;
+                            break;
 
-                        MovementController.Instance.SetDestination(randomizedPosition);
+                        case State.MovingForward:
+                            if (Time.NormalTime >= forwardStartTime + 2)
+                            {
+                                MovementController.Instance.SetMovement(MovementAction.ForwardStop); // Stop moving forward
+                                currentState = State.PathingBackToEntrance;
+                            }
+                            break;
+
+                        case State.PathingBackToEntrance:
+                            // Path back to the entrance door
+                            MovementController.Instance.SetDestination(shipEntrance.Position); // Path to door
+                            currentState = State.PathingToEntrance; // Reset to initial state
+                            break;
                     }
                 }
             }
@@ -110,6 +125,13 @@ namespace CityBuddy
                     CityBuddy.previousErrorMessage = errorMessage;
                 }
             }
+        }
+        public enum State
+        {
+            PathingToEntrance,
+            ArrivedAtEntrance,
+            MovingForward,
+            PathingBackToEntrance
         }
     }
 }
