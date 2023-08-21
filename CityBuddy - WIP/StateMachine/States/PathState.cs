@@ -249,17 +249,17 @@ namespace CityBuddy
             if (Team.Members.Any(c => c.Character == null))
                 return;
 
-            if (_corpse != null)
-            {
-                if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 2)
-                {
-                    CityBuddy.NavMeshMovementController.SetNavMeshDestination(_corpse.Position);
-                }
-            }
-            else if (_allMobs != null && _corpse == null)
+            //if (_corpse != null)
+            //{
+            //    if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 2)
+            //    {
+            //        CityBuddy.NavMeshMovementController.SetNavMeshDestination(_corpse.Position);
+            //    }
+            //}
+            else if (_allMobs != null)
                 HandleTargetMovement();
 
-            else if (_allMobs == null && _corpse == null && CityBuddy.CanProceed())
+            else if (_allMobs == null && CityBuddy.CanProceed())
                 HandleDestinationMovement();
         }
 
