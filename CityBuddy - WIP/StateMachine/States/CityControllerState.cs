@@ -13,7 +13,7 @@ namespace CityBuddy
     public class CityControllerState : IState
     {
 
-        private static DateTime _lastCruUseTime;
+        private static double _lastCruUseTime;
 
         public IState GetNextState()
         {
@@ -64,7 +64,7 @@ namespace CityBuddy
             
             CityController.Use();
 
-            await Task.Delay(2000);
+            await Task.Delay(3000);
 
             if (CityController.Charge < 0.50f)
             {
@@ -78,10 +78,11 @@ namespace CityBuddy
                     }
                 }
 
-                if (cru != null)
+                if (cru != null && Time.NormalTime > _lastCruUseTime +5)
                 {
+                    Chat.WriteLine("Using Controller Recompiler Unit");
                     cru.UseOn(cc.Identity);
-                    await Task.Delay(3000);
+                    _lastCruUseTime = Time.NormalTime;
                 }
             }
 
