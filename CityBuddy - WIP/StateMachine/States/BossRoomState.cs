@@ -73,7 +73,7 @@ namespace CityBuddy
                 if (Game.IsZoning || !Team.IsInTeam) { return; }
 
                 _target = DynelManager.NPCs
-                 .Where(c => c.Health > 0 && !CityBuddy._ignores.Contains(c.Name) && c.IsInLineOfSight)
+                 .Where(c => c.Health > 0 && !CityBuddy._ignores.Contains(c.Name))// && c.IsInLineOfSight)
                  .OrderByDescending(c => c.Name.Contains("Fighter Pilot"))
                  .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                  .ThenBy(c => c.HealthPercent)

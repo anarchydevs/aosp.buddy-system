@@ -6,6 +6,7 @@ using SmokeLounge.AOtomation.Messaging.GameData;
 using System;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace CityBuddy
 {
@@ -13,6 +14,7 @@ namespace CityBuddy
     {
 
         private static DateTime _lastCruUseTime;
+
         public IState GetNextState()
         {
             if (!CityBuddy._settings["Toggle"].AsBool())
@@ -37,7 +39,7 @@ namespace CityBuddy
             Chat.WriteLine("Exiting city controller state.");
         }
 
-        public void Tick()
+        public async void Tick()
         {
             Dynel citycontroller = DynelManager.AllDynels
                 .Where(c => c.Name == "City Controller")
@@ -48,7 +50,7 @@ namespace CityBuddy
                 if (citycontroller.DistanceFrom(DynelManager.LocalPlayer) < 5f)
                 {
                     MovementController.Instance.Halt();
-                    ExecuteCityControllerActions(citycontroller);
+                   await ExecuteCityControllerActionsAsync(citycontroller);
                 }
                 else if (citycontroller.DistanceFrom(DynelManager.LocalPlayer) > 5f && !MovementController.Instance.IsNavigating)
                 {
@@ -57,36 +59,29 @@ namespace CityBuddy
             }
         }
 
-        private static void ExecuteCityControllerActions(Dynel cc)
+        private static async Task ExecuteCityControllerActionsAsync(Dynel cc)
         {
+            
+            CityController.Use();
 
-            if (CityController.CloakState == CloakStatus.Unknown)
+            await Task.Delay(2000);
+
+            if (CityController.Charge < 0.50f)
             {
-                CityController.Use();
-            }
-            else if (CityController.CloakState != CloakStatus.Unknown)
-            {
-                if ((DateTime.Now - _lastCruUseTime).TotalSeconds >= 5)  // 5 seconds cooldown
+                Item cru = null;
+
+                foreach (var id in ControllerRecompilerUnit.Crus)
                 {
-                    Item cru = null;
+                    if (Inventory.Find(id, out cru))
+                    {
+                        break;
+                    }
+                }
 
-                    foreach (var id in ControllerRecompilerUnit.Crus)
-                    {
-                        if (Inventory.Find(id, out cru))
-                        {
-                            break;
-                        }
-                    }
-
-                    if (cru != null)
-                    {
-                        _lastCruUseTime = DateTime.Now;  // Update the last used time
-                        cru.UseOn(cc.Identity);
-                    }
-                    else
-                    {
-                        Chat.WriteLine("No usable items found.");
-                    }
+                if (cru != null)
+                {
+                    cru.UseOn(cc.Identity);
+                    await Task.Delay(3000);
                 }
             }
 
