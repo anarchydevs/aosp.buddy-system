@@ -79,7 +79,8 @@ namespace CityBuddy
 
                 _target = DynelManager.NPCs
                  .Where(c => c.Health > 0 && !CityBuddy._ignores.Contains(c.Name) && c.IsInLineOfSight)
-                 .OrderByDescending(c => c.Name.Contains("Fighter Pilot") || c.Name.Contains("Alien Reproduction Technician"))
+                 .OrderByDescending(c => c.Name.Contains("Fighter Pilot"))
+                 .OrderByDescending(c => c.Name.Contains("Alien Reproduction Technician"))
                  .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                  .ThenBy(c => c.HealthPercent)
                  .FirstOrDefault();
@@ -89,7 +90,7 @@ namespace CityBuddy
                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                .FirstOrDefault();
 
-                if (_target != null || _fleetAdmiral != null)
+                if (_target != null)
                 {
                     if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 10f)
                     {
@@ -107,12 +108,19 @@ namespace CityBuddy
                 {
                     if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
                     {
-                        if (_target != null || _fleetAdmiral != null)
+                        if (_target != null)
                         {
                             if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
                             {
                                 CityBuddy.NavMeshMovementController.SetNavMeshDestination(_target.Position);
                             } 
+                        }
+                        if (_fleetAdmiral != null)
+                        {
+                            if (_fleetAdmiral.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
+                            {
+                                CityBuddy.NavMeshMovementController.SetNavMeshDestination(_fleetAdmiral.Position);
+                            }
                         }
                         else if (_target == null && _corpse != null)
                         {
