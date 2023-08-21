@@ -170,7 +170,7 @@ namespace CityBuddy
                 || DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return;
 
-            CityBuddy.NavMeshMovementController.SetNavMeshDestination(CityBuddy._leaderPos);
+            MovementController.Instance.SetDestination(CityBuddy._leaderPos);
         }
     }
 }

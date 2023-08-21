@@ -143,11 +143,8 @@ namespace CityBuddy
                 _stateMachine.SetState(new IdleState());
 
             NavMeshMovementController.Halt();
-
-            if (MovementController.Instance.IsNavigating)
-            {
-                MovementController.Instance.Halt();
-            }
+            MovementController.Instance.Halt();
+            
         }
 
         private void EnterMessage(int sender, IPCMessage msg)
@@ -298,6 +295,7 @@ namespace CityBuddy
                         _settings["Toggle"] = true;
                         Toggle = true;
                         IPCChannel.Broadcast(new StartMessage());
+                        Chat.WriteLine("CityBuddy enabled.");
 
                     }
                     else
@@ -305,6 +303,9 @@ namespace CityBuddy
                         _settings["Toggle"] = false;
                         Toggle = false;
                         IPCChannel.Broadcast(new StopMessage());
+                        Chat.WriteLine("CityBuddy disabled.");
+                        NavMeshMovementController.Halt();
+                        MovementController.Instance.Halt();
                     }
                 }
                 Config.Save();
