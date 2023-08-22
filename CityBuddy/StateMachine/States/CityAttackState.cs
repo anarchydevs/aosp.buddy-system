@@ -87,25 +87,37 @@ namespace CityBuddy
                             DynelManager.LocalPlayer.Attack(_target);
                         }
                     }
-                    else if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
+                }
+
+                if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
+                {
+                    if (_target != null && _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
                     {
                         MovementController.Instance.SetDestination(_target.Position);
                     }
-                }
-                else if (_corpse != null && _target == null && CityBuddy._settings["Corpses"].AsBool())
-                {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5)
+                    else if (_corpse != null && _target == null && CityBuddy._settings["Corpses"].AsBool())
                     {
-                        MovementController.Instance.SetDestination(_corpse.Position);
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5)
+                        {
+                            MovementController.Instance.SetDestination(_corpse.Position);
+                        }
+                    }
+                    else if (shipentrance == null)
+                    {
+                        if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity)
+                        {
+                            if (DynelManager.LocalPlayer.Position.Distance2DFrom(CityBuddy._montroyalGaurdPos) > 10)
+                            { MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos); }
+                        }
                     }
                 }
-                else if (shipentrance == null)
+
+                if (DynelManager.LocalPlayer.Identity != CityBuddy.Leader)
                 {
-                    if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity)
-                    {
-                        if (DynelManager.LocalPlayer.Position.Distance2DFrom(CityBuddy._montroyalGaurdPos) > 10)
-                        { MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos); }
-                    }
+                    CityBuddy._leader = GetLeaderCharacter();
+
+                    if (CityBuddy._leader != null)
+                        PathToLeader();
                 }
             }
             catch (Exception ex)
@@ -119,6 +131,24 @@ namespace CityBuddy
                     CityBuddy.previousErrorMessage = errorMessage;
                 }
             }
+        }
+        private SimpleChar GetLeaderCharacter()
+        {
+            return Team.Members
+                .Where(c => c.Character?.Health > 0 && c.Character?.IsValid == true && c.Identity == CityBuddy.Leader)
+                .FirstOrDefault()?.Character;
+        }
+
+        private void PathToLeader()
+        {
+            CityBuddy._leaderPos = (Vector3)CityBuddy._leader?.Position;
+
+            if (CityBuddy._leaderPos == Vector3.Zero
+                || DynelManager.LocalPlayer.Position.DistanceFrom(CityBuddy._leaderPos) <= 1.6f
+                || DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return;
+
+            CityBuddy.NavMeshMovementController.SetNavMeshDestination(CityBuddy._leaderPos);
         }
     }
 }
