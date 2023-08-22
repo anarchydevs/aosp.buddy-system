@@ -20,9 +20,6 @@ namespace CityBuddy
                     || Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands
                     || Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
                 {
-                    //if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
-                    //    return new CityControllerState();
-                    //else if (DynelManager.LocalPlayer.Identity != CityBuddy.Leader)
                         return new CityAttackState();
                 }
 
@@ -34,7 +31,6 @@ namespace CityBuddy
                     return new PathState();
                 }
             }
-
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return new SitState();
 

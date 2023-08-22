@@ -3,32 +3,27 @@ using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using CityBuddy.IPCMessages;
-using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
-using SmokeLounge.AOtomation.Messaging.Messages;
 using System;
 using System.Linq;
 
 namespace CityBuddy
 {
-    public class CityAttackState : IState
+    public class WaitForShipState : IState
     {
 
         public static TeamMember selectedMember = null;
 
         private static Random rand = new Random();
 
-        private SimpleChar _target;
         private Dynel shipentrance;
 
         public IState GetNextState()
         {
-            Corpse _bossCorpse = DynelManager.Corpses
-                    .Where(c => c.Name.Contains("General"))
-               .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-               .FirstOrDefault();
 
             if (!CityBuddy._settings["Toggle"].AsBool())
                 return new IdleState();
+
+            shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
 
             if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader
                 && !DynelManager.NPCs.Any(c => c.Health > 0)
@@ -37,9 +32,30 @@ namespace CityBuddy
                 return new CityControllerState();
             }
 
-            if (_bossCorpse != null) 
-            { 
-                return new BossLootState(); 
+            if (shipentrance != null)
+            {
+                if (Team.IsInTeam && selectedMember == null && DynelManager.LocalPlayer.Identity == CityBuddy.Leader
+                && !Team.Members.Any(c => c.Character == null))
+                {
+                    int randomIndex = rand.Next(Team.Members.Count);
+                    selectedMember = Team.Members[randomIndex];
+
+                    if (selectedMember != null)
+                    {
+                        CityBuddy.IPCChannel.Broadcast(new SelectedMemberUpdateMessage()
+                        { SelectedMemberIdentity = selectedMember.Identity });
+                    }
+                }
+
+                if (selectedMember != null && DynelManager.LocalPlayer.Identity == selectedMember.Identity)
+                {
+                    return new EnterState();
+                }
+
+                if (Team.Members.Count(c => c.Character == null) > 1)
+                {
+                    return new EnterState();
+                }
             }
 
             return null;
@@ -66,48 +82,14 @@ namespace CityBuddy
             {
                 shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
 
-                _target = DynelManager.NPCs.Where(c => c.Health > 0 && c.DistanceFrom(DynelManager.LocalPlayer) < 40f)
-                    .OrderByDescending(c => c.Name.Contains("Hacker"))
-                    .FirstOrDefault();
-
-                Corpse _corpse = DynelManager.Corpses
-                     .Where(c => !c.Name.Contains("General"))
-                     .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-                     .FirstOrDefault();
-
-
-                if (_target != null)
-                {
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 10f)
-                    {
-                        if (DynelManager.LocalPlayer.FightingTarget == null
-                            && !DynelManager.LocalPlayer.IsAttacking
-                            && !DynelManager.LocalPlayer.IsAttackPending
-                            && _target.IsInLineOfSight)
-                        {
-                            DynelManager.LocalPlayer.Attack(_target);
-                        }
-                    }
-                    else if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
-                    {
-                        MovementController.Instance.SetDestination(_target.Position);
-                    }
-                }
-                else if (_corpse != null && _target == null)
-                {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5)
-                    {
-                        MovementController.Instance.SetDestination(_corpse.Position);
-                    }
-                }
-                else if (shipentrance == null)
+                if (shipentrance == null)
                 {
                     if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity)
                     {
                         if (DynelManager.LocalPlayer.Position.Distance2DFrom(CityBuddy._montroyalGaurdPos) > 10)
                         { MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos); }
                     }
-                }
+                } 
             }
             catch (Exception ex)
             {

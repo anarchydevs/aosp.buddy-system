@@ -14,9 +14,8 @@ namespace CityBuddy
         private Dynel _downButton;
         private Dynel _exitDevice;
 
-        private SimpleChar _fleetAdmiral;
+        private SimpleChar _boss;
         private SimpleChar _target;
-        private static Corpse _corpse;
 
         public IState GetNextState()
         {
@@ -28,15 +27,19 @@ namespace CityBuddy
                 .ThenBy(c => c.HealthPercent)
                 .FirstOrDefault();
 
-            _corpse = DynelManager.Corpses.OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position)).FirstOrDefault();
+            Corpse bossCorpse = DynelManager.Corpses
+                   .Where(c => c.Name.Contains("Fleet Admiral") || c.Name.Contains("Recruitment Director"))
+                   .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+                   .FirstOrDefault();
+
 
             if (!CityBuddy._settings["Toggle"].AsBool() || !Playfield.IsDungeon
                 || DynelManager.LocalPlayer.Room.Name != "AI_bossroom")
                 return new IdleState();
 
-            if (_exitDevice != null && _corpse == null && _target == null)
+            if (bossCorpse != null && _exitDevice != null)
             {
-                return new ButtonExitState();
+                return new BossLootState();
             }
 
             return null;
@@ -54,7 +57,7 @@ namespace CityBuddy
             if (DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.StopAttack();
 
-            Chat.WriteLine("Boss room state");
+            Chat.WriteLine("Boss room state.");
         }
 
         public void OnStateExit()
@@ -64,7 +67,7 @@ namespace CityBuddy
             if (DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.StopAttack();
 
-            Chat.WriteLine("Exit Boss boom state");
+            Chat.WriteLine("Exit boss boom state.");
         }
 
         public void Tick()
@@ -73,22 +76,22 @@ namespace CityBuddy
             {
                 if (Game.IsZoning || !Team.IsInTeam) { return; }
 
-                _fleetAdmiral = DynelManager.NPCs
-                 .Where(c => c.Health > 0 && c.Name.Contains("Fleet Admiral"))
+                _boss = DynelManager.NPCs
+                 .Where(c => c.Health > 0 && c.Name.Contains("Fleet Admiral") || c.Name.Contains("Recruitment Director"))
                  .FirstOrDefault();
 
                 _target = DynelManager.NPCs
                  .Where(c => c.Health > 0 && !CityBuddy._ignores.Contains(c.Name) && c.IsInLineOfSight)
                  .OrderByDescending(c => c.Name.Contains("Fighter Pilot"))
-                 .OrderByDescending(c => c.Name.Contains("Alien Reproduction Technician"))
+                 .ThenByDescending(c => c.Name.Contains("Alien Reproduction Technician"))
                  .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                  .ThenBy(c => c.HealthPercent)
                  .FirstOrDefault();
 
-                _corpse = DynelManager.Corpses
-                    .Where(c => !c.Name.Contains("Coccoon"))
-               .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-               .FirstOrDefault();
+               Corpse _corpse = DynelManager.Corpses
+                   .Where(c => !c.Name.Contains("Coccoon") || !c.Name.Contains("Fleet Admiral") || !c.Name.Contains("Recruitment Director"))
+                   .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+                   .FirstOrDefault();
 
                 if (_target != null)
                 {
@@ -115,11 +118,11 @@ namespace CityBuddy
                                 CityBuddy.NavMeshMovementController.SetNavMeshDestination(_target.Position);
                             } 
                         }
-                        if (_fleetAdmiral != null)
+                        if (_boss != null)
                         {
-                            if (_fleetAdmiral.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
+                            if (_boss.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
                             {
-                                CityBuddy.NavMeshMovementController.SetNavMeshDestination(_fleetAdmiral.Position);
+                                CityBuddy.NavMeshMovementController.SetNavMeshDestination(_boss.Position);
                             }
                         }
                         else if (_target == null && _corpse != null)
