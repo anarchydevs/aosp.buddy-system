@@ -90,6 +90,7 @@ namespace CityBuddy
 
                 _settings.AddVariable("Enable", false);
                 _settings.AddVariable("Leader", false);
+                _settings.AddVariable("Corpses", false);
 
                 _settings["Enable"] = false;
 
@@ -287,8 +288,6 @@ namespace CityBuddy
             return false;
         }
 
-
-
         private void CityBuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
@@ -359,15 +358,16 @@ namespace CityBuddy
 
         private void CityAttackStatus(object s, ChatMessageBody msg)
         {
-            if (msg.PacketType == ChatMessageType.GroupMessage)
-            {
-                var groupMsg = (GroupMsgMessage)msg;
+            if (msg.PacketType != ChatMessageType.GroupMessage) { return; }
 
-                if (groupMsg.MessageType == GroupMessageType.Org 
-                    && groupMsg.Text.Contains("Your city in Montroyal has been targeted by hostile forces"))
-                {
-                    CityUnderAttack = true;
-                }
+            var groupMsg = (GroupMsgMessage)msg;
+
+            if (groupMsg.MessageType != GroupMessageType.Org) { return; }
+
+            if (groupMsg.Text.Contains("Your city in Montroyal has been targeted by hostile forces"))
+            {
+                Chat.WriteLine("City is under attack!");
+                CityUnderAttack = true;
             }
         }
 
