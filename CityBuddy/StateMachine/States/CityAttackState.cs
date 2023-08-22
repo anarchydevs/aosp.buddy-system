@@ -28,13 +28,16 @@ namespace CityBuddy
 
             if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader
                 && !DynelManager.NPCs.Any(c => c.Health > 0)
+                && !CityBuddy.CityUnderAttack
                 && (CityController.CloakState == CloakStatus.Unknown || CityController.CanToggleCloak()))
             {
                 return new CityControllerState();
             }
 
             if (_bossCorpse != null) 
-            { 
+            {
+                CityBuddy.CityUnderAttack = false;
+
                 return new BossLootState(); 
             }
 

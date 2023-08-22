@@ -7,6 +7,8 @@ using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
 using CityBuddy.IPCMessages;
+using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
+using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using System;
 using System.Collections.Generic;
@@ -26,6 +28,7 @@ namespace CityBuddy
         public static Config Config { get; private set; }
 
         public static bool Enable = false;
+        public static bool CityUnderAttack = false;
 
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
@@ -93,6 +96,7 @@ namespace CityBuddy
                Chat.RegisterCommand("buddy", CityBuddyCommand);
 
                 Game.OnUpdate += OnUpdate;
+                Network.ChatMessageReceived += CityAttackStatus;
             }
             catch (Exception ex)
             {
@@ -351,6 +355,20 @@ namespace CityBuddy
 
             return DynelManager.Characters
                     .Any(c => c.FightingTarget != null && c.FightingTarget?.Name == DynelManager.LocalPlayer.Name);
+        }
+
+        private void CityAttackStatus(object s, ChatMessageBody msg)
+        {
+            if (msg.PacketType == ChatMessageType.GroupMessage)
+            {
+                var groupMsg = (GroupMsgMessage)msg;
+
+                if (groupMsg.MessageType == GroupMessageType.Org 
+                    && groupMsg.Text.Contains("Your city in Montroyal has been targeted by hostile forces"))
+                {
+                    CityUnderAttack = true;
+                }
+            }
         }
 
         public static int GetLineNumber(Exception ex)

@@ -20,7 +20,7 @@ namespace CityBuddy
             if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
 
-            if (CityController.CloakState != CloakStatus.Unknown && CityController.Charge >= 0.5f
+            if (CityController.CloakState != CloakStatus.Unknown && CityController.Charge >= 0.75f
                 && !CityController.CanToggleCloak())
             {
                 return new CityAttackState();
@@ -66,7 +66,7 @@ namespace CityBuddy
 
             await Task.Delay(3000);
 
-            if (CityController.Charge < 0.50f)
+            if (CityController.Charge < 0.75f)
             {
                 Item cru = null;
 
