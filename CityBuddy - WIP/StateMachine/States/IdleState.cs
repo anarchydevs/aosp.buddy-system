@@ -39,12 +39,12 @@ namespace CityBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Idle state");
+            //Chat.WriteLine("Idle state");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exit Idle state");
+            //Chat.WriteLine("Exit Idle state");
         }
 
         public void Tick()

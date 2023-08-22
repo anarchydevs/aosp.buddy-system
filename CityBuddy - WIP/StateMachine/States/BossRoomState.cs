@@ -57,7 +57,7 @@ namespace CityBuddy
             if (DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.StopAttack();
 
-            Chat.WriteLine("Boss room state.");
+            //Chat.WriteLine("Boss room state.");
         }
 
         public void OnStateExit()
@@ -67,7 +67,7 @@ namespace CityBuddy
             if (DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.StopAttack();
 
-            Chat.WriteLine("Exit boss boom state.");
+            //Chat.WriteLine("Exit boss boom state.");
         }
 
         public void Tick()

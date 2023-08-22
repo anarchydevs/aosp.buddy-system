@@ -33,7 +33,7 @@ namespace CityBuddy
         public void OnStateEnter()
         {
             EnterState.NavGenSuccessful = false;
-            Chat.WriteLine("Enter ButtonExitState");
+            //Chat.WriteLine("Enter ButtonExitState");
         }
 
         public void OnStateExit()
@@ -44,7 +44,7 @@ namespace CityBuddy
             PathState._upButtonLocations.Clear();
             PathState._bossButtonLocation = Vector3.Zero;
             _exitDoorLocation = Vector3.Zero;
-            Chat.WriteLine("Exit ButtonExitState");
+            //Chat.WriteLine("Exit ButtonExitState");
         }
 
         public void Tick()

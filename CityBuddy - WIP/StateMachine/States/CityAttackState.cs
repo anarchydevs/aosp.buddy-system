@@ -52,12 +52,12 @@ namespace CityBuddy
                 MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos);
             }
 
-            Chat.WriteLine("City attack state");
+            Chat.WriteLine("City state");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exit city attack state");
+            Chat.WriteLine("Exit city state");
         }
 
         public void Tick()

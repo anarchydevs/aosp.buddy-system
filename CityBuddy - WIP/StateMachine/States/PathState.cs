@@ -50,14 +50,14 @@ namespace CityBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("PathState");
+            //Chat.WriteLine("PathState");
         }
 
         public void OnStateExit()
         {
             CityBuddy.NavMeshMovementController.Halt();
 
-            Chat.WriteLine("Exit PathState");
+            //Chat.WriteLine("Exit PathState");
 
             if (DynelManager.LocalPlayer.IsAttacking)
                 DynelManager.LocalPlayer.StopAttack();

@@ -31,12 +31,12 @@ namespace CityBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Entering city controller state.");
+            Chat.WriteLine("Checking city controller.");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exiting city controller state.");
+            //Chat.WriteLine("Exiting city controller state.");
         }
 
         public async void Tick()

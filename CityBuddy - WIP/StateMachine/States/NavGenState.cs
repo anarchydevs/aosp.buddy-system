@@ -52,7 +52,7 @@ namespace CityBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("NavGenState");
+            Chat.WriteLine("NavGen");
 
             if (!NavmeshFileExists && Playfield.IsDungeon)
             {
@@ -67,7 +67,7 @@ namespace CityBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exit NavGenState");
+            //Chat.WriteLine("Exit NavGenState");
         }
 
         public void Tick()

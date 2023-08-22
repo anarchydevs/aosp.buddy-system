@@ -57,12 +57,12 @@ namespace CityBuddy
         public void OnStateEnter()
         {
 
-            Chat.WriteLine("City attack state");
+            Chat.WriteLine("Waiting for ship.");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exit city attack state");
+            //Chat.WriteLine("Exit city attack state");
         }
 
         public void Tick()

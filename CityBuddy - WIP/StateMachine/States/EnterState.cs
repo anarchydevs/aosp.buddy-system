@@ -55,12 +55,12 @@ namespace CityBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("EnterState");
+            Chat.WriteLine("Entering ship");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("Exit EnterState");
+            //Chat.WriteLine("Exit EnterState");
 
         }
 
