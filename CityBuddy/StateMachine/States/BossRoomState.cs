@@ -125,7 +125,7 @@ namespace CityBuddy
                                 CityBuddy.NavMeshMovementController.SetNavMeshDestination(_boss.Position);
                             }
                         }
-                        else if (_target == null && _corpse != null)
+                        else if (_target == null && _corpse != null && CityBuddy._settings["Corpses"].AsBool())
                         {
                             if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 2f)
                             {
