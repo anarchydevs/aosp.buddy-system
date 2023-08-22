@@ -93,13 +93,13 @@ namespace CityBuddy
                         MovementController.Instance.SetDestination(_target.Position);
                     }
                 }
-                else if (_corpse != null && _target == null)
-                {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5)
-                    {
-                        MovementController.Instance.SetDestination(_corpse.Position);
-                    }
-                }
+                //else if (_corpse != null && _target == null)
+                //{
+                //    if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5)
+                //    {
+                //        MovementController.Instance.SetDestination(_corpse.Position);
+                //    }
+                //}
                 else if (shipentrance == null)
                 {
                     if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity)
