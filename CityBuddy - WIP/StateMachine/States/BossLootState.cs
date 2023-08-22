@@ -84,16 +84,16 @@ namespace CityBuddy
 
                     if (!_initCorpse && _atCorpse)
                     {
-                        Chat.WriteLine("Pause for looting, 30 sec");
+                        //Chat.WriteLine("Pause for looting, 30 sec");
                         Task.Factory.StartNew(
                             async () =>
                             {
                                 await Task.Delay(30000);
-                                Chat.WriteLine("Done, Leaving");
-
+                                //Chat.WriteLine("Done looting");
+                                _initCorpse = true;
                             });
 
-                        _initCorpse = true;
+                        
                     }
                 }
 
