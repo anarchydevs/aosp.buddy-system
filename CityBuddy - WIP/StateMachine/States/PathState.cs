@@ -84,7 +84,7 @@ namespace CityBuddy
 
                 _allMobs = GetAllMobs();
 
-                _corpse = (Corpse)GetCorpse();
+                //_corpse = (Corpse)GetCorpse();
 
                 _downButton = GetButton("Button (down)");
                 _bossButton = GetButton("Button (boss)");
@@ -227,12 +227,12 @@ namespace CityBuddy
                 .FirstOrDefault();
         }
 
-        private Dynel GetCorpse()
-        {
-            return DynelManager.Corpses
-                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-                .FirstOrDefault();
-        }
+        //private Dynel GetCorpse()
+        //{
+        //    return DynelManager.Corpses
+        //        .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+        //        .FirstOrDefault();
+        //}
 
         private Dynel GetButton(string buttonName)
         {
