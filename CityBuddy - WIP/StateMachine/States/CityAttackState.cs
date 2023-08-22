@@ -13,10 +13,6 @@ namespace CityBuddy
     public class CityAttackState : IState
     {
 
-        public static TeamMember selectedMember = null;
-
-        private static Random rand = new Random();
-
         private SimpleChar _target;
         private Dynel shipentrance;
 

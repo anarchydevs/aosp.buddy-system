@@ -162,12 +162,12 @@ namespace CityBuddy
             if (message != null)
             {
                 // Find the team member with the received identity and set as selectedMember
-                CityAttackState.selectedMember = Team.Members.FirstOrDefault(m => m.Identity == message.SelectedMemberIdentity);
+                WaitForShipState.selectedMember = Team.Members.FirstOrDefault(m => m.Identity == message.SelectedMemberIdentity);
             }
         }
         private void HandleClearSelectedMember(int sender, IPCMessage msg)
         {
-            CityAttackState.selectedMember = null;
+            WaitForShipState.selectedMember = null;
         }
 
         private void HandleInfoViewClick(object s, ButtonBase button)

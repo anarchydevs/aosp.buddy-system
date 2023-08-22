@@ -34,9 +34,9 @@ namespace CityBuddy
 
             if (Playfield.IsDungeon && DynelManager.LocalPlayer.Room.Name == "AI_entrance")
             {
-                if (CityAttackState.selectedMember != null)
+                if (WaitForShipState.selectedMember != null)
                 {
-                    if (DynelManager.LocalPlayer.Identity == CityAttackState.selectedMember.Identity)
+                    if (DynelManager.LocalPlayer.Identity == WaitForShipState.selectedMember.Identity)
                     {
                         if (!NavGenSuccessful)
                             return new NavGenState();
@@ -44,7 +44,7 @@ namespace CityBuddy
                             return new PathState();
                     }
 
-                    if (DynelManager.LocalPlayer.Identity != CityAttackState.selectedMember.Identity
+                    if (DynelManager.LocalPlayer.Identity != WaitForShipState.selectedMember.Identity
                     && Team.Members.Any(c => c.Character != null))
                         return new PathState();
                 }

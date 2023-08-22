@@ -19,7 +19,6 @@ namespace CityBuddy
 
         public IState GetNextState()
         {
-
             if (!CityBuddy._settings["Toggle"].AsBool())
                 return new IdleState();
 
@@ -67,30 +66,7 @@ namespace CityBuddy
 
         public void Tick()
         {
-            try
-            {
-                shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
-
-                if (shipentrance == null)
-                {
-                    if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity)
-                    {
-                        if (DynelManager.LocalPlayer.Position.Distance2DFrom(CityBuddy._montroyalGaurdPos) > 10)
-                        { MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos); }
-                    }
-                } 
-            }
-            catch (Exception ex)
-            {
-                var errorMessage = "An error occurred on line " + CityBuddy.GetLineNumber(ex) + ": " + ex.Message;
-
-                if (errorMessage != CityBuddy.previousErrorMessage)
-                {
-                    Chat.WriteLine(errorMessage);
-                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
-                    CityBuddy.previousErrorMessage = errorMessage;
-                }
-            }
+            
         }
     }
 }
