@@ -64,9 +64,16 @@ namespace CityBuddy
                                 channelInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel}";
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Chat.WriteLine(e);
+                        var errorMessage = "An error occurred on line " + CityBuddy.GetLineNumber(ex) + ": " + ex.Message;
+
+                        if (errorMessage != CityBuddy.previousErrorMessage)
+                        {
+                            Chat.WriteLine(errorMessage);
+                            Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                            CityBuddy.previousErrorMessage = errorMessage;
+                        }
                     }
                 });
 
