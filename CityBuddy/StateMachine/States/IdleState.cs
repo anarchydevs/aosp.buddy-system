@@ -14,7 +14,7 @@ namespace CityBuddy
         public IState GetNextState()
         {
 
-            if (CityBuddy._settings["Toggle"].AsBool() && CityBuddy.Toggle)
+            if (CityBuddy._settings["Enable"].AsBool())
             {
                 if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity
                     || Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands

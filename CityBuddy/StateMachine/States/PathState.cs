@@ -36,10 +36,10 @@ namespace CityBuddy
 
             if (Game.IsZoning) { return null; }
 
-            if (!CityBuddy._settings["Toggle"].AsBool() || !Playfield.IsDungeon)
+            if (!CityBuddy._settings["Enable"].AsBool() || !Playfield.IsDungeon)
                 return new IdleState();
 
-            if (CityBuddy._settings["Toggle"].AsBool())
+            if (CityBuddy._settings["Enable"].AsBool())
             {
                 if (DynelManager.LocalPlayer.Room.Name == "AI_bossroom")
                     return new BossRoomState();

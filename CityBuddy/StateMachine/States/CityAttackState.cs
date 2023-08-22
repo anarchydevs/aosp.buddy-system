@@ -23,7 +23,7 @@ namespace CityBuddy
                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                .FirstOrDefault();
 
-            if (!CityBuddy._settings["Toggle"].AsBool())
+            if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
 
             if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader

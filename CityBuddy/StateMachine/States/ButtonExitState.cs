@@ -24,7 +24,7 @@ namespace CityBuddy
 
         public IState GetNextState()
         {
-            if (!CityBuddy._settings["Toggle"].AsBool() || !Playfield.IsDungeon)
+            if (!CityBuddy._settings["Enable"].AsBool() || !Playfield.IsDungeon)
                 return new IdleState();
 
             return null;

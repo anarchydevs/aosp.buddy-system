@@ -25,7 +25,7 @@ namespace CityBuddy
 
         public IState GetNextState()
         {
-            if (CityBuddy._settings["Toggle"].AsBool())
+            if (CityBuddy._settings["Enable"].AsBool())
             {
                 if (NavmeshFileExists)
                 {

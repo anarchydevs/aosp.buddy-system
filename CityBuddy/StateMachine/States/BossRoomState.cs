@@ -33,7 +33,7 @@ namespace CityBuddy
                    .FirstOrDefault();
 
 
-            if (!CityBuddy._settings["Toggle"].AsBool() || !Playfield.IsDungeon
+            if (!CityBuddy._settings["Enable"].AsBool() || !Playfield.IsDungeon
                 || DynelManager.LocalPlayer.Room.Name != "AI_bossroom")
                 return new IdleState();
 

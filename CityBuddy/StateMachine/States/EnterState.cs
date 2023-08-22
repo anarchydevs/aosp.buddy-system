@@ -29,7 +29,7 @@ namespace CityBuddy
         public IState GetNextState()
         {
 
-            if (!CityBuddy._settings["Toggle"].AsBool())
+            if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
 
             if (Playfield.IsDungeon && DynelManager.LocalPlayer.Room.Name == "AI_entrance")

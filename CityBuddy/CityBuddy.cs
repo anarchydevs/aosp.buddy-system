@@ -25,7 +25,7 @@ namespace CityBuddy
         public static IPCChannel IPCChannel { get; private set; }
         public static Config Config { get; private set; }
 
-        public static bool Toggle = false;
+        public static bool Enable = false;
 
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
@@ -85,12 +85,12 @@ namespace CityBuddy
 
                 _stateMachine = new StateMachine(new IdleState());
 
-                _settings.AddVariable("Toggle", false);
+                _settings.AddVariable("Enable", false);
                 _settings.AddVariable("Leader", false);
 
-                _settings["Toggle"] = false;
+                _settings["Enable"] = false;
 
-                Chat.RegisterCommand("buddy", CityBuddyCommand);
+               Chat.RegisterCommand("buddy", CityBuddyCommand);
 
                 Game.OnUpdate += OnUpdate;
             }
@@ -123,8 +123,8 @@ namespace CityBuddy
             {
                 Leader = _settings["Leader"].AsBool() ? DynelManager.LocalPlayer.Identity : new Identity(IdentityType.SimpleChar, sender);
             }
-             Toggle = true;
-            _settings["Toggle"] = true;
+            Enable = true;
+            _settings["Enable"] = true;
 
             Chat.WriteLine("CityBuddy enabled.");
 
@@ -134,8 +134,8 @@ namespace CityBuddy
 
         private void OnStopMessage(int sender, IPCMessage msg)
         {
-            _settings["Toggle"] = false;
-            Toggle = false;
+            _settings["Enable"] = false;
+            Enable = false;
 
             Chat.WriteLine("CityBuddy disabled.");
 
@@ -144,7 +144,7 @@ namespace CityBuddy
 
             NavMeshMovementController.Halt();
             MovementController.Instance.Halt();
-            
+
         }
 
         private void EnterMessage(int sender, IPCMessage msg)
@@ -161,7 +161,6 @@ namespace CityBuddy
             SelectedMemberUpdateMessage message = msg as SelectedMemberUpdateMessage;
             if (message != null)
             {
-                // Find the team member with the received identity and set as selectedMember
                 WaitForShipState.selectedMember = Team.Members.FirstOrDefault(m => m.Identity == message.SelectedMemberIdentity);
             }
         }
@@ -214,15 +213,15 @@ namespace CityBuddy
                     infoView.Clicked = HandleInfoViewClick;
                 }
 
-                if (!_settings["Toggle"].AsBool() && Toggle)
+                if (!_settings["Enable"].AsBool() && Enable)
                 {
                     IPCChannel.Broadcast(new StopMessage());
-                    Toggle = false;
+                    Enable = false;
                 }
-                if (_settings["Toggle"].AsBool() && !Toggle)
+                if (_settings["Enable"].AsBool() && !Enable)
                 {
                     IPCChannel.Broadcast(new StartMessage());
-                    Toggle = true;
+                    Enable = true;
                 }
             }
             #endregion
@@ -284,24 +283,26 @@ namespace CityBuddy
             return false;
         }
 
+
+
         private void CityBuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Toggle"].AsBool())
+                    if (!_settings["Enable"].AsBool())
                     {
-                        _settings["Toggle"] = true;
-                        Toggle = true;
+                        _settings["Enable"] = true;
+                        Enable = true;
                         IPCChannel.Broadcast(new StartMessage());
                         Chat.WriteLine("CityBuddy enabled.");
 
                     }
                     else
                     {
-                        _settings["Toggle"] = false;
-                        Toggle = false;
+                        _settings["Enable"] = false;
+                        Enable = false;
                         IPCChannel.Broadcast(new StopMessage());
                         Chat.WriteLine("CityBuddy disabled.");
                         NavMeshMovementController.Halt();

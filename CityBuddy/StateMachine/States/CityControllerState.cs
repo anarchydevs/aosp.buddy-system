@@ -17,7 +17,7 @@ namespace CityBuddy
 
         public IState GetNextState()
         {
-            if (!CityBuddy._settings["Toggle"].AsBool())
+            if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
 
             if (CityController.CloakState != CloakStatus.Unknown && CityController.Charge >= 0.5f

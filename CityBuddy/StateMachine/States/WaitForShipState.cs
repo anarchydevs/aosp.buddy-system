@@ -19,7 +19,7 @@ namespace CityBuddy
 
         public IState GetNextState()
         {
-            if (!CityBuddy._settings["Toggle"].AsBool())
+            if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
 
             shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
