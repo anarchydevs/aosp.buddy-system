@@ -75,7 +75,7 @@ namespace CityBuddy
 
                 if (_corpse != null)
                 {
-                    if (!_atCorpse && DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 2)
+                    if (!_atCorpse && DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 4)
                     {
                         MovementController.Instance.SetDestination(_corpse.Position);
 
@@ -92,8 +92,6 @@ namespace CityBuddy
                                 //Chat.WriteLine("Done looting");
                                 _initCorpse = true;
                             });
-
-                        
                     }
                 }
 

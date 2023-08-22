@@ -84,8 +84,8 @@ namespace CityBuddy
                  .Where(c => c.Health > 0 && !CityBuddy._ignores.Contains(c.Name) && c.IsInLineOfSight)
                  .OrderByDescending(c => c.Name.Contains("Fighter Pilot"))
                  .ThenByDescending(c => c.Name.Contains("Alien Reproduction Technician"))
-                 .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-                 .ThenBy(c => c.HealthPercent)
+                 .ThenByDescending(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+                 .ThenByDescending(c => c.HealthPercent)
                  .FirstOrDefault();
 
                Corpse _corpse = DynelManager.Corpses
