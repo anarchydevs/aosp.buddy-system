@@ -12,7 +12,6 @@ namespace CityBuddy
 {
     public class CityAttackState : IState
     {
-
         private SimpleChar _target;
         private Dynel shipentrance;
 
@@ -91,13 +90,13 @@ namespace CityBuddy
 
                 if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
                 {
-                    if (_target != null && _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
+                    if (_target != null && _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
                     {
                         MovementController.Instance.SetDestination(_target.Position);
                     }
                     else if (_corpse != null && _target == null && CityBuddy._settings["Corpses"].AsBool())
                     {
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5)
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5f)
                         {
                             MovementController.Instance.SetDestination(_corpse.Position);
                         }
@@ -148,7 +147,7 @@ namespace CityBuddy
                 || DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return;
 
-            CityBuddy.NavMeshMovementController.SetNavMeshDestination(CityBuddy._leaderPos);
+            MovementController.Instance.SetDestination(CityBuddy._leaderPos);
         }
     }
 }

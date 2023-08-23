@@ -364,9 +364,10 @@ namespace CityBuddy
 
             if (groupMsg.MessageType != GroupMessageType.Org) { return; }
 
-            if (groupMsg.Text.Contains("Your city in Montroyal has been targeted by hostile forces"))
+            if (groupMsg.Text.Contains("has been targeted by hostile forces"))
             {
                 Chat.WriteLine("City is under attack!");
+
                 CityUnderAttack = true;
             }
         }
