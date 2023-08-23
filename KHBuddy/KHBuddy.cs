@@ -555,7 +555,7 @@ namespace KHBuddy
                 if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
                     DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                 {
-                    if (DynelManager.LocalPlayer.NanoPercent < 90 || DynelManager.LocalPlayer.HealthPercent < 90)
+                    if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
                     {
                         NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
                     }
