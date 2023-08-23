@@ -26,8 +26,8 @@ namespace KHBuddy
 
         public IState GetNextState()
         {
-            if (Time.NormalTime - KHBuddy._stateTimeOut > 1300f
-                && DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
+            //if (Time.NormalTime - KHBuddy._stateTimeOut > 1300f
+                if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician && !Team.IsInTeam)
             {
                 KHBuddy._settings["Toggle"] = false;
                 Chat.WriteLine("Turning off bot, Idle for too long.");
@@ -170,7 +170,7 @@ namespace KHBuddy
 
                     if (_hecksAtPosBeach.Count >= 1)
                     {
-                        if (DynelManager.LocalPlayer.FightingTarget == null && !KHBuddy.Sitting  &&
+                        if (DynelManager.LocalPlayer.FightingTarget == null && DynelManager.LocalPlayer.MovementState != MovementState.Sit &&
                             (DynelManager.LocalPlayer.NanoPercent >= 31 || DynelManager.LocalPlayer.HealthPercent >= 66))
                         {
                             DynelManager.LocalPlayer.Attack(_hecksAtPosBeach.FirstOrDefault());
@@ -198,7 +198,7 @@ namespace KHBuddy
 
                     if (_hecksAtPosWest.Count >= 1)
                     {
-                        if (DynelManager.LocalPlayer.FightingTarget == null && !KHBuddy.Sitting  &&
+                        if (DynelManager.LocalPlayer.FightingTarget == null && DynelManager.LocalPlayer.MovementState != MovementState.Sit &&
                             (DynelManager.LocalPlayer.NanoPercent >= 31 || DynelManager.LocalPlayer.HealthPercent >= 66))
                         {
                             DynelManager.LocalPlayer.Attack(_hecksAtPosWest.FirstOrDefault());
@@ -225,7 +225,7 @@ namespace KHBuddy
 
                     if (_hecksAtPosEast.Count >= 1)
                     {
-                        if (DynelManager.LocalPlayer.FightingTarget == null && !KHBuddy.Sitting  &&
+                        if (DynelManager.LocalPlayer.FightingTarget == null && DynelManager.LocalPlayer.MovementState != MovementState.Sit &&
                             (DynelManager.LocalPlayer.NanoPercent >= 31 || DynelManager.LocalPlayer.HealthPercent >= 66))
                         {
                             DynelManager.LocalPlayer.Attack(_hecksAtPosEast.FirstOrDefault());

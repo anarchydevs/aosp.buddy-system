@@ -22,6 +22,10 @@ namespace CityBuddy
                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                .FirstOrDefault();
 
+            _target = DynelManager.NPCs.Where(c => c.Health > 0 && c.DistanceFrom(DynelManager.LocalPlayer) < 40f)
+                   .OrderByDescending(c => c.Name.Contains("Hacker"))
+                   .FirstOrDefault();
+
             if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
 
@@ -37,7 +41,10 @@ namespace CityBuddy
             {
                 CityBuddy.CityUnderAttack = false;
 
-                return new BossLootState(); 
+                if (!CityBuddy.CityUnderAttack && _target == null)
+                {
+                    return new BossLootState();
+                } 
             }
 
             return null;

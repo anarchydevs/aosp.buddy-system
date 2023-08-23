@@ -16,6 +16,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using SmokeLounge.AOtomation.Messaging.GameData;
 
 namespace CityBuddy
 {
@@ -98,6 +99,8 @@ namespace CityBuddy
 
                 Game.OnUpdate += OnUpdate;
                 Network.ChatMessageReceived += CityAttackStatus;
+
+                //Network.N3MessageReceived += Network_N3MessageReceived;
             }
             catch (Exception ex)
             {
@@ -369,6 +372,22 @@ namespace CityBuddy
                 Chat.WriteLine("City is under attack!");
 
                 CityUnderAttack = true;
+            }
+        }
+        private void Network_N3MessageReceived(object s, SmokeLounge.AOtomation.Messaging.Messages.N3Message n3Msg)
+        {
+            if (n3Msg.N3MessageType != N3MessageType.AOTransportSignal)
+                return;
+
+            AOTransportSignalMessage sigMsg = (AOTransportSignalMessage)n3Msg;
+
+            if (sigMsg.Action == AOSignalAction.CityInfo)
+            {
+                var cityInfo = (CityInfo)(sigMsg.TransportSignalMessage);
+                //Chat.WriteLine(cityInfo.Unknown1);// 1763334
+                Chat.WriteLine(cityInfo.Unknown2);// 2
+                //Chat.WriteLine(cityInfo.Unknown3);// 3
+                
             }
         }
 
