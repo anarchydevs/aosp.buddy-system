@@ -17,8 +17,8 @@ namespace CityBuddy
 
         private static Corpse _corpse;
 
-        public static bool _initCorpse = false;
-        public static bool _atCorpse = false;
+        public bool _initCorpse = false;
+        public bool _atCorpse = false;
 
         public IState GetNextState()
         {
@@ -75,11 +75,16 @@ namespace CityBuddy
 
                 if (_corpse != null)
                 {
-                    if (!_atCorpse && DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 4)
+                    if (!_atCorpse)
                     {
-                        MovementController.Instance.SetDestination(_corpse.Position);
-
-                        _atCorpse = true;
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) < 2)
+                        {
+                            _atCorpse = true;
+                        }
+                        else
+                        {
+                            MovementController.Instance.SetDestination(_corpse.Position);
+                        }
                     }
 
                     if (!_initCorpse && _atCorpse)
@@ -95,7 +100,7 @@ namespace CityBuddy
                     }
                 }
 
-                if (_corpse == null)
+                else //if (_corpse == null)
                 {
 
                     _initCorpse = true;

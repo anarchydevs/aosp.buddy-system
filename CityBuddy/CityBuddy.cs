@@ -364,7 +364,7 @@ namespace CityBuddy
 
             if (groupMsg.MessageType != GroupMessageType.Org) { return; }
 
-            if (groupMsg.Text.Contains("has been targeted by hostile forces"))
+            if (groupMsg.Text.Contains("Wave counter started."))
             {
                 Chat.WriteLine("City is under attack!");
 

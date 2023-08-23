@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace CityBuddy
 {
@@ -78,14 +79,15 @@ namespace CityBuddy
 
                 _boss = DynelManager.NPCs
                  .Where(c => c.Health > 0 && c.Name.Contains("Fleet Admiral") || c.Name.Contains("Recruitment Director"))
-                 .FirstOrDefault();
+                .FirstOrDefault();
+
+                SimpleChar _pilot = DynelManager.NPCs.Where(c => c.Health > 0 && c.Name.Contains("Fighter Pilot") 
+                || c.Name.Contains("Alien Reproduction Technician")).FirstOrDefault();
 
                 _target = DynelManager.NPCs
                  .Where(c => c.Health > 0 && !CityBuddy._ignores.Contains(c.Name) && c.IsInLineOfSight)
-                 .OrderByDescending(c => c.Name.Contains("Fighter Pilot"))
-                 .ThenByDescending(c => c.Name.Contains("Alien Reproduction Technician"))
-                 .ThenByDescending(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-                 .ThenByDescending(c => c.HealthPercent)
+                 .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+                 .OrderBy(c => c.HealthPercent)
                  .FirstOrDefault();
 
                Corpse _corpse = DynelManager.Corpses
@@ -93,7 +95,20 @@ namespace CityBuddy
                    .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                    .FirstOrDefault();
 
-                if (_target != null)
+                if (_pilot != null)
+                {
+                    if (_pilot.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 10f)
+                    {
+                        if (DynelManager.LocalPlayer.FightingTarget == null
+                            && !DynelManager.LocalPlayer.IsAttacking
+                            && !DynelManager.LocalPlayer.IsAttackPending
+                            && _pilot.IsInLineOfSight)
+                        {
+                            DynelManager.LocalPlayer.Attack(_pilot);
+                        }
+                    }
+                }
+                else if (_target != null)
                 {
                     if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 10f)
                     {
@@ -111,19 +126,19 @@ namespace CityBuddy
                 {
                     if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
                     {
-                        if (_target != null)
+                        if (_pilot != null)
                         {
-                            if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
+                            if (_pilot.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
+                            {
+                                CityBuddy.NavMeshMovementController.SetNavMeshDestination(_pilot.Position);
+                            }
+                        }
+                        else if (_target != null)
+                        {
+                            if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
                             {
                                 CityBuddy.NavMeshMovementController.SetNavMeshDestination(_target.Position);
                             } 
-                        }
-                        if (_boss != null)
-                        {
-                            if (_boss.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
-                            {
-                                CityBuddy.NavMeshMovementController.SetNavMeshDestination(_boss.Position);
-                            }
                         }
                         else if (_target == null && _corpse != null && CityBuddy._settings["Corpses"].AsBool())
                         {
@@ -132,15 +147,22 @@ namespace CityBuddy
                                 CityBuddy.NavMeshMovementController.SetNavMeshDestination(_corpse.Position);
                             }
                         }
-                    }
+                        else if (_boss != null)
+                        {
+                            if (_boss.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
+                            {
+                                CityBuddy.NavMeshMovementController.SetNavMeshDestination(_boss.Position);
+                            }
+                        }
+                    }  
+                }
 
-                    if (DynelManager.LocalPlayer.Identity != CityBuddy.Leader)
-                    {
-                        CityBuddy._leader = GetLeaderCharacter();
+                if (DynelManager.LocalPlayer.Identity != CityBuddy.Leader)
+                {
+                    CityBuddy._leader = GetLeaderCharacter();
 
-                        if (CityBuddy._leader != null)
-                            PathToLeader();
-                    }
+                    if (CityBuddy._leader != null)
+                        PathToLeader();
                 }
             }
             catch (Exception ex)

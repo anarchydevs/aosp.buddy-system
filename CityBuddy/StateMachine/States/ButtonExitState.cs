@@ -24,8 +24,23 @@ namespace CityBuddy
 
         public IState GetNextState()
         {
-            if (!CityBuddy._settings["Enable"].AsBool() || !Playfield.IsDungeon)
+            if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
+
+            if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity
+                    || Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands
+                    || Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
+            {
+                if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
+                {
+
+                    return new CityControllerState();
+                }
+                else
+                {
+                    return new CityAttackState();
+                }
+            }
 
             return null;
         }
