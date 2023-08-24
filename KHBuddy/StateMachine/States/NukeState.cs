@@ -150,98 +150,6 @@ namespace KHBuddy
         {
             try
             {
-                _hecksAtPos = DynelManager.NPCs
-                    .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
-                        && x.DistanceFrom(DynelManager.LocalPlayer) <= 10f
-                        && x.IsAlive && x.IsInLineOfSight
-                        && !x.IsMoving
-                        && x.FightingTarget != null)
-                    .ToList();
-
-                //if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
-                //{
-                //    if (KHBuddy.SideSelection.Beach == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32())
-                //    {
-                //        List<SimpleChar> _hecksAtPosBeach = DynelManager.NPCs
-                //                .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
-                //                    && x.DistanceFrom(DynelManager.LocalPlayer) <= 43f
-                //                    && x.IsAlive && x.IsInLineOfSight && x.IsAttacking
-                //                    && !x.IsMoving
-                //                    && x.FightingTarget.Identity != DynelManager.LocalPlayer.Identity
-                //                    && x.Position.DistanceFrom(new Vector3(901.9f, 4.4f, 299.6f)) < 10f)
-                //                .ToList();
-
-                //        if (_hecksAtPosBeach.Count >= 1)
-                //        {
-                //            if (DynelManager.LocalPlayer.FightingTarget == null && DynelManager.LocalPlayer.MovementState != MovementState.Sit &&
-                //                (DynelManager.LocalPlayer.NanoPercent >= 31 || DynelManager.LocalPlayer.HealthPercent >= 66))
-                //            {
-                //                DynelManager.LocalPlayer.Attack(_hecksAtPosBeach.FirstOrDefault());
-                //                KHBuddy._stateTimeOut = Time.NormalTime;
-                //            }
-                //            if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
-                //            {
-                //                DynelManager.LocalPlayer.StopAttack();
-                //            }
-                //        }
-                //    }
-
-                //    if (KHBuddy.SideSelection.West == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32()
-                //        || KHBuddy.SideSelection.EastAndWest == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32())
-                //    {
-                //        List<SimpleChar> _hecksAtPosWest = DynelManager.NPCs
-                //                .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
-                //                    && x.DistanceFrom(DynelManager.LocalPlayer) <= 60f
-                //                    && x.IsAlive && x.IsInLineOfSight && x.IsAttacking
-                //                    && !x.IsMoving
-                //                    && x.FightingTarget.Identity != DynelManager.LocalPlayer.Identity
-                //                    && x.Position.DistanceFrom(new Vector3(1043.2f, 1.6f, 1020.5f)) < 10f)
-                //                .ToList();
-
-
-                //        if (_hecksAtPosWest.Count >= 1)
-                //        {
-                //            if (DynelManager.LocalPlayer.FightingTarget == null && DynelManager.LocalPlayer.MovementState != MovementState.Sit &&
-                //                (DynelManager.LocalPlayer.NanoPercent >= 31 || DynelManager.LocalPlayer.HealthPercent >= 66))
-                //            {
-                //                DynelManager.LocalPlayer.Attack(_hecksAtPosWest.FirstOrDefault());
-                //                KHBuddy._stateTimeOut = Time.NormalTime;
-                //            }
-                //            if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
-                //            {
-                //                DynelManager.LocalPlayer.StopAttack();
-                //            }
-                //        }
-                //    }
-
-                //    if (KHBuddy.SideSelection.East == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32()
-                //        || KHBuddy.SideSelection.EastAndWest == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32())
-                //    {
-                //        List<SimpleChar> _hecksAtPosEast = DynelManager.NPCs
-                //                .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
-                //                    && x.DistanceFrom(DynelManager.LocalPlayer) <= 60f
-                //                    && x.IsAlive && x.IsInLineOfSight && x.IsAttacking
-                //                    && !x.IsMoving
-                //                    && x.FightingTarget.Identity != DynelManager.LocalPlayer.Identity
-                //                    && x.Position.DistanceFrom(new Vector3(1115.9f, 1.6f, 1064.3f)) < 10f)
-                //                .ToList();
-
-                //        if (_hecksAtPosEast.Count >= 1)
-                //        {
-                //            if (DynelManager.LocalPlayer.FightingTarget == null && DynelManager.LocalPlayer.MovementState != MovementState.Sit &&
-                //                (DynelManager.LocalPlayer.NanoPercent >= 31 || DynelManager.LocalPlayer.HealthPercent >= 66))
-                //            {
-                //                DynelManager.LocalPlayer.Attack(_hecksAtPosEast.FirstOrDefault());
-                //                KHBuddy._stateTimeOut = Time.NormalTime;
-                //            }
-                //            if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
-                //            {
-                //                DynelManager.LocalPlayer.StopAttack();
-                //            }
-                //        }
-                //    }
-                //}
-
                 if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
                 {
                     List<Vector3> positions = new List<Vector3>
@@ -286,6 +194,14 @@ namespace KHBuddy
 
                 if (DynelManager.LocalPlayer.Profession == Profession.Enforcer)
                 {
+                    _hecksAtPos = DynelManager.NPCs
+                   .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
+                       && x.DistanceFrom(DynelManager.LocalPlayer) <= 10f
+                       && x.IsAlive && x.IsInLineOfSight
+                       && !x.IsMoving
+                       && x.FightingTarget != null)
+                   .ToList();
+
                     Spell.Find(270786, out Spell mongobuff);
 
                     if (_hecksAtPos.Count >= 1)
