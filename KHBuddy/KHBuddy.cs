@@ -42,8 +42,9 @@ namespace KHBuddy
         public static bool _doingEast = false;
         public static bool _doingWest = false;
         public static bool _started = false;
+
         public static bool _init = false;
-        //public static bool Sitting = false;
+        public static bool NeedsKit = false;
 
         public static bool Beach = false;
         public static bool East = false;
@@ -79,8 +80,6 @@ namespace KHBuddy
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
-                //Chat.RegisterCommand("buddy", KHBuddyCommand);
-
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Toggle", false);
@@ -113,7 +112,6 @@ namespace KHBuddy
         {
             IPCChannel.SetChannelId(Convert.ToByte(e));
 
-            ////TODO: Change in config so it saves when needed to - interface name -> INotifyPropertyChanged
             Config.Save();
         }
 
@@ -512,8 +510,42 @@ namespace KHBuddy
             }
         }
 
-        private bool CanUseSitKit()
+        private void ListenerSit()
         {
+            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
+
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+
+            if (kit == null && spell == null)
+            {
+                return;
+            }
+
+            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            {
+                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
+                        DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                {
+                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                    {
+                        MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
+                    }
+                }
+            }
+
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                NeedsKit = false;
+
+               MovementController.Instance.SetMovement(MovementAction.LeaveSit);
+            }
+        }
+
+    
+
+    private bool CanUseSitKit()
+        {
+
             if (Inventory.Find(297274, out Item premSitKit))
                 if (DynelManager.LocalPlayer.Health > 0 && DynelManager.LocalPlayer.GetStat(Stat.NumFightingOpponents) == 0
                                     && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
@@ -537,157 +569,6 @@ namespace KHBuddy
             return false;
         }
 
-        private void ListenerSit()
-        {
-            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
-
-            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-
-            if (kit == null || spell == null)
-            {
-                return;
-            }
-            if (DynelManager.LocalPlayer.IsAttacking)
-                DynelManager.LocalPlayer.StopAttack();
-
-            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
-            {
-                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
-                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
-                {
-                    if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
-                    {
-                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                    }
-                }
-            }
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
-            {
-                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-
-            }
-        }
-
-        //private void KHBuddyCommand(string command, string[] param, ChatWindow chatWindow)
-        //{
-        //    try
-        //    {
-        //        if (param.Length < 1)
-        //        {
-        //            if (!KHBuddySettings["West"].AsBool() && !KHBuddySettings["East"].AsBool()
-        //                && !KHBuddySettings["Beach"].AsBool())
-        //            {
-        //                KHBuddySettings["West"] = false;
-        //                KHBuddySettings["East"] = false;
-        //                KHBuddySettings["Beach"] = false;
-        //                KHBuddySettings["BothSides"] = false;
-
-        //                Chat.WriteLine($"Can only toggle one mode.");
-        //                return;
-        //            }
-
-        //            if (KHBuddySettings["West"].AsBool() && KHBuddySettings["Beach"].AsBool()
-        //                || (KHBuddySettings["East"].AsBool() && KHBuddySettings["Beach"].AsBool()))
-        //            {
-        //                KHBuddySettings["West"] = false;
-        //                KHBuddySettings["East"] = false;
-        //                KHBuddySettings["Beach"] = false;
-        //                KHBuddySettings["BothSides"] = false;
-
-        //                Chat.WriteLine($"Can only toggle one mode.");
-        //                return;
-        //            }
-
-        //            if (!KHBuddySettings["Toggle"].AsBool() && !_started)
-        //            {
-        //                if (KHBuddySettings["West"].AsBool() && KHBuddySettings["East"].AsBool()
-        //                    && !KHBuddySettings["Beach"].AsBool())
-        //                {
-        //                    IsLeader = true;
-        //                    Leader = DynelManager.LocalPlayer.Identity;
-
-        //                    KHBuddySettings["BothSides"] = true;
-
-        //                    if (DynelManager.LocalPlayer.Identity == Leader)
-        //                    {
-        //                        if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1115.9f, 1.6f, 1064.3f)) < 5f) // East
-        //                        {
-        //                            KHBuddySettings["West"] = false;
-
-        //                            IPCChannel.Broadcast(new StartModeMessage()
-        //                            {
-        //                                West = KHBuddySettings["West"].AsBool(),
-        //                                East = KHBuddySettings["East"].AsBool(),
-        //                                Beach = KHBuddySettings["Beach"].AsBool(),
-        //                                BothSides = KHBuddySettings["BothSides"].AsBool()
-        //                            });
-        //                        }
-
-        //                        if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1043.2f, 1.6f, 1021.1f)) < 5f) // West
-        //                        {
-        //                            KHBuddySettings["East"] = false;
-
-        //                            IPCChannel.Broadcast(new StartModeMessage()
-        //                            {
-        //                                West = KHBuddySettings["West"].AsBool(),
-        //                                East = KHBuddySettings["East"].AsBool(),
-        //                                Beach = KHBuddySettings["Beach"].AsBool(),
-        //                                BothSides = KHBuddySettings["BothSides"].AsBool()
-        //                            });
-        //                        }
-        //                    }
-        //                    Start();
-        //                    Chat.WriteLine("Starting");
-        //                    return;
-        //                }
-        //                else
-        //                {
-        //                    IsLeader = true;
-        //                    Leader = DynelManager.LocalPlayer.Identity;
-
-        //                    KHBuddySettings["BothSides"] = false;
-
-        //                    if (DynelManager.LocalPlayer.Identity == Leader)
-        //                    {
-        //                        IPCChannel.Broadcast(new StartModeMessage()
-        //                        {
-        //                            West = KHBuddySettings["West"].AsBool(),
-        //                            East = KHBuddySettings["East"].AsBool(),
-        //                            Beach = KHBuddySettings["Beach"].AsBool(),
-        //                            BothSides = KHBuddySettings["BothSides"].AsBool()
-        //                        });
-        //                    }
-        //                    Start();
-        //                    Chat.WriteLine("Starting");
-        //                    return;
-        //                }
-        //            }
-        //            else if (KHBuddySettings["Toggle"].AsBool() && _started)
-        //            {
-        //                if (DynelManager.LocalPlayer.Identity == Leader)
-        //                {
-        //                    IPCChannel.Broadcast(new StopModeMessage()
-        //                    {
-        //                        West = KHBuddySettings["West"].AsBool(),
-        //                        East = KHBuddySettings["East"].AsBool(),
-        //                        Beach = KHBuddySettings["Beach"].AsBool(),
-        //                        BothSides = KHBuddySettings["BothSides"].AsBool()
-        //                    });
-        //                }
-
-        //                Stop();
-        //                Chat.WriteLine("Stopping");
-        //                return;
-        //            }
-        //        }
-        //        Config.Save();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Chat.WriteLine(e.Message);
-        //    }
-        //}
-
         public enum SideSelection
         {
             Beach, East, West, EastAndWest
@@ -696,7 +577,7 @@ namespace KHBuddy
         public static class RelevantItems
         {
             public static readonly int[] Kits = {
-                297274, 293297, 293296, 291084, 291083, 291082, 292256
+                297274, 293296, 291084, 291083, 291082
             };
         }
 
