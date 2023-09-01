@@ -143,10 +143,6 @@ namespace CityBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            //if (Leader == Identity.None && DynelManager.LocalPlayer.Identity.Instance != sender)
-            //{
-            //    Leader = _settings["Leader"].AsBool() ? DynelManager.LocalPlayer.Identity : new Identity(IdentityType.SimpleChar, sender);
-            //}
             Enable = true;
             _settings["Enable"] = true;
 
