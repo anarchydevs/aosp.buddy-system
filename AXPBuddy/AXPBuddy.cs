@@ -15,6 +15,7 @@ using AOSharp.Common.GameData.UI;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace AXPBuddy
 {
@@ -30,6 +31,8 @@ namespace AXPBuddy
         public static SimpleChar _leader;
         public static Vector3 _leaderPos = Vector3.Zero;
         public static Vector3 _ourPos = Vector3.Zero;
+
+        private Stopwatch _kitTimer = new Stopwatch();
 
         public static float Tick = 0;
 
@@ -211,7 +214,7 @@ namespace AXPBuddy
                 if (Game.IsZoning || Time.NormalTime < _lastZonedTime + 2f) { return; }
 
 
-                ListenerSit();
+                SitAndUseKit();
 
 
                 #region UI Update
@@ -286,7 +289,7 @@ namespace AXPBuddy
             _lastZonedTime = Time.NormalTime;
         }
 
-        private void ListenerSit()
+        private void SitAndUseKit()
         {
             Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
 
@@ -304,21 +307,37 @@ namespace AXPBuddy
                 {
                     if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
                     {
-                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
+                        // Switch to sitting
+                        MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
                     }
                 }
             }
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
+           && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
             {
-                if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                // If the Stopwatch hasn't been started or 2 seconds have elapsed
+                if (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000)
                 {
-                    kit.Use();
+                    if (DynelManager.LocalPlayer.NanoPercent < 90 || DynelManager.LocalPlayer.HealthPercent < 90)
+                    {
+                        // Use the kit
+                        kit.Use(DynelManager.LocalPlayer, true);
+
+                        // Reset and start the Stopwatch
+                        _kitTimer.Restart();
+                    }
                 }
             }
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
-            {
-                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
 
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
+            && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                if (DynelManager.LocalPlayer.NanoPercent > 66 || DynelManager.LocalPlayer.HealthPercent > 66)
+                {
+                    // Leave sitting if treatment cooldown is active
+                    MovementController.Instance.SetMovement(MovementAction.LeaveSit);
+                }
             }
         }
 
