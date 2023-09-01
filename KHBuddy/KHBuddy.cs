@@ -516,7 +516,7 @@ namespace KHBuddy
 
             Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
 
-            if (kit == null && spell == null)
+            if (kit == null || spell == null)
             {
                 return;
             }
@@ -524,26 +524,31 @@ namespace KHBuddy
             if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
             {
                 if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
-                        DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
                 {
                     if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
                     {
-                        MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
+                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
                     }
                 }
             }
-
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                {
+                    kit.Use();
+                }
+            }
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
             {
-                NeedsKit = false;
+                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
 
-               MovementController.Instance.SetMovement(MovementAction.LeaveSit);
             }
         }
 
-    
 
-    private bool CanUseSitKit()
+
+        private bool CanUseSitKit()
         {
 
             if (Inventory.Find(297274, out Item premSitKit))

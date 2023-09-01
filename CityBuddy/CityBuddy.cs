@@ -95,7 +95,7 @@ namespace CityBuddy
 
                 _settings["Enable"] = false;
 
-               Chat.RegisterCommand("buddy", CityBuddyCommand);
+                Chat.RegisterCommand("buddy", CityBuddyCommand);
 
                 Game.OnUpdate += OnUpdate;
                 Network.ChatMessageReceived += CityAttackStatus;
@@ -259,6 +259,13 @@ namespace CityBuddy
                     }
                 }
             }
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                {
+                    kit.Use();
+                }
+            }
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
             {
                 NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
@@ -386,8 +393,8 @@ namespace CityBuddy
                 var cityInfo = (CityInfo)(sigMsg.TransportSignalMessage);
                 //Chat.WriteLine(cityInfo.Unknown1);// 1763334
                 Chat.WriteLine(cityInfo.Unknown2);// 2
-                //Chat.WriteLine(cityInfo.Unknown3);// 3
-                
+                                                  //Chat.WriteLine(cityInfo.Unknown3);// 3
+
             }
         }
 

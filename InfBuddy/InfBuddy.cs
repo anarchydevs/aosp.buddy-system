@@ -51,9 +51,7 @@ namespace InfBuddy
         public static Identity Leader = Identity.None;
 
         public static bool DoubleReward = false;
-        private static bool _initSit = false;
 
-        private static double _sitUpdateTimer;
         public static double _stateTimeOut;
 
         private string previousErrorMessage = string.Empty;
@@ -251,12 +249,7 @@ namespace InfBuddy
 
             Selections();
 
-            if (Time.NormalTime > _sitUpdateTimer + 1.5)
-            {
-                ListenerSit();
-
-                _sitUpdateTimer = Time.NormalTime;
-            }
+            ListenerSit();
 
             if (Leader == Identity.None)
             {
@@ -418,6 +411,42 @@ namespace InfBuddy
             Config.Save();
         }
 
+        private void ListenerSit()
+        {
+            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
+
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+
+            if (kit == null || spell == null)
+            {
+                return;
+            }
+
+            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            {
+                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
+                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                {
+                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                    {
+                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
+                    }
+                }
+            }
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                {
+                    kit.Use();
+                }
+            }
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+
+            }
+        }
+
         private bool CanUseSitKit()
         {
             if (Inventory.Find(297274, out Item premSitKit))
@@ -441,35 +470,6 @@ namespace InfBuddy
             }
 
             return false;
-        }
-
-        private void ListenerSit()
-        {
-            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
-
-            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-
-            if (kit == null || spell == null)
-            {
-                return;
-            }
-
-            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
-            {
-                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
-                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
-                {
-                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
-                    {
-                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                    }
-                }
-            }
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
-            {
-                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-
-            }
         }
 
         private void NpcDialog_AnswerListChanged(object s, Dictionary<int, string> options)
