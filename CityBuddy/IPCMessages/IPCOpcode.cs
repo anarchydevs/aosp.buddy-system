@@ -6,6 +6,7 @@
         Stop = 1002,
         Enter = 1003,
         SelectedMemberUpdate = 1004,
-        ClearSelectedMember = 1005
+        ClearSelectedMember = 1005,
+        Leader = 1006
     }
 }

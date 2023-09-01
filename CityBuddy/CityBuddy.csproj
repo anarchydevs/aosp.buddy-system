@@ -96,6 +96,7 @@
     <Compile Include="IPCMessages\ClearSelectedMemberMessage.cs" />
     <Compile Include="IPCMessages\EnterMessage.cs" />
     <Compile Include="IPCMessages\IPCOpcode.cs" />
+    <Compile Include="IPCMessages\LeaderMessage.cs" />
     <Compile Include="IPCMessages\SelectedMemberUpdateMessage.cs" />
     <Compile Include="IPCMessages\StartMessage.cs" />
     <Compile Include="IPCMessages\StopMessage.cs" />

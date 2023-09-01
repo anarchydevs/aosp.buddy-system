@@ -82,6 +82,7 @@ namespace CityBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.Enter, EnterMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.SelectedMemberUpdate, HandleSelectedMemberUpdate);
                 IPCChannel.RegisterCallback((int)IPCOpcode.ClearSelectedMember, HandleClearSelectedMember);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Leader, HandleBroadcastLeader);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -93,7 +94,6 @@ namespace CityBuddy
                 _stateMachine = new StateMachine(new IdleState());
 
                 _settings.AddVariable("Enable", false);
-                _settings.AddVariable("Leader", false);
                 _settings.AddVariable("Corpses", false);
 
                 _settings["Enable"] = false;
@@ -104,6 +104,19 @@ namespace CityBuddy
                 Network.ChatMessageReceived += CityAttackStatus;
 
                 Network.N3MessageReceived += Network_N3MessageReceived;
+
+                SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
+
+                if (teamLeader != null && teamLeader.Identity == DynelManager.LocalPlayer.Identity)
+                {
+                    if (Leader != teamLeader.Identity)
+                    {
+                        Leader = teamLeader.Identity;
+                        LeaderMessage leaderMessage = new LeaderMessage { Leader = Leader };
+                        IPCChannel.Broadcast(leaderMessage);
+                    }
+                }
+
             }
             catch (Exception ex)
             {
@@ -130,10 +143,10 @@ namespace CityBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            if (Leader == Identity.None && DynelManager.LocalPlayer.Identity.Instance != sender)
-            {
-                Leader = _settings["Leader"].AsBool() ? DynelManager.LocalPlayer.Identity : new Identity(IdentityType.SimpleChar, sender);
-            }
+            //if (Leader == Identity.None && DynelManager.LocalPlayer.Identity.Instance != sender)
+            //{
+            //    Leader = _settings["Leader"].AsBool() ? DynelManager.LocalPlayer.Identity : new Identity(IdentityType.SimpleChar, sender);
+            //}
             Enable = true;
             _settings["Enable"] = true;
 
@@ -178,6 +191,15 @@ namespace CityBuddy
         private void HandleClearSelectedMember(int sender, IPCMessage msg)
         {
             WaitForShipState.selectedMember = null;
+        }
+
+        private void HandleBroadcastLeader(int sender, IPCMessage msg)
+        {
+            LeaderMessage message = msg as LeaderMessage;
+            if (message != null)
+            {
+                Leader = message.Leader;
+            }
         }
 
         private void HandleInfoViewClick(object s, ButtonBase button)
