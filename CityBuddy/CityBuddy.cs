@@ -15,8 +15,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using SmokeLounge.AOtomation.Messaging.GameData;
+using System.Diagnostics;
 
 namespace CityBuddy
 {
@@ -30,6 +30,8 @@ namespace CityBuddy
 
         public static bool Enable = false;
         public static bool CityUnderAttack = false;
+
+        private Stopwatch _kitTimer = new Stopwatch();
 
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
@@ -58,7 +60,6 @@ namespace CityBuddy
         {
             "Alien Coccoon"
         };
-
 
         public static string previousErrorMessage = string.Empty;
 
@@ -201,7 +202,7 @@ namespace CityBuddy
                 Leader = teamLeader?.Identity ?? Identity.None;
             }
 
-            ListenerSit();
+            SitAndUseKit();
 
             #region UI
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
@@ -239,7 +240,7 @@ namespace CityBuddy
             _stateMachine.Tick();
         }
 
-        private void ListenerSit()
+        private void SitAndUseKit()
         {
             Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
 
@@ -257,31 +258,47 @@ namespace CityBuddy
                 {
                     if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
                     {
-                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
+                        // Switch to sitting
+                        MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
                     }
                 }
             }
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
+            && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
             {
-                if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                // If the Stopwatch hasn't been started or 2 seconds have elapsed
+                if (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000)
                 {
-                    kit.Use();
+                    if (DynelManager.LocalPlayer.NanoPercent < 90 || DynelManager.LocalPlayer.HealthPercent < 90)
+                    {
+                        // Use the kit
+                        kit.Use(DynelManager.LocalPlayer, true);
+
+                        // Reset and start the Stopwatch
+                        _kitTimer.Restart();
+                    }
                 }
             }
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
-            {
-                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
 
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
+            && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                if (DynelManager.LocalPlayer.NanoPercent > 66 || DynelManager.LocalPlayer.HealthPercent > 66)
+                {
+                    // Leave sitting if treatment cooldown is active
+                    MovementController.Instance.SetMovement(MovementAction.LeaveSit);
+                }
             }
         }
 
         private bool CanUseSitKit()
         {
             if (Inventory.Find(297274, out Item premSitKit))
-                if (DynelManager.LocalPlayer.Health > 0 && !CityBuddy.InCombat()
+                if (DynelManager.LocalPlayer.Health > 0 && !InCombat()
                                     && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
 
-            if (DynelManager.LocalPlayer.Health > 0 && !CityBuddy.InCombat()
+            if (DynelManager.LocalPlayer.Health > 0 && !InCombat()
                     && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
             {
                 List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();

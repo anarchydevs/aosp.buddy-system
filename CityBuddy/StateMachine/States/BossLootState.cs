@@ -5,6 +5,7 @@ using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -16,6 +17,8 @@ namespace CityBuddy
         private Dynel _downButton;
 
         private static Corpse _corpse;
+
+        private Stopwatch _lootTimer;
 
         public bool _initCorpse = false;
         public bool _atCorpse = false;
@@ -86,18 +89,30 @@ namespace CityBuddy
                             MovementController.Instance.SetDestination(_corpse.Position);
                         }
                     }
-
                     if (!_initCorpse && _atCorpse)
                     {
-                        //Chat.WriteLine("Pause for looting, 30 sec");
-                        Task.Factory.StartNew(
-                            async () =>
-                            {
-                                await Task.Delay(30000);
-                                //Chat.WriteLine("Done looting");
-                                _initCorpse = true;
-                            });
+                        // Initialize the Stopwatch the first time you get to the corpse
+                        if (_lootTimer == null)
+                        {
+                            _lootTimer = Stopwatch.StartNew();
+                            //Chat.WriteLine("Pause for looting, 30 sec");
+                        }
+
+                        // Check the elapsed time
+                        if (_lootTimer.ElapsedMilliseconds >= 30000)
+                        {
+                            // Reset and stop the Stopwatch
+                            _lootTimer.Reset();
+
+                            //Chat.WriteLine("Done looting");
+                            _initCorpse = true;
+
+                            // Dispose of the Stopwatch if you don't need it anymore
+                            _lootTimer = null;
+                        }
                     }
+
+                    
                 }
 
                 else //if (_corpse == null)
