@@ -62,6 +62,8 @@ namespace CityBuddy
 
         public static string previousErrorMessage = string.Empty;
 
+        List<int> seenValues = new List<int>();
+
         public override void Run(string pluginDir)
         {
             try
@@ -100,7 +102,7 @@ namespace CityBuddy
                 Game.OnUpdate += OnUpdate;
                 Network.ChatMessageReceived += CityAttackStatus;
 
-                //Network.N3MessageReceived += Network_N3MessageReceived;
+                Network.N3MessageReceived += Network_N3MessageReceived;
             }
             catch (Exception ex)
             {
@@ -391,10 +393,24 @@ namespace CityBuddy
             if (sigMsg.Action == AOSignalAction.CityInfo)
             {
                 var cityInfo = (CityInfo)(sigMsg.TransportSignalMessage);
-                //Chat.WriteLine(cityInfo.Unknown1);// 1763334
-                Chat.WriteLine(cityInfo.Unknown2);// 2
-                                                  //Chat.WriteLine(cityInfo.Unknown3);// 3
 
+                if (!seenValues.Contains(cityInfo.Unknown1))
+                {
+                    seenValues.Add(cityInfo.Unknown1);
+                    Chat.WriteLine($"Unknown1: {cityInfo.Unknown1}"); // Example output: "Unknown1: 1763334"
+                }
+
+                if (!seenValues.Contains(cityInfo.Unknown2))
+                {
+                    seenValues.Add(cityInfo.Unknown2);
+                    Chat.WriteLine($"Unknown2: {cityInfo.Unknown2}"); // Example output: "Unknown2: 2"
+                }
+
+                if (!seenValues.Contains(cityInfo.Unknown3))
+                {
+                    seenValues.Add(cityInfo.Unknown3);
+                    Chat.WriteLine($"Unknown3: {cityInfo.Unknown3}"); // Example output: "Unknown3: 3"
+                }
             }
         }
 
