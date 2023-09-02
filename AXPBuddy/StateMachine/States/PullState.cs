@@ -100,7 +100,7 @@ namespace AXPBuddy
                                 if (DynelManager.LocalPlayer.FightingTarget == null
                                    && !DynelManager.LocalPlayer.IsAttacking
                                    && !DynelManager.LocalPlayer.IsAttackPending
-                                   && _target.IsInLineOfSight)
+                                   && targetMob.IsInLineOfSight)
                                 {
                                     DynelManager.LocalPlayer.Attack(targetMob);
                                 }
@@ -139,7 +139,7 @@ namespace AXPBuddy
                                     if (DynelManager.LocalPlayer.FightingTarget == null
                                    && !DynelManager.LocalPlayer.IsAttacking
                                    && !DynelManager.LocalPlayer.IsAttackPending
-                                   && _target.IsInLineOfSight)
+                                   && mob.IsInLineOfSight)
                                     {
                                         DynelManager.LocalPlayer.Attack(mob);
                                     }
