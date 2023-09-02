@@ -88,6 +88,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="AXPBuddy.cs" />
     <Compile Include="IPCMessages\IPCOpcode.cs" />
+    <Compile Include="IPCMessages\LeaderMessage.cs" />
     <Compile Include="IPCMessages\StartMessage.cs" />
     <Compile Include="IPCMessages\StopMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -101,6 +102,7 @@
     <Compile Include="StateMachine\States\PathState.cs" />
     <Compile Include="StateMachine\States\PullState.cs" />
     <Compile Include="StateMachine\States\ReformState.cs" />
+    <Compile Include="StateMachine\States\SitState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -64,15 +64,9 @@ namespace AXPBuddy
                             AppendSettingsTab(settingsName, settingsWindow);
 
                             settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
-                            settingsWindow.FindView("LeaderBox", out TextInputView leaderInput);
-                            settingsWindow.FindView("TickBox", out TextInputView tickInput);
 
                             if (channelInput != null)
                                 channelInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel}";
-                            if (leaderInput != null)
-                                leaderInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].Leader}";
-                            if (tickInput != null)
-                                tickInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].Tick}";
                         }
                     }
                     catch (Exception e)

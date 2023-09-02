@@ -31,6 +31,7 @@ namespace CityBuddy
                     return new PathState();
                 }
             }
+
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
                 return new SitState();
 

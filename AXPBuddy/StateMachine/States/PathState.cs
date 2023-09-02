@@ -15,9 +15,6 @@ namespace AXPBuddy
 
         public IState GetNextState()
         {
-            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f)
-                return null;
-
             if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
                 return new DiedState();
 
@@ -41,7 +38,7 @@ namespace AXPBuddy
         {
             try
             {
-                if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f)
+                if (Game.IsZoning)
                     return;
 
                 if (Team.IsInTeam && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) <= 10f
@@ -95,7 +92,9 @@ namespace AXPBuddy
                             if (targetMob != null)
                             {
                                 if (DynelManager.LocalPlayer.FightingTarget == null
-                                    && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                                   && !DynelManager.LocalPlayer.IsAttacking
+                                   && !DynelManager.LocalPlayer.IsAttackPending
+                                   && _target.IsInLineOfSight)
                                 {
                                     DynelManager.LocalPlayer.Attack(targetMob);
                                 }
@@ -125,7 +124,9 @@ namespace AXPBuddy
                                 AXPBuddy.NavMeshMovementController.Halt();
 
                                 if (DynelManager.LocalPlayer.FightingTarget == null
-                                        && !DynelManager.LocalPlayer.IsAttacking)
+                                   && !DynelManager.LocalPlayer.IsAttacking
+                                   && !DynelManager.LocalPlayer.IsAttackPending
+                                   && _target.IsInLineOfSight)
                                 {
                                     DynelManager.LocalPlayer.Attack(mob);
                                 }

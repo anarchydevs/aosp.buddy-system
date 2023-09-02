@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
@@ -13,14 +12,13 @@ namespace AXPBuddy
     {
         public IState GetNextState()
         {
-            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return null; }
-
-            if (AXPBuddy._settings["Toggle"].AsBool() && Team.IsInTeam && Team.IsRaid)
+            if (AXPBuddy._settings["Toggle"].AsBool() && Team.IsRaid)
             {
                 if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
                 {
                     return new EnterSectorState();
                 }
+
                 if (Playfield.ModelIdentity.Instance == Constants.S13Id)
                 {
                     switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
@@ -33,7 +31,7 @@ namespace AXPBuddy
                             break;
 
                         case AXPBuddy.ModeSelection.Path:
-                            if ( AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                            if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
                             {
                                 return new PathState();
                             }
@@ -52,12 +50,15 @@ namespace AXPBuddy
                     return new DiedState();
             }
 
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                return new SitState();
+
             return null;
         }
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("IdleState::OnStateEnter");
+            Chat.WriteLine("Idle");
         }
 
         public void OnStateExit()
@@ -67,7 +68,7 @@ namespace AXPBuddy
 
         public void Tick()
         {
-            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return; }
+           
         }
     }
 }

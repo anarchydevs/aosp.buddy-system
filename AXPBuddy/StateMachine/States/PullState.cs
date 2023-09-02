@@ -98,7 +98,9 @@ namespace AXPBuddy
                             if (targetMob != null)
                             {
                                 if (DynelManager.LocalPlayer.FightingTarget == null
-                                    && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                                   && !DynelManager.LocalPlayer.IsAttacking
+                                   && !DynelManager.LocalPlayer.IsAttackPending
+                                   && _target.IsInLineOfSight)
                                 {
                                     DynelManager.LocalPlayer.Attack(targetMob);
                                 }
@@ -135,7 +137,9 @@ namespace AXPBuddy
                                 if (mob.IsInAttackRange())
                                 {
                                     if (DynelManager.LocalPlayer.FightingTarget == null
-                                            && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                                   && !DynelManager.LocalPlayer.IsAttacking
+                                   && !DynelManager.LocalPlayer.IsAttackPending
+                                   && _target.IsInLineOfSight)
                                     {
                                         DynelManager.LocalPlayer.Attack(mob);
                                     }

@@ -61,19 +61,22 @@ namespace AXPBuddy
             try
             {
                 _settings = new Settings("AXPBuddy");
+
                 PluginDir = pluginDir;
 
                 Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\AXPBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
+               
                 NavMeshMovementController = new NavMeshMovementController($"{pluginDir}\\NavMeshes", true);
+
                 MovementController.Set(NavMeshMovementController);
+
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Leader, HandleBroadcastLeader);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
-                Config.CharSettings[DynelManager.LocalPlayer.Name].LeaderChangedEvent += Leader_Changed;
-                Config.CharSettings[DynelManager.LocalPlayer.Name].TickChangedEvent += Tick_Changed;
 
                 Chat.RegisterCommand("buddy", AXPBuddyCommand);
 
@@ -82,7 +85,7 @@ namespace AXPBuddy
                 _stateMachine = new StateMachine(new IdleState());
 
                 Game.OnUpdate += OnUpdate;
-                Game.TeleportEnded += OnEndZoned;
+                Team.TeamRequest += OnTeamRequest;
 
                 _settings.AddVariable("ModeSelection", (int)ModeSelection.Path);
 
@@ -94,8 +97,18 @@ namespace AXPBuddy
                 Chat.WriteLine("AXPBuddy Loaded!");
                 Chat.WriteLine("/axpbuddy for settings.");
 
-                LeaderName = Config.CharSettings[DynelManager.LocalPlayer.Name].Leader;
-                Tick = Config.CharSettings[DynelManager.LocalPlayer.Name].Tick;
+                SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
+
+                if (teamLeader != null && teamLeader.Identity == DynelManager.LocalPlayer.Identity)
+                {
+                    if (Leader != teamLeader.Identity)
+                    {
+                        Leader = teamLeader.Identity;
+                        LeaderMessage leaderMessage = new LeaderMessage { Leader = Leader };
+                        IPCChannel.Broadcast(leaderMessage);
+                    }
+                }
+
             }
             catch (Exception ex)
             {
@@ -121,18 +134,6 @@ namespace AXPBuddy
             Config.Save();
         }
 
-        public static void Leader_Changed(object s, string e)
-        {
-            Config.CharSettings[DynelManager.LocalPlayer.Name].Leader = e;
-            LeaderName = e;
-            Config.Save();
-        }
-        public static void Tick_Changed(object s, float e)
-        {
-            Config.CharSettings[DynelManager.LocalPlayer.Name].Tick = e;
-            Tick = e;
-            Config.Save();
-        }
         private void Start()
         {
             Toggle = true;
@@ -160,9 +161,6 @@ namespace AXPBuddy
 
         private void OnStartMessage(int sender, IPCMessage msg)
         {
-            if (!_settings["Merge"].AsBool() && Leader == Identity.None)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
-
             if (DynelManager.LocalPlayer.Identity == Leader || _settings["Merge"].AsBool())
                 return;
 
@@ -177,9 +175,6 @@ namespace AXPBuddy
 
         private void OnStopMessage(int sender, IPCMessage msg)
         {
-            if (Leader == Identity.None)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
-
             if (DynelManager.LocalPlayer.Identity == Leader || _settings["Merge"].AsBool())
                 return;
 
@@ -197,6 +192,15 @@ namespace AXPBuddy
                 _stateMachine.SetState(new IdleState());
         }
 
+        private void HandleBroadcastLeader(int sender, IPCMessage msg)
+        {
+            LeaderMessage message = msg as LeaderMessage;
+            if (message != null)
+            {
+                Leader = message.Leader;
+            }
+        }
+
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
             _infoWindow = Window.CreateFromXml("Info", PluginDir + "\\UI\\AXPBuddyInfoView.xml",
@@ -211,36 +215,20 @@ namespace AXPBuddy
         {
             try
             {
-                if (Game.IsZoning || Time.NormalTime < _lastZonedTime + 2f) { return; }
-
+                if (Game.IsZoning) { return; }
 
                 SitAndUseKit();
-
 
                 #region UI Update
 
                 if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
                 {
                     SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
-                    SettingsController.settingsWindow.FindView("LeaderBox", out TextInputView leaderInput);
-                    SettingsController.settingsWindow.FindView("TickBox", out TextInputView tickInput);
 
                     if (channelInput != null && !string.IsNullOrEmpty(channelInput.Text))
                         if (int.TryParse(channelInput.Text, out int channelValue)
                             && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                             Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
-                    if (tickInput != null && !string.IsNullOrEmpty(tickInput.Text))
-                        if (float.TryParse(tickInput.Text, out float tickValue)
-                            && Config.CharSettings[DynelManager.LocalPlayer.Name].Tick != tickValue)
-                            Config.CharSettings[DynelManager.LocalPlayer.Name].Tick = tickValue;
-
-                    if (leaderInput != null && !string.IsNullOrEmpty(leaderInput.Text))
-                    {
-                        if (Config.CharSettings[DynelManager.LocalPlayer.Name].Leader != leaderInput.Text)
-                        {
-                            Config.CharSettings[DynelManager.LocalPlayer.Name].Leader = leaderInput.Text;
-                        }
-                    }
 
                     if (SettingsController.settingsWindow.FindView("AXPBuddyInfoView", out Button infoView))
                     {
@@ -248,12 +236,8 @@ namespace AXPBuddy
                         infoView.Clicked = HandleInfoViewClick;
                     }
 
-
                     if (_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        if (!_settings["Merge"].AsBool() && Leader == Identity.None)
-                            Leader = DynelManager.LocalPlayer.Identity;
-
                         if (DynelManager.LocalPlayer.Identity == Leader)
                             IPCChannel.Broadcast(new StartMessage());
 
@@ -268,9 +252,12 @@ namespace AXPBuddy
                             IPCChannel.Broadcast(new StopMessage());
                     }
                 }
+
+                #endregion
+
+                _stateMachine.Tick();
             }
 
-            #endregion
             catch (Exception ex)
             {
                 var errorMessage = "An error occurred on line " + AXPBuddy.GetLineNumber(ex) + ": " + ex.Message;
@@ -282,11 +269,6 @@ namespace AXPBuddy
                     previousErrorMessage = errorMessage;
                 }
             }
-        }
-
-        private void OnEndZoned(object s, EventArgs e)
-        {
-            _lastZonedTime = Time.NormalTime;
         }
 
         private void SitAndUseKit()
@@ -366,6 +348,12 @@ namespace AXPBuddy
             return false;
         }
 
+        private void OnTeamRequest(object sender, TeamRequestEventArgs e)
+        {
+            // Set the leader to the sender of the team request
+            Leader = e.Requester;
+        }
+
         private void AXPBuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
@@ -374,9 +362,6 @@ namespace AXPBuddy
                 {
                     if (!_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        if (!_settings["Merge"].AsBool() && Leader == Identity.None)
-                            Leader = DynelManager.LocalPlayer.Identity;
-
                         if (DynelManager.LocalPlayer.Identity == Leader)
                             IPCChannel.Broadcast(new StartMessage());
 
@@ -413,9 +398,7 @@ namespace AXPBuddy
 
         public static class RelevantItems
         {
-            public static readonly int[] Kits = {
-                297274, 293296, 291084, 291083, 291082
-            };
+            public static readonly int[] Kits = { 297274, 293296, 291084, 291083, 291082 };
         }
         public static int GetLineNumber(Exception ex)
         {
