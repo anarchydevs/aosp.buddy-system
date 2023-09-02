@@ -30,16 +30,18 @@ namespace AttackBuddy
         public IState GetNextState()
         {
 
-            if (!AttackBuddy._settings["Enable"].AsBool())
+            if (AttackBuddy._settings["Enable"].AsBool())
+            {
+                if (Extensions.IsNull(_target))
+                //|| (Time.NormalTime > _fightStartTime + _fightTimeout && _target?.MaxHealth <= 999999))
+                {
+                    _target = null;
+                    return new ScanState();
+                }
+            }
+            else
             {
                 return new IdleState();
-            }
-
-            if (Extensions.IsNull(_target))
-            //|| (Time.NormalTime > _fightStartTime + _fightTimeout && _target?.MaxHealth <= 999999))
-            {
-                _target = null;
-                return new ScanState();
             }
 
             return null;

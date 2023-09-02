@@ -20,14 +20,16 @@ namespace AttackBuddy
         public IState GetNextState()
         {
 
-            if (!AttackBuddy._settings["Enable"].AsBool())
+            if (AttackBuddy._settings["Enable"].AsBool())
+            {
+                if (_target != null)
+                {
+                    return new FightState(_target);
+                }
+            }
+            else
             {
                 return new IdleState();
-            }
-
-            if (_target != null)
-            {
-                return new FightState(_target);
             }
 
             return null;

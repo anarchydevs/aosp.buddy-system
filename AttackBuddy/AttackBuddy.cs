@@ -155,8 +155,8 @@ namespace AttackBuddy
             if (!(_stateMachine.CurrentState is IdleState))
                 _stateMachine.SetState(new IdleState());
 
-            if (DynelManager.LocalPlayer.IsAttacking)
-                DynelManager.LocalPlayer.StopAttack();
+            //if (DynelManager.LocalPlayer.IsAttacking)
+            //    DynelManager.LocalPlayer.StopAttack();
         }
 
         private void OnStartMessage(int sender, IPCMessage msg)
