@@ -431,12 +431,6 @@ namespace CityBuddy
             {
                 var cityInfo = (CityInfo)(sigMsg.TransportSignalMessage);
 
-                if (!seenValues.Contains(cityInfo.Unknown1))
-                {
-                    seenValues.Add(cityInfo.Unknown1);
-                    Chat.WriteLine($"Unknown1: {cityInfo.Unknown1}"); // Example output: "Unknown1: 1763334"
-                }
-
                 if (!seenValues.Contains(cityInfo.Unknown2))
                 {
                     seenValues.Add(cityInfo.Unknown2);
