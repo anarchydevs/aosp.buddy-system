@@ -105,7 +105,7 @@ namespace CityBuddy
                 Game.OnUpdate += OnUpdate;
                 Network.ChatMessageReceived += CityAttackStatus;
 
-                Network.N3MessageReceived += Network_N3MessageReceived;
+                //Network.N3MessageReceived += Network_N3MessageReceived;
 
                 SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
 
