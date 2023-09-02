@@ -57,6 +57,16 @@ namespace CityBuddy
                 MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos);
             }
 
+            if (Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands)
+            {
+                MovementController.Instance.SetDestination(CityBuddy._serenityGaurdPos);
+            }
+
+            if (Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
+            {
+                MovementController.Instance.SetDestination(CityBuddy._playadelGaurdPos);
+            }
+
             //Chat.WriteLine("City state");
         }
 
@@ -119,6 +129,16 @@ namespace CityBuddy
                         {
                             if (DynelManager.LocalPlayer.Position.Distance2DFrom(CityBuddy._montroyalGaurdPos) > 10)
                             { MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos); }
+                        }
+                        if (Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands)
+                        {
+                            if (DynelManager.LocalPlayer.Position.Distance2DFrom(CityBuddy._serenityGaurdPos) > 10)
+                            { MovementController.Instance.SetDestination(CityBuddy._serenityGaurdPos); }
+                        }
+                        if (Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
+                        {
+                            if (DynelManager.LocalPlayer.Position.Distance2DFrom(CityBuddy._playadelGaurdPos) > 10)
+                            { MovementController.Instance.SetDestination(CityBuddy._playadelGaurdPos); }
                         }
                     }
                 }
