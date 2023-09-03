@@ -43,7 +43,7 @@ namespace CityBuddy
         public void Tick()
         {
             double currentTime = Time.NormalTime;
-            if (currentTime < _lastActionTime + 3) // 3 second delay
+            if (currentTime < _lastActionTime + 10) // 10 second delay
             {
                 return;
             }
@@ -90,7 +90,7 @@ namespace CityBuddy
                 {
                     CityController.ToggleCloak();
                 }
-                if (CityController.CloakState == CloakStatus.Disabled && CityController.Charge > 0.75f)
+                if (CityController.CloakState == CloakStatus.Disabled)
                 {
                     CityController.ToggleCloak();
                 }
