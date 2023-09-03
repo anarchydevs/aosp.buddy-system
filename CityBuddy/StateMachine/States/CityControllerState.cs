@@ -72,6 +72,10 @@ namespace CityBuddy
 
         private void ExecuteCityControllerActions(Dynel cc)
         {
+            Item cru = ControllerRecompilerUnit.Crus
+                    .Select(id => Inventory.Find(id, out var item) ? item : null)
+                    .FirstOrDefault(item => item != null);
+
             if (!CityBuddy.CTWindowIsOpen)
             {
                 Chat.WriteLine("Opening City Controller");
@@ -79,33 +83,36 @@ namespace CityBuddy
             }
             else
             {
-                if (CityController.Charge < 0.60f)
-                {
-                    Item cru = ControllerRecompilerUnit.Crus
-                        .Select(id => Inventory.Find(id, out var item) ? item : null)
-                        .FirstOrDefault(item => item != null);
-
-                    if (cru != null && Time.NormalTime > _lastCruUseTime + 5)
-                    {
-                        Chat.WriteLine("Using Controller Recompiler Unit");
-                        cru.UseOn(cc.Identity);
-                        _lastCruUseTime = Time.NormalTime;
-                    }
-                }
-
                 if (CityController.CanToggleCloak())
                 {
-                    if (CityController.CloakState == CloakStatus.Enabled && CityController.Charge > 0.75f)
+                    if (CityController.CloakState == CloakStatus.Enabled)
                     {
-                        CityController.ToggleCloak();
+                        if (CityController.Charge <= 0.75f)
+                        {
+                            if (cru != null && Time.NormalTime > _lastCruUseTime + 5)
+                            {
+                                Chat.WriteLine("Using Controller Recompiler Unit");
+                                cru.UseOn(cc.Identity);
+                                _lastCruUseTime = Time.NormalTime;
+                            }
+
+                        }
+                        else
+                        {
+                            Chat.WriteLine("Disabling Cloak");
+                            CityController.ToggleCloak();
+                        }
                     }
+
                     if (CityController.CloakState == CloakStatus.Disabled)
                     {
+                        Chat.WriteLine("Enabling Cloak");
                         CityController.ToggleCloak();
                     }
                 }
             }
         }
+        
 
         public static class ControllerRecompilerUnit
         {
