@@ -23,6 +23,8 @@ namespace CityBuddy
         public bool _initCorpse = false;
         public bool _atCorpse = false;
 
+        public static Dictionary<Vector3, Identity> bossCorpseDictionary = new Dictionary<Vector3, Identity>();
+
         public IState GetNextState()
         {
             if (!CityBuddy._settings["Enable"].AsBool())
@@ -75,6 +77,13 @@ namespace CityBuddy
                     || c.Name.Contains("Recruitment Director"))
                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                .FirstOrDefault();
+
+                Corpse _bossCorpse = DynelManager.Corpses
+                    .Where(c => c.Name.Contains("General"))
+               .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+               .FirstOrDefault();
+
+                UpdateBossCorpseDictionary(_bossCorpse);
 
                 if (_corpse != null)
                 {
@@ -135,6 +144,40 @@ namespace CityBuddy
                 }
             }
         }
+        static void UpdateBossCorpseDictionary(Corpse _bossCorpse)
+        {
+            // Check if _bossCorpse is not null
+            if (_bossCorpse != null)
+            {
+                // Check if _bossCorpse is not in the Dictionary
+                if (!bossCorpseDictionary.ContainsKey(_bossCorpse.Position))
+                {
+                    // Add _bossCorpse to Dictionary
+                    bossCorpseDictionary.Add(_bossCorpse.Position, _bossCorpse.Identity);
+                }
+            }
+            else
+            {
+                // Identify and remove entries in the Dictionary that no longer exist
+                List<Vector3> keysToRemove = new List<Vector3>();
 
+                foreach (var pair in bossCorpseDictionary)
+                {
+                    // Check if the corpse with this Identity is still in DynelManager.Corpses
+                    bool exists = DynelManager.Corpses.Any(c => c.Identity == pair.Value);
+
+                    if (!exists)
+                    {
+                        keysToRemove.Add(pair.Key);
+                    }
+                }
+
+                // Remove keys
+                foreach (var key in keysToRemove)
+                {
+                    bossCorpseDictionary.Remove(key);
+                }
+            }
+        }
     }
 }

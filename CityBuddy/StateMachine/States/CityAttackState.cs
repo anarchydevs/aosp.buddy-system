@@ -7,6 +7,7 @@ using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
 using SmokeLounge.AOtomation.Messaging.Messages;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace CityBuddy
 {
@@ -37,15 +38,29 @@ namespace CityBuddy
                 return new CityControllerState();
             }
 
-            if (_bossCorpse != null) 
+            if (_bossCorpse != null)
             {
                 CityBuddy.CityUnderAttack = false;
 
-                if (!CityBuddy.CityUnderAttack && _target == null)
+                // Check if the corpse is new (not in the dictionary)
+                if (!CityBuddy.CityUnderAttack && _target == null && !BossLootState.bossCorpseDictionary.ContainsKey(_bossCorpse.Position))
                 {
+                    
+                   // BossLootState.bossCorpseDictionary.Add(_bossCorpse.Position, _bossCorpse.Identity);
+
                     return new BossLootState();
-                } 
+                }
             }
+
+            //if (_bossCorpse != null) 
+            //{
+            //    CityBuddy.CityUnderAttack = false;
+
+            //    if (!CityBuddy.CityUnderAttack && _target == null)
+            //    {
+            //        return new BossLootState();
+            //    } 
+            //}
 
             return null;
         }
