@@ -7,6 +7,8 @@ using System;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+using SmokeLounge.AOtomation.Messaging.Messages;
 
 namespace CityBuddy
 {
@@ -32,11 +34,13 @@ namespace CityBuddy
 
         public void OnStateEnter()
         {
+            CityBuddy.CTWindowIsOpen = false;
             Chat.WriteLine("Checking city controller.");
         }
 
         public void OnStateExit()
         {
+            CityBuddy.CTWindowIsOpen = false;
             //Chat.WriteLine("Exiting city controller state.");
         }
 
@@ -68,31 +72,37 @@ namespace CityBuddy
 
         private void ExecuteCityControllerActions(Dynel cc)
         {
-            CityController.Use();
-
-            if (CityController.Charge < 0.60f)
+            if (!CityBuddy.CTWindowIsOpen)
             {
-                Item cru = ControllerRecompilerUnit.Crus
-                    .Select(id => Inventory.Find(id, out var item) ? item : null)
-                    .FirstOrDefault(item => item != null);
-
-                if (cru != null && Time.NormalTime > _lastCruUseTime + 5)
-                {
-                    Chat.WriteLine("Using Controller Recompiler Unit");
-                    cru.UseOn(cc.Identity);
-                    _lastCruUseTime = Time.NormalTime;
-                }
+                Chat.WriteLine("Opening City Controller");
+                CityController.Use();
             }
-
-            if (CityController.CanToggleCloak())
+            else
             {
-                if (CityController.CloakState == CloakStatus.Enabled && CityController.Charge > 0.75f)
+                if (CityController.Charge < 0.60f)
                 {
-                    CityController.ToggleCloak();
+                    Item cru = ControllerRecompilerUnit.Crus
+                        .Select(id => Inventory.Find(id, out var item) ? item : null)
+                        .FirstOrDefault(item => item != null);
+
+                    if (cru != null && Time.NormalTime > _lastCruUseTime + 5)
+                    {
+                        Chat.WriteLine("Using Controller Recompiler Unit");
+                        cru.UseOn(cc.Identity);
+                        _lastCruUseTime = Time.NormalTime;
+                    }
                 }
-                if (CityController.CloakState == CloakStatus.Disabled)
+
+                if (CityController.CanToggleCloak())
                 {
-                    CityController.ToggleCloak();
+                    if (CityController.CloakState == CloakStatus.Enabled && CityController.Charge > 0.75f)
+                    {
+                        CityController.ToggleCloak();
+                    }
+                    if (CityController.CloakState == CloakStatus.Disabled)
+                    {
+                        CityController.ToggleCloak();
+                    }
                 }
             }
         }

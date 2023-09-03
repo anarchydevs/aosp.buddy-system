@@ -30,8 +30,10 @@ namespace CityBuddy
 
         public static bool Enable = false;
         public static bool CityUnderAttack = false;
+        public static bool CTWindowIsOpen = false;
 
         private Stopwatch _kitTimer = new Stopwatch();
+        private Stopwatch _sitTimer = new Stopwatch();
 
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
@@ -106,6 +108,7 @@ namespace CityBuddy
                 Network.ChatMessageReceived += CityAttackStatus;
 
                 //Network.N3MessageReceived += Network_N3MessageReceived;
+                Network.N3MessageReceived += CTWindowIsOpenBool;
 
                 SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
 
@@ -302,13 +305,11 @@ namespace CityBuddy
             }
 
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-            && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+           && (DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) || !_sitTimer.IsRunning
+           || _sitTimer.ElapsedMilliseconds >= 10000))
             {
-                if (DynelManager.LocalPlayer.NanoPercent > 66 || DynelManager.LocalPlayer.HealthPercent > 66)
-                {
-                    // Leave sitting if treatment cooldown is active
-                    MovementController.Instance.SetMovement(MovementAction.LeaveSit);
-                }
+                MovementController.Instance.SetMovement(MovementAction.LeaveSit);
+                _sitTimer.Restart();
             }
         }
 
@@ -441,6 +442,25 @@ namespace CityBuddy
                 {
                     seenValues.Add(cityInfo.Unknown3);
                     Chat.WriteLine($"Unknown3: {cityInfo.Unknown3}"); // Example output: "Unknown3: 3"
+                }
+            }
+        }
+
+        private void CTWindowIsOpenBool(object s, SmokeLounge.AOtomation.Messaging.Messages.N3Message n3Msg)
+        {
+            if (n3Msg.N3MessageType != N3MessageType.AOTransportSignal)
+                return;
+
+            AOTransportSignalMessage sigMsg = (AOTransportSignalMessage)n3Msg;
+
+            if (sigMsg.Action == AOSignalAction.CityInfo)
+            {
+                var cityInfo = (CityInfo)(sigMsg.TransportSignalMessage);
+
+                // If Unknown1 has any number, it means the City Controller is open
+                if (cityInfo.Unknown1 != 0)
+                {
+                    CTWindowIsOpen = true;
                 }
             }
         }
