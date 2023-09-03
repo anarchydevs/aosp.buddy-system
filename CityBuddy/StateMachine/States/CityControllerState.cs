@@ -106,8 +106,22 @@ namespace CityBuddy
 
                     if (CityController.CloakState == CloakStatus.Disabled)
                     {
-                        Chat.WriteLine("Enabling Cloak");
-                        CityController.ToggleCloak();
+                        if (CityController.Charge <= 0.75f)
+                        {
+                            if (cru != null && Time.NormalTime > _lastCruUseTime + 5)
+                            {
+                                Chat.WriteLine("Using Controller Recompiler Unit");
+                                cru.UseOn(cc.Identity);
+                                _lastCruUseTime = Time.NormalTime;
+                            }
+
+                        }
+                        else
+                        {
+                            Chat.WriteLine("Enabling Cloak");
+                            CityController.ToggleCloak();
+                        }
+                           
                     }
                 }
             }
