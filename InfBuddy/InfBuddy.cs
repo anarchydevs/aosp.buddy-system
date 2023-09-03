@@ -27,6 +27,7 @@ namespace InfBuddy
         public static Config Config { get; private set; }
 
         private Stopwatch _kitTimer = new Stopwatch();
+        private Stopwatch _sitTimer = new Stopwatch();
 
         private static string InfBuddyFaction;
         private static string InfBuddyDifficulty;
@@ -441,28 +442,24 @@ namespace InfBuddy
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
            && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
             {
-                // If the Stopwatch hasn't been started or 2 seconds have elapsed
+                
                 if (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000)
                 {
                     if (DynelManager.LocalPlayer.NanoPercent < 90 || DynelManager.LocalPlayer.HealthPercent < 90)
                     {
-                        // Use the kit
                         kit.Use(DynelManager.LocalPlayer, true);
 
-                        // Reset and start the Stopwatch
                         _kitTimer.Restart();
                     }
                 }
             }
 
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-            && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            && (DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) || !_sitTimer.IsRunning 
+            || _sitTimer.ElapsedMilliseconds >= 10000))
             {
-                if (DynelManager.LocalPlayer.NanoPercent > 66 || DynelManager.LocalPlayer.HealthPercent > 66)
-                {
-                    // Leave sitting if treatment cooldown is active
-                    MovementController.Instance.SetMovement(MovementAction.LeaveSit);
-                }
+                MovementController.Instance.SetMovement(MovementAction.LeaveSit);
+                _sitTimer.Restart();
             }
         }
 
