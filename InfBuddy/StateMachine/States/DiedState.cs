@@ -71,16 +71,24 @@ namespace InfBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
             {
-                if (InfBuddy.ModeSelection.Leech == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                    return new LeechState();
-
-                if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                    return new RoamState();
-
-                if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                if (InfBuddy._settings["Leech"].AsBool())
                 {
-                    Constants.DefendPos = new Vector3(165.6f, 2.2f, 186.4f);
-                    return new DefendSpiritState();
+                    return new LeechState();
+                }
+
+                else
+                {
+                    if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                    {
+
+                        return new RoamState();
+                    }
+
+                    if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                    {
+                        Constants.DefendPos = new Vector3(165.6f, 2.2f, 186.4f);
+                        return new DefendSpiritState();
+                    }
                 }
             }
 
