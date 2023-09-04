@@ -13,7 +13,6 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace InfBuddy
 {
@@ -412,7 +411,6 @@ namespace InfBuddy
                     _roamToggled = true;
                     break;
             }
-            Config.Save();
         }
 
         private void SitAndUseKit()

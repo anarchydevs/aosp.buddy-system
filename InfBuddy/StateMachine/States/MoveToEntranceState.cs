@@ -2,8 +2,6 @@
 using AOSharp.Core;
 using AOSharp.Core.UI;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace InfBuddy
 {
@@ -14,7 +12,8 @@ namespace InfBuddy
 
         private static bool _init = false;
 
-        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+        private double _scheduledExecutionTime = 0;
+        private int randomWait = 0;
 
         public IState GetNextState()
         {
@@ -58,28 +57,18 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("MoveToEntranceState::OnStateEnter");
-
             int randomWait = Extensions.Next(_minWait, _maxWait);
 
             if (DynelManager.LocalPlayer.Identity == InfBuddy.Leader)
                 randomWait = 4;
 
-            //Chat.WriteLine($"Idling for {randomWait} seconds..");
-
-            Task.Delay(randomWait * 1000).ContinueWith(x =>
-            {
-                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.EntrancePos);
-                InfBuddy.NavMeshMovementController.AppendDestination(Constants.EntranceFinalPos);
-                InfBuddy._stateTimeOut = Time.NormalTime;
-            }, _cancellationToken.Token);
+            _scheduledExecutionTime = Time.NormalTime + randomWait;
         }
 
         public void OnStateExit()
         {
             //Chat.WriteLine("MoveToEntranceState::OnStateExit");
 
-            _cancellationToken.Cancel();
             _init = false;
         }
 
@@ -87,6 +76,15 @@ namespace InfBuddy
         {
             if (Playfield.ModelIdentity.Instance != Constants.InfernoId
                 || Game.IsZoning || !Team.IsInTeam) { return; }
+
+            if (_scheduledExecutionTime <= Time.NormalTime && !_init)
+            {
+                _init = true;
+                InfBuddy._stateTimeOut = Time.NormalTime;
+
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.EntrancePos);
+                InfBuddy.NavMeshMovementController.AppendDestination(Constants.EntranceFinalPos);
+            }
 
             if (InfBuddy.NavMeshMovementController.IsNavigating
                 && Time.NormalTime > InfBuddy._stateTimeOut + 35f)
