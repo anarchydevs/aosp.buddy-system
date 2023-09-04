@@ -24,29 +24,33 @@ namespace InfBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                if (InfBuddy.ModeSelection.Leech == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                    return new LeechState();
-
-                if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                if (InfBuddy._settings["Leech"].AsBool())
                 {
-                    if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
+                    return new LeechState();
+                }
+                else
+                {
+                    if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                     {
-                        if (Team.Members.Any(c => c.Character != null && c.IsLeader)
-                            || InfBuddy._settings["Merge"].AsBool())
+                        if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
                         {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.QuestStarterPos) < 10f
-                                && Team.Members.Any(c => c.Character != null && c.IsLeader))
-                                return new RoamState();
-                            else if (!InfBuddy.NavMeshMovementController.IsNavigating)
-                                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterPos);
+                            if (Team.Members.Any(c => c.Character != null && c.IsLeader)
+                                || InfBuddy._settings["Merge"].AsBool())
+                            {
+                                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.QuestStarterPos) < 10f
+                                    && Team.Members.Any(c => c.Character != null && c.IsLeader))
+                                    return new RoamState();
+                                else if (!InfBuddy.NavMeshMovementController.IsNavigating)
+                                    InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterPos);
+                            }
                         }
+                        else
+                            return new MoveToQuestStarterState();
                     }
-                    else
+
+                    if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                         return new MoveToQuestStarterState();
                 }
-
-                if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                    return new MoveToQuestStarterState();
             }
 
             //if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)

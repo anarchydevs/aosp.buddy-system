@@ -23,8 +23,8 @@ namespace InfBuddy
                 return new DefendSpiritState();
             }
 
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return new SitState();
+            //if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+            //    return new SitState();
 
             return null;
         }

@@ -76,7 +76,7 @@ namespace InfBuddy
                 _init = true;
                 InfBuddy._stateTimeOut = Time.NormalTime;
 
-                if (InfBuddy.ModeSelection.Leech == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                if (InfBuddy._settings["Leech"].AsBool())
                 {
                     DynelManager.LocalPlayer.Position = Constants.LeechMissionExit;
                     InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitFinalPos);
