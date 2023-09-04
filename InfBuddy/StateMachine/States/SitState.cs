@@ -30,8 +30,8 @@ namespace InfBuddy
 
             
                 if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-                    && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
-                    InfBuddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+                    && DynelManager.LocalPlayer.HealthPercent > 66 && DynelManager.LocalPlayer.NanoPercent > 66)
+                    MovementController.Instance.SetMovement(MovementAction.LeaveSit);
            
             
         }
