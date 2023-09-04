@@ -5,7 +5,6 @@ using AOSharp.Core.UI;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace InfBuddy
 {

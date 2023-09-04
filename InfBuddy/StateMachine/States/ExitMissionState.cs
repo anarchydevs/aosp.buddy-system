@@ -1,15 +1,12 @@
 ﻿using AOSharp.Core;
 using AOSharp.Core.UI;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace InfBuddy
 {
     public class ExitMissionState : IState
     {
         private static bool _init = false;
-
-        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+        private double _scheduledExecutionTime = 0;
 
         public IState GetNextState()
         {
@@ -42,27 +39,12 @@ namespace InfBuddy
             int _time = 0;
 
             if (InfBuddy._settings["DoubleReward"].AsBool() && !InfBuddy.DoubleReward)
-                _time = 1000;
+                _time = 1;
             else
-                _time = 5000;
+                _time = 5;
 
-
-            Task.Delay(_time).ContinueWith(x =>
-            {
-                InfBuddy._stateTimeOut = Time.NormalTime;
-                _init = true;
-
-                if (InfBuddy.ModeSelection.Leech == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                {
-                    DynelManager.LocalPlayer.Position = Constants.LeechMissionExit;
-                    InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitFinalPos);
-                }
-                else
-                {
-                    InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.ExitPos);
-                    InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitFinalPos);
-                }
-            }, _cancellationToken.Token);
+            _scheduledExecutionTime = Time.NormalTime + _time;
+            _init = false;
 
             foreach (Mission mission in Mission.List)
                 if (mission.DisplayName.Contains("The Purification"))
@@ -73,7 +55,6 @@ namespace InfBuddy
         {
             //Chat.WriteLine("ExitMissionState::OnStateExit");
 
-            _cancellationToken.Cancel();
             _init = false;
         }
 
@@ -90,17 +71,34 @@ namespace InfBuddy
                 }
             }
 
-            if (InfBuddy.ModeSelection.Leech != (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
-                && _init
-                && Time.NormalTime > InfBuddy._stateTimeOut + 15f)
+            if (!_init && Time.NormalTime >= _scheduledExecutionTime)
             {
+                _init = true;
                 InfBuddy._stateTimeOut = Time.NormalTime;
 
-                InfBuddy.NavMeshMovementController.Halt();
-                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterBeforePos);
-                InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitPos);
-                InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitFinalPos);
+                if (InfBuddy._settings["Leech"].AsBool())
+                {
+                    DynelManager.LocalPlayer.Position = Constants.LeechMissionExit;
+                    InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitFinalPos);
+                }
+                else
+                {
+                    InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.ExitPos);
+                    InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitFinalPos);
+                }
             }
+
+            //if (InfBuddy.ModeSelection.Leech != (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32()
+            //    && _init
+            //    && Time.NormalTime > InfBuddy._stateTimeOut + 15f)
+            //{
+            //    InfBuddy._stateTimeOut = Time.NormalTime;
+
+            //    InfBuddy.NavMeshMovementController.Halt();
+            //    InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterBeforePos);
+            //    InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitPos);
+            //    InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitFinalPos);
+            //}
         }
     }
 }
