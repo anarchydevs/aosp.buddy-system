@@ -86,7 +86,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("IdleState::OnStateEnter");
+            Chat.WriteLine("IdleState::OnStateEnter");
         }
 
         public void OnStateExit()
