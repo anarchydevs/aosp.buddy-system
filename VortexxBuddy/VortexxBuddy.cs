@@ -10,7 +10,6 @@ using AOSharp.Pathfinding;
 using VortexxBuddy.IPCMessages;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Security.Cryptography;
 using System.Collections.Generic;
 using System.Diagnostics;
