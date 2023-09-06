@@ -3,22 +3,19 @@ using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Db1Buddy
 {
     public class FarmingState : IState
     {
         public static bool _initCorpse = false;
-
+        private static double _timeToDisband;
         private static Corpse _mikkelsenCorpse;
 
         public static Vector3 _mikkelsenCorpsePos = Vector3.Zero;
 
         public IState GetNextState()
         {
-            
-
             if (Playfield.ModelIdentity.Instance == Constants.PWId
                 && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) <= 10f)
                 return new ReformState();
@@ -29,13 +26,13 @@ namespace Db1Buddy
         public void OnStateEnter()
         {
             Db1Buddy.MikkelsenCorpse = false;
-            Chat.WriteLine("Pause for looting, 10 sec");
-
+            Chat.WriteLine("Pause for looting, 30 sec");
+            _timeToDisband = Time.NormalTime + 30; // Schedule disband 30 seconds from now
         }
 
         public void OnStateExit()
         {
-
+            // Cleanup actions
         }
 
         public void Tick()
@@ -52,18 +49,14 @@ namespace Db1Buddy
 
             if (!_initCorpse && Team.IsInTeam && Playfield.ModelIdentity.Instance == 6003)
             {
-
-                Task.Factory.StartNew(
-                    async () =>
-                    {
-                        await Task.Delay(10000);
-                        Chat.WriteLine("Done, Disbanding");
-                        Team.Disband();
-                    });
-
-                _initCorpse = true;
+                // Check if it's time to disband
+                if (Time.NormalTime >= _timeToDisband)
+                {
+                    Chat.WriteLine("Done, Disbanding");
+                    Team.Disband();
+                    _initCorpse = true; // Prevent this block from running again
+                }
             }
-
         }
     }
 }

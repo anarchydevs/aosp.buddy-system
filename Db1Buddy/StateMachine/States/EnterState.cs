@@ -5,8 +5,6 @@ using AOSharp.Pathfinding;
 using AOSharp.Common.GameData;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Runtime.InteropServices;
 
@@ -14,13 +12,7 @@ namespace Db1Buddy
 {
     public class EnterState : IState
     {
-
         private static double _time;
-
-        private const int MinWait = 3;
-        private const int MaxWait = 5;
-        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
-        
 
         public IState GetNextState()
         {
@@ -41,17 +33,14 @@ namespace Db1Buddy
             if (Extensions.CanProceed())
             {
                 Chat.WriteLine("Entering");
-
                 _time = Time.NormalTime;
-
             }
         }
 
         public void OnStateExit()
         {
             //Chat.WriteLine("EnterSectorState::OnStateExit");
-
-            _cancellationToken.Cancel();
+            
         }
 
         public void Tick()
@@ -70,7 +59,6 @@ namespace Db1Buddy
                     Db1Buddy.NavMeshMovementController.AppendDestination(new Vector3(2119.3f, 3.2f, 2762.1f));
                 }
             }
-
         }
     }
 }
