@@ -9,7 +9,6 @@ using AOSharp.Core.Movement;
 using DB2Buddy.IPCMessages;
 using AOSharp.Core.Inventory;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
