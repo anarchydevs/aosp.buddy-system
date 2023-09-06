@@ -13,7 +13,6 @@ using System.Data;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Debug = AOSharp.Core.Debug;
 
 namespace KHBuddy
