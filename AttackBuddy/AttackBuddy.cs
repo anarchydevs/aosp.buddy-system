@@ -85,6 +85,7 @@ namespace AttackBuddy
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Enable", false);
+                _settings["Enable"] = false;
                 _settings.AddVariable("Taunt", false);
 
                 Chat.WriteLine("AttackBuddy Loaded!");
