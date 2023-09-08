@@ -88,12 +88,12 @@ namespace AttackBuddy
                     if (validTargetConditions)
                     {
                         DynelManager.LocalPlayer.Attack(_target);
-                        Chat.WriteLine($"Attacking {_target.Name}.");
+                        //Chat.WriteLine($"Attacking {_target.Name}.");
 
-                        if (Targeting.TargetChar != null)
-                        {
-                            Chat.WriteLine($"{Targeting.TargetChar?.Health}");
-                        }
+                        //if (Targeting.TargetChar != null)
+                        //{
+                        //    Chat.WriteLine($"{Targeting.TargetChar?.Health}");
+                        //}
 
                         _fightStartTime = Time.NormalTime;
                     }
@@ -127,7 +127,7 @@ namespace AttackBuddy
                             {
                                 _target = switchTarget;
                                 DynelManager.LocalPlayer.Attack(_target);
-                                Chat.WriteLine($"Switching to _target {_target.Name}.");
+                                //Chat.WriteLine($"Switching to _target {_target.Name}.");
                                 _fightStartTime = Time.NormalTime;
                             }
                         }
@@ -142,7 +142,7 @@ namespace AttackBuddy
                         {
                             _target = switchTarget;
                             DynelManager.LocalPlayer.Attack(_target);
-                            Chat.WriteLine($"Switching to _target {_target.Name}.");
+                            //Chat.WriteLine($"Switching to _target {_target.Name}.");
                             _fightStartTime = Time.NormalTime;
                         }
                     }
