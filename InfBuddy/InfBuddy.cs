@@ -70,9 +70,6 @@ namespace InfBuddy
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel));
 
-                //IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
-                //IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
-
                 IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
                 IPCChannel.RegisterCallback((short)IPCOpcode.ModeSelections, OnModeSelectionsMessage);
 
@@ -158,21 +155,6 @@ namespace InfBuddy
             NavMeshMovementController.Halt();
         }
 
-        //private void OnStartMessage(int sender, IPCMessage msg)
-        //{
-        //    if (!_settings["Merge"].AsBool())
-        //        Leader = new Identity(IdentityType.SimpleChar, sender);
-
-        //    _settings["Toggle"] = true;
-        //    Start();
-        //}
-
-        //private void OnStopMessage(int sender, IPCMessage msg)
-        //{
-        //    _settings["Toggle"] = false;
-        //    Stop();
-        //}
-
         private void OnStartStopMessage(int sender, IPCMessage msg)
         {
             if (msg is StartStopIPCMessage startStopMessage)
@@ -251,20 +233,6 @@ namespace InfBuddy
                         infoView.Tag = SettingsController.settingsWindow;
                         infoView.Clicked = InfoView;
                     }
-
-                    //if (!_settings["Toggle"].AsBool() && Toggle)
-                    //{
-                    //    IPCChannel.Broadcast(new StopMessage());
-                    //    Stop();
-                    //}
-                    //if (_settings["Toggle"].AsBool() && !Toggle)
-                    //{
-                    //    if (!_settings["Merge"].AsBool())
-                    //        Leader = DynelManager.LocalPlayer.Identity;
-
-                    //    IPCChannel.Broadcast(new StartMessage());
-                    //    Start();
-                    //}
 
                     if (!_settings["Toggle"].AsBool() && Toggle)
                     {
@@ -457,33 +425,6 @@ namespace InfBuddy
                 Chat.WriteLine(e.Message);
             }
         }
-
-        //private void InfBuddyCommand(string command, string[] param, ChatWindow chatWindow)
-        //{
-        //    try
-        //    {
-        //        if (param.Length < 1)
-        //        {
-        //            if (!_settings["Toggle"].AsBool() && !Toggle)
-        //            {
-        //                Leader = DynelManager.LocalPlayer.Identity;
-
-        //                IPCChannel.Broadcast(new StartMessage());
-        //                Start();
-        //            }
-        //            else
-        //            {
-        //                IPCChannel.Broadcast(new StopMessage());
-        //                Stop();
-        //            }
-        //        }
-        //        Config.Save();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Chat.WriteLine(e.Message);
-        //    }
-        //}
 
         public enum ModeSelection
         {
