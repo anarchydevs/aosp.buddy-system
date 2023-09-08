@@ -34,9 +34,6 @@ namespace InfBuddy
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
                 return new IdleState();
 
-            //if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-            //    return new SitState();
-
             return null;
         }
 
@@ -64,7 +61,7 @@ namespace InfBuddy
                 InfBuddy._leader = Team.Members
                         .Where(c => c.Character?.Health > 0
                             && c.Character?.IsValid == true
-                            && (c.Identity == InfBuddy.Leader || c.IsLeader))
+                            && c.Identity == InfBuddy.Leader)
                         .FirstOrDefault()?.Character;
 
                 if (InfBuddy._leader != null)

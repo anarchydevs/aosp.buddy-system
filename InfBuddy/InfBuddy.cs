@@ -72,6 +72,7 @@ namespace InfBuddy
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
                 IPCChannel.RegisterCallback((short)IPCOpcode.ModeSelections, OnModeSelectionsMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.LeaderInfo, OnLeaderInfoMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -195,6 +196,23 @@ namespace InfBuddy
                 //Chat.WriteLine($"Received Mode: {currentMode}, Faction: {currentFaction}, Difficulty: {currentDifficulty}");
             }
         }
+        private void OnLeaderInfoMessage(int sender, IPCMessage msg)
+        {
+            if (msg is LeaderInfoIPCMessage leaderInfoMessage)
+            {
+                if (leaderInfoMessage.IsRequest)
+                {
+                    if (Leader != Identity.None)
+                    {
+                        IPCChannel.Broadcast(new LeaderInfoIPCMessage() { LeaderIdentity = Leader, IsRequest = false });
+                    }
+                }
+                else
+                {
+                    Leader = leaderInfoMessage.LeaderIdentity;
+                }
+            }
+        }
 
         private void OnUpdate(object s, float deltaTime)
         {
@@ -206,9 +224,16 @@ namespace InfBuddy
 
             if (Leader == Identity.None)
             {
-                SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
+                if (_settings["Merge"].AsBool())
+                {
+                    SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
 
-                Leader = teamLeader?.Identity ?? Identity.None;
+                    Leader = teamLeader?.Identity ?? Identity.None;
+                }
+                else
+                {
+                    IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
+                }
             }
 
             #region UI

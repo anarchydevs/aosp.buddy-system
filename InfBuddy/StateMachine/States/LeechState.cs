@@ -43,7 +43,7 @@ namespace InfBuddy
         {
             //Chat.WriteLine("LeechState::OnStateExit");
 
-            _missionsLoaded = false;
+            //_missionsLoaded = false;
             DynelManager.LocalPlayer.Position = new Vector3(160.4f, 2.6f, 103.0f);
         }
 
@@ -51,8 +51,8 @@ namespace InfBuddy
         {
             if (Game.IsZoning) { return; }
 
-            if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-                _missionsLoaded = true;
+            //if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+            //    _missionsLoaded = true;
         }
     }
 }
