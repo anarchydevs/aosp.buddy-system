@@ -59,7 +59,7 @@ namespace AXPBuddy
         public void OnStateEnter()
         {
             // Called when entering the state
-            Chat.WriteLine("ReformState::OnStateEnter");
+            Chat.WriteLine("Reforming");
 
             _reformStartedTime = Time.NormalTime;
 
@@ -81,7 +81,7 @@ namespace AXPBuddy
         public void OnStateExit()
         {
             // Called when exiting the state
-            Chat.WriteLine("ReformState::OnStateExit");
+            //Chat.WriteLine("ReformState::OnStateExit");
 
             _invitedList.Clear();
             _teamCache.Clear();
