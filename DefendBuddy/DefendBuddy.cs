@@ -65,7 +65,7 @@ namespace DefendBuddy
                 Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRangeChangedEvent += AttackRange_Changed;
                 Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRangeChangedEvent += ScanRange_Changed;
 
-                Chat.RegisterCommand("buddy", DefendBuddyCommand);
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 SettingsController.RegisterSettingsWindow("DefendBuddy", pluginDir + "\\UI\\DefendBuddySettingWindow.xml", _settings);
 
@@ -385,7 +385,7 @@ namespace DefendBuddy
 
         }
 
-        private void DefendBuddyCommand(string command, string[] param, ChatWindow chatWindow)
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {
