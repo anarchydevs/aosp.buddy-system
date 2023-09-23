@@ -14,40 +14,43 @@ namespace AXPBuddy
         {
             if (AXPBuddy._settings["Toggle"].AsBool() && Team.IsRaid)
             {
-                if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
+                if (AXPBuddy.Ready)
                 {
-                    return new EnterSectorState();
-                }
-
-                if (Playfield.ModelIdentity.Instance == Constants.S13Id)
-                {
-                    switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                    if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
                     {
-                        case AXPBuddy.ModeSelection.Leech:
-                            if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
-                            {
-                                return new LeechState();
-                            }
-                            break;
-
-                        case AXPBuddy.ModeSelection.Path:
-                            if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
-                            {
-                                return new PathState();
-                            }
-                            break;
-
-                        default:
-                            if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
-                            {
-                                return new PullState();
-                            }
-                            break;
+                        return new EnterSectorState();
                     }
-                }
 
-                if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
-                    return new DiedState();
+                    if (Playfield.ModelIdentity.Instance == Constants.S13Id)
+                    {
+                        switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                        {
+                            case AXPBuddy.ModeSelection.Leech:
+                                if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                                {
+                                    return new LeechState();
+                                }
+                                break;
+
+                            case AXPBuddy.ModeSelection.Path:
+                                if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                                {
+                                    return new PathState();
+                                }
+                                break;
+
+                            default:
+                                if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                                {
+                                    return new PullState();
+                                }
+                                break;
+                        }
+                    }
+
+                    if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
+                        return new DiedState();
+                }
             }
 
             if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)

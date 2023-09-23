@@ -39,6 +39,8 @@ namespace AXPBuddy
 
         public static bool Toggle = false;
 
+        public static bool Ready = true;
+
         private bool? lastSentIsReadyState = null;
 
         public static double _stateTimeOut;
@@ -200,13 +202,11 @@ namespace AXPBuddy
                 {
                     if (waitAndReadyMessage.IsReady)
                     {
-                        _settings["Toggle"] = true;
-                        Start();
+                        Ready = true;
                     }
                     else
                     {
-                        _settings["Toggle"] = false;
-                        Stop();
+                        Ready = false;
                     }
                 }
             }
@@ -258,7 +258,8 @@ namespace AXPBuddy
                     }
 
                     // Check if Nano and Health are above 66%
-                    else if (!Spell.HasPendingCast || localPlayer.NanoPercent > 70 && localPlayer.HealthPercent > 70)
+                    else if (!Spell.HasPendingCast && localPlayer.NanoPercent > 70 
+                        && localPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady))
                     {
                         currentIsReadyState = true;
                     }

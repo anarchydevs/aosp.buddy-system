@@ -32,6 +32,11 @@ namespace AXPBuddy
                     return new IdleState();
             }
 
+            if (!AXPBuddy.Ready)
+            {
+                return new IdleState();
+            }
+
             return null;
         }
 
