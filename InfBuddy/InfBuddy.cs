@@ -76,13 +76,14 @@ namespace InfBuddy
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
-                Chat.RegisterCommand("buddy", InfBuddyCommand);
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 SettingsController.RegisterSettingsWindow("InfBuddy", pluginDir + "\\UI\\InfBuddySettingWindow.xml", _settings);
 
                 _stateMachine = new StateMachine(new IdleState());
 
                 NpcDialog.AnswerListChanged += NpcDialog_AnswerListChanged;
+                Team.TeamRequest += OnTeamRequest;
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("ModeSelection", (int)ModeSelection.Normal);
@@ -422,7 +423,13 @@ namespace InfBuddy
             }
         }
 
-        private void InfBuddyCommand(string command, string[] param, ChatWindow chatWindow)
+        private void OnTeamRequest(object sender, TeamRequestEventArgs e)
+        {
+            // Set the leader to the sender of the team request
+            Leader = e.Requester;
+        }
+
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {
