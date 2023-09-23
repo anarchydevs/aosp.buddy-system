@@ -242,31 +242,35 @@ namespace AXPBuddy
                         IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
                     }
                 }
-
-                var localPlayer = DynelManager.LocalPlayer;
-                bool currentIsReadyState = true;
-
-                // Check if Nano or Health is below 66% and not in combat
-                if (!InCombat())
+                
+                if (Playfield.ModelId == PlayfieldId.Sector13)
                 {
-                    if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66)
+                    var localPlayer = DynelManager.LocalPlayer;
+                    bool currentIsReadyState = true;
+
+                    // Check if Nano or Health is below 66% and not in combat
+                    if (!InCombat())
                     {
-                        currentIsReadyState = false;
+                        if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66)
+                        {
+                            currentIsReadyState = false;
+                        }
+                    }
+
+                    // Check if Nano and Health are above 66%
+                    else if (localPlayer.NanoPercent > 70 && localPlayer.HealthPercent > 70)
+                    {
+                        currentIsReadyState = true;
+                    }
+
+                    // Only send a message if the state has changed.
+                    if (currentIsReadyState != lastSentIsReadyState)
+                    {
+                        IPCChannel.Broadcast(new WaitAndReadyIPCMessage { IsReady = currentIsReadyState });
+                        lastSentIsReadyState = currentIsReadyState; // Update the last sent state
                     }
                 }
-                   
-                // Check if Nano and Health are above 66%
-                else if (localPlayer.NanoPercent > 70 && localPlayer.HealthPercent > 70)
-                {
-                    currentIsReadyState = true;
-                }
-
-                // Only send a message if the state has changed.
-                if (currentIsReadyState != lastSentIsReadyState)
-                {
-                    IPCChannel.Broadcast(new WaitAndReadyIPCMessage { IsReady = currentIsReadyState });
-                    lastSentIsReadyState = currentIsReadyState; // Update the last sent state
-                }
+                
 
                 #region UI Update
 
