@@ -249,7 +249,7 @@ namespace AXPBuddy
                 // Check if Nano or Health is below 66% and not in combat
                 if (!InCombat())
                 {
-                    if (localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66)
+                    if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66)
                     {
                         currentIsReadyState = false;
                     }
@@ -267,8 +267,6 @@ namespace AXPBuddy
                     IPCChannel.Broadcast(new WaitAndReadyIPCMessage { IsReady = currentIsReadyState });
                     lastSentIsReadyState = currentIsReadyState; // Update the last sent state
                 }
-
-
 
                 #region UI Update
 
