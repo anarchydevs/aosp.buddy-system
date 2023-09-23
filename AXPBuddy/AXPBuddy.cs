@@ -344,6 +344,8 @@ namespace AXPBuddy
             }
         }
 
+        #region Kitting
+
         private void SitAndUseKit()
         {
             if (InCombat())
@@ -433,6 +435,9 @@ namespace AXPBuddy
                     || Team.IsInCombat()
                     || localPlayer.FightingTarget != null;
         }
+
+        #endregion
+
         private void OnTeamRequest(object sender, TeamRequestEventArgs e)
         {
             // Set the leader to the sender of the team request
