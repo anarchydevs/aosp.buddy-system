@@ -37,7 +37,7 @@ namespace AXPBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("PullState::OnStateEnter");
+            Chat.WriteLine("Pull state");
         }
 
         public void Tick()
@@ -214,7 +214,7 @@ namespace AXPBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("PullState::OnStateExit");
+            //Chat.WriteLine("PullState::OnStateExit");
 
             _init = false;
         }

@@ -31,7 +31,7 @@ namespace AXPBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("PathState::OnStateEnter");
+            Chat.WriteLine("Path state");
         }
 
         public void Tick()
@@ -160,7 +160,7 @@ namespace AXPBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("PathState::OnStateExit");
+            //Chat.WriteLine("PathState::OnStateExit");
 
             _init = false;
         }

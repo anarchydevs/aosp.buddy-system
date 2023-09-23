@@ -63,7 +63,7 @@ namespace AXPBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("IdleState::OnStateExit");
+            //Chat.WriteLine("IdleState::OnStateExit");
         }
 
         public void Tick()

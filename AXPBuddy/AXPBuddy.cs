@@ -39,6 +39,8 @@ namespace AXPBuddy
 
         public static bool Toggle = false;
 
+        private bool? lastSentIsReadyState = null;
+
         public static double _stateTimeOut;
 
         public static double _mainUpdate;
@@ -71,13 +73,14 @@ namespace AXPBuddy
 
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Leader, HandleBroadcastLeader);
+                IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.LeaderInfo, OnLeaderInfoMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.WaitAndReady, OnWaitAndReadyMessage);
+
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
-                Chat.RegisterCommand("buddy", AXPBuddyCommand);
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 SettingsController.RegisterSettingsWindow("AXPBuddy", pluginDir + "\\UI\\AXPBuddySettingWindow.xml", _settings);
 
@@ -95,18 +98,6 @@ namespace AXPBuddy
 
                 Chat.WriteLine("AXPBuddy Loaded!");
                 Chat.WriteLine("/axpbuddy for settings.");
-
-                SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
-
-                if (teamLeader != null && teamLeader.Identity == DynelManager.LocalPlayer.Identity)
-                {
-                    if (Leader != teamLeader.Identity)
-                    {
-                        Leader = teamLeader.Identity;
-                        LeaderMessage leaderMessage = new LeaderMessage { Leader = Leader };
-                        IPCChannel.Broadcast(leaderMessage);
-                    }
-                }
 
             }
             catch (Exception ex)
@@ -158,48 +149,68 @@ namespace AXPBuddy
                 MovementController.Instance.Halt();
         }
 
-        private void OnStartMessage(int sender, IPCMessage msg)
+        private void OnStartStopMessage(int sender, IPCMessage msg)
         {
-            if (DynelManager.LocalPlayer.Identity == Leader || _settings["Merge"].AsBool())
-                return;
-
-            Chat.WriteLine("Buddy enabled.");
-            _settings["Toggle"] = true;
-
-            Toggle = true;
-
-            if (!(_stateMachine.CurrentState is IdleState))
-                _stateMachine.SetState(new IdleState());
-        }
-
-        private void OnStopMessage(int sender, IPCMessage msg)
-        {
-            if (DynelManager.LocalPlayer.Identity == Leader || _settings["Merge"].AsBool())
-                return;
-
-            Toggle = false;
-
-            _settings["Toggle"] = false;
-            Chat.WriteLine("Buddy disabled.");
-
-            if (DynelManager.LocalPlayer.IsAttacking)
-                DynelManager.LocalPlayer.StopAttack();
-            if (MovementController.Instance.IsNavigating)
-                MovementController.Instance.Halt();
-
-            if (!(_stateMachine.CurrentState is IdleState))
-                _stateMachine.SetState(new IdleState());
-        }
-
-        private void HandleBroadcastLeader(int sender, IPCMessage msg)
-        {
-            LeaderMessage message = msg as LeaderMessage;
-            if (message != null)
+            if (msg is StartStopIPCMessage startStopMessage)
             {
-                Leader = message.Leader;
+                if (startStopMessage.IsStarting)
+                {
+                    // Only set the Leader if "Merge" is not checked.
+                    if (!_settings["Merge"].AsBool())
+                    {
+                        Leader = new Identity(IdentityType.SimpleChar, sender);
+                    }
+
+                    // Update the setting and start the process.
+                    _settings["Toggle"] = true;
+                    Start();
+                }
+                else
+                {
+                    // Update the setting and stop the process.
+                    _settings["Toggle"] = false;
+                    Stop();
+                }
             }
         }
 
+        private void OnLeaderInfoMessage(int sender, IPCMessage msg)
+        {
+            if (msg is LeaderInfoIPCMessage leaderInfoMessage)
+            {
+                if (leaderInfoMessage.IsRequest)
+                {
+                    if (Leader != Identity.None)
+                    {
+                        IPCChannel.Broadcast(new LeaderInfoIPCMessage() { LeaderIdentity = Leader, IsRequest = false });
+                    }
+                }
+                else
+                {
+                    Leader = leaderInfoMessage.LeaderIdentity;
+                }
+            }
+        }
+        private void OnWaitAndReadyMessage(int sender, IPCMessage msg)
+        {
+            if (msg is WaitAndReadyIPCMessage waitAndReadyMessage)
+            {
+                var localPlayer = DynelManager.LocalPlayer;
+                if (Leader == localPlayer.Identity)
+                {
+                    if (waitAndReadyMessage.IsReady)
+                    {
+                        _settings["Toggle"] = true;
+                        Start();
+                    }
+                    else
+                    {
+                        _settings["Toggle"] = false;
+                        Stop();
+                    }
+                }
+            }
+        }
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
             _infoWindow = Window.CreateFromXml("Info", PluginDir + "\\UI\\AXPBuddyInfoView.xml",
@@ -218,6 +229,47 @@ namespace AXPBuddy
 
                 SitAndUseKit();
 
+                if (Leader == Identity.None)
+                {
+                    if (_settings["Merge"].AsBool())
+                    {
+                        SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
+
+                        Leader = teamLeader?.Identity ?? Identity.None;
+                    }
+                    else
+                    {
+                        IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
+                    }
+                }
+
+                var localPlayer = DynelManager.LocalPlayer;
+                bool currentIsReadyState = true;
+
+                // Check if Nano or Health is below 66% and not in combat
+                if (!InCombat())
+                {
+                    if (localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66)
+                    {
+                        currentIsReadyState = false;
+                    }
+                }
+                   
+                // Check if Nano and Health are above 66%
+                else if (localPlayer.NanoPercent > 70 && localPlayer.HealthPercent > 70)
+                {
+                    currentIsReadyState = true;
+                }
+
+                // Only send a message if the state has changed.
+                if (currentIsReadyState != lastSentIsReadyState)
+                {
+                    IPCChannel.Broadcast(new WaitAndReadyIPCMessage { IsReady = currentIsReadyState });
+                    lastSentIsReadyState = currentIsReadyState; // Update the last sent state
+                }
+
+
+
                 #region UI Update
 
                 if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
@@ -235,20 +287,18 @@ namespace AXPBuddy
                         infoView.Clicked = HandleInfoViewClick;
                     }
 
-                    if (_settings["Toggle"].AsBool() && !Toggle)
-                    {
-                        if (DynelManager.LocalPlayer.Identity == Leader)
-                            IPCChannel.Broadcast(new StartMessage());
-
-                        Start();
-                    }
-
                     if (!_settings["Toggle"].AsBool() && Toggle)
                     {
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
                         Stop();
+                    }
+                    if (_settings["Toggle"].AsBool() && !Toggle)
+                    {
+                        if (!_settings["Merge"].AsBool())
+                            Leader = DynelManager.LocalPlayer.Identity;
 
-                        if (DynelManager.LocalPlayer.Identity == Leader)
-                            IPCChannel.Broadcast(new StopMessage());
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                        Start();
                     }
                 }
 
@@ -272,121 +322,125 @@ namespace AXPBuddy
 
         private void SitAndUseKit()
         {
-            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
+            if (InCombat())
+                return;
 
+            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
             Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+            var localPlayer = DynelManager.LocalPlayer;
 
             if (kit == null || spell == null)
-            {
                 return;
+
+            if (!localPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            {
+                HandleSitState();
             }
 
-            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            if (localPlayer.MovementState == MovementState.Sit && (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000))
             {
-                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
-                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                if (localPlayer.NanoPercent < 90 || localPlayer.HealthPercent < 90)
                 {
-                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
-                    {
-                        // Switch to sitting
-                        MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
-                    }
+                    kit.Use(localPlayer, true);
+                    _kitTimer.Restart();
                 }
             }
+        }
 
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-           && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+        private void HandleSitState()
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+
+            bool shouldSit = localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66;
+            bool canSit = !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && localPlayer.MovementState != MovementState.Sit;
+
+            bool shouldStand = localPlayer.NanoPercent > 66 || localPlayer.HealthPercent > 66;
+            bool onCooldown = localPlayer.Cooldowns.ContainsKey(Stat.Treatment);
+
+            if (shouldSit && canSit)
             {
-                // If the Stopwatch hasn't been started or 2 seconds have elapsed
-                if (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000)
-                {
-                    if (DynelManager.LocalPlayer.NanoPercent < 90 || DynelManager.LocalPlayer.HealthPercent < 90)
-                    {
-                        // Use the kit
-                        kit.Use(DynelManager.LocalPlayer, true);
-
-                        // Reset and start the Stopwatch
-                        _kitTimer.Restart();
-                    }
-                }
+                MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
             }
-
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-            && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            else if (shouldStand && onCooldown)
             {
-                if (DynelManager.LocalPlayer.NanoPercent > 66 || DynelManager.LocalPlayer.HealthPercent > 66)
-                {
-                    // Leave sitting if treatment cooldown is active
-                    MovementController.Instance.SetMovement(MovementAction.LeaveSit);
-                }
+                MovementController.Instance.SetMovement(MovementAction.LeaveSit);
             }
         }
 
         private bool CanUseSitKit()
         {
-            if (Inventory.Find(297274, out Item premSitKit))
-                if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
-                                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
-
-            if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
-                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
+            if (!DynelManager.LocalPlayer.IsAlive || DynelManager.LocalPlayer.IsMoving || Game.IsZoning)
             {
-                List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
-
-                if (!sitKits.Any()) { return false; }
-
-                foreach (Item sitKit in sitKits.OrderBy(x => x.QualityLevel))
-                {
-                    int skillReq = (sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f));
-
-                    if (DynelManager.LocalPlayer.GetStat(Stat.FirstAid) >= skillReq || DynelManager.LocalPlayer.GetStat(Stat.Treatment) >= skillReq)
-                        return true;
-                }
+                return false;
             }
 
-            return false;
+            List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
+            if (sitKits.Any())
+            {
+                return sitKits.OrderBy(x => x.QualityLevel).Any(sitKit => MeetsSkillRequirement(sitKit));
+            }
+
+            return Inventory.Find(297274, out Item premSitKit);
         }
 
+        private bool MeetsSkillRequirement(Item sitKit)
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+            int skillReq = sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f);
+
+            return localPlayer.GetStat(Stat.FirstAid) >= skillReq || localPlayer.GetStat(Stat.Treatment) >= skillReq;
+        }
+
+        public static bool InCombat()
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+
+            if (Team.IsInTeam)
+            {
+                return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null
+                        && Team.Members.Select(m => m.Name).Contains(c.FightingTarget.Name));
+            }
+
+            return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null
+                        && c.FightingTarget.Name == localPlayer.Name)
+                    || localPlayer.GetStat(Stat.NumFightingOpponents) > 0
+                    || Team.IsInCombat()
+                    || localPlayer.FightingTarget != null;
+        }
         private void OnTeamRequest(object sender, TeamRequestEventArgs e)
         {
             // Set the leader to the sender of the team request
             Leader = e.Requester;
         }
 
-        private void AXPBuddyCommand(string command, string[] param, ChatWindow chatWindow)
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Toggle"].AsBool() && !Toggle)
+                    bool currentToggle = _settings["Toggle"].AsBool();
+                    if (!currentToggle)
                     {
-                        if (DynelManager.LocalPlayer.Identity == Leader)
-                            IPCChannel.Broadcast(new StartMessage());
-
+                        Leader = DynelManager.LocalPlayer.Identity;
                         _settings["Toggle"] = true;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                         Start();
-
                     }
                     else
                     {
-                        Stop();
                         _settings["Toggle"] = false;
-                        IPCChannel.Broadcast(new StopMessage());
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
                     }
                 }
                 Config.Save();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                var errorMessage = "An error occurred on line " + AXPBuddy.GetLineNumber(ex) + ": " + ex.Message;
-
-                if (errorMessage != previousErrorMessage)
-                {
-                    Chat.WriteLine(errorMessage);
-                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
-                    previousErrorMessage = errorMessage;
-                }
+                Chat.WriteLine(e.Message);
             }
         }
 
