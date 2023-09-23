@@ -758,6 +758,8 @@ namespace AttackBuddy
                            && c.MaxHealth >= 1000000)
                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
                        .OrderByDescending(c => c.Name == "Field Support  - Cha'Khaz")
+                       .OrderByDescending(c => c.Name == "Ground Chief Aune")
+
 
                        .ToList();
 
@@ -802,6 +804,7 @@ namespace AttackBuddy
                 .OrderByDescending(c => c.Name == "The Sacrifice")
                 .OrderByDescending(c => c.Name == "Hacker'Uri")
                 .OrderByDescending(c => c.Name == "Hand of the Colonel")
+                .OrderByDescending(c => c.Name == "Ground Chief Aune")
                 .ToList();
         }
 
