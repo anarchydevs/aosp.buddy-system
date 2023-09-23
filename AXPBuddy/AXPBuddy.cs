@@ -204,7 +204,7 @@ namespace AXPBuddy
 
                 teamReadiness[senderIdentity] = waitAndReadyMessage.IsReady;
 
-                Chat.WriteLine($"IPC received. Sender: {senderIdentity}, IsReady: {waitAndReadyMessage.IsReady}"); // Debugging line added
+                //Chat.WriteLine($"IPC received. Sender: {senderIdentity}, IsReady: {waitAndReadyMessage.IsReady}"); // Debugging line added
 
                 bool allReady = true;
 
