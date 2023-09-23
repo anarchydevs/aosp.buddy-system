@@ -29,21 +29,21 @@ namespace AXPBuddy
                 switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
                 {
                     case AXPBuddy.ModeSelection.Leech:
-                        if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                        if (AXPBuddy._settings["Merge"].AsBool() || (Team.Members.Any(c => c.Character != null)))
                         {
                             return new LeechState();
                         }
                         break;
 
                     case AXPBuddy.ModeSelection.Path:
-                        if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                        if (AXPBuddy._settings["Merge"].AsBool() || (Team.Members.Any(c => c.Character != null)))
                         {
                             return new PathState();
                         }
                         break;
 
                     default:
-                        if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                        if (AXPBuddy._settings["Merge"].AsBool() || (Team.Members.Any(c => c.Character != null)))
                         {
                             return new PullState();
                         }

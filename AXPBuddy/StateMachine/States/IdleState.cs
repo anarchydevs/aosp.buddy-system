@@ -12,49 +12,58 @@ namespace AXPBuddy
     {
         public IState GetNextState()
         {
-            if (AXPBuddy._settings["Toggle"].AsBool() && Team.IsRaid)
+            if (AXPBuddy._settings["Toggle"].AsBool())
             {
                 if (AXPBuddy.Ready)
                 {
-                    if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
+                    if (Team.IsRaid)
                     {
-                        return new EnterSectorState();
-                    }
-
-                    if (Playfield.ModelIdentity.Instance == Constants.S13Id)
-                    {
-                        switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                        if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
                         {
-                            case AXPBuddy.ModeSelection.Leech:
-                                if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
-                                {
-                                    return new LeechState();
-                                }
-                                break;
+                            return new EnterSectorState();
+                        }
 
-                            case AXPBuddy.ModeSelection.Path:
-                                if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
-                                {
-                                    return new PathState();
-                                }
-                                break;
+                        if (Playfield.ModelIdentity.Instance == Constants.S13Id)
+                        {
+                            switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                            {
+                                case AXPBuddy.ModeSelection.Leech:
+                                    if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                                    {
+                                        return new LeechState();
+                                    }
+                                    break;
 
-                            default:
-                                if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
-                                {
-                                    return new PullState();
-                                }
-                                break;
+                                case AXPBuddy.ModeSelection.Path:
+                                    if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                                    {
+                                        return new PathState();
+                                    }
+                                    break;
+
+                                default:
+                                    if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                                    {
+                                        return new PullState();
+                                    }
+                                    break;
+                            }
                         }
                     }
-
-                    if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
-                        return new DiedState();
+                    else
+                    {
+                        return new ReformState();
+                    }
                 }
+
+                if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
+                    return new DiedState();
+
+                if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                    return new SitState();
             }
 
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return new SitState();
+
 
             return null;
         }
@@ -71,7 +80,7 @@ namespace AXPBuddy
 
         public void Tick()
         {
-           
+
         }
     }
 }

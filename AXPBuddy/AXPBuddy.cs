@@ -41,6 +41,8 @@ namespace AXPBuddy
 
         public static bool Ready = true;
 
+        private Dictionary<Identity, bool> teamReadiness = new Dictionary<Identity, bool>();
+
         private bool? lastSentIsReadyState = null;
 
         public static double _stateTimeOut;
@@ -195,19 +197,31 @@ namespace AXPBuddy
         }
         private void OnWaitAndReadyMessage(int sender, IPCMessage msg)
         {
+
             if (msg is WaitAndReadyIPCMessage waitAndReadyMessage)
             {
-                var localPlayer = DynelManager.LocalPlayer;
-                if (Leader == localPlayer.Identity)
+                Identity senderIdentity = waitAndReadyMessage.PlayerIdentity; // Get the Identity from the IPCMessage
+
+                teamReadiness[senderIdentity] = waitAndReadyMessage.IsReady;
+
+                Chat.WriteLine($"IPC received. Sender: {senderIdentity}, IsReady: {waitAndReadyMessage.IsReady}"); // Debugging line added
+
+                bool allReady = true;
+
+                // Check team members against the readiness dictionary
+                foreach (var teamMember in Team.Members)
                 {
-                    if (waitAndReadyMessage.IsReady)
+                    if (teamReadiness.ContainsKey(teamMember.Identity) && !teamReadiness[teamMember.Identity])
                     {
-                        Ready = true;
+                        allReady = false;
+                        break;
                     }
-                    else
-                    {
-                        Ready = false;
-                    }
+                }
+
+                if (Leader == DynelManager.LocalPlayer.Identity)
+                {
+                    Ready = allReady;
+                    
                 }
             }
         }
@@ -243,7 +257,7 @@ namespace AXPBuddy
                     }
                 }
                 
-                if (Playfield.ModelId == PlayfieldId.Sector13)
+                if (Playfield.ModelId == PlayfieldId.Sector13 && DynelManager.LocalPlayer.Identity != Leader)
                 {
                     var localPlayer = DynelManager.LocalPlayer;
                     bool currentIsReadyState = true;
@@ -251,7 +265,8 @@ namespace AXPBuddy
                     // Check if Nano or Health is below 66% and not in combat
                     if (!InCombat())
                     {
-                        if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66)
+                        if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66
+                            || !Spell.List.Any(spell => spell.IsReady))
                         {
                             currentIsReadyState = false;
                         }
@@ -267,12 +282,18 @@ namespace AXPBuddy
                     // Only send a message if the state has changed.
                     if (currentIsReadyState != lastSentIsReadyState)
                     {
-                        IPCChannel.Broadcast(new WaitAndReadyIPCMessage { IsReady = currentIsReadyState });
+                        Identity localPlayerIdentity = DynelManager.LocalPlayer.Identity;
+                        //Chat.WriteLine($"Broadcasting IPC. Local player identity: {localPlayerIdentity}"); // Debugging line added
+
+                        IPCChannel.Broadcast(new WaitAndReadyIPCMessage
+                        {
+                            IsReady = currentIsReadyState,
+                            PlayerIdentity = localPlayerIdentity
+                        });
                         lastSentIsReadyState = currentIsReadyState; // Update the last sent state
                     }
                 }
                 
-
                 #region UI Update
 
                 if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)

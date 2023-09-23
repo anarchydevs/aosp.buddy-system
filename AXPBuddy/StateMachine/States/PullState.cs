@@ -32,11 +32,6 @@ namespace AXPBuddy
                     return new IdleState();
             }
 
-            if (!AXPBuddy.Ready)
-            {
-                return new IdleState();
-            }
-
             return null;
         }
 
@@ -155,7 +150,8 @@ namespace AXPBuddy
                                     HandleTaunting(mob);
                                 }
 
-                                else if (mob.IsAttacking && !mob.IsInAttackRange())
+                                else if (mob.IsAttacking && !mob.IsInAttackRange() && !Spell.HasPendingCast && DynelManager.LocalPlayer.NanoPercent > 70
+                       && DynelManager.LocalPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady) && AXPBuddy.Ready)
                                 {
                                     AXPBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
                                 }
@@ -163,7 +159,9 @@ namespace AXPBuddy
                         }
                         else if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
                                 && Team.Members.Any(c => c.Character != null)
-                                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
+                                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f 
+                                && !Spell.HasPendingCast && DynelManager.LocalPlayer.NanoPercent > 70
+                       && DynelManager.LocalPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady) && AXPBuddy.Ready)
                         {
                             AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
                         }
