@@ -30,6 +30,10 @@ namespace InfBuddy
 
         public static bool Toggle = false;
 
+        public static bool Ready = true;
+        private Dictionary<Identity, bool> teamReadiness = new Dictionary<Identity, bool>();
+        private bool? lastSentIsReadyState = null;
+
         ModeSelection currentMode;
         FactionSelection currentFaction;
         DifficultySelection currentDifficulty;
@@ -73,6 +77,7 @@ namespace InfBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
                 IPCChannel.RegisterCallback((short)IPCOpcode.ModeSelections, OnModeSelectionsMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.LeaderInfo, OnLeaderInfoMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.WaitAndReady, OnWaitAndReadyMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -214,7 +219,36 @@ namespace InfBuddy
                 }
             }
         }
+        private void OnWaitAndReadyMessage(int sender, IPCMessage msg)
+        {
 
+            if (msg is WaitAndReadyIPCMessage waitAndReadyMessage)
+            {
+                Identity senderIdentity = waitAndReadyMessage.PlayerIdentity; // Get the Identity from the IPCMessage
+
+                teamReadiness[senderIdentity] = waitAndReadyMessage.IsReady;
+
+                //Chat.WriteLine($"IPC received. Sender: {senderIdentity}, IsReady: {waitAndReadyMessage.IsReady}"); // Debugging line added
+
+                bool allReady = true;
+
+                // Check team members against the readiness dictionary
+                foreach (var teamMember in Team.Members)
+                {
+                    if (teamReadiness.ContainsKey(teamMember.Identity) && !teamReadiness[teamMember.Identity])
+                    {
+                        allReady = false;
+                        break;
+                    }
+                }
+
+                if (Leader == DynelManager.LocalPlayer.Identity)
+                {
+                    Ready = allReady;
+
+                }
+            }
+        }
         private void OnUpdate(object s, float deltaTime)
         {
             if (Game.IsZoning) { return; }
@@ -234,6 +268,43 @@ namespace InfBuddy
                 else
                 {
                     IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
+                }
+            }
+
+            if (DynelManager.LocalPlayer.Identity != Leader)
+            {
+                var localPlayer = DynelManager.LocalPlayer;
+                bool currentIsReadyState = true;
+
+                // Check if Nano or Health is below 66% and not in combat
+                if (!InCombat())
+                {
+                    if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66
+                        || !Spell.List.Any(spell => spell.IsReady))
+                    {
+                        currentIsReadyState = false;
+                    }
+                }
+
+                // Check if Nano and Health are above 66%
+                else if (!Spell.HasPendingCast && localPlayer.NanoPercent > 70
+                    && localPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady))
+                {
+                    currentIsReadyState = true;
+                }
+
+                // Only send a message if the state has changed.
+                if (currentIsReadyState != lastSentIsReadyState)
+                {
+                    Identity localPlayerIdentity = DynelManager.LocalPlayer.Identity;
+                    //Chat.WriteLine($"Broadcasting IPC. Local player identity: {localPlayerIdentity}"); // Debugging line added
+
+                    IPCChannel.Broadcast(new WaitAndReadyIPCMessage
+                    {
+                        IsReady = currentIsReadyState,
+                        PlayerIdentity = localPlayerIdentity
+                    });
+                    lastSentIsReadyState = currentIsReadyState; // Update the last sent state
                 }
             }
 
@@ -318,78 +389,99 @@ namespace InfBuddy
             }
         }
 
+        #region Kitting
+
         private void SitAndUseKit()
         {
-            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
+            if (InCombat())
+                return;
 
+            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
             Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+            var localPlayer = DynelManager.LocalPlayer;
 
             if (kit == null || spell == null)
-            {
                 return;
+
+            if (!localPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            {
+                HandleSitState();
             }
 
-            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            if (localPlayer.MovementState == MovementState.Sit && (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000))
             {
-                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
-                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                if (localPlayer.NanoPercent < 90 || localPlayer.HealthPercent < 90)
                 {
-                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
-                    {
-                        // Switch to sitting
-                        MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
-                    }
+                    kit.Use(localPlayer, true);
+                    _kitTimer.Restart();
                 }
             }
+        }
 
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-           && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+        private void HandleSitState()
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+
+            bool shouldSit = localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66;
+            bool canSit = !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && localPlayer.MovementState != MovementState.Sit;
+
+            bool shouldStand = localPlayer.NanoPercent > 66 || localPlayer.HealthPercent > 66;
+            bool onCooldown = localPlayer.Cooldowns.ContainsKey(Stat.Treatment);
+
+            if (shouldSit && canSit)
             {
-
-                if (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000)
-                {
-                    if (DynelManager.LocalPlayer.NanoPercent < 90 || DynelManager.LocalPlayer.HealthPercent < 90)
-                    {
-                        kit.Use(DynelManager.LocalPlayer, true);
-
-                        _kitTimer.Restart();
-                    }
-                }
+                MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
             }
-
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-            && (DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) || !_sitTimer.IsRunning
-            || _sitTimer.ElapsedMilliseconds >= 10000))
+            else if (shouldStand && onCooldown)
             {
                 MovementController.Instance.SetMovement(MovementAction.LeaveSit);
-                _sitTimer.Restart();
             }
         }
 
         private bool CanUseSitKit()
         {
-            if (Inventory.Find(297274, out Item premSitKit))
-                if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
-                                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
-
-            if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
-                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
+            if (!DynelManager.LocalPlayer.IsAlive || DynelManager.LocalPlayer.IsMoving || Game.IsZoning)
             {
-                List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
-
-                if (!sitKits.Any()) { return false; }
-
-                foreach (Item sitKit in sitKits.OrderBy(x => x.QualityLevel))
-                {
-                    int skillReq = (sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f));
-
-                    if (DynelManager.LocalPlayer.GetStat(Stat.FirstAid) >= skillReq || DynelManager.LocalPlayer.GetStat(Stat.Treatment) >= skillReq)
-                        return true;
-                }
+                return false;
             }
 
-            return false;
+            List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
+            if (sitKits.Any())
+            {
+                return sitKits.OrderBy(x => x.QualityLevel).Any(sitKit => MeetsSkillRequirement(sitKit));
+            }
+
+            return Inventory.Find(297274, out Item premSitKit);
         }
+
+        private bool MeetsSkillRequirement(Item sitKit)
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+            int skillReq = sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f);
+
+            return localPlayer.GetStat(Stat.FirstAid) >= skillReq || localPlayer.GetStat(Stat.Treatment) >= skillReq;
+        }
+
+        public static bool InCombat()
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+
+            if (Team.IsInTeam)
+            {
+                return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null
+                        && Team.Members.Select(m => m.Name).Contains(c.FightingTarget.Name));
+            }
+
+            return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null
+                        && c.FightingTarget.Name == localPlayer.Name)
+                    || localPlayer.GetStat(Stat.NumFightingOpponents) > 0
+                    || Team.IsInCombat()
+                    || localPlayer.FightingTarget != null;
+        }
+
+        #endregion
 
         private void NpcDialog_AnswerListChanged(object s, Dictionary<int, string> options)
         {

@@ -90,6 +90,7 @@
     <Compile Include="IPCMessages\IPCOpcode.cs" />
     <Compile Include="IPCMessages\LeaderInfoIPCMessage.cs" />
     <Compile Include="IPCMessages\StartStopIPCMessage.cs" />
+    <Compile Include="IPCMessages\WaitAndReadyIPCMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsController.cs" />
     <Compile Include="StateMachine\IState.cs" />
