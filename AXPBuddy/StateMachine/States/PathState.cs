@@ -119,7 +119,8 @@ namespace AXPBuddy
                     {
                         if (mob != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 10f)
                         {
-                            if (mob.IsInAttackRange(true) && mob.IsInLineOfSight)
+                            if (mob.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 8
+                                && mob.IsInLineOfSight)
                             {
                                 AXPBuddy.NavMeshMovementController.Halt();
 

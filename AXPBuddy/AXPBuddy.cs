@@ -258,7 +258,7 @@ namespace AXPBuddy
                     }
 
                     // Check if Nano and Health are above 66%
-                    else if (localPlayer.NanoPercent > 70 && localPlayer.HealthPercent > 70)
+                    else if (!Spell.HasPendingCast || localPlayer.NanoPercent > 70 && localPlayer.HealthPercent > 70)
                     {
                         currentIsReadyState = true;
                     }
