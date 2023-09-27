@@ -165,7 +165,7 @@ namespace CityBuddy
             {
                 if (startStopMessage.IsStarting)
                 {
-
+                    Leader = new Identity(IdentityType.SimpleChar, sender);
                     // Update the setting and start the process.
                     _settings["Enable"] = true;
                     Start();
