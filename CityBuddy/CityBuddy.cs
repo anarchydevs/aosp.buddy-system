@@ -149,7 +149,7 @@ namespace CityBuddy
 
         private void Stop()
         {
-           Enable = false;
+            Enable = false;
 
             Chat.WriteLine("CityBuddy disabled.");
 
@@ -267,9 +267,46 @@ namespace CityBuddy
 
             if (Leader == Identity.None)
             {
-                SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
 
-                Leader = teamLeader?.Identity ?? Identity.None;
+                IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
+
+            }
+
+            if (DynelManager.LocalPlayer.Identity != Leader)
+            {
+                var localPlayer = DynelManager.LocalPlayer;
+                bool currentIsReadyState = true;
+
+                // Check if Nano or Health is below 66% and not in combat
+                if (!InCombat())
+                {
+                    if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66
+                        || !Spell.List.Any(spell => spell.IsReady))
+                    {
+                        currentIsReadyState = false;
+                    }
+                }
+
+                // Check if Nano and Health are above 66%
+                else if (!Spell.HasPendingCast && localPlayer.NanoPercent > 70
+                    && localPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady))
+                {
+                    currentIsReadyState = true;
+                }
+
+                // Only send a message if the state has changed.
+                if (currentIsReadyState != lastSentIsReadyState)
+                {
+                    Identity localPlayerIdentity = DynelManager.LocalPlayer.Identity;
+                    //Chat.WriteLine($"Broadcasting IPC. Local player identity: {localPlayerIdentity}"); // Debugging line added
+
+                    IPCChannel.Broadcast(new WaitAndReadyIPCMessage
+                    {
+                        IsReady = currentIsReadyState,
+                        PlayerIdentity = localPlayerIdentity
+                    });
+                    lastSentIsReadyState = currentIsReadyState; // Update the last sent state
+                }
             }
 
             SitAndUseKit();
