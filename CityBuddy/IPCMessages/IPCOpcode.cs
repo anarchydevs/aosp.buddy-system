@@ -2,11 +2,11 @@
 {
     public enum IPCOpcode
     {
-        Start = 1001,
-        Stop = 1002,
-        Enter = 1003,
-        SelectedMemberUpdate = 1004,
-        ClearSelectedMember = 1005,
-        Leader = 1006
+        StartStop = 1001,
+        LeaderInfo = 1002,
+        WaitAndReady = 1003,
+        Enter = 1004,
+        SelectedMemberUpdate = 1005,
+        ClearSelectedMember = 1006,
     }
 }

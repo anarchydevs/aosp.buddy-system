@@ -39,6 +39,10 @@ namespace CityBuddy
         public static Identity Leader = Identity.None;
         public static Vector3 _leaderPos = Vector3.Zero;
 
+        public static bool Ready = true;
+        private Dictionary<Identity, bool> teamReadiness = new Dictionary<Identity, bool>();
+        private bool? lastSentIsReadyState = null;
+
         public static Window _infoWindow;
 
         public static Settings _settings;
@@ -81,12 +85,12 @@ namespace CityBuddy
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Enter, EnterMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.SelectedMemberUpdate, HandleSelectedMemberUpdate);
                 IPCChannel.RegisterCallback((int)IPCOpcode.ClearSelectedMember, HandleClearSelectedMember);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Leader, HandleBroadcastLeader);
+                IPCChannel.RegisterCallback((int)IPCOpcode.LeaderInfo, OnLeaderInfoMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.WaitAndReady, OnWaitAndReadyMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -107,20 +111,7 @@ namespace CityBuddy
                 Game.OnUpdate += OnUpdate;
                 Network.ChatMessageReceived += CityAttackStatus;
 
-                //Network.N3MessageReceived += Network_N3MessageReceived;
                 Network.N3MessageReceived += CTWindowIsOpenBool;
-
-                SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
-
-                if (teamLeader != null && teamLeader.Identity == DynelManager.LocalPlayer.Identity)
-                {
-                    if (Leader != teamLeader.Identity)
-                    {
-                        Leader = teamLeader.Identity;
-                        LeaderMessage leaderMessage = new LeaderMessage { Leader = Leader };
-                        IPCChannel.Broadcast(leaderMessage);
-                    }
-                }
 
             }
             catch (Exception ex)
@@ -146,10 +137,9 @@ namespace CityBuddy
             Config.Save();
         }
 
-        private void OnStartMessage(int sender, IPCMessage msg)
+        private void Start()
         {
             Enable = true;
-            _settings["Enable"] = true;
 
             Chat.WriteLine("CityBuddy enabled.");
 
@@ -157,10 +147,9 @@ namespace CityBuddy
                 _stateMachine.SetState(new IdleState());
         }
 
-        private void OnStopMessage(int sender, IPCMessage msg)
+        private void Stop()
         {
-            _settings["Enable"] = false;
-            Enable = false;
+           Enable = false;
 
             Chat.WriteLine("CityBuddy disabled.");
 
@@ -168,8 +157,26 @@ namespace CityBuddy
                 _stateMachine.SetState(new IdleState());
 
             NavMeshMovementController.Halt();
-            MovementController.Instance.Halt();
+        }
 
+        private void OnStartStopMessage(int sender, IPCMessage msg)
+        {
+            if (msg is StartStopIPCMessage startStopMessage)
+            {
+                if (startStopMessage.IsStarting)
+                {
+
+                    // Update the setting and start the process.
+                    _settings["Enable"] = true;
+                    Start();
+                }
+                else
+                {
+                    // Update the setting and stop the process.
+                    _settings["Enable"] = false;
+                    Stop();
+                }
+            }
         }
 
         private void EnterMessage(int sender, IPCMessage msg)
@@ -194,12 +201,52 @@ namespace CityBuddy
             WaitForShipState.selectedMember = null;
         }
 
-        private void HandleBroadcastLeader(int sender, IPCMessage msg)
+        private void OnLeaderInfoMessage(int sender, IPCMessage msg)
         {
-            LeaderMessage message = msg as LeaderMessage;
-            if (message != null)
+            if (msg is LeaderInfoIPCMessage leaderInfoMessage)
             {
-                Leader = message.Leader;
+                if (leaderInfoMessage.IsRequest)
+                {
+                    if (Leader != Identity.None)
+                    {
+                        IPCChannel.Broadcast(new LeaderInfoIPCMessage() { LeaderIdentity = Leader, IsRequest = false });
+                    }
+                }
+                else
+                {
+                    Leader = leaderInfoMessage.LeaderIdentity;
+                }
+            }
+        }
+
+        private void OnWaitAndReadyMessage(int sender, IPCMessage msg)
+        {
+
+            if (msg is WaitAndReadyIPCMessage waitAndReadyMessage)
+            {
+                Identity senderIdentity = waitAndReadyMessage.PlayerIdentity; // Get the Identity from the IPCMessage
+
+                teamReadiness[senderIdentity] = waitAndReadyMessage.IsReady;
+
+                //Chat.WriteLine($"IPC received. Sender: {senderIdentity}, IsReady: {waitAndReadyMessage.IsReady}"); // Debugging line added
+
+                bool allReady = true;
+
+                // Check team members against the readiness dictionary
+                foreach (var teamMember in Team.Members)
+                {
+                    if (teamReadiness.ContainsKey(teamMember.Identity) && !teamReadiness[teamMember.Identity])
+                    {
+                        allReady = false;
+                        break;
+                    }
+                }
+
+                if (Leader == DynelManager.LocalPlayer.Identity)
+                {
+                    Ready = allReady;
+
+                }
             }
         }
 
@@ -249,13 +296,11 @@ namespace CityBuddy
 
                 if (!_settings["Enable"].AsBool() && Enable)
                 {
-                    IPCChannel.Broadcast(new StopMessage());
-                    Enable = false;
+                    IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
                 }
                 if (_settings["Enable"].AsBool() && !Enable)
                 {
-                    IPCChannel.Broadcast(new StartMessage());
-                    Enable = true;
+                    IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                 }
             }
             #endregion
@@ -356,42 +401,34 @@ namespace CityBuddy
         }
 
         #endregion
+
+
         private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Enable"].AsBool())
+                    bool currentToggle = _settings["Enable"].AsBool();
+                    if (!currentToggle)
                     {
+                        Leader = DynelManager.LocalPlayer.Identity;
                         _settings["Enable"] = true;
-                        Enable = true;
-                        IPCChannel.Broadcast(new StartMessage());
-                        Chat.WriteLine("CityBuddy enabled.");
-
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                        Start();
                     }
                     else
                     {
                         _settings["Enable"] = false;
-                        Enable = false;
-                        IPCChannel.Broadcast(new StopMessage());
-                        Chat.WriteLine("CityBuddy disabled.");
-                        NavMeshMovementController.Halt();
-                        MovementController.Instance.Halt();
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
                     }
                 }
                 Config.Save();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
-
-                if (errorMessage != previousErrorMessage)
-                {
-                    Chat.WriteLine(errorMessage);
-                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
-                    previousErrorMessage = errorMessage;
-                }
+                Chat.WriteLine(e.Message);
             }
         }
 
