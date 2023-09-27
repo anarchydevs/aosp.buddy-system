@@ -43,20 +43,27 @@ namespace InfBuddy
             {
                 if (Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
                 {
-                    if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                    if (InfBuddy._settings["Leech"].AsBool())
                     {
-                        Constants.DefendPos = new Vector3(165.6f, 2.2f, 186.4f);
-                        return new DefendSpiritState();
-                    }
-
-                    if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
-                    {
-                        //Constants.RoamPos = new Vector3(184.5f, 1.0f, 242.9f);
-                        return new RoamState();
-                    }
-
-                    if (InfBuddy.ModeSelection.Leech == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                         return new LeechState();
+                    }
+                    else
+                    {
+                        if (DynelManager.NPCs.Any(c => c.Name == Constants.QuestStarterName))
+                        return new MoveToQuestStarterState();
+
+                        if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                        {
+                            Constants.DefendPos = new Vector3(165.6f, 2.2f, 186.4f);
+                            return new DefendSpiritState();
+                        }
+
+                        if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                        {
+                            //Constants.RoamPos = new Vector3(184.5f, 1.0f, 242.9f);
+                            return new RoamState();
+                        }
+                    }
                 }
 
                 if (!Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")) || Extensions.IsClear())

@@ -10,9 +10,9 @@ using InfBuddy.IPCMessages;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace InfBuddy
 {
@@ -24,6 +24,9 @@ namespace InfBuddy
         public static IPCChannel IPCChannel { get; set; }
 
         public static Config Config { get; private set; }
+
+        private Stopwatch _kitTimer = new Stopwatch();
+        private Stopwatch _sitTimer = new Stopwatch();
 
         private static string InfBuddyFaction;
         private static string InfBuddyDifficulty;
@@ -51,9 +54,7 @@ namespace InfBuddy
         public static Identity Leader = Identity.None;
 
         public static bool DoubleReward = false;
-        private static bool _initSit = false;
 
-        private static double _sitUpdateTimer;
         public static double _stateTimeOut;
 
         private string previousErrorMessage = string.Empty;
@@ -118,6 +119,7 @@ namespace InfBuddy
                 _settings.AddVariable("DoubleReward", false);
                 _settings.AddVariable("Merge", false);
                 _settings.AddVariable("Looting", false);
+                _settings.AddVariable("Leech", false);
 
                 _settings["Toggle"] = false;
 
@@ -251,12 +253,7 @@ namespace InfBuddy
 
             Selections();
 
-            if (Time.NormalTime > _sitUpdateTimer + 1.5)
-            {
-                ListenerSit();
-
-                _sitUpdateTimer = Time.NormalTime;
-            }
+            SitAndUseKit();
 
             if (Leader == Identity.None)
             {
@@ -415,7 +412,54 @@ namespace InfBuddy
                     _roamToggled = true;
                     break;
             }
-            Config.Save();
+        }
+
+        private void SitAndUseKit()
+        {
+            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
+
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+
+            if (kit == null || spell == null)
+            {
+                return;
+            }
+
+            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            {
+                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
+                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                {
+                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                    {
+                        // Switch to sitting
+                        MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
+                    }
+                }
+            }
+
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
+           && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            {
+                
+                if (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000)
+                {
+                    if (DynelManager.LocalPlayer.NanoPercent < 90 || DynelManager.LocalPlayer.HealthPercent < 90)
+                    {
+                        kit.Use(DynelManager.LocalPlayer, true);
+
+                        _kitTimer.Restart();
+                    }
+                }
+            }
+
+            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
+            && (DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) || !_sitTimer.IsRunning 
+            || _sitTimer.ElapsedMilliseconds >= 10000))
+            {
+                MovementController.Instance.SetMovement(MovementAction.LeaveSit);
+                _sitTimer.Restart();
+            }
         }
 
         private bool CanUseSitKit()
@@ -441,35 +485,6 @@ namespace InfBuddy
             }
 
             return false;
-        }
-
-        private void ListenerSit()
-        {
-            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
-
-            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-
-            if (kit == null || spell == null)
-            {
-                return;
-            }
-
-            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
-            {
-                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
-                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
-                {
-                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
-                    {
-                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                    }
-                }
-            }
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
-            {
-                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-
-            }
         }
 
         private void NpcDialog_AnswerListChanged(object s, Dictionary<int, string> options)
