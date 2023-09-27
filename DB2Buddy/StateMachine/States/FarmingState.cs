@@ -5,13 +5,13 @@ using AOSharp.Core.UI;
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DB2Buddy
 {
     public class FarmingState : IState
     {
         public static bool _initCorpse = false;
+        private static double _timeToDisband;
 
         private Corpse _auneCorpse;
         private Dynel _exitBeacon;
@@ -42,7 +42,8 @@ namespace DB2Buddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("FarmingState");
+            Chat.WriteLine("Pause for looting, 30 sec");
+            _timeToDisband = Time.NormalTime + 30; // Schedule disband 30 seconds from now
         }
 
         public void OnStateExit()
@@ -76,16 +77,14 @@ namespace DB2Buddy
                     && !MovementController.Instance.IsNavigating
                     && DynelManager.LocalPlayer.Position.DistanceFrom(_exitBeacon.Position) < 1.0f)
                 {
-                    Chat.WriteLine("Pause for looting, 20 sec");
-                    Task.Factory.StartNew(
-                        async () =>
-                        {
-                            await Task.Delay(20000);
-                            Chat.WriteLine("Done, Disbanding");
-                            Team.Disband();
-                        });
 
-                    _initCorpse = true;
+                    // Check if it's time to disband
+                    if (Time.NormalTime >= _timeToDisband)
+                    {
+                        Chat.WriteLine("Done, Disbanding");
+                        Team.Disband();
+                        _initCorpse = true; // Prevent this block from running again
+                    }
                 }
             }
             catch (Exception ex)

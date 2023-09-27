@@ -35,7 +35,7 @@ namespace VortexxBuddy
             
                 if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
                     && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
-                    VortexxBuddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+                    MovementController.Instance.SetMovement(MovementAction.LeaveSit);
            
             
         }

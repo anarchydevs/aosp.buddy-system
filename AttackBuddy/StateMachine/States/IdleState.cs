@@ -1,11 +1,15 @@
-﻿namespace AttackBuddy
+﻿using AOSharp.Core.UI;
+
+namespace AttackBuddy
 {
     public class IdleState : IState
     {
         public IState GetNextState()
         {
-            if (AttackBuddy.Toggle)
+            if (AttackBuddy._settings["Enable"].AsBool())
+            {
                 return new ScanState();
+            }
 
             return null;
         }

@@ -9,8 +9,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
@@ -18,7 +16,7 @@ namespace AXPBuddy
     {
         public IState GetNextState()
         {
-            if (Playfield.ModelIdentity.Instance == Constants.S13Id && Team.Members.Any(c => c.Character != null))
+            if (Playfield.ModelId == PlayfieldId.Sector13 && Team.Members.Any(c => c.Character != null))
             {
                 switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
                 {

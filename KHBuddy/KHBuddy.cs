@@ -10,8 +10,10 @@ using KHBuddy.IPCMessages;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using Debug = AOSharp.Core.Debug;
 
 namespace KHBuddy
 {
@@ -25,8 +27,9 @@ namespace KHBuddy
         public static Identity Leader = Identity.None;
         public static bool IsLeader = false;
 
-        public static string PluginDirectory;
+        private Stopwatch _kitTimer = new Stopwatch();
 
+        public static string PluginDirectory;
 
         public static Settings _settings = new Settings("KHBuddy");
 
@@ -39,13 +42,12 @@ namespace KHBuddy
 
         public static double _stateTimeOut = Time.NormalTime;
 
-        private static double _sitUpdateTimer;
-
         public static bool _doingEast = false;
         public static bool _doingWest = false;
         public static bool _started = false;
+
         public static bool _init = false;
-        public static bool Sitting = false;
+        public static bool NeedsKit = false;
 
         public static bool Beach = false;
         public static bool East = false;
@@ -56,6 +58,8 @@ namespace KHBuddy
         public static bool _eastToggled = false;
         public static bool _westToggled = false;
         public static bool _eastandWestToggled = false;
+
+        public static string previousErrorMessage = string.Empty;
 
         public override void Run(string pluginDir)
         {
@@ -79,8 +83,6 @@ namespace KHBuddy
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
-                //Chat.RegisterCommand("buddy", KHBuddyCommand);
-
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Toggle", false);
@@ -96,9 +98,16 @@ namespace KHBuddy
 
                 PluginDirectory = pluginDir;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + KHBuddy.GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != KHBuddy.previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    KHBuddy.previousErrorMessage = errorMessage;
+                }
             }
         }
 
@@ -106,7 +115,6 @@ namespace KHBuddy
         {
             IPCChannel.SetChannelId(Convert.ToByte(e));
 
-            ////TODO: Change in config so it saves when needed to - interface name -> INotifyPropertyChanged
             Config.Save();
         }
 
@@ -231,208 +239,216 @@ namespace KHBuddy
         private void OnUpdate(object s, float deltaTime)
         {
             //GameTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Time.NormalTime);
-
-            if (Game.IsZoning)
-                return;
-
-            _stateMachine.Tick();
-
-            Selection();
-
-            if (Time.NormalTime > _sitUpdateTimer + 1)
+            try
             {
-                ListenerSit();
+                if (Game.IsZoning)
+                    return;
 
-                _sitUpdateTimer = Time.NormalTime;
-            }
+                _stateMachine.Tick();
 
-            if (DynelManager.LocalPlayer.Profession == Profession.Enforcer)
-            {
-                if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
+                Selection();
+
+                SitAndUseKit();
+
+                if (DynelManager.LocalPlayer.Profession == Profession.Enforcer)
                 {
-                    Debug.DrawSphere(new Vector3(1115.9f, 1.6f, 1064.3f), 0.2f, DebuggingColor.White);
-                    Debug.DrawLine(DynelManager.LocalPlayer.Position, new Vector3(1115.9f, 1.6f, 1064.3f), DebuggingColor.White); // East
-                }
-
-                if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
-                {
-                    Debug.DrawSphere(new Vector3(1115.9f, 1.6f, 1064.3f), 0.2f, DebuggingColor.White);
-                    Debug.DrawLine(DynelManager.LocalPlayer.Position, new Vector3(1115.9f, 1.6f, 1064.3f), DebuggingColor.White); // East
-                }
-
-                if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
-                {
-                    Debug.DrawSphere(new Vector3(1043.2f, 1.6f, 1021.1f), 0.2f, DebuggingColor.White);
-                    Debug.DrawLine(DynelManager.LocalPlayer.Position, new Vector3(1043.2f, 1.6f, 1021.1f), DebuggingColor.White); // West
-                }
-
-                if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32())
-                {
-                    Debug.DrawSphere(new Vector3(898.1f, 4.4f, 289.9f), 0.2f, DebuggingColor.White);
-                    Debug.DrawLine(DynelManager.LocalPlayer.Position, new Vector3(898.1f, 4.4f, 289.9f), DebuggingColor.White); // beach
-                }
-            }
-
-            if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
-            {
-                SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelBox);
-
-                if (channelBox != null && !string.IsNullOrEmpty(channelBox.Text))
-                {
-                    if (int.TryParse(channelBox.Text, out int channelValue))
+                    if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
                     {
-                        if (Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
-                        {
-                            IPCChannel.SetChannelId(Convert.ToByte(channelValue));
-                            Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = Convert.ToByte(channelValue);
-                            Config.Save();
-                        }
-                    }
-                }
-
-                if (SettingsController.settingsWindow.FindView("KHBuddyInfoView", out Button infoView))
-                {
-                    infoView.Tag = SettingsController.settingsWindow;
-                    infoView.Clicked = InfoView;
-                }
-
-                if (!_settings["Toggle"].AsBool() && _started == true
-                    && DynelManager.LocalPlayer.Profession == Profession.Enforcer)
-                {
-                    if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32())
-                    {
-                        IPCChannel.Broadcast(new StopModeMessage()
-                        {
-                            Side = (int)SideSelection.Beach
-                        });
-                    }
-                    else if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
-                    {
-                        IPCChannel.Broadcast(new StopModeMessage()
-                        {
-                            Side = (int)SideSelection.East
-                        });
-
-                    }
-                    else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
-                    {
-                        IPCChannel.Broadcast(new StopModeMessage()
-                        {
-                            Side = (int)SideSelection.West
-                        });
-
-                    }
-                    else if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
-                    {
-                        IPCChannel.Broadcast(new StopModeMessage()
-                        {
-                            Side = (int)SideSelection.EastAndWest
-                        });
-
-                    }
-
-                    Stop();
-                }
-
-                if (_settings["Toggle"].AsBool() && _started == false
-                    && DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
-                {
-                    _started = true;
-
-                    if (Leader == Identity.None)
-                    {
-                        IsLeader = true;
-                        Leader = DynelManager.LocalPlayer.Identity;
+                        Debug.DrawSphere(new Vector3(1115.9f, 1.6f, 1064.3f), 0.2f, DebuggingColor.White);
+                        Debug.DrawLine(DynelManager.LocalPlayer.Position, new Vector3(1115.9f, 1.6f, 1064.3f), DebuggingColor.White); // East
                     }
 
                     if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
                     {
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1090.2f, 28.1f, 1050.1f)) > 1f && !MovementController.Instance.IsNavigating)
-                        {
-                            MovementController.Instance.SetDestination(new Vector3(1090.2f, 28.1f, 1050.1f));
-                        }
-                    }
-                    else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
-                    {
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1065.4f, 26.2f, 1033.5f)) > 1f && !MovementController.Instance.IsNavigating)
-                        {
-                            MovementController.Instance.SetDestination(new Vector3(1065.4f, 26.2f, 1033.5f));
-                        }
+                        Debug.DrawSphere(new Vector3(1115.9f, 1.6f, 1064.3f), 0.2f, DebuggingColor.White);
+                        Debug.DrawLine(DynelManager.LocalPlayer.Position, new Vector3(1115.9f, 1.6f, 1064.3f), DebuggingColor.White); // East
                     }
 
-                    Start();
-                }
-
-                if (_settings["Toggle"].AsBool() && _started == false
-                    && DynelManager.LocalPlayer.Profession == Profession.Enforcer)
-                {
-                    _started = true;
-
-                    if (Leader == Identity.None)
+                    if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
                     {
-                        IsLeader = true;
-                        Leader = DynelManager.LocalPlayer.Identity;
+                        Debug.DrawSphere(new Vector3(1043.2f, 1.6f, 1021.1f), 0.2f, DebuggingColor.White);
+                        Debug.DrawLine(DynelManager.LocalPlayer.Position, new Vector3(1043.2f, 1.6f, 1021.1f), DebuggingColor.White); // West
                     }
 
                     if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32())
                     {
-                        IPCChannel.Broadcast(new StartModeMessage()
-                        {
-                            Side = (int)SideSelection.Beach
-                        });
+                        Debug.DrawSphere(new Vector3(898.1f, 4.4f, 289.9f), 0.2f, DebuggingColor.White);
+                        Debug.DrawLine(DynelManager.LocalPlayer.Position, new Vector3(898.1f, 4.4f, 289.9f), DebuggingColor.White); // beach
                     }
-                    else if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
+                }
+
+                if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
+                {
+                    SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelBox);
+
+                    if (channelBox != null && !string.IsNullOrEmpty(channelBox.Text))
                     {
-                        IPCChannel.Broadcast(new StartModeMessage()
+                        if (int.TryParse(channelBox.Text, out int channelValue))
                         {
-                            Side = (int)SideSelection.East
-                        });
-                        IPCChannel.Broadcast(new MoveEastMessage());
+                            if (Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
+                            {
+                                IPCChannel.SetChannelId(Convert.ToByte(channelValue));
+                                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = Convert.ToByte(channelValue);
+                                Config.Save();
+                            }
+                        }
                     }
-                    else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
+
+                    if (SettingsController.settingsWindow.FindView("KHBuddyInfoView", out Button infoView))
                     {
-                        IPCChannel.Broadcast(new StartModeMessage()
-                        {
-                            Side = (int)SideSelection.West
-                        });
-                        IPCChannel.Broadcast(new MoveWestMessage());
+                        infoView.Tag = SettingsController.settingsWindow;
+                        infoView.Clicked = InfoView;
                     }
-                    else if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
+
+                    if (!_settings["Toggle"].AsBool() && _started == true
+                        && DynelManager.LocalPlayer.Profession == Profession.Enforcer)
                     {
-                        IPCChannel.Broadcast(new StartModeMessage()
+                        if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32())
                         {
-                            Side = (int)SideSelection.EastAndWest
-                        });
-                        IPCChannel.Broadcast(new MoveEastMessage());
+                            IPCChannel.Broadcast(new StopModeMessage()
+                            {
+                                Side = (int)SideSelection.Beach
+                            });
+                        }
+                        else if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
+                        {
+                            IPCChannel.Broadcast(new StopModeMessage()
+                            {
+                                Side = (int)SideSelection.East
+                            });
 
-                        _doingEast = true;
+                        }
+                        else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
+                        {
+                            IPCChannel.Broadcast(new StopModeMessage()
+                            {
+                                Side = (int)SideSelection.West
+                            });
+
+                        }
+                        else if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
+                        {
+                            IPCChannel.Broadcast(new StopModeMessage()
+                            {
+                                Side = (int)SideSelection.EastAndWest
+                            });
+
+                        }
+
+                        Stop();
                     }
 
-                    Start();
-                }
+                    if (_settings["Toggle"].AsBool() && _started == false
+                        && DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
+                    {
+                        _started = true;
 
-                if (Beach)
-                {
-                    IPCChannel.Broadcast(new BeachSelection());
-                    Beach = false;
-                }
+                        if (Leader == Identity.None)
+                        {
+                            IsLeader = true;
+                            Leader = DynelManager.LocalPlayer.Identity;
+                        }
 
-                if (East)
-                {
-                    IPCChannel.Broadcast(new EastSelection());
-                    East = false;
-                }
+                        if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
+                        {
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1090.2f, 28.1f, 1050.1f)) > 1f && !MovementController.Instance.IsNavigating)
+                            {
+                                MovementController.Instance.SetDestination(new Vector3(1090.2f, 28.1f, 1050.1f));
+                            }
+                        }
+                        else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
+                        {
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1065.4f, 26.2f, 1033.5f)) > 1f && !MovementController.Instance.IsNavigating)
+                            {
+                                MovementController.Instance.SetDestination(new Vector3(1065.4f, 26.2f, 1033.5f));
+                            }
+                        }
 
-                if (West)
-                {
-                    IPCChannel.Broadcast(new WestSelection());
-                    West = false;
-                }
+                        Start();
+                    }
 
-                if (EastandWest)
+                    if (_settings["Toggle"].AsBool() && _started == false
+                        && DynelManager.LocalPlayer.Profession == Profession.Enforcer)
+                    {
+                        _started = true;
+
+                        if (Leader == Identity.None)
+                        {
+                            IsLeader = true;
+                            Leader = DynelManager.LocalPlayer.Identity;
+                        }
+
+                        if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32())
+                        {
+                            IPCChannel.Broadcast(new StartModeMessage()
+                            {
+                                Side = (int)SideSelection.Beach
+                            });
+                        }
+                        else if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
+                        {
+                            IPCChannel.Broadcast(new StartModeMessage()
+                            {
+                                Side = (int)SideSelection.East
+                            });
+                            IPCChannel.Broadcast(new MoveEastMessage());
+                        }
+                        else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
+                        {
+                            IPCChannel.Broadcast(new StartModeMessage()
+                            {
+                                Side = (int)SideSelection.West
+                            });
+                            IPCChannel.Broadcast(new MoveWestMessage());
+                        }
+                        else if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
+                        {
+                            IPCChannel.Broadcast(new StartModeMessage()
+                            {
+                                Side = (int)SideSelection.EastAndWest
+                            });
+                            IPCChannel.Broadcast(new MoveEastMessage());
+
+                            _doingEast = true;
+                        }
+
+                        Start();
+                    }
+
+                    if (Beach)
+                    {
+                        IPCChannel.Broadcast(new BeachSelection());
+                        Beach = false;
+                    }
+
+                    if (East)
+                    {
+                        IPCChannel.Broadcast(new EastSelection());
+                        East = false;
+                    }
+
+                    if (West)
+                    {
+                        IPCChannel.Broadcast(new WestSelection());
+                        West = false;
+                    }
+
+                    if (EastandWest)
+                    {
+                        IPCChannel.Broadcast(new EastandWestSelection());
+                        EastandWest = false;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "An error occurred on line " + KHBuddy.GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != KHBuddy.previousErrorMessage)
                 {
-                    IPCChannel.Broadcast(new EastandWestSelection());
-                    EastandWest = false;
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    KHBuddy.previousErrorMessage = errorMessage;
                 }
             }
         }
@@ -440,7 +456,7 @@ namespace KHBuddy
         public static void Selection()
         {
             if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32() && !_beachToggled)
-                {
+            {
                 Beach = true;
                 East = false;
                 West = false;
@@ -497,195 +513,122 @@ namespace KHBuddy
             }
         }
 
+        #region Kitting
+
+        private void SitAndUseKit()
+        {
+            if (InCombat())
+                return;
+
+            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+            var localPlayer = DynelManager.LocalPlayer;
+
+            if (kit == null || spell == null)
+                return;
+
+            if (!localPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            {
+                HandleSitState();
+            }
+
+            if (localPlayer.MovementState == MovementState.Sit && (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000))
+            {
+                if (localPlayer.NanoPercent < 90 || localPlayer.HealthPercent < 90)
+                {
+                    kit.Use(localPlayer, true);
+                    _kitTimer.Restart();
+                }
+            }
+        }
+
+        private void HandleSitState()
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+
+            bool shouldSit = localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66;
+            bool canSit = !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && localPlayer.MovementState != MovementState.Sit;
+
+            bool shouldStand = localPlayer.NanoPercent > 66 || localPlayer.HealthPercent > 66;
+            bool onCooldown = localPlayer.Cooldowns.ContainsKey(Stat.Treatment);
+
+            if (shouldSit && canSit)
+            {
+                MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
+            }
+            else if (shouldStand && onCooldown)
+            {
+                MovementController.Instance.SetMovement(MovementAction.LeaveSit);
+            }
+        }
+
         private bool CanUseSitKit()
         {
-            if (Inventory.Find(297274, out Item premSitKit))
-                if (DynelManager.LocalPlayer.Health > 0 && DynelManager.LocalPlayer.GetStat(Stat.NumFightingOpponents) == 0
-                                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
-
-            if (DynelManager.LocalPlayer.IsAlive && DynelManager.LocalPlayer.GetStat(Stat.NumFightingOpponents) == 0
-                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
+            if (!DynelManager.LocalPlayer.IsAlive || DynelManager.LocalPlayer.IsMoving || Game.IsZoning)
             {
-                List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
-
-                if (!sitKits.Any()) { return false; }
-
-                foreach (Item sitKit in sitKits.OrderBy(x => x.QualityLevel))
-                {
-                    int skillReq = (sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f));
-
-                    if (DynelManager.LocalPlayer.GetStat(Stat.FirstAid) >= skillReq || DynelManager.LocalPlayer.GetStat(Stat.Treatment) >= skillReq)
-                        return true;
-                }
+                return false;
             }
 
-            return false;
+            List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
+            if (sitKits.Any())
+            {
+                return sitKits.OrderBy(x => x.QualityLevel).Any(sitKit => MeetsSkillRequirement(sitKit));
+            }
+
+            return Inventory.Find(297274, out Item premSitKit);
         }
 
-        private void ListenerSit()
+        private bool MeetsSkillRequirement(Item sitKit)
         {
-            Item kit = Inventory.Items.Where(x => RelevantItems.Kits.Contains(x.Id)).FirstOrDefault();
+            var localPlayer = DynelManager.LocalPlayer;
+            int skillReq = sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f);
 
-            if (kit == null) { return; }
-
-            if (CanUseSitKit())
-            {
-                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
-                    && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
-                {
-                    if (DynelManager.LocalPlayer.NanoPercent < 30 || DynelManager.LocalPlayer.HealthPercent < 65)
-                    {
-                        Task.Factory.StartNew(
-                           async () =>
-                           {
-                               Sitting = true;
-
-                               if (DynelManager.LocalPlayer.IsAttacking)
-                                   DynelManager.LocalPlayer.StopAttack();
-
-                               await Task.Delay(400);
-                               NavMeshMovementController.Instance.SetMovement(MovementAction.SwitchToSit);
-                               await Task.Delay(800);
-                               NavMeshMovementController.Instance.SetMovement(MovementAction.LeaveSit);
-                               await Task.Delay(200);
-
-                               if (DynelManager.LocalPlayer.NanoPercent > 30 || DynelManager.LocalPlayer.HealthPercent > 65)
-                                   Sitting = false;
-                           });
-                    }
-                }
-            }
+            return localPlayer.GetStat(Stat.FirstAid) >= skillReq || localPlayer.GetStat(Stat.Treatment) >= skillReq;
         }
 
-        //private void KHBuddyCommand(string command, string[] param, ChatWindow chatWindow)
-        //{
-        //    try
-        //    {
-        //        if (param.Length < 1)
-        //        {
-        //            if (!KHBuddySettings["West"].AsBool() && !KHBuddySettings["East"].AsBool()
-        //                && !KHBuddySettings["Beach"].AsBool())
-        //            {
-        //                KHBuddySettings["West"] = false;
-        //                KHBuddySettings["East"] = false;
-        //                KHBuddySettings["Beach"] = false;
-        //                KHBuddySettings["BothSides"] = false;
+        public static bool InCombat()
+        {
+            var localPlayer = DynelManager.LocalPlayer;
 
-        //                Chat.WriteLine($"Can only toggle one mode.");
-        //                return;
-        //            }
+            if (Team.IsInTeam)
+            {
+                return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null
+                        && Team.Members.Select(m => m.Name).Contains(c.FightingTarget.Name));
+            }
 
-        //            if (KHBuddySettings["West"].AsBool() && KHBuddySettings["Beach"].AsBool()
-        //                || (KHBuddySettings["East"].AsBool() && KHBuddySettings["Beach"].AsBool()))
-        //            {
-        //                KHBuddySettings["West"] = false;
-        //                KHBuddySettings["East"] = false;
-        //                KHBuddySettings["Beach"] = false;
-        //                KHBuddySettings["BothSides"] = false;
+            return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null
+                        && c.FightingTarget.Name == localPlayer.Name)
+                    || localPlayer.GetStat(Stat.NumFightingOpponents) > 0
+                    || Team.IsInCombat()
+                    || localPlayer.FightingTarget != null;
+        }
 
-        //                Chat.WriteLine($"Can only toggle one mode.");
-        //                return;
-        //            }
-
-        //            if (!KHBuddySettings["Toggle"].AsBool() && !_started)
-        //            {
-        //                if (KHBuddySettings["West"].AsBool() && KHBuddySettings["East"].AsBool()
-        //                    && !KHBuddySettings["Beach"].AsBool())
-        //                {
-        //                    IsLeader = true;
-        //                    Leader = DynelManager.LocalPlayer.Identity;
-
-        //                    KHBuddySettings["BothSides"] = true;
-
-        //                    if (DynelManager.LocalPlayer.Identity == Leader)
-        //                    {
-        //                        if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1115.9f, 1.6f, 1064.3f)) < 5f) // East
-        //                        {
-        //                            KHBuddySettings["West"] = false;
-
-        //                            IPCChannel.Broadcast(new StartModeMessage()
-        //                            {
-        //                                West = KHBuddySettings["West"].AsBool(),
-        //                                East = KHBuddySettings["East"].AsBool(),
-        //                                Beach = KHBuddySettings["Beach"].AsBool(),
-        //                                BothSides = KHBuddySettings["BothSides"].AsBool()
-        //                            });
-        //                        }
-
-        //                        if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1043.2f, 1.6f, 1021.1f)) < 5f) // West
-        //                        {
-        //                            KHBuddySettings["East"] = false;
-
-        //                            IPCChannel.Broadcast(new StartModeMessage()
-        //                            {
-        //                                West = KHBuddySettings["West"].AsBool(),
-        //                                East = KHBuddySettings["East"].AsBool(),
-        //                                Beach = KHBuddySettings["Beach"].AsBool(),
-        //                                BothSides = KHBuddySettings["BothSides"].AsBool()
-        //                            });
-        //                        }
-        //                    }
-        //                    Start();
-        //                    Chat.WriteLine("Starting");
-        //                    return;
-        //                }
-        //                else
-        //                {
-        //                    IsLeader = true;
-        //                    Leader = DynelManager.LocalPlayer.Identity;
-
-        //                    KHBuddySettings["BothSides"] = false;
-
-        //                    if (DynelManager.LocalPlayer.Identity == Leader)
-        //                    {
-        //                        IPCChannel.Broadcast(new StartModeMessage()
-        //                        {
-        //                            West = KHBuddySettings["West"].AsBool(),
-        //                            East = KHBuddySettings["East"].AsBool(),
-        //                            Beach = KHBuddySettings["Beach"].AsBool(),
-        //                            BothSides = KHBuddySettings["BothSides"].AsBool()
-        //                        });
-        //                    }
-        //                    Start();
-        //                    Chat.WriteLine("Starting");
-        //                    return;
-        //                }
-        //            }
-        //            else if (KHBuddySettings["Toggle"].AsBool() && _started)
-        //            {
-        //                if (DynelManager.LocalPlayer.Identity == Leader)
-        //                {
-        //                    IPCChannel.Broadcast(new StopModeMessage()
-        //                    {
-        //                        West = KHBuddySettings["West"].AsBool(),
-        //                        East = KHBuddySettings["East"].AsBool(),
-        //                        Beach = KHBuddySettings["Beach"].AsBool(),
-        //                        BothSides = KHBuddySettings["BothSides"].AsBool()
-        //                    });
-        //                }
-
-        //                Stop();
-        //                Chat.WriteLine("Stopping");
-        //                return;
-        //            }
-        //        }
-        //        Config.Save();
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Chat.WriteLine(e.Message);
-        //    }
-        //}
+        #endregion
 
         public enum SideSelection
         {
             Beach, East, West, EastAndWest
         }
+
         public static class RelevantItems
         {
             public static readonly int[] Kits = {
                 297274, 293296, 291084, 291083, 291082
             };
+        }
+
+        public static int GetLineNumber(Exception ex)
+        {
+            var lineNumber = 0;
+
+            var lineMatch = Regex.Match(ex.StackTrace ?? "", @":line (\d+)$", RegexOptions.Multiline);
+
+            if (lineMatch.Success)
+                lineNumber = int.Parse(lineMatch.Groups[1].Value);
+
+            return lineNumber;
         }
     }
 }

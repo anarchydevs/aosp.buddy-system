@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AXPBuddy
 {
@@ -13,61 +12,75 @@ namespace AXPBuddy
     {
         public IState GetNextState()
         {
-            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return null; }
-
-            if (AXPBuddy._settings["Toggle"].AsBool() && Team.IsInTeam && Team.IsRaid)
+            if (AXPBuddy._settings["Toggle"].AsBool())
             {
-                if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
+                if (AXPBuddy.Ready)
                 {
-                    return new EnterSectorState();
-                }
-                if (Playfield.ModelIdentity.Instance == Constants.S13Id)
-                {
-                    switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+                    if (Team.IsRaid)
                     {
-                        case AXPBuddy.ModeSelection.Leech:
-                            if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
-                            {
-                                return new LeechState();
-                            }
-                            break;
+                        if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
+                        {
+                            return new EnterSectorState();
+                        }
 
-                        case AXPBuddy.ModeSelection.Path:
-                            if ( AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                        if (Playfield.ModelIdentity.Instance == Constants.S13Id)
+                        {
+                            switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
                             {
-                                return new PathState();
-                            }
-                            break;
+                                case AXPBuddy.ModeSelection.Leech:
+                                    if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                                    {
+                                        return new LeechState();
+                                    }
+                                    break;
 
-                        default:
-                            if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
-                            {
-                                return new PullState();
+                                case AXPBuddy.ModeSelection.Path:
+                                    if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                                    {
+                                        return new PathState();
+                                    }
+                                    break;
+
+                                default:
+                                    if (AXPBuddy._settings["Merge"].AsBool() || (!Team.Members.Any(c => c.Character == null)))
+                                    {
+                                        return new PullState();
+                                    }
+                                    break;
                             }
-                            break;
+                        }
+                    }
+                    else
+                    {
+                        return new ReformState();
                     }
                 }
 
                 if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
                     return new DiedState();
+
+                if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                    return new SitState();
             }
+
+
 
             return null;
         }
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("IdleState::OnStateEnter");
+            Chat.WriteLine("Idle");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("IdleState::OnStateExit");
+            //Chat.WriteLine("IdleState::OnStateExit");
         }
 
         public void Tick()
         {
-            if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f) { return; }
+
         }
     }
 }

@@ -15,11 +15,8 @@ namespace AXPBuddy
         protected string _path;
 
         [JsonIgnore]
-        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(DynelManager.LocalPlayer.Name) ? CharSettings[DynelManager.LocalPlayer.Name].IPCChannel : 37;
-        [JsonIgnore]
-        public float Tick => CharSettings != null && CharSettings.ContainsKey(DynelManager.LocalPlayer.Name) ? CharSettings[DynelManager.LocalPlayer.Name].Tick : 0.7f;
-        [JsonIgnore]
-        public string Leader => CharSettings != null && CharSettings.ContainsKey(DynelManager.LocalPlayer.Name) ? CharSettings[DynelManager.LocalPlayer.Name].Leader : string.Empty;
+        public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(DynelManager.LocalPlayer.Name) 
+            ? CharSettings[DynelManager.LocalPlayer.Name].IPCChannel : 37;
 
         public static Config Load(string path)
         {
@@ -65,7 +62,6 @@ namespace AXPBuddy
         public event EventHandler<int> IPCChannelChangedEvent;
         private int _ipcChannel = 37;
 
-        //Breaking out auto-property
         public int IPCChannel
         {
             get
@@ -78,43 +74,6 @@ namespace AXPBuddy
                 {
                     _ipcChannel = value;
                     IPCChannelChangedEvent?.Invoke(this, value);
-                }
-            }
-        }
-        public event EventHandler<float> TickChangedEvent;
-        private float _tick = 0.7f;
-
-        public float Tick
-        {
-            get
-            {
-                return _tick;
-            }
-            set
-            {
-                if (_tick != value)
-                {
-                    _tick = value;
-                    TickChangedEvent?.Invoke(this, value);
-                }
-            }
-        }
-        public event EventHandler<string> LeaderChangedEvent;
-        private string _leader = string.Empty;
-
-        //Breaking out auto-property
-        public string Leader
-        {
-            get
-            {
-                return _leader;
-            }
-            set
-            {
-                if (_leader != value)
-                {
-                    _leader = value;
-                    LeaderChangedEvent?.Invoke(this, value);
                 }
             }
         }

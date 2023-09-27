@@ -3,8 +3,6 @@ using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace VortexxBuddy
 {
@@ -12,6 +10,7 @@ namespace VortexxBuddy
     {
         public static bool _initCorpse = false;
         public static bool _atCorpse = false;
+        private static double _timeToLeave;
 
         private static Corpse _vortexxCorpse;
 
@@ -36,6 +35,8 @@ namespace VortexxBuddy
             _atCorpse = false;
             _initCorpse = false;
             VortexxBuddy.VortexxCorpse = false;
+            Chat.WriteLine("Pause for looting, 30 sec");
+            _timeToLeave = Time.NormalTime + 30; // Schedule leave 30 seconds from now
         }
 
         public void Tick()
@@ -62,21 +63,20 @@ namespace VortexxBuddy
                     _atCorpse = true;
                 }
 
-                if (!_initCorpse && _atCorpse)
+                if (_atCorpse && !_initCorpse)
                 {
-                    Chat.WriteLine("Pause for looting, 10 sec");
-                    Task.Factory.StartNew(
-                        async () =>
-                        {
-                            await Task.Delay(10000);
-                            Chat.WriteLine("Done, Leaving");
+                    // Check if it's time to disband
+                    if (Time.NormalTime >= _timeToLeave)
+                    {
+                        Chat.WriteLine("Done, leaving");
+                        _initCorpse = true; // Prevent this block from running again
+                    }
+                }
 
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._BeaconPos) > 1)
-                                VortexxBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._BeaconPos);
-
-                        });
-
-                    _initCorpse = true;
+                if (_initCorpse)
+                {
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._BeaconPos) > 1)
+                        MovementController.Instance.SetDestination(Constants._BeaconPos);
                 }
             }
 

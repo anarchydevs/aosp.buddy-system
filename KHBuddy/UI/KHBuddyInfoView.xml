@@ -1,20 +1,17 @@
 ﻿<?xml version="1.0" standalone="yes"?>
 <root>
-  <BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="KHBuddyHelpBox" layout_borders="Rect(0,0,0,2)" max_size="Point(16000,-1)">
-    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="Inject Handlers and KHBuddy on enfo and nt, nothing else needed." layout_borders="Rect(0,0,0,2)"/>
-	  <TextView value="East + West - start from east" layout_borders="Rect(0,0,0,2)"/>
-    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="Commands;" layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="/buddy - toggles start and stop." layout_borders="Rect(0,0,0,2)"/>
-    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-    <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="NOTE: Disable Taunts and buffing cycles." layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="Follow the white line, start with enforcer around the white sphere." layout_borders="Rect(0,0,0,2)"/>
-    <TextView value="Enable AOE or VE under Nukes on the nano-technician." layout_borders="Rect(0,0,0,2)"/>
-    <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
-  </BorderView>
+	<BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="KHBuddyHelpBox" layout_borders="Rect(0,0,0,2)" max_size="Point(16000,-1)">
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="Inject Handlers and KHBuddy on enfo and nt, nothing else needed." layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="East + West - start from east" layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="NOTE: Disable Taunts and buffing cycles." layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="Follow the white line, start with enforcer around the white sphere." layout_borders="Rect(0,0,0,2)"/>
+		<TextView value="Enable AOE or VE under Nukes on the nano-technician." layout_borders="Rect(0,0,0,2)"/>
+		<TextView value=" " layout_borders="Rect(0,0,0,2)"/>
+	</BorderView>
 </root>

@@ -35,7 +35,7 @@ namespace Db1Buddy
             
                 if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
                     && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
-                    Db1Buddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+                    MovementController.Instance.SetMovement(MovementAction.LeaveSit);
            
             
         }
