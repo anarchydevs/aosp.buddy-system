@@ -34,9 +34,6 @@ namespace InfBuddy
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
                 return new IdleState();
 
-            //if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-            //    return new SitState();
-
             return null;
         }
 
@@ -64,7 +61,7 @@ namespace InfBuddy
                 InfBuddy._leader = Team.Members
                         .Where(c => c.Character?.Health > 0
                             && c.Character?.IsValid == true
-                            && (c.Identity == InfBuddy.Leader || c.IsLeader))
+                            && c.Identity == InfBuddy.Leader)
                         .FirstOrDefault()?.Character;
 
                 if (InfBuddy._leader != null)
@@ -94,7 +91,7 @@ namespace InfBuddy
                     }
                 }
             }
-            else
+            else // is leader
             {
                 SimpleChar mob = DynelManager.NPCs
                     .Where(c => c.Health > 0)
@@ -102,33 +99,36 @@ namespace InfBuddy
                     .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                     .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name));
 
-                if (mob != null)
+                if (mob != null && mob.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 8
+                            && mob.IsInLineOfSight)
                 {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) > 9 || !mob.IsInLineOfSight)
+                    if (DynelManager.LocalPlayer.FightingTarget == null
+                       && !DynelManager.LocalPlayer.IsAttacking
+                       && !DynelManager.LocalPlayer.IsAttackPending)
                     {
-                        InfBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
+                        DynelManager.LocalPlayer.Attack(mob);
                     }
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) < 9 && mob.IsInLineOfSight)
+                }
+                else if (Team.Members.Any(c => c.Character != null) && !Spell.HasPendingCast && DynelManager.LocalPlayer.NanoPercent > 70
+                && DynelManager.LocalPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady) && InfBuddy.Ready)
+                {
+                    if (mob != null)
                     {
-                        InfBuddy.NavMeshMovementController.Halt();
-
-                        if (DynelManager.LocalPlayer.FightingTarget == null
-                                && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) > 9 || !mob.IsInLineOfSight)
                         {
-                            DynelManager.LocalPlayer.Attack(mob);
+                            InfBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
+                        }
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) < 9 && mob.IsInLineOfSight)
+                        {
+                            InfBuddy.NavMeshMovementController.Halt();
                         }
                     }
-                }
-                else if (mob == null && _corpse != null && InfBuddy._settings["Looting"].AsBool())
-                {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5f)
-                        InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
-                }
-                else if (!Team.Members.Where(c => c.Character != null && (c.Character.HealthPercent < 66 || c.Character.NanoPercent < 66)).Any()
-                && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
-                {
-
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.RoamPos) > 5)
+                    else if (mob == null && _corpse != null && InfBuddy._settings["Looting"].AsBool())
+                    {
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5f)
+                            InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_corpse?.Position);
+                    }
+                    else if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.RoamPos) > 5)
                     {
                         InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.RoamPos);
                     }

@@ -1,30 +1,28 @@
 ﻿<?xml version="1.0" standalone="yes"?>
 <root>
-  <View view_layout="vertical" name="parent">
-      <BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="Settings" layout_borders="Rect(5,5,5,5)" max_size="Point(16000,-1)">
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-      <Button name="AttackBuddyInfoView" label="Info" layout_borders="Rect(5,5,3,5)"/>
-      <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-      <TextView value="Channel" layout_borders="Rect(5,5,5,5)"/>
-      <TextInputView name="ChannelBox" min_size="Point(30,14)" max_size="Point(30,14)" layout_borders="Rect(4,4,4,4)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <OptionCheckBox label="Enabled" opt_category="AOSharp" opt_type="variant" opt_variable="AttackBuddy__Enable" layout_borders="Rect(10,1,5,1)"/>
-      <OptionCheckBox label="Taunt" opt_category="AOSharp" opt_type="variant" opt_variable="AttackBuddy__Taunt" layout_borders="Rect(10,1,5,1)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-		  <OptionCheckBox label="Leader" opt_category="AOSharp" opt_type="variant" opt_variable="AttackBuddy__Leader" layout_borders="Rect(10,1,5,1)"/>
-		  <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <TextView value="Attack Range" layout_borders="Rect(5,5,5,5)"/>
-      <TextInputView name="AttackRangeBox" min_size="Point(30,14)" max_size="Point(30,14)" layout_borders="Rect(4,4,4,4)"/>
-      <TextView value="Taunt Range" layout_borders="Rect(5,5,5,5)"/>
-      <TextInputView name="ScanRangeBox" min_size="Point(30,14)" max_size="Point(30,14)" layout_borders="Rect(4,4,4,4)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <Button name="AttackBuddyHelpersView" label="Helpers" layout_borders="Rect(5,5,3,5)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-      <BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
-      <TextView value=" " layout_borders="Rect(5,5,5,5)"/>
-    </BorderView>
-  </View>
+	<View view_layout="vertical" name="parent">
+		<BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="Settings" layout_borders="Rect(5,5,5,5)" max_size="Point(16000,-1)">
+			<TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+			<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+			<Button name="AttackBuddyInfoView" label="Info" layout_borders="Rect(5,5,3,5)"/>
+			<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+			<TextView value="Channel" layout_borders="Rect(5,5,5,5)"/>
+			<TextInputView name="ChannelBox" min_size="Point(30,14)" max_size="Point(30,14)" layout_borders="Rect(4,4,4,4)"/>
+			<TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+			<OptionCheckBox label="Enabled" opt_category="AOSharp" opt_type="variant" opt_variable="AttackBuddy__Enable" layout_borders="Rect(10,1,5,1)"/>
+			<OptionCheckBox label="Taunt" opt_category="AOSharp" opt_type="variant" opt_variable="AttackBuddy__Taunt" layout_borders="Rect(10,1,5,1)"/>
+			<TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+			<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+			<TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+			<TextView value="Attack Range" layout_borders="Rect(5,5,5,5)"/>
+			<TextInputView name="AttackRangeBox" min_size="Point(30,14)" max_size="Point(30,14)" layout_borders="Rect(4,4,4,4)"/>
+			<TextView value="Taunt Range" layout_borders="Rect(5,5,5,5)"/>
+			<TextInputView name="ScanRangeBox" min_size="Point(30,14)" max_size="Point(30,14)" layout_borders="Rect(4,4,4,4)"/>
+			<TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+			<Button name="AttackBuddyHelpersView" label="Helpers" layout_borders="Rect(5,5,3,5)"/>
+			<TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+			<BitmapView bitmap_id="GFX_GUI_FRIENDLIST_SPLITTER" layout_borders="Rect(5,5,5,5)"/>
+			<TextView value=" " layout_borders="Rect(5,5,5,5)"/>
+		</BorderView>
+	</View>
 </root>

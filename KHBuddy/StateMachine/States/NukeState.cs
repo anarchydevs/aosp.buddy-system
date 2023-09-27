@@ -31,7 +31,7 @@ namespace KHBuddy
                 if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician && !Team.IsInTeam)
             {
                 KHBuddy._settings["Toggle"] = false;
-                Chat.WriteLine("Turning off bot, Idle for too long.");
+                //Chat.WriteLine("Turning off bot, Idle for too long.");
                 return new IdleState();
             }
 

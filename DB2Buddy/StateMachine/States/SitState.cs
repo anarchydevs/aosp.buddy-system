@@ -40,7 +40,7 @@ namespace DB2Buddy
 
                 if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
                     && DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65)
-                    DB2Buddy.NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
+                    MovementController.Instance.SetMovement(MovementAction.LeaveSit);
 
             }
             catch (Exception ex)

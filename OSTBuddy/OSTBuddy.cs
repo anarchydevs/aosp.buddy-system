@@ -49,7 +49,7 @@ namespace OSTBuddy
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].RespawnDelayChangedEvent += RespawnDelay_Changed;
 
-                Chat.RegisterCommand("buddy", OSTBuddyCommand); Chat.RegisterCommand("buddy", OSTBuddyCommand);
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 SettingsController.RegisterSettingsWindow("OSTBuddy", pluginDir + "\\UI\\OSTBuddySettingWindow.xml", _settings);
 
@@ -190,7 +190,7 @@ namespace OSTBuddy
 
         }
 
-        private void OSTBuddyCommand(string command, string[] param, ChatWindow chatWindow)
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {

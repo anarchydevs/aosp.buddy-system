@@ -3,6 +3,7 @@
   <BorderView v_alignment="TOP" h_alignment="CENTER" view_layout="vertical" name="AXPBuddyInfoView" layout_borders="Rect(0,0,0,2)" max_size="Point(16000,-1)">
     <TextView value=" " layout_borders="Rect(0,0,0,2)"/>
 	  <TextView value="Save in Unicorn Hub." layout_borders="Rect(5,0,0,2)"/>
+	  <TextView value="Form team then create a raid before enabling." layout_borders="Rect(5,0,0,2)"/>
     <TextView value="Merge - Merge with another team." layout_borders="Rect(5,0,0,2)"/>
     <TextView value="Pull Mob - Pulls to the closest mob." layout_borders="Rect(5,0,0,2)"/>
     <TextView value="Path to Mob - Paths to the closest mob." layout_borders="Rect(5,0,0,2)"/>

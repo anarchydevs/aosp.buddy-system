@@ -10,9 +10,10 @@ using KHBuddy.IPCMessages;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using Debug = AOSharp.Core.Debug;
 
 namespace KHBuddy
 {
@@ -25,6 +26,8 @@ namespace KHBuddy
 
         public static Identity Leader = Identity.None;
         public static bool IsLeader = false;
+
+        private Stopwatch _kitTimer = new Stopwatch();
 
         public static string PluginDirectory;
 
@@ -245,7 +248,7 @@ namespace KHBuddy
 
                 Selection();
 
-                ListenerSit();
+                SitAndUseKit();
 
                 if (DynelManager.LocalPlayer.Profession == Profession.Enforcer)
                 {
@@ -510,64 +513,99 @@ namespace KHBuddy
             }
         }
 
-        private void ListenerSit()
+        #region Kitting
+
+        private void SitAndUseKit()
         {
-            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
-
-            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-
-            if (kit == null && spell == null)
-            {
+            if (InCombat())
                 return;
+
+            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+            var localPlayer = DynelManager.LocalPlayer;
+
+            if (kit == null || spell == null)
+                return;
+
+            if (!localPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            {
+                HandleSitState();
             }
 
-            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
+            if (localPlayer.MovementState == MovementState.Sit && (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000))
             {
-                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
-                        DynelManager.LocalPlayer.MovementState != MovementState.Sit)
+                if (localPlayer.NanoPercent < 90 || localPlayer.HealthPercent < 90)
                 {
-                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
-                    {
-                        MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
-                    }
+                    kit.Use(localPlayer, true);
+                    _kitTimer.Restart();
                 }
-            }
-
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
-            {
-                NeedsKit = false;
-
-               MovementController.Instance.SetMovement(MovementAction.LeaveSit);
             }
         }
 
-    
-
-    private bool CanUseSitKit()
+        private void HandleSitState()
         {
+            var localPlayer = DynelManager.LocalPlayer;
 
-            if (Inventory.Find(297274, out Item premSitKit))
-                if (DynelManager.LocalPlayer.Health > 0 && DynelManager.LocalPlayer.GetStat(Stat.NumFightingOpponents) == 0
-                                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
+            bool shouldSit = localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66;
+            bool canSit = !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && localPlayer.MovementState != MovementState.Sit;
 
-            if (DynelManager.LocalPlayer.IsAlive && DynelManager.LocalPlayer.GetStat(Stat.NumFightingOpponents) == 0
-                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
+            bool shouldStand = localPlayer.NanoPercent > 66 || localPlayer.HealthPercent > 66;
+            bool onCooldown = localPlayer.Cooldowns.ContainsKey(Stat.Treatment);
+
+            if (shouldSit && canSit)
             {
-                List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
+                MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
+            }
+            else if (shouldStand && onCooldown)
+            {
+                MovementController.Instance.SetMovement(MovementAction.LeaveSit);
+            }
+        }
 
-                if (!sitKits.Any()) { return false; }
-
-                foreach (Item sitKit in sitKits.OrderBy(x => x.QualityLevel))
-                {
-                    int skillReq = (sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f));
-
-                    if (DynelManager.LocalPlayer.GetStat(Stat.FirstAid) >= skillReq || DynelManager.LocalPlayer.GetStat(Stat.Treatment) >= skillReq)
-                        return true;
-                }
+        private bool CanUseSitKit()
+        {
+            if (!DynelManager.LocalPlayer.IsAlive || DynelManager.LocalPlayer.IsMoving || Game.IsZoning)
+            {
+                return false;
             }
 
-            return false;
+            List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
+            if (sitKits.Any())
+            {
+                return sitKits.OrderBy(x => x.QualityLevel).Any(sitKit => MeetsSkillRequirement(sitKit));
+            }
+
+            return Inventory.Find(297274, out Item premSitKit);
         }
+
+        private bool MeetsSkillRequirement(Item sitKit)
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+            int skillReq = sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f);
+
+            return localPlayer.GetStat(Stat.FirstAid) >= skillReq || localPlayer.GetStat(Stat.Treatment) >= skillReq;
+        }
+
+        public static bool InCombat()
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+
+            if (Team.IsInTeam)
+            {
+                return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null
+                        && Team.Members.Select(m => m.Name).Contains(c.FightingTarget.Name));
+            }
+
+            return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null
+                        && c.FightingTarget.Name == localPlayer.Name)
+                    || localPlayer.GetStat(Stat.NumFightingOpponents) > 0
+                    || Team.IsInCombat()
+                    || localPlayer.FightingTarget != null;
+        }
+
+        #endregion
 
         public enum SideSelection
         {

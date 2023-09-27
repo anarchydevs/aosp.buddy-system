@@ -37,7 +37,7 @@ namespace AXPBuddy
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("PullState::OnStateEnter");
+            Chat.WriteLine("Pull state");
         }
 
         public void Tick()
@@ -98,7 +98,9 @@ namespace AXPBuddy
                             if (targetMob != null)
                             {
                                 if (DynelManager.LocalPlayer.FightingTarget == null
-                                    && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                                   && !DynelManager.LocalPlayer.IsAttacking
+                                   && !DynelManager.LocalPlayer.IsAttackPending
+                                   && targetMob.IsInLineOfSight)
                                 {
                                     DynelManager.LocalPlayer.Attack(targetMob);
                                 }
@@ -135,7 +137,9 @@ namespace AXPBuddy
                                 if (mob.IsInAttackRange())
                                 {
                                     if (DynelManager.LocalPlayer.FightingTarget == null
-                                            && !DynelManager.LocalPlayer.IsAttacking && !DynelManager.LocalPlayer.IsAttackPending)
+                                   && !DynelManager.LocalPlayer.IsAttacking
+                                   && !DynelManager.LocalPlayer.IsAttackPending
+                                   && mob.IsInLineOfSight)
                                     {
                                         DynelManager.LocalPlayer.Attack(mob);
                                     }
@@ -146,7 +150,8 @@ namespace AXPBuddy
                                     HandleTaunting(mob);
                                 }
 
-                                else if (mob.IsAttacking && !mob.IsInAttackRange())
+                                else if (mob.IsAttacking && !mob.IsInAttackRange() && !Spell.HasPendingCast && DynelManager.LocalPlayer.NanoPercent > 70
+                       && DynelManager.LocalPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady) && AXPBuddy.Ready)
                                 {
                                     AXPBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
                                 }
@@ -154,7 +159,9 @@ namespace AXPBuddy
                         }
                         else if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
                                 && Team.Members.Any(c => c.Character != null)
-                                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f)
+                                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 5f 
+                                && !Spell.HasPendingCast && DynelManager.LocalPlayer.NanoPercent > 70
+                       && DynelManager.LocalPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady) && AXPBuddy.Ready)
                         {
                             AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.S13GoalPos);
                         }
@@ -210,7 +217,7 @@ namespace AXPBuddy
 
         public void OnStateExit()
         {
-            Chat.WriteLine("PullState::OnStateExit");
+            //Chat.WriteLine("PullState::OnStateExit");
 
             _init = false;
         }

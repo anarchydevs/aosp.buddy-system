@@ -5,8 +5,6 @@ using AOSharp.Pathfinding;
 using AOSharp.Common.GameData;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Runtime.InteropServices;
 
@@ -19,7 +17,6 @@ namespace VortexxBuddy
 
         private const int MinWait = 3;
         private const int MaxWait = 5;
-        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
         
 
         public IState GetNextState()
@@ -48,8 +45,6 @@ namespace VortexxBuddy
 
         public void OnStateExit()
         {
-
-            _cancellationToken.Cancel();
         }
 
         public void Tick()

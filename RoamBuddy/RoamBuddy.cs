@@ -71,7 +71,7 @@ namespace RoamBuddy
                 Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRangeChangedEvent += AttackRange_Changed;
                 Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRangeChangedEvent += ScanRange_Changed;
 
-                Chat.RegisterCommand("buddy", RoamBuddyCommand);
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 SettingsController.RegisterSettingsWindow("RoamBuddy", pluginDir + "\\UI\\RoamBuddySettingWindow.xml", _settings);
 
@@ -534,7 +534,7 @@ namespace RoamBuddy
 
         }
 
-        private void RoamBuddyCommand(string command, string[] param, ChatWindow chatWindow)
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {

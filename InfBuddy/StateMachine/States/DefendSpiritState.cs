@@ -30,16 +30,15 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            if (Game.IsZoning) { return null; }
+
             _corpse = DynelManager.Corpses
                 .Where(c => c.Name.Contains("Remains of "))
                 .FirstOrDefault();
 
-            if (Game.IsZoning) { return null; }
-
             _primevalSpinetooth = DynelManager.NPCs
             .Where(c => c.Health > 0
-                && c.Name.Contains("Primeval Spinetooth")
-                && !c.Name.Contains("Remains of "))
+                && c.Name.Contains("Primeval Spinetooth"))
             .FirstOrDefault();
 
             if (Extensions.HasDied())

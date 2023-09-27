@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace AXPBuddy.IPCMessages
 {
     public enum IPCOpcode
     {
-        Start = 1001,
-        Stop = 1002
+        StartStop = 1001,
+        LeaderInfo = 1003,
+        WaitAndReady = 1004
+
     }
 }

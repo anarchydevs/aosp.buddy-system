@@ -40,6 +40,7 @@ namespace AttackBuddy
         public static List<SimpleChar> _switchMobShield = new List<SimpleChar>();
 
         private static double _refreshList;
+        private static double _uiDelay;
 
         private static Window _infoWindow;
         private static Window _helperWindow;
@@ -64,10 +65,12 @@ namespace AttackBuddy
                 Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp\\KnowsMods\\AttackBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.AttackRange, OnAttackRangeMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.ScanRange, OnScanRangeMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.RangeInfo, OnRangeInfoMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.LeaderInfo, OnLeaderInfoMessage);
+
+                //IPCChannel.RegisterCallback((int)IPCOpcode.AttackRange, OnAttackRangeMessage);
+                //IPCChannel.RegisterCallback((int)IPCOpcode.ScanRange, OnScanRangeMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
                 Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRangeChangedEvent += AttackRange_Changed;
@@ -82,10 +85,8 @@ namespace AttackBuddy
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Enable", false);
-                _settings.AddVariable("Taunt", false);
-                _settings.AddVariable("Leader", false);
-
                 _settings["Enable"] = false;
+                _settings.AddVariable("Taunt", false);
 
                 Chat.WriteLine("AttackBuddy Loaded!");
                 Chat.WriteLine("/attackbuddy for settings.");
@@ -135,11 +136,6 @@ namespace AttackBuddy
         {
             Enable = true;
 
-            if (_settings["Leader"].AsBool())
-            {
-                Leader = DynelManager.LocalPlayer.Identity;
-            }
-
             Chat.WriteLine("AttackBuddy enabled.");
 
             if (!(_stateMachine.CurrentState is IdleState))
@@ -155,37 +151,67 @@ namespace AttackBuddy
             if (!(_stateMachine.CurrentState is IdleState))
                 _stateMachine.SetState(new IdleState());
 
-            if (DynelManager.LocalPlayer.IsAttacking)
-                DynelManager.LocalPlayer.StopAttack();
         }
 
-        private void OnStartMessage(int sender, IPCMessage msg)
+        private void OnStartStopMessage(int sender, IPCMessage msg)
         {
-            Start();
-            _settings["Enable"] = true;
+            if (msg is StartStopIPCMessage startStopMessage)
+            {
+                if (startStopMessage.IsStarting)
+                {
+                    // Update the setting and start the process.
+                    _settings["Enable"] = true;
+                    Start();
+                }
+                else
+                {
+                    // Update the setting and stop the process.
+                    _settings["Enable"] = false;
+                    Stop();
+                }
+            }
         }
 
-        private void OnStopMessage(int sender, IPCMessage msg)
+        private void OnRangeInfoMessage(int sender, IPCMessage msg)
         {
-            Stop();
-            _settings["Enable"] = false;
+            if (msg is RangeInfoIPCMessage rangeInfoMessage)
+            {
+                Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = rangeInfoMessage.AttackRange;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = rangeInfoMessage.ScanRange;
+            }
         }
 
-        private void OnAttackRangeMessage(int sender, IPCMessage msg)
+        private void OnLeaderInfoMessage(int sender, IPCMessage msg)
         {
-            AttackRangeMessage rangeMsg = (AttackRangeMessage)msg;
-
-            Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = rangeMsg.Range;
+            if (msg is LeaderInfoIPCMessage leaderInfoMessage)
+            {
+                if (leaderInfoMessage.IsRequest)
+                {
+                    if (Leader != Identity.None)
+                    {
+                        IPCChannel.Broadcast(new LeaderInfoIPCMessage() { LeaderIdentity = Leader, IsRequest = false });
+                    }
+                }
+                else
+                {
+                    Leader = leaderInfoMessage.LeaderIdentity;
+                }
+            }
         }
 
-        private void OnScanRangeMessage(int sender, IPCMessage msg)
-        {
-            ScanRangeMessage rangeMsg = (ScanRangeMessage)msg;
+        //private void OnAttackRangeMessage(int sender, IPCMessage msg)
+        //{
+        //    AttackRangeMessage rangeMsg = (AttackRangeMessage)msg;
 
-            Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = rangeMsg.Range;
-        }
+        //    Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = rangeMsg.Range;
+        //}
 
+        //private void OnScanRangeMessage(int sender, IPCMessage msg)
+        //{
+        //    ScanRangeMessage rangeMsg = (ScanRangeMessage)msg;
 
+        //    Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = rangeMsg.Range;
+        //}
 
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
@@ -301,107 +327,146 @@ namespace AttackBuddy
                     return;
                 }
 
-                if (Time.NormalTime > _refreshList + 0.5f
-                    && Enable == true)
-                    Scanning();
-
-                #region UI
-                var window = SettingsController.FindValidWindow(_windows);
-
-                if (window != null && window.IsValid)
+                if (Leader == Identity.None)
                 {
-                    if (window.FindView("AttackBuddyAddHelper", out Button addHelperView))
-                    {
-                        addHelperView.Tag = window;
-                        addHelperView.Clicked = HandleAddHelperViewClick;
-                    }
-
-                    if (window.FindView("AttackBuddyRemoveHelper", out Button removeHelperView))
-                    {
-                        removeHelperView.Tag = window;
-                        removeHelperView.Clicked = HandleRemoveHelperViewClick;
-                    }
-
-                    if (window.FindView("AttackBuddyClearHelpers", out Button clearHelpersView))
-                    {
-                        clearHelpersView.Tag = window;
-                        clearHelpersView.Clicked = HandleClearHelpersViewClick;
-                    }
-
-                    if (window.FindView("AttackBuddyPrintHelpers", out Button printHelpersView))
-                    {
-                        printHelpersView.Tag = window;
-                        printHelpersView.Clicked = HandlePrintHelpersViewClick;
-                    }
+                    IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
                 }
 
-                if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
+                if (Time.NormalTime > _refreshList + 0.5f && Enable == true)
                 {
-                    SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
-                    SettingsController.settingsWindow.FindView("AttackRangeBox", out TextInputView attackRangeInput);
-                    SettingsController.settingsWindow.FindView("ScanRangeBox", out TextInputView scanRangeInput);
+                    Scanning();
+                }
+                    
+                #region UI
 
-                    if (channelInput != null)
+                if (Time.NormalTime > _uiDelay + 1.0)
+                {
+                    var window = SettingsController.FindValidWindow(_windows);
+
+                    if (window != null && window.IsValid)
                     {
-                        if (int.TryParse(channelInput.Text, out int channelValue)
-                            && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
+                        if (window.FindView("AttackBuddyAddHelper", out Button addHelperView))
                         {
-                            Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
+                            addHelperView.Tag = window;
+                            addHelperView.Clicked = HandleAddHelperViewClick;
+                        }
+
+                        if (window.FindView("AttackBuddyRemoveHelper", out Button removeHelperView))
+                        {
+                            removeHelperView.Tag = window;
+                            removeHelperView.Clicked = HandleRemoveHelperViewClick;
+                        }
+
+                        if (window.FindView("AttackBuddyClearHelpers", out Button clearHelpersView))
+                        {
+                            clearHelpersView.Tag = window;
+                            clearHelpersView.Clicked = HandleClearHelpersViewClick;
+                        }
+
+                        if (window.FindView("AttackBuddyPrintHelpers", out Button printHelpersView))
+                        {
+                            printHelpersView.Tag = window;
+                            printHelpersView.Clicked = HandlePrintHelpersViewClick;
                         }
                     }
-                    if (attackRangeInput != null && !string.IsNullOrEmpty(attackRangeInput.Text))
+
+                    if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
                     {
+                        SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
+                        SettingsController.settingsWindow.FindView("AttackRangeBox", out TextInputView attackRangeInput);
+                        SettingsController.settingsWindow.FindView("ScanRangeBox", out TextInputView scanRangeInput);
+
+                        if (channelInput != null)
+                        {
+                            if (int.TryParse(channelInput.Text, out int channelValue)
+                                && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
+                            {
+                                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
+                            }
+                        }
+
+                        //if (attackRangeInput != null && !string.IsNullOrEmpty(attackRangeInput.Text))
+                        //{
+                        //    if (int.TryParse(attackRangeInput.Text, out int attackRangeInputValue)
+                        //        && Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange != attackRangeInputValue)
+                        //    {
+                        //        Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = attackRangeInputValue;
+                        //        IPCChannel.Broadcast(new AttackRangeMessage()
+                        //        {
+                        //            Range = attackRangeInputValue
+                        //        });
+                        //    }
+                        //}
+                        //if (scanRangeInput != null && !string.IsNullOrEmpty(scanRangeInput.Text))
+                        //{
+                        //    if (int.TryParse(scanRangeInput.Text, out int scanRangeInputValue)
+                        //        && Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange != scanRangeInputValue)
+                        //    {
+                        //        Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = scanRangeInputValue;
+                        //        IPCChannel.Broadcast(new ScanRangeMessage()
+                        //        {
+                        //            Range = scanRangeInputValue
+                        //        });
+                        //    }
+                        //}
+
+                        bool attackRangeChanged = false;
+                        bool scanRangeChanged = false;
+
                         if (int.TryParse(attackRangeInput.Text, out int attackRangeInputValue)
                             && Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange != attackRangeInputValue)
                         {
                             Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = attackRangeInputValue;
-                            IPCChannel.Broadcast(new AttackRangeMessage()
-                            {
-                                Range = attackRangeInputValue
-                            });
+                            attackRangeChanged = true;
                         }
-                    }
-                    if (scanRangeInput != null && !string.IsNullOrEmpty(scanRangeInput.Text))
-                    {
+
                         if (int.TryParse(scanRangeInput.Text, out int scanRangeInputValue)
                             && Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange != scanRangeInputValue)
                         {
                             Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = scanRangeInputValue;
-                            IPCChannel.Broadcast(new ScanRangeMessage()
+                            scanRangeChanged = true;
+                        }
+
+                        if (attackRangeChanged || scanRangeChanged)
+                        {
+                            IPCChannel.Broadcast(new RangeInfoIPCMessage()
                             {
-                                Range = scanRangeInputValue
+                                AttackRange = Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange,
+                                ScanRange = Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange
                             });
                         }
-                    }
 
-                    if (SettingsController.settingsWindow.FindView("AttackBuddyInfoView", out Button infoView))
-                    {
-                        infoView.Tag = SettingsController.settingsWindow;
-                        infoView.Clicked = HandleInfoViewClick;
-                    }
 
-                    if (SettingsController.settingsWindow.FindView("AttackBuddyHelpersView", out Button helperView))
-                    {
-                        helperView.Tag = SettingsController.settingsWindow;
-                        helperView.Clicked = HandleHelpersViewClick;
-                    }
+                        if (SettingsController.settingsWindow.FindView("AttackBuddyInfoView", out Button infoView))
+                        {
+                            infoView.Tag = SettingsController.settingsWindow;
+                            infoView.Clicked = HandleInfoViewClick;
+                        }
 
-                    if (!_settings["Enable"].AsBool() && Enable)
-                    {
+                        if (SettingsController.settingsWindow.FindView("AttackBuddyHelpersView", out Button helperView))
+                        {
+                            helperView.Tag = SettingsController.settingsWindow;
+                            helperView.Clicked = HandleHelpersViewClick;
+                        }
 
-                        IPCChannel.Broadcast(new StopMessage());
-                        Stop();
-                    }
-                    if (_settings["Enable"].AsBool() && !Enable)
-                    {
-                        //if (DynelManager.LocalPlayer.Identity == Leader)
-                        IPCChannel.Broadcast(new StartMessage());
-                        Start();
+                        if (!_settings["Enable"].AsBool() && Enable)
+                        {
+                            IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                            Stop();
+                        }
+                        if (_settings["Enable"].AsBool() && !Enable)
+                        {
+                            IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                            Start();
+                        }
+
+                        _uiDelay = Time.NormalTime;
                     }
 
                     #endregion
 
                 }
+                
                 _stateMachine.Tick();
             }
             catch (Exception ex)
@@ -423,20 +488,21 @@ namespace AttackBuddy
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Enable"].AsBool())
+                    bool currentToggle = _settings["Enable"].AsBool();
+                    if (!currentToggle)
                     {
-                        IPCChannel.Broadcast(new StartMessage());
-
+                        Leader = DynelManager.LocalPlayer.Identity;
                         _settings["Enable"] = true;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                         Start();
                     }
                     else
                     {
-                        Stop();
                         _settings["Enable"] = false;
-                        IPCChannel.Broadcast(new StopMessage());
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
                     }
-                    return; // Add an early return here
+                    return;
                 }
 
                 switch (param[0].ToLower())
@@ -670,7 +736,7 @@ namespace AttackBuddy
                 .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
                     && !Constants._ignores.Contains(c.Name)
                     && c.Health > 0
-                    && c.IsInLineOfSight && c.MaxHealth < 1000000 
+                    && c.IsInLineOfSight && c.MaxHealth < 1000000
                     && Extensions.IsFightingAny(c)
                     && !c.IsPet)
                 .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
@@ -692,6 +758,8 @@ namespace AttackBuddy
                            && c.MaxHealth >= 1000000)
                        .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
                        .OrderByDescending(c => c.Name == "Field Support  - Cha'Khaz")
+                       .OrderByDescending(c => c.Name == "Ground Chief Aune")
+
 
                        .ToList();
 
@@ -736,6 +804,7 @@ namespace AttackBuddy
                 .OrderByDescending(c => c.Name == "The Sacrifice")
                 .OrderByDescending(c => c.Name == "Hacker'Uri")
                 .OrderByDescending(c => c.Name == "Hand of the Colonel")
+                .OrderByDescending(c => c.Name == "Ground Chief Aune")
                 .ToList();
         }
 

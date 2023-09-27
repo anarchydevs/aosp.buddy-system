@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace CityBuddy
 {
@@ -91,14 +90,14 @@ namespace CityBuddy
                             break;
 
                         case State.ArrivedAtEntrance:
-                            // Start moving forward for 2 seconds
+                            // Start moving forward for 1 seconds
                             MovementController.Instance.SetMovement(MovementAction.ForwardStart);
                             forwardStartTime = Time.NormalTime;
                             currentState = State.MovingForward;
                             break;
 
                         case State.MovingForward:
-                            if (Time.NormalTime >= forwardStartTime + 2)
+                            if (Time.NormalTime >= forwardStartTime + 1)
                             {
                                 MovementController.Instance.SetMovement(MovementAction.ForwardStop); // Stop moving forward
                                 currentState = State.PathingBackToEntrance;

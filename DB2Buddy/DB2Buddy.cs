@@ -9,9 +9,9 @@ using AOSharp.Core.Movement;
 using DB2Buddy.IPCMessages;
 using AOSharp.Core.Inventory;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 
 namespace DB2Buddy
 {
@@ -21,6 +21,8 @@ namespace DB2Buddy
         public static NavMeshMovementController NavMeshMovementController { get; private set; }
         public static IPCChannel IPCChannel { get; private set; }
         public static Config Config { get; private set; }
+
+        private Stopwatch _kitTimer = new Stopwatch();
 
         public static bool Toggle = false;
         public static bool Farming = false;
@@ -35,12 +37,9 @@ namespace DB2Buddy
 
         public static bool _taggedNotum = false;
 
-        public static bool Sitting = false;
-
         public static bool AuneCorpse = false;
 
         public static double _time = Time.NormalTime;
-        public static double _sitUpdateTimer;
 
         public static Identity Leader = Identity.None;
 
@@ -94,7 +93,7 @@ namespace DB2Buddy
                 _settings["Toggle"] = false;
                 _settings["Farming"] = false;
 
-                Chat.RegisterCommand("buddy", DB2BuddyCommand);
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 Game.OnUpdate += OnUpdate;
             }
@@ -192,12 +191,8 @@ namespace DB2Buddy
                 if (Game.IsZoning)
                     return;
 
-                if (Time.NormalTime > _sitUpdateTimer + 1)
-                {
-                    ListenerSit();
 
-                    _sitUpdateTimer = Time.NormalTime;
-                }
+                SitAndUseKit();
 
                 if (_settings["Toggle"].AsBool())
                 {
@@ -267,41 +262,101 @@ namespace DB2Buddy
             }
         }
 
-        private void ListenerSit()
+        #region Kitting
+
+        private void SitAndUseKit()
         {
+            if (InCombat())
+                return;
+
             Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+            var localPlayer = DynelManager.LocalPlayer;
 
-            Item kit = Inventory.Items.Where(x => RelevantItems.Kits.Contains(x.Id)).FirstOrDefault();
+            if (kit == null || spell == null)
+                return;
 
-            if (kit == null) { return; }
-
-            if (spell != null)
+            if (!localPlayer.Buffs.Contains(280488) && CanUseSitKit())
             {
-                if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && Extensions.CanUseSitKit())
+                HandleSitState();
+            }
+
+            if (localPlayer.MovementState == MovementState.Sit && (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000))
+            {
+                if (localPlayer.NanoPercent < 90 || localPlayer.HealthPercent < 90)
                 {
-                    if (spell != null && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) && Sitting == false
-                        && DynelManager.LocalPlayer.MovementState != MovementState.Sit)
-                    {
-                        if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
-                        {
-                            Task.Factory.StartNew(
-                               async () =>
-                               {
-                                   Sitting = true;
-                                   await Task.Delay(500);
-                                   NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                                   await Task.Delay(800);
-                                   NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-                                   await Task.Delay(500);
-                                   Sitting = false;
-                               });
-                        }
-                    }
+                    kit.Use(localPlayer, true);
+                    _kitTimer.Restart();
                 }
             }
         }
 
-        private void DB2BuddyCommand(string command, string[] param, ChatWindow chatWindow)
+        private void HandleSitState()
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+
+            bool shouldSit = localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66;
+            bool canSit = !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && localPlayer.MovementState != MovementState.Sit;
+
+            bool shouldStand = localPlayer.NanoPercent > 66 || localPlayer.HealthPercent > 66;
+            bool onCooldown = localPlayer.Cooldowns.ContainsKey(Stat.Treatment);
+
+            if (shouldSit && canSit)
+            {
+                MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
+            }
+            else if (shouldStand && onCooldown)
+            {
+                MovementController.Instance.SetMovement(MovementAction.LeaveSit);
+            }
+        }
+
+        private bool CanUseSitKit()
+        {
+            if (!DynelManager.LocalPlayer.IsAlive || DynelManager.LocalPlayer.IsMoving || Game.IsZoning)
+            {
+                return false;
+            }
+
+            List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
+            if (sitKits.Any())
+            {
+                return sitKits.OrderBy(x => x.QualityLevel).Any(sitKit => MeetsSkillRequirement(sitKit));
+            }
+
+            return Inventory.Find(297274, out Item premSitKit);
+        }
+
+        private bool MeetsSkillRequirement(Item sitKit)
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+            int skillReq = sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f);
+
+            return localPlayer.GetStat(Stat.FirstAid) >= skillReq || localPlayer.GetStat(Stat.Treatment) >= skillReq;
+        }
+
+        public static bool InCombat()
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+
+            if (Team.IsInTeam)
+            {
+                return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null
+                        && Team.Members.Select(m => m.Name).Contains(c.FightingTarget.Name));
+            }
+
+            return DynelManager.Characters
+                    .Any(c => c.FightingTarget != null
+                        && c.FightingTarget.Name == localPlayer.Name)
+                    || localPlayer.GetStat(Stat.NumFightingOpponents) > 0
+                    || Team.IsInCombat()
+                    || localPlayer.FightingTarget != null;
+        }
+
+        #endregion
+
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {
