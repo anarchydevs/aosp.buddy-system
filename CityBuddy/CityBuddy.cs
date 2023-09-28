@@ -1,4 +1,4 @@
-﻿using AOSharp.Common.GameData;
+using AOSharp.Common.GameData;
 using AOSharp.Common.GameData.UI;
 using AOSharp.Core;
 using AOSharp.Core.Inventory;
@@ -334,11 +334,15 @@ namespace CityBuddy
                 if (!_settings["Enable"].AsBool() && Enable)
                 {
                     IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                    Stop();
                 }
                 if (_settings["Enable"].AsBool() && !Enable)
                 {
+                    
                     IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                    Start();
                 }
+
             }
             #endregion
 
