@@ -379,7 +379,7 @@ namespace CityBuddy
             var localPlayer = DynelManager.LocalPlayer;
 
             bool shouldSit = localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66;
-            bool canSit = !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && localPlayer.MovementState != MovementState.Sit;
+            bool canSit = !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && localPlayer.MovementState != MovementState.Sit && !InCombat();
 
             bool shouldStand = localPlayer.NanoPercent > 66 || localPlayer.HealthPercent > 66;
             bool onCooldown = localPlayer.Cooldowns.ContainsKey(Stat.Treatment);
@@ -388,7 +388,7 @@ namespace CityBuddy
             {
                 MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
             }
-            else if (shouldStand && onCooldown)
+            else if (shouldStand || onCooldown)
             {
                 MovementController.Instance.SetMovement(MovementAction.LeaveSit);
             }
@@ -396,7 +396,7 @@ namespace CityBuddy
 
         private bool CanUseSitKit()
         {
-            if (!DynelManager.LocalPlayer.IsAlive || DynelManager.LocalPlayer.IsMoving || Game.IsZoning)
+            if (!DynelManager.LocalPlayer.IsAlive || DynelManager.LocalPlayer.IsMoving || Game.IsZoning || InCombat())
             {
                 return false;
             }
