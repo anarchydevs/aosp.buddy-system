@@ -392,7 +392,7 @@ namespace CityBuddy
             {
                 MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
             }
-            else if (shouldStand || onCooldown)
+            else if (shouldStand && onCooldown)
             {
                 MovementController.Instance.SetMovement(MovementAction.LeaveSit);
             }
