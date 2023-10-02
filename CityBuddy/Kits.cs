@@ -5,13 +5,14 @@ using System.Linq;
 using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using System.Collections.Generic;
+using System.Security.Policy;
 
 
 namespace CityBuddy
 {
     public class Kits
     {
-        //private Stopwatch _kitTimer = new Stopwatch();
+        private Stopwatch _kitTimer = new Stopwatch();
 
         public void SitAndUseKit()
         {
@@ -25,9 +26,10 @@ namespace CityBuddy
                 {
                     MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
                 }
-                else
+                else if (localPlayer.MovementState == MovementState.Sit)
                 {
                     // Use the kit.
+                    _kitTimer.Restart();
                     UseKit();
                 }
             }
@@ -60,12 +62,16 @@ namespace CityBuddy
 
         public void UseKit()
         {
-
-            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-            if (kit != null)
+            // Check if the timer has been running for at least 2 seconds.
+            if (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000)
             {
-                kit.Use(DynelManager.LocalPlayer, true);
-                //_kitTimer.Restart();
+                Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+                if (kit != null)
+                {
+                    kit.Use(DynelManager.LocalPlayer, true);
+                    // Restart the timer after using the kit.
+                    _kitTimer.Restart();
+                }
             }
         }
 
