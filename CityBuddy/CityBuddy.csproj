@@ -91,7 +91,6 @@
     <Compile Include="..\CommonParameters.cs">
       <Link>CommonParameters.cs</Link>
     </Compile>
-    <Compile Include="Kits.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="CityBuddy.cs" />
     <Compile Include="IPCMessages\ClearSelectedMemberMessage.cs" />
@@ -131,6 +130,12 @@
     <Content Include="UI\CityBuddySettingWindow.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Shared\Shared.csproj">
+      <Project>{9368d47e-1f6f-4904-95d6-b18579c59d5e}</Project>
+      <Name>Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

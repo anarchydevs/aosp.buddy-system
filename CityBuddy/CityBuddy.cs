@@ -32,9 +32,6 @@ namespace CityBuddy
         public static bool CityUnderAttack = false;
         public static bool CTWindowIsOpen = false;
 
-        private Stopwatch _kitTimer = new Stopwatch();
-        private Stopwatch _sitTimer = new Stopwatch();
-
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
         public static Vector3 _leaderPos = Vector3.Zero;
