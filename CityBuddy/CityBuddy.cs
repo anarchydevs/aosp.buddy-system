@@ -278,7 +278,7 @@ namespace CityBuddy
                 bool currentIsReadyState = true;
 
                 // Check if Nano or Health is below 66% and not in combat
-                if (!InCombat())
+                if (!Kits.InCombat())
                 {
                     if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66
                         || !Spell.List.Any(spell => spell.IsReady))
@@ -309,7 +309,10 @@ namespace CityBuddy
                 }
             }
 
-            SitAndUseKit();
+            
+            Kits kitsInstance = new Kits();
+
+            kitsInstance.SitAndUseKit();
 
             #region UI
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
@@ -349,100 +352,6 @@ namespace CityBuddy
             _stateMachine.Tick();
         }
 
-        #region Kitting
-
-        private void SitAndUseKit()
-        {
-            if (InCombat())
-                return;
-
-            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
-            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-            var localPlayer = DynelManager.LocalPlayer;
-
-            if (kit == null || spell == null)
-                return;
-
-            if (!localPlayer.Buffs.Contains(280488) && CanUseSitKit())
-            {
-                HandleSitState();
-            }
-
-            if (localPlayer.MovementState == MovementState.Sit && (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000))
-            {
-                if (localPlayer.NanoPercent < 90 || localPlayer.HealthPercent < 90)
-                {
-                    kit.Use(localPlayer, true);
-                    _kitTimer.Restart();
-                }
-            }
-        }
-
-        private void HandleSitState()
-        {
-            var localPlayer = DynelManager.LocalPlayer;
-
-            bool shouldSit = localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66;
-            bool canSit = !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && localPlayer.MovementState != MovementState.Sit && !InCombat();
-
-            bool shouldStand = localPlayer.NanoPercent > 66 || localPlayer.HealthPercent > 66;
-            bool onCooldown = localPlayer.Cooldowns.ContainsKey(Stat.Treatment);
-
-            if (shouldSit && canSit)
-            {
-                MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
-            }
-            else if (shouldStand && onCooldown)
-            {
-                MovementController.Instance.SetMovement(MovementAction.LeaveSit);
-            }
-        }
-
-        private bool CanUseSitKit()
-        {
-            if (!DynelManager.LocalPlayer.IsAlive || DynelManager.LocalPlayer.IsMoving || Game.IsZoning || InCombat())
-            {
-                return false;
-            }
-
-            List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
-            if (sitKits.Any())
-            {
-                return sitKits.OrderBy(x => x.QualityLevel).Any(sitKit => MeetsSkillRequirement(sitKit));
-            }
-
-            return Inventory.Find(297274, out Item premSitKit);
-        }
-
-        private bool MeetsSkillRequirement(Item sitKit)
-        {
-            var localPlayer = DynelManager.LocalPlayer;
-            int skillReq = sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f);
-
-            return localPlayer.GetStat(Stat.FirstAid) >= skillReq || localPlayer.GetStat(Stat.Treatment) >= skillReq;
-        }
-
-        public static bool InCombat()
-        {
-            var localPlayer = DynelManager.LocalPlayer;
-
-            if (Team.IsInTeam)
-            {
-                return DynelManager.Characters
-                    .Any(c => c.FightingTarget != null
-                        && Team.Members.Select(m => m.Name).Contains(c.FightingTarget.Name));
-            }
-
-            return DynelManager.Characters
-                    .Any(c => c.FightingTarget != null
-                        && c.FightingTarget.Name == localPlayer.Name)
-                    || localPlayer.GetStat(Stat.NumFightingOpponents) > 0
-                    || Team.IsInCombat()
-                    || localPlayer.FightingTarget != null;
-        }
-
-        #endregion
-
 
         private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
@@ -471,13 +380,6 @@ namespace CityBuddy
             {
                 Chat.WriteLine(e.Message);
             }
-        }
-
-        public static class RelevantItems
-        {
-            public static readonly int[] Kits = {
-                297274, 293296, 291084, 291083, 291082
-            };
         }
 
         public static bool CanProceed()
