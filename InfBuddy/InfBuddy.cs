@@ -255,7 +255,9 @@ namespace InfBuddy
 
             _stateMachine.Tick();
 
-            SitAndUseKit();
+            Kits kitsInstance = new Kits();
+
+            kitsInstance.SitAndUseKit();
 
             if (Leader == Identity.None)
             {

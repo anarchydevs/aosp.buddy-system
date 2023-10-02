@@ -191,8 +191,9 @@ namespace DB2Buddy
                 if (Game.IsZoning)
                     return;
 
+                Kits kitsInstance = new Kits();
 
-                SitAndUseKit();
+                kitsInstance.SitAndUseKit();
 
                 if (_settings["Toggle"].AsBool())
                 {

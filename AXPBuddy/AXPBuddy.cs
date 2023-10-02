@@ -241,7 +241,9 @@ namespace AXPBuddy
             {
                 if (Game.IsZoning) { return; }
 
-                SitAndUseKit();
+                Kits kitsInstance = new Kits();
+
+                kitsInstance.SitAndUseKit();
 
                 if (Leader == Identity.None)
                 {

@@ -213,7 +213,9 @@ namespace MitaarBuddy
 
             Difficulty();
 
-                SitAndUseKit();
+            Kits kitsInstance = new Kits();
+
+            kitsInstance.SitAndUseKit();
 
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {

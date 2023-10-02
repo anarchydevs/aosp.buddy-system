@@ -195,7 +195,9 @@ namespace VortexxBuddy
             if (Game.IsZoning)
                 return;
 
-            SitAndUseKit();
+            Kits kitsInstance = new Kits();
+
+            kitsInstance.SitAndUseKit();
 
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {
