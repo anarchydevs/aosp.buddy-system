@@ -213,7 +213,7 @@ namespace MitaarBuddy
 
             Difficulty();
 
-            Kits kitsInstance = new Kits();
+            Shared.Kits kitsInstance = new Shared.Kits();
 
             kitsInstance.SitAndUseKit();
 

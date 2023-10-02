@@ -255,7 +255,7 @@ namespace InfBuddy
 
             _stateMachine.Tick();
 
-            Kits kitsInstance = new Kits();
+            Shared.Kits kitsInstance = new Shared.Kits();
 
             kitsInstance.SitAndUseKit();
 

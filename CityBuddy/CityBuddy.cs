@@ -275,7 +275,7 @@ namespace CityBuddy
                 bool currentIsReadyState = true;
 
                 // Check if Nano or Health is below 66% and not in combat
-                if (!Kits.InCombat())
+                if (!Shared.Kits.InCombat())
                 {
                     if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66
                         || !Spell.List.Any(spell => spell.IsReady))
@@ -307,7 +307,7 @@ namespace CityBuddy
             }
 
             
-            Kits kitsInstance = new Kits();
+            Shared.Kits kitsInstance = new Shared.Kits();
 
             kitsInstance.SitAndUseKit();
 

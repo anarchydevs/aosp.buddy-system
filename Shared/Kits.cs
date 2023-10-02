@@ -7,7 +7,8 @@ using AOSharp.Core.Movement;
 using System.Collections.Generic;
 using System.Security.Policy;
 
-
+namespace Shared
+{
     public class Kits
     {
         private Stopwatch _kitTimer = new Stopwatch();
@@ -102,6 +103,7 @@ using System.Security.Policy;
     }
     public static class RelevantItems
     {
-        public static readonly int[] Kits = {297274, 293296, 291084, 291083, 291082 };
+        public static readonly int[] Kits = { 297274, 293296, 291084, 291083, 291082 };
     }
 
+}

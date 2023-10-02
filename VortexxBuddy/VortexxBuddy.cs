@@ -195,7 +195,7 @@ namespace VortexxBuddy
             if (Game.IsZoning)
                 return;
 
-            Kits kitsInstance = new Kits();
+            Shared.Kits kitsInstance = new Shared.Kits();
 
             kitsInstance.SitAndUseKit();
 
