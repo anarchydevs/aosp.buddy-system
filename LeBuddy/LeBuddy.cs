@@ -254,7 +254,7 @@ namespace LeBuddy
                 bool currentIsReadyState = true;
 
                 // Check if Nano or Health is below 66% and not in combat
-                if (!InCombat())
+                if (!Shared.Kits.InCombat())
                 {
                     if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66
                         || !Spell.List.Any(spell => spell.IsReady))
