@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace MitaarBuddy
 {
-    public class HardcoreState : IState
+    public class FightState : IState
     {
 
         private static SimpleChar _sinuh;
@@ -123,55 +123,61 @@ namespace MitaarBuddy
                 if (_sinuhCorpse != null)
                     MitaarBuddy.SinuhCorpse = true;
 
-                //Attack and initial start
-                if (_sinuh != null && _alienCoccoon == null)
+                if (MitaarBuddy._settings["StopAttack"].AsBool())
                 {
-                    if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
-                        DynelManager.LocalPlayer.Attack(_sinuh);
-                }
-
-                if (_sinuh != null && _alienCoccoon != null)
-                {
-                    if (DynelManager.LocalPlayer.FightingTarget != null
-                        && DynelManager.LocalPlayer.FightingTarget.Name == _sinuh.Name)
+                    if (_xanSpirits != null)
                     {
-                        DynelManager.LocalPlayer.StopAttack();
+                        HandleStopAttack();
+                    }
+
+                    if (_sinuh != null && _alienCoccoon == null && _xanSpirits == null)
+                    {
+                        HandleSinuhAttack();
+                    }
+
+                    if (_alienCoccoon != null)
+                    {
+                        HandleAlienCoccoonAttack();
                     }
                 }
-
-                if (_alienCoccoon != null)
+                else
                 {
-                    if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
+                    if (_sinuh != null && _alienCoccoon == null)
                     {
-                        DynelManager.LocalPlayer.Attack(_alienCoccoon);
+                        HandleSinuhAttack();
+                    }
+
+                    if (_alienCoccoon != null)
+                    {
+                        HandleAlienCoccoonAttack();
                     }
                 }
 
                 //Pathing to spirits
                 if (_xanSpirits != null && !MovementController.Instance.IsNavigating)
                 {
-                    if (_redXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
+                    if (MitaarBuddy._settings["Red"].AsBool() && _redXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheBlood))
                         MovementController.Instance.SetDestination(Constants._redPodium);
                     else if (_redXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._redPodium) > 0.9f
                         && DynelManager.LocalPlayer.Buffs.Find(MitaarBuddy.SpiritNanos.BlessingofTheBlood, out Buff redbuff) && redbuff.RemainingTime < 5)
                         MovementController.Instance.SetDestination(Constants._redPodium);
 
-                    if (_blueXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) > 0.9f
+                    if (MitaarBuddy._settings["Blue"].AsBool() && _blueXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheSource))
                         MovementController.Instance.SetDestination(Constants._bluePodium);
                     else if (_blueXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._bluePodium) > 0.9f
                         && DynelManager.LocalPlayer.Buffs.Find(MitaarBuddy.SpiritNanos.BlessingofTheSource, out Buff bluebuff) && bluebuff.RemainingTime < 4)
                         MovementController.Instance.SetDestination(Constants._bluePodium);
 
-                    if (_greenXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) > 0.9f
+                    if (MitaarBuddy._settings["Green"].AsBool() && _greenXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheOutsider))
                         MovementController.Instance.SetDestination(Constants._greenPodium);
                     else if (_greenXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._greenPodium) > 0.9f
                        && DynelManager.LocalPlayer.Buffs.Find(MitaarBuddy.SpiritNanos.BlessingofTheOutsider, out Buff greenbuff) && greenbuff.RemainingTime < 3)
                         MovementController.Instance.SetDestination(Constants._greenPodium);
 
-                    if (_yellowXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) > 0.9f
+                    if (MitaarBuddy._settings["Yellow"].AsBool() && _yellowXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) > 0.9f
                         && !DynelManager.LocalPlayer.Buffs.Contains(MitaarBuddy.SpiritNanos.BlessingofTheLight))
                         MovementController.Instance.SetDestination(Constants._yellowPodium);
                     else if (_yellowXanSpirit != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._yellowPodium) > 0.9f
@@ -179,6 +185,35 @@ namespace MitaarBuddy
                         MovementController.Instance.SetDestination(Constants._yellowPodium);
                 }
 
+            }
+        }
+
+        void HandleStopAttack()
+        {
+            if (DynelManager.LocalPlayer.FightingTarget != null && DynelManager.LocalPlayer.FightingTarget.Name == _sinuh.Name)
+            {
+                DynelManager.LocalPlayer.StopAttack();
+            }
+        }
+
+        void HandleSinuhAttack()
+        {
+            if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
+            {
+                DynelManager.LocalPlayer.Attack(_sinuh);
+            }
+        }
+
+        void HandleAlienCoccoonAttack()
+        {
+            if (DynelManager.LocalPlayer.FightingTarget != null && DynelManager.LocalPlayer.FightingTarget.Name == _sinuh.Name)
+            {
+                DynelManager.LocalPlayer.StopAttack();
+            }
+
+            if (DynelManager.LocalPlayer.FightingTarget == null && !DynelManager.LocalPlayer.IsAttackPending)
+            {
+                DynelManager.LocalPlayer.Attack(_alienCoccoon);
             }
         }
     }
