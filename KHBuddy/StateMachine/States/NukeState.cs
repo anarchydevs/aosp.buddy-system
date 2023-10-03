@@ -176,15 +176,15 @@ namespace KHBuddy
                                 .ToList();
 
                             if (_hecksAtPos.Count >= 1 && DynelManager.LocalPlayer.FightingTarget == null && !KHBuddy.NeedsKit
-                                && (DynelManager.LocalPlayer.NanoPercent >= 67 || DynelManager.LocalPlayer.HealthPercent >= 67))
+                                && (DynelManager.LocalPlayer.NanoPercent >= 70 || DynelManager.LocalPlayer.HealthPercent >= 70))
                             {
                                 DynelManager.LocalPlayer.Attack(_hecksAtPos.FirstOrDefault());
                                 //KHBuddy._stateTimeOut = Time.NormalTime;
                             }
 
-                            if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                            if (DynelManager.LocalPlayer.NanoPercent < 60 || DynelManager.LocalPlayer.HealthPercent < 60)
                             {
-                                KHBuddy.NeedsKit = true;
+                                //KHBuddy.NeedsKit = true;
 
                                 DynelManager.LocalPlayer.StopAttack();
                             }
