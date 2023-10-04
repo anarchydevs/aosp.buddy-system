@@ -6,6 +6,7 @@ using AOSharp.Core.UI;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -40,7 +41,22 @@ namespace CityBuddy
                         || Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands
                         || Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
                 {
-                    return new WaitForShipState();
+                    if (Team.Members.Count(c => c.Character == null) < 4)
+                    // Not running enough toons to trigger a ship
+                    {
+                        if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
+                        {
+                            return new CityControllerState();
+                        }
+                        else
+                        {
+                            return new CityAttackState();
+                        }
+                    }
+                    else
+                    {
+                        return new WaitForShipState();
+                    }
                 }
             }
 
