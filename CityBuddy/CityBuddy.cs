@@ -349,7 +349,6 @@ namespace CityBuddy
             _stateMachine.Tick();
         }
 
-
         private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
