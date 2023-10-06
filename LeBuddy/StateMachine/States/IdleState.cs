@@ -70,9 +70,6 @@ namespace LeBuddy
                 }
             }
 
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return new SitState();
-
             return null;
         }
 

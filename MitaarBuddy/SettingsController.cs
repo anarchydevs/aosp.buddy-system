@@ -46,7 +46,7 @@ namespace MitaarBuddy
         {
             if (!IsCommandRegistered)
             {
-                Chat.RegisterCommand("mitaarbuddy", (string command, string[] param, ChatWindow chatWindow) =>
+                Chat.RegisterCommand("mitaar", (string command, string[] param, ChatWindow chatWindow) =>
                 {
                     try
                     {

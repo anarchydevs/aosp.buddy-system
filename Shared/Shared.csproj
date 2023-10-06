@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9368D47E-1F6F-4904-95D6-B18579C59D5E}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Shared</RootNamespace>
+    <AssemblyName>Shared</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>
+    </DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AOSharp.Common">
+      <HintPath>..\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="AOSharp.Core">
+      <HintPath>..\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="AOSharp.Recast">
+      <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\AOSharp.Recast.dll</HintPath>
+    </Reference>
+    <Reference Include="cai-nav">
+      <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\cai-nav.dll</HintPath>
+    </Reference>
+    <Reference Include="cai-nav-rcn">
+      <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\cai-nav-rcn.dll</HintPath>
+    </Reference>
+    <Reference Include="cai-nmbuild">
+      <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\cai-nmbuild.dll</HintPath>
+    </Reference>
+    <Reference Include="cai-nmgen">
+      <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\cai-nmgen.dll</HintPath>
+    </Reference>
+    <Reference Include="cai-nmgen-rcn">
+      <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\cai-nmgen-rcn.dll</HintPath>
+    </Reference>
+    <Reference Include="cai-util">
+      <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\cai-util.dll</HintPath>
+    </Reference>
+    <Reference Include="NavmeshMovementController">
+      <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\NavmeshMovementController.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Kits.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="NavMeshes\4364.Navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NavMeshes\4365.navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NavMeshes\4368.navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NavMeshes\4605.navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NavMeshes\4696.navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NavMeshes\5002.Navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NavMeshes\6003.Navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NavMeshes\6013.Navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NavMeshes\6055.Navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NavMeshes\6061.Navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="NavMeshes\9042.navmesh">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

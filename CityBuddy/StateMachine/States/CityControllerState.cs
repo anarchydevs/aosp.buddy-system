@@ -81,7 +81,7 @@ namespace CityBuddy
                 Chat.WriteLine("Opening City Controller");
                 CityController.Use();
             }
-            else
+            else if (CityBuddy.CTWindowIsOpen)
             {
                 if (CityController.CanToggleCloak())
                 {

@@ -246,7 +246,7 @@ namespace LeBuddy
         {
             LockedDoors();
 
-            if (Team.Members.Any(c => c.Character == null))
+            if (Team.Members.Any(c => c.Character == null) || !LeBuddy.Ready)
                 return;
 
             if (_corpse != null)

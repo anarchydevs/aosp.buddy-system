@@ -30,8 +30,7 @@ namespace LeBuddy
                     return new IdleState();
 
 
-                if (Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!")
-                && Playfield.IsDungeon))
+                if (Playfield.IsDungeon || Playfield.ModelIdentity.Instance != Constants.UnicornOutpost)
                 {
                     if (IdleState.selectedMember != null)
                     {

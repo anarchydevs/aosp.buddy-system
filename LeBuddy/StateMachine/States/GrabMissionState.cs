@@ -39,7 +39,7 @@ namespace LeBuddy
             NpcDialog.AnswerListChanged += NpcDialog_AnswerListChanged;
 
             Chat.WriteLine("GrabMissionState");
-            NavGenState.DeleteNavMesh();
+            //NavGenState.DeleteNavMesh();
         }
 
         public void OnStateExit()

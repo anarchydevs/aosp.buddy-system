@@ -61,6 +61,8 @@ namespace CityBuddy
         {
             //Chat.WriteLine("Exit EnterState");
 
+            CityBuddy.NavMeshMovementController.Halt();
+
         }
 
         public void Tick()

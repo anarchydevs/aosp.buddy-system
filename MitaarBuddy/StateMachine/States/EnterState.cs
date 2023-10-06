@@ -19,17 +19,7 @@ namespace MitaarBuddy
         {
             if (Playfield.ModelIdentity.Instance == Constants.MitaarId)
             {
-                if (MitaarBuddy.DifficultySelection.Easy == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32())
-                    if (MitaarBuddy._died || (!MitaarBuddy._died && Team.Members.Any(c => c.Character != null)))
-                        return new EasyState();
-
-                if (MitaarBuddy.DifficultySelection.Medium == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32())
-                    if (MitaarBuddy._died || (!MitaarBuddy._died && Team.Members.Any(c => c.Character != null)))
-                        return new MediumState();
-
-                if (MitaarBuddy.DifficultySelection.Hardcore == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32())
-                    if (MitaarBuddy._died || (!MitaarBuddy._died && Team.Members.Any(c => c.Character != null)))
-                        return new HardcoreState();
+                return new FightState();
             }
 
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId
