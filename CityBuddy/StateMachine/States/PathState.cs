@@ -246,7 +246,7 @@ namespace CityBuddy
         {
             LockedDoors();
 
-            if (Team.Members.Any(c => c.Character == null))
+            if (Team.Members.Any(c => c.Character == null) || !CityBuddy.Ready)
                 return;
 
             if (_corpse != null && CityBuddy._settings["Corpses"].AsBool())

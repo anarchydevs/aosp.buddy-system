@@ -50,9 +50,6 @@ namespace DB2Buddy
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
                 DB2Buddy.NavMeshMovementController.Halt();
-            
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return new SitState();
 
             if (DB2Buddy._settings["Toggle"].AsBool())
 

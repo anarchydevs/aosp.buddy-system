@@ -74,9 +74,6 @@ namespace InfBuddy
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
                 return new IdleState();
 
-            //if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-            //    return new SitState();
-
             return null;
         }
 

@@ -58,9 +58,6 @@ namespace AXPBuddy
 
                 if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
                     return new DiedState();
-
-                if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                    return new SitState();
             }
 
 

@@ -11,8 +11,6 @@ namespace VortexxBuddy
 
         public IState GetNextState()
         {
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return new SitState();
 
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId && VortexxBuddy._settings["Toggle"].AsBool())
             {

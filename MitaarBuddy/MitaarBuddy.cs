@@ -26,23 +26,19 @@ namespace MitaarBuddy
 
         public static Vector3 _sinuhCorpsePos = Vector3.Zero;
 
-        private Stopwatch _kitTimer = new Stopwatch();
-
-        public static bool Toggle = false;
+        public static bool Enable = false;
         public static bool Farming = false;
-
-        //public static bool _initCorpse = false;
-
-        public static bool Easy = false;
-        public static bool _easyToggled = false;
-        public static bool Medium = false;
-        public static bool _mediumToggled = false;
-        public static bool Hardcore = false;
-        public static bool _hardcoreToggled = false;
 
         public static bool SinuhCorpse = false;
 
         public static bool _died = false;
+
+        private bool previousStopAttack = false;
+        private bool previousRed = false;
+        private bool previousBlue = false;
+        private bool previousYellow = false;
+        private bool previousGreen = false;
+
 
         public static double _stateTimeOut;
 
@@ -64,15 +60,9 @@ namespace MitaarBuddy
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
-
-                IPCChannel.RegisterCallback((int)IPCOpcode.Farming, FarmingMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.NoFarming, NoFarmingMessage);
-
-                IPCChannel.RegisterCallback((int)IPCOpcode.EasyMode, EasyMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.MediumMode, MediumMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.HardcoreMode, HardcoreMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Farming, OnFarmingStatusMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.SettingsUpdate, OnSettingsUpdateMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -85,20 +75,18 @@ namespace MitaarBuddy
                 Team.TeamRequest += OnTeamRequest;
                 Game.OnUpdate += OnUpdate;
 
-                _settings.AddVariable("DifficultySelection", (int)DifficultySelection.Easy);
-
-                _settings.AddVariable("Toggle", false);
+                _settings.AddVariable("Enable", false);
                 _settings.AddVariable("Farming", false);
                 _settings.AddVariable("Leader", false);
 
-                _settings["Toggle"] = false;
-                _settings["Farming"] = false;
-                
-
-                _settings["DifficultySelection"] = (int)DifficultySelection.Easy;
+                _settings.AddVariable("StopAttack", false);
+                _settings.AddVariable("Red", false);
+                _settings.AddVariable("Blue", false);
+                _settings.AddVariable("Yellow", false);
+                _settings.AddVariable("Green", false);
 
                 Chat.WriteLine("MitaarBuddy Loaded!");
-                Chat.WriteLine("/mitaarbuddy for settings.");
+                Chat.WriteLine("/mitaar for settings.");
             }
             catch (Exception e)
             {
@@ -123,9 +111,9 @@ namespace MitaarBuddy
                 Leader = DynelManager.LocalPlayer.Identity;
             }
 
-            Toggle = true;
+            Enable = true;
 
-            Chat.WriteLine("MitaarBuddy enabled.");
+            Chat.WriteLine("MitaarBuddy Enabled.");
 
             if (!(_stateMachine.CurrentState is IdleState))
                 _stateMachine.SetState(new IdleState());
@@ -133,7 +121,7 @@ namespace MitaarBuddy
 
         private void Stop()
         {
-            Toggle = false;
+            Enable = false;
 
             Chat.WriteLine("MitaarBuddy disabled.");
 
@@ -143,56 +131,64 @@ namespace MitaarBuddy
             NavMeshMovementController.Halt();
         }
 
-        private void farmingEnabled()
+        private void FarmingEnabled()
         {
+            Chat.WriteLine("Farming Enabled.");
             Farming = true;
         }
-        private void farmingDisabled()
+        private void FarmingDisabled()
         {
+            Chat.WriteLine("Farming Disabled");
             Farming = false;
         }
 
-        private void OnStartMessage(int sender, IPCMessage msg)
+        private void OnStartStopMessage(int sender, IPCMessage msg)
         {
-            //if (Leader == Identity.None
-            //    && DynelManager.LocalPlayer.Identity.Instance != sender)
-            //    Leader = new Identity(IdentityType.SimpleChar, sender);
-
-            _settings["Toggle"] = true;
-            Start();
+            if (msg is StartStopIPCMessage startStopMessage)
+            {
+                if (startStopMessage.IsStarting)
+                {
+                    // Update the setting and start the process.
+                    _settings["Enable"] = true;
+                    Start();
+                }
+                else
+                {
+                    // Update the setting and stop the process.
+                    _settings["Enable"] = false;
+                    Stop();
+                }
+            }
         }
 
-        private void OnStopMessage(int sender, IPCMessage msg)
+        private void OnFarmingStatusMessage(int sender, IPCMessage msg)
         {
-            _settings["Toggle"] = false;
-            Stop();
+            if (msg is FarmingStatusMessage farmingStatusMessage)
+            {
+ 
+                if (farmingStatusMessage.IsFarming)
+                {
+                    _settings["Farming"] = true;
+                    FarmingEnabled();
+                }
+                else
+                {
+                    _settings["Farming"] = false;
+                    FarmingDisabled();
+                }
+            }
         }
 
-        private void FarmingMessage(int sender, IPCMessage msg)
+        private void OnSettingsUpdateMessage(int sender, IPCMessage msg)
         {
-            _settings["Farming"] = true;
-            farmingEnabled();
-        }
-
-        private void NoFarmingMessage(int sender, IPCMessage msg)
-        {
-            _settings["Farming"] = false;
-            farmingDisabled();
-        }
-
-        private void EasyMessage(int sender, IPCMessage msg)
-        {
-            _settings["DifficultySelection"] = (int)DifficultySelection.Easy;
-        }
-
-        private void MediumMessage(int sender, IPCMessage msg)
-        {
-            _settings["DifficultySelection"] = (int)DifficultySelection.Medium;
-        }
-
-        private void HardcoreMessage(int sender, IPCMessage msg)
-        {
-            _settings["DifficultySelection"] = (int)DifficultySelection.Hardcore;
+            if (msg is SettingsUpdateMessage settingsUpdateMessage)
+            {
+                _settings["StopAttack"] = settingsUpdateMessage.StopAttack;
+                _settings["Red"] = settingsUpdateMessage.Red;
+                _settings["Blue"] = settingsUpdateMessage.Blue;
+                _settings["Yellow"] = settingsUpdateMessage.Yellow;
+                _settings["Green"] = settingsUpdateMessage.Green;
+            }
         }
 
         private void HandleInfoViewClick(object s, ButtonBase button)
@@ -211,9 +207,9 @@ namespace MitaarBuddy
             if (Game.IsZoning)
                 return;
 
-            Difficulty();
+            Shared.Kits kitsInstance = new Shared.Kits();
 
-                SitAndUseKit();
+            kitsInstance.SitAndUseKit();
 
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {
@@ -234,95 +230,65 @@ namespace MitaarBuddy
                     infoView.Clicked = HandleInfoViewClick;
                 }
 
-                if (!_settings["Toggle"].AsBool() && Toggle)
+                if (!_settings["Enable"].AsBool() && Enable)
                 {
-                    IPCChannel.Broadcast(new StopMessage());
+                    IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
                     Stop();
                 }
-                if (_settings["Toggle"].AsBool() && !Toggle)
+                if (_settings["Enable"].AsBool() && !Enable)
                 {
-                    //Leader = DynelManager.LocalPlayer.Identity;
-                    IPCChannel.Broadcast(new StartMessage());
+
+                    IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                     Start();
                 }
 
-                if (!_settings["Farming"].AsBool() && Farming) // Farming off
+                if (!_settings["Farming"].AsBool() && Farming)// Farming is off
                 {
-                    IPCChannel.Broadcast(new NoFarmingMessage());
-                    Chat.WriteLine("Farming disabled");
-                    farmingDisabled();
+                    IPCChannel.Broadcast(new FarmingStatusMessage { IsFarming = false });
+                    FarmingDisabled();
+                }
+                if (_settings["Farming"].AsBool() && !Farming) // Farming is on
+                {
+                    IPCChannel.Broadcast(new FarmingStatusMessage { IsFarming = true });
+                    FarmingEnabled();
                 }
 
-                if (_settings["Farming"].AsBool() && !Farming) // farming on
-                {
-                    IPCChannel.Broadcast(new FarmingMessage());
-                    Chat.WriteLine("Farming enabled.");
-                    farmingEnabled();
-                }
-
-                if (Easy)
-                {
-                    IPCChannel.Broadcast(new EasyMessage());
-                    Easy = false;
-                }
-
-                if (Medium)
-                {
-                    IPCChannel.Broadcast(new MediumMessage());
-                    Medium = false;
-                }
-
-                if (Hardcore)
-                {
-                    IPCChannel.Broadcast(new HardecoreMessage());
-                    Hardcore = false;
-                }
+                BroadcastSettingsUpdateIfNeeded();
             }
-            if (_settings["Toggle"].AsBool())
+
+            if (_settings["Enable"].AsBool())
             {
                 _stateMachine.Tick();
             }
         }
 
-        public static void Difficulty()
+        private void BroadcastSettingsUpdateIfNeeded()
         {
-            if (DifficultySelection.Easy == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_easyToggled)
+            bool stopAttack = _settings["StopAttack"].AsBool();
+            bool red = _settings["Red"].AsBool();
+            bool blue = _settings["Blue"].AsBool();
+            bool yellow = _settings["Yellow"].AsBool();
+            bool green = _settings["Green"].AsBool();
+
+            if (stopAttack != previousStopAttack || red != previousRed || blue != previousBlue
+                || yellow != previousYellow || green != previousGreen)
             {
-                Easy = true;
-                Medium = false;
-                Hardcore = false;
+                var settingsUpdateMessage = new SettingsUpdateMessage
+                {
+                    StopAttack = stopAttack,
+                    Red = red,
+                    Blue = blue,
+                    Yellow = yellow,
+                    Green = green
+                };
 
-                _easyToggled = true;
-                _mediumToggled = false;
-                _hardcoreToggled = false;
+                IPCChannel.Broadcast(settingsUpdateMessage);
 
-                Chat.WriteLine("Stop being a Primitive Screwhead.");
-            }
-
-            if (DifficultySelection.Medium == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_mediumToggled)
-            {
-                Easy = false;
-                Medium = true;
-                Hardcore = false;
-
-                _easyToggled = false;
-                _mediumToggled = true;
-                _hardcoreToggled = false;
-
-                Chat.WriteLine("Okay, a little better. Groovy.");
-            }
-
-            if (DifficultySelection.Hardcore == (DifficultySelection)_settings["DifficultySelection"].AsInt32() && !_hardcoreToggled)
-            {
-                Easy = false;
-                Medium = false;
-                Hardcore = true;
-
-                _easyToggled = false;
-                _mediumToggled = false;
-                _hardcoreToggled = true;
-
-                Chat.WriteLine("Destroyer! Hail to the king, baby.");
+                previousStopAttack = stopAttack;
+                previousRed = red;
+                previousBlue = blue;
+                previousYellow = yellow;
+                previousGreen = green;
             }
         }
 
@@ -330,7 +296,7 @@ namespace MitaarBuddy
         {
             if (e.Requester != Leader)
             {
-                if (Toggle)
+                if (Enable)
                     e.Ignore();
 
                 return;
@@ -339,116 +305,24 @@ namespace MitaarBuddy
             e.Accept();
         }
 
-        #region Kitting
-
-        private void SitAndUseKit()
-        {
-            if (InCombat())
-                return;
-
-            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
-            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-            var localPlayer = DynelManager.LocalPlayer;
-
-            if (kit == null || spell == null)
-                return;
-
-            if (!localPlayer.Buffs.Contains(280488) && CanUseSitKit())
-            {
-                HandleSitState();
-            }
-
-            if (localPlayer.MovementState == MovementState.Sit && (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000))
-            {
-                if (localPlayer.NanoPercent < 90 || localPlayer.HealthPercent < 90)
-                {
-                    kit.Use(localPlayer, true);
-                    _kitTimer.Restart();
-                }
-            }
-        }
-
-        private void HandleSitState()
-        {
-            var localPlayer = DynelManager.LocalPlayer;
-
-            bool shouldSit = localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66;
-            bool canSit = !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && localPlayer.MovementState != MovementState.Sit;
-
-            bool shouldStand = localPlayer.NanoPercent > 66 || localPlayer.HealthPercent > 66;
-            bool onCooldown = localPlayer.Cooldowns.ContainsKey(Stat.Treatment);
-
-            if (shouldSit && canSit)
-            {
-                MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
-            }
-            else if (shouldStand && onCooldown)
-            {
-                MovementController.Instance.SetMovement(MovementAction.LeaveSit);
-            }
-        }
-
-        private bool CanUseSitKit()
-        {
-            if (!DynelManager.LocalPlayer.IsAlive || DynelManager.LocalPlayer.IsMoving || Game.IsZoning)
-            {
-                return false;
-            }
-
-            List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
-            if (sitKits.Any())
-            {
-                return sitKits.OrderBy(x => x.QualityLevel).Any(sitKit => MeetsSkillRequirement(sitKit));
-            }
-
-            return Inventory.Find(297274, out Item premSitKit);
-        }
-
-        private bool MeetsSkillRequirement(Item sitKit)
-        {
-            var localPlayer = DynelManager.LocalPlayer;
-            int skillReq = sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f);
-
-            return localPlayer.GetStat(Stat.FirstAid) >= skillReq || localPlayer.GetStat(Stat.Treatment) >= skillReq;
-        }
-
-        public static bool InCombat()
-        {
-            var localPlayer = DynelManager.LocalPlayer;
-
-            if (Team.IsInTeam)
-            {
-                return DynelManager.Characters
-                    .Any(c => c.FightingTarget != null
-                        && Team.Members.Select(m => m.Name).Contains(c.FightingTarget.Name));
-            }
-
-            return DynelManager.Characters
-                    .Any(c => c.FightingTarget != null
-                        && c.FightingTarget.Name == localPlayer.Name)
-                    || localPlayer.GetStat(Stat.NumFightingOpponents) > 0
-                    || Team.IsInCombat()
-                    || localPlayer.FightingTarget != null;
-        }
-
-        #endregion
-
         private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Toggle"].AsBool())
+                    bool currentEnable = _settings["Enable"].AsBool();
+
+                    if (!currentEnable)
                     {
-                        _settings["Toggle"] = true;
-                        IPCChannel.Broadcast(new StartMessage());
+                        _settings["Enable"] = true;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                         Start();
                     }
                     else
                     {
-                        _settings["Toggle"] = false;
-                        IPCChannel.Broadcast(new StopMessage());
+                        _settings["Enable"] = false;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
                         Stop();
                     }
                 }
@@ -458,18 +332,6 @@ namespace MitaarBuddy
             {
                 Chat.WriteLine(e.Message);
             }
-        }
-
-        public enum DifficultySelection
-        {
-            Easy, Medium, Hardcore
-        }
-
-        public static class RelevantItems
-        {
-            public static readonly int[] Kits = {
-                297274, 293296, 291084, 291083, 291082
-            };
         }
 
         public static class SpiritNanos
