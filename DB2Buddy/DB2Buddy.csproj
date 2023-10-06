@@ -110,9 +110,6 @@
     <Compile Include="StateMachine\States\ReformState.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="StateMachine\States\SitState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

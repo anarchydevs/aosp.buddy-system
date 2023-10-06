@@ -114,7 +114,6 @@
     <Compile Include="StateMachine\States\CityAttackState.cs" />
     <Compile Include="StateMachine\States\NavGenState.cs" />
     <Compile Include="StateMachine\States\PathState.cs" />
-    <Compile Include="StateMachine\States\SitState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -78,9 +78,7 @@ namespace InfBuddy
             if (Playfield.ModelIdentity.Instance == Constants.ClanPandeGId || Playfield.ModelIdentity.Instance == Constants.OmniPandeGId)
                 return new DiedState();
 
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return new SitState();
-
+            
             return null;
         }
 

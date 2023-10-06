@@ -25,9 +25,6 @@ namespace InfBuddy
 
         public static Config Config { get; private set; }
 
-        private Stopwatch _kitTimer = new Stopwatch();
-        private Stopwatch _sitTimer = new Stopwatch();
-
         public static bool Toggle = false;
 
         public static bool Ready = true;
@@ -388,6 +385,7 @@ namespace InfBuddy
                 }
 
                 #endregion
+
             }
         }
 
@@ -435,8 +433,7 @@ namespace InfBuddy
             {
                 if (param.Length < 1)
                 {
-                    bool currentToggle = _settings["Toggle"].AsBool();
-                    if (!currentToggle)
+                    if (!_settings["Toggle"].AsBool())
                     {
                         Leader = DynelManager.LocalPlayer.Identity;
                         _settings["Toggle"] = true;

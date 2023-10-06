@@ -101,9 +101,6 @@
     </Compile>
     <Compile Include="StateMachine\States\DiedState.cs" />
     <Compile Include="StateMachine\States\ImmunityState.cs" />
-    <Compile Include="StateMachine\States\SitState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
     <Compile Include="StateMachine\States\FarmingState.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

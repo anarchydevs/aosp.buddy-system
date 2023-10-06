@@ -108,9 +108,6 @@
     <Compile Include="StateMachine\States\StartState.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>
-    <Compile Include="StateMachine\States\SitState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
     <Compile Include="StateMachine\States\FarmingState.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

@@ -107,9 +107,6 @@
     <Compile Include="StateMachine\States\DefendSpiritState.cs" />
     <Compile Include="StateMachine\States\ReformState.cs" />
     <Compile Include="StateMachine\States\MoveToQuestStarterState.cs" />
-    <Compile Include="StateMachine\States\SitState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
     <Compile Include="StateMachine\States\StartMissionState.cs" />
     <Compile Include="StateMachine\States\GrabMissionState.cs" />
     <Compile Include="StateMachine\States\MoveToEntranceState.cs" />

@@ -102,7 +102,6 @@
     <Compile Include="StateMachine\States\PathState.cs" />
     <Compile Include="StateMachine\States\PullState.cs" />
     <Compile Include="StateMachine\States\ReformState.cs" />
-    <Compile Include="StateMachine\States\SitState.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

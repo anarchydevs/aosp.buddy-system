@@ -33,9 +33,6 @@ namespace MitaarBuddy
                 return new FightState();
             }
 
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return new SitState();
-
             return null;
         }
 
