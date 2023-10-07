@@ -51,12 +51,12 @@ namespace CityBuddy
                     if (citycontroller.DistanceFrom(DynelManager.LocalPlayer) < 5f)
                     {
                         MovementController.Instance.Halt();
+                        _cruUseStopwatch.Start();
                         ExecuteCityControllerActions(citycontroller);
                     }
                     else if (!MovementController.Instance.IsNavigating)
                     {
                         MovementController.Instance.SetDestination(citycontroller.Position);
-                        Chat.WriteLine(" Moving to CT");
                     }
                 }
 
@@ -88,7 +88,7 @@ namespace CityBuddy
                             if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5)
                             {
                                 Chat.WriteLine("Using Controller Recompiler Unit");
-                                //cru.UseOn(cc.Identity);
+                                cru.UseOn(cc.Identity);
 
                                 // Reset the CRU stopwatch whenever you use a CRU
                                 _cruUseStopwatch.Restart();
@@ -110,7 +110,7 @@ namespace CityBuddy
                             if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5)
                             {
                                 Chat.WriteLine("Using Controller Recompiler Unit");
-                                //cru.UseOn(cc.Identity);
+                                cru.UseOn(cc.Identity);
 
                                 // Reset the CRU stopwatch whenever you use a CRU
                                 _cruUseStopwatch.Restart();
