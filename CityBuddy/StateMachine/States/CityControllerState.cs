@@ -2,21 +2,15 @@
 using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
-using SmokeLounge.AOtomation.Messaging.GameData;
-using System;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
-using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-using SmokeLounge.AOtomation.Messaging.Messages;
+using System.Linq;
 
 namespace CityBuddy
 {
     public class CityControllerState : IState
     {
-
-        private static double _lastActionTime = 0;
-        private static double _lastCruUseTime;
+        private static Stopwatch _actionStopwatch = new Stopwatch();
+        private static Stopwatch _cruUseStopwatch = new Stopwatch();
 
         public IState GetNextState()
         {
@@ -35,6 +29,7 @@ namespace CityBuddy
         public void OnStateEnter()
         {
             CityBuddy.CTWindowIsOpen = false;
+            _actionStopwatch.Start();
             Chat.WriteLine("Checking city controller.");
         }
 
@@ -46,28 +41,28 @@ namespace CityBuddy
 
         public void Tick()
         {
-            double currentTime = Time.NormalTime;
-            if (currentTime < _lastActionTime + 10) // 10 second delay
+            if (_actionStopwatch.Elapsed.TotalSeconds >= 1) // 1 second interval
             {
-                return;
+                Dynel citycontroller = DynelManager.AllDynels
+                    .FirstOrDefault(c => c.Name == "City Controller");
+
+                if (citycontroller != null)
+                {
+                    if (citycontroller.DistanceFrom(DynelManager.LocalPlayer) < 5f)
+                    {
+                        MovementController.Instance.Halt();
+                        ExecuteCityControllerActions(citycontroller);
+                    }
+                    else if (!MovementController.Instance.IsNavigating)
+                    {
+                        MovementController.Instance.SetDestination(citycontroller.Position);
+                        Chat.WriteLine(" Moving to CT");
+                    }
+                }
+
+                _actionStopwatch.Restart();
             }
 
-            Dynel citycontroller = DynelManager.AllDynels
-                .FirstOrDefault(c => c.Name == "City Controller");
-
-            if (citycontroller != null)
-            {
-                if (citycontroller.DistanceFrom(DynelManager.LocalPlayer) < 5f)
-                {
-                    MovementController.Instance.Halt();
-                    ExecuteCityControllerActions(citycontroller);
-                    _lastActionTime = currentTime;
-                }
-                else if (!MovementController.Instance.IsNavigating)
-                {
-                    MovementController.Instance.SetDestination(citycontroller.Position);
-                }
-            }
         }
 
         private void ExecuteCityControllerActions(Dynel cc)
@@ -89,13 +84,16 @@ namespace CityBuddy
                     {
                         if (CityController.Charge <= 0.75f)
                         {
-                            if (cru != null && Time.NormalTime > _lastCruUseTime + 5)
+                            // Add an additional check for `_lastCruUseTime`
+                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5)
                             {
                                 Chat.WriteLine("Using Controller Recompiler Unit");
-                                cru.UseOn(cc.Identity);
-                                _lastCruUseTime = Time.NormalTime;
-                            }
+                                //cru.UseOn(cc.Identity);
 
+                                // Reset the CRU stopwatch whenever you use a CRU
+                                _cruUseStopwatch.Restart();
+
+                            }
                         }
                         else
                         {
@@ -108,13 +106,16 @@ namespace CityBuddy
                     {
                         if (CityController.Charge <= 0.75f)
                         {
-                            if (cru != null && Time.NormalTime > _lastCruUseTime + 5)
+                            // Add an additional check for `_lastCruUseTime`
+                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5)
                             {
                                 Chat.WriteLine("Using Controller Recompiler Unit");
-                                cru.UseOn(cc.Identity);
-                                _lastCruUseTime = Time.NormalTime;
-                            }
+                                //cru.UseOn(cc.Identity);
 
+                                // Reset the CRU stopwatch whenever you use a CRU
+                                _cruUseStopwatch.Restart();
+
+                            }
                         }
                         else
                         {
