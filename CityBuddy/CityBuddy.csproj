@@ -95,6 +95,7 @@
     <Compile Include="CityBuddy.cs" />
     <Compile Include="IPCMessages\ClearSelectedMemberMessage.cs" />
     <Compile Include="IPCMessages\EnterMessage.cs" />
+    <Compile Include="IPCMessages\ShipToggle.cs" />
     <Compile Include="IPCMessages\IPCOpcode.cs" />
     <Compile Include="IPCMessages\LeaderInfoIPCMessage.cs" />
     <Compile Include="IPCMessages\SelectedMemberUpdateMessage.cs" />

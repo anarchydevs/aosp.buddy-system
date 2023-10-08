@@ -31,6 +31,7 @@ namespace CityBuddy
         public static bool Enable = false;
         public static bool CityUnderAttack = false;
         public static bool CTWindowIsOpen = false;
+        public static bool ShipOnOff = false;
 
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
@@ -88,6 +89,7 @@ namespace CityBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.ClearSelectedMember, HandleClearSelectedMember);
                 IPCChannel.RegisterCallback((int)IPCOpcode.LeaderInfo, OnLeaderInfoMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.WaitAndReady, OnWaitAndReadyMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Ship, ShipMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -99,9 +101,8 @@ namespace CityBuddy
                 _stateMachine = new StateMachine(new IdleState());
 
                 _settings.AddVariable("Enable", false);
+                _settings.AddVariable("Ship", false);
                 _settings.AddVariable("Corpses", false);
-
-                _settings["Enable"] = false;
 
                 Chat.RegisterCommand("buddy", BuddyCommand);
 
@@ -143,7 +144,6 @@ namespace CityBuddy
             if (!(_stateMachine.CurrentState is IdleState))
                 _stateMachine.SetState(new IdleState());
         }
-
         private void Stop()
         {
             Enable = false;
@@ -155,7 +155,16 @@ namespace CityBuddy
 
             NavMeshMovementController.Halt();
         }
-
+        private void ShipEnabled()
+        {
+            Chat.WriteLine("Ship Enabled.");
+            ShipOnOff = true;
+        }
+        private void ShipDisabled()
+        {
+            Chat.WriteLine("Ship Disabled");
+            ShipOnOff = false;
+        }
         private void OnStartStopMessage(int sender, IPCMessage msg)
         {
             if (msg is StartStopIPCMessage startStopMessage)
@@ -172,6 +181,24 @@ namespace CityBuddy
                     // Update the setting and stop the process.
                     _settings["Enable"] = false;
                     Stop();
+                }
+            }
+        }
+
+        private void ShipMessage(int sender, IPCMessage msg)
+        {
+            if (msg is ShipToggle shiptoggle)
+            {
+
+                if (shiptoggle.ShipOnOff)
+                {
+                    _settings["Ship"] = true;
+                    ShipEnabled();
+                }
+                else
+                {
+                    _settings["Ship"] = false;
+                    ShipDisabled();
                 }
             }
         }
@@ -341,6 +368,17 @@ namespace CityBuddy
                     
                     IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                     Start();
+                }
+
+                if (!_settings["Ship"].AsBool() && ShipOnOff)
+                {
+                    IPCChannel.Broadcast(new ShipToggle { ShipOnOff = false });
+                    ShipDisabled();
+                }
+                if (_settings["Ship"].AsBool() && !ShipOnOff)
+                {
+                    IPCChannel.Broadcast(new ShipToggle { ShipOnOff = true });
+                    ShipEnabled();
                 }
 
             }

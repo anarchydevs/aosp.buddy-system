@@ -3,6 +3,7 @@ using AOSharp.Core;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace CityBuddy
@@ -13,8 +14,17 @@ namespace CityBuddy
         private Dynel shipentrance;
         private bool _atStart = false;
 
+
+
         public IState GetNextState()
         {
+            var validPlayfields = new[]
+                {
+                    CityBuddy.MontroyalCity,
+                    CityBuddy.SerenityIslands,
+                    CityBuddy.PlayadelDesierto
+                };
+
             Corpse _bossCorpse = DynelManager.Corpses
                     .Where(c => c.Name.Contains("General"))
                .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
@@ -27,26 +37,29 @@ namespace CityBuddy
             if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
 
-            if (_bossCorpse != null)
+            if (validPlayfields.Contains(Playfield.ModelIdentity.Instance))
             {
-                CityBuddy.CityUnderAttack = false;
-
-                // Check if the corpse is new (not in the dictionary)
-                if (!CityBuddy.CityUnderAttack && _target == null && !BossLootState.bossCorpseDictionary.ContainsKey(_bossCorpse.Position))
+                if (_bossCorpse != null)
                 {
+                    CityBuddy.CityUnderAttack = false;
 
-                    // BossLootState.bossCorpseDictionary.Add(_bossCorpse.Position, _bossCorpse.Identity);
-
-                    return new BossLootState();
+                    // Check if the corpse is new (not in the dictionary)
+                    if (!CityBuddy.CityUnderAttack && _target == null && !BossLootState.bossCorpseDictionary.ContainsKey(_bossCorpse.Position))
+                    {
+                        return new BossLootState();
+                    }
                 }
-            }
-
-            if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader
-                && !DynelManager.NPCs.Any(c => c.Health > 0)
-                && !CityBuddy.CityUnderAttack
-                && (CityController.CloakState == CloakStatus.Unknown || CityController.CanToggleCloak()))
-            {
-                return new CityControllerState();
+                else if (shipentrance != null && CityBuddy._settings["Ship"].AsBool())
+                {
+                    return new WaitForShipState();
+                }
+                else if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader
+                    && !DynelManager.NPCs.Any(c => c.Health > 0)
+                    && !CityBuddy.CityUnderAttack
+                    && (CityController.CloakState == CloakStatus.Unknown || CityController.CanToggleCloak()))
+                {
+                    return new CityControllerState();
+                }
             }
 
             return null;
@@ -54,20 +67,7 @@ namespace CityBuddy
 
         public void OnStateEnter()
         {
-            if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity)
-            {
-                MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos);
-            }
-
-            if (Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands)
-            {
-                MovementController.Instance.SetDestination(CityBuddy._serenityGaurdPos);
-            }
-
-            if (Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
-            {
-                MovementController.Instance.SetDestination(CityBuddy._playadelGaurdPos);
-            }
+            MoveToStart();
 
             //Chat.WriteLine("City state");
         }
@@ -89,7 +89,6 @@ namespace CityBuddy
                  .Where(c => !c.Name.Contains("General"))
                  .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                  .FirstOrDefault();
-
 
             if (_target != null)
             {
@@ -114,18 +113,18 @@ namespace CityBuddy
                         MovementController.Instance.SetDestination(_target.Position);
                     }
                 }
-
                 else if (_corpse != null && _target == null && CityBuddy._settings["Corpses"].AsBool())
                 {
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 5f)
                     {
                         MovementController.Instance.SetDestination(_corpse.Position);
+
                     }
                 }
-
-                else if (shipentrance == null)
+                else
                 {
-                    AtStart();
+                    MoveToStart();
+                    UpdateAtStartStatus();
                 }
             }
 
@@ -156,32 +155,33 @@ namespace CityBuddy
             MovementController.Instance.SetDestination(CityBuddy._leaderPos);
         }
 
-        private void AtStart()
+        private void MoveToStart()
         {
-            if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity)
+            Dictionary<int, Vector3> destinationByPlayfield = new Dictionary<int, Vector3>
             {
-                if (DynelManager.LocalPlayer.Position.Distance2DFrom(CityBuddy._montroyalGaurdPos) > 10)
-                { 
-                    MovementController.Instance.SetDestination(CityBuddy._montroyalGaurdPos); 
-                    _atStart = true;
-                }
-            }
-            if (Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands)
+                { CityBuddy.MontroyalCity, CityBuddy._montroyalGaurdPos },
+                { CityBuddy.SerenityIslands, CityBuddy._serenityGaurdPos },
+                { CityBuddy.PlayadelDesierto, CityBuddy._playadelGaurdPos }
+            };
+
+            int currentPlayfield = Playfield.ModelIdentity.Instance;
+
+            if (destinationByPlayfield.TryGetValue(currentPlayfield, out Vector3 destination) &&
+                DynelManager.LocalPlayer.Position.Distance2DFrom(destination) > 10)
             {
-                if (DynelManager.LocalPlayer.Position.Distance2DFrom(CityBuddy._serenityGaurdPos) > 10)
-                {
-                    MovementController.Instance.SetDestination(CityBuddy._serenityGaurdPos);
-                    _atStart = true;
-                }
+                MovementController.Instance.SetDestination(destination);
             }
-            if (Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
-            {
-                if (DynelManager.LocalPlayer.Position.Distance2DFrom(CityBuddy._playadelGaurdPos) > 10)
-                {
-                    MovementController.Instance.SetDestination(CityBuddy._playadelGaurdPos);
-                    _atStart = true;
-                }
-            }
+        }
+
+        private void UpdateAtStartStatus()
+        {
+            Vector3 currentPos = DynelManager.LocalPlayer.Position;
+            int currentPlayfieldInstance = Playfield.ModelIdentity.Instance;
+
+            _atStart =
+                (currentPlayfieldInstance == CityBuddy.MontroyalCity && currentPos.Distance2DFrom(CityBuddy._montroyalGaurdPos) <= 10) ||
+                (currentPlayfieldInstance == CityBuddy.SerenityIslands && currentPos.Distance2DFrom(CityBuddy._serenityGaurdPos) <= 10) ||
+                (currentPlayfieldInstance == CityBuddy.PlayadelDesierto && currentPos.Distance2DFrom(CityBuddy._playadelGaurdPos) <= 10);
         }
     }
 }

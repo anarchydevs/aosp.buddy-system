@@ -89,7 +89,7 @@ namespace CityBuddy
                         if (CityController.Charge <= 0.75f)
                         {
                             // Add an additional check for `_lastCruUseTime`
-                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5) 
+                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5)
                             {
                                 Chat.WriteLine("Using Controller Recompiler Unit");
                                 cru.UseOn(cc.Identity);
@@ -125,12 +125,11 @@ namespace CityBuddy
                         {
                             Chat.WriteLine("Enabling Cloak");
                             CityController.ToggleCloak();
-                        }  
+                        }
                     }
                 }
             }
         }
-        
 
         public static class ControllerRecompilerUnit
         {

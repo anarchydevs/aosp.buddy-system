@@ -19,11 +19,16 @@ namespace CityBuddy
 
             if (CityBuddy._settings["Enable"].AsBool())
             {
-                if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity
-                    || Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands
-                    || Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
+                var validPlayfields = new[]
                 {
-                    if (shipentrance != null && Team.Members.Count(c => c.Character == null) > 4)
+                    CityBuddy.MontroyalCity,
+                    CityBuddy.SerenityIslands,
+                    CityBuddy.PlayadelDesierto
+                };
+
+                if (validPlayfields.Contains(Playfield.ModelIdentity.Instance))
+                {
+                    if (shipentrance != null && CityBuddy._settings["Ship"].AsBool())
                     {
                         return new WaitForShipState();
                     }
