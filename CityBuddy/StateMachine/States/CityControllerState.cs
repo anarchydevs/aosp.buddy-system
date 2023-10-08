@@ -17,8 +17,8 @@ namespace CityBuddy
             if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
 
-            if (CityController.CloakState != CloakStatus.Unknown && CityController.Charge >= 0.80f
-                && !CityController.CanToggleCloak())
+            if ((CityController.CloakState != CloakStatus.Unknown && CityController.Charge >= 0.80f && !CityController.CanToggleCloak())
+                || (!CityController.CanToggleCloak() && CityBuddy.CTWindowIsOpen))
             {
                 return new CityAttackState();
             }
@@ -48,10 +48,9 @@ namespace CityBuddy
 
                 if (citycontroller != null)
                 {
-                    if (citycontroller.DistanceFrom(DynelManager.LocalPlayer) < 5f)
+                    if (citycontroller.DistanceFrom(DynelManager.LocalPlayer) < 7f)
                     {
                         MovementController.Instance.Halt();
-                        _cruUseStopwatch.Start();
                         ExecuteCityControllerActions(citycontroller);
                     }
                     else if (!MovementController.Instance.IsNavigating)
@@ -62,7 +61,6 @@ namespace CityBuddy
 
                 _actionStopwatch.Restart();
             }
-
         }
 
         private void ExecuteCityControllerActions(Dynel cc)
@@ -73,19 +71,25 @@ namespace CityBuddy
 
             if (!CityBuddy.CTWindowIsOpen)
             {
-                Chat.WriteLine("Opening City Controller");
+                //Chat.WriteLine("Opening City Controller");
                 CityController.Use();
             }
             else if (CityBuddy.CTWindowIsOpen)
             {
+                //Chat.WriteLine("CT window is open");
+
                 if (CityController.CanToggleCloak())
                 {
+                    //Chat.WriteLine("Can toggle cloak");
+
+                    _cruUseStopwatch.Start();
+
                     if (CityController.CloakState == CloakStatus.Enabled)
                     {
                         if (CityController.Charge <= 0.75f)
                         {
                             // Add an additional check for `_lastCruUseTime`
-                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5)
+                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5) 
                             {
                                 Chat.WriteLine("Using Controller Recompiler Unit");
                                 cru.UseOn(cc.Identity);
@@ -121,8 +125,7 @@ namespace CityBuddy
                         {
                             Chat.WriteLine("Enabling Cloak");
                             CityController.ToggleCloak();
-                        }
-                           
+                        }  
                     }
                 }
             }

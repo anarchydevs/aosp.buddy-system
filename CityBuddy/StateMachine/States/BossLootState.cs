@@ -14,7 +14,6 @@ namespace CityBuddy
 {
     public class BossLootState : IState
     {
-        private Dynel _downButton;
 
         private static Corpse _corpse;
 
