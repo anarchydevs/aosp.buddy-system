@@ -10,25 +10,44 @@ namespace CityBuddy
 {
     public class IdleState : IState
     {
+        private Dynel shipentrance;
 
         public IState GetNextState()
         {
 
+            shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
+
             if (CityBuddy._settings["Enable"].AsBool())
             {
-                if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity
-                    || Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands
-                    || Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
+                var validPlayfields = new[]
                 {
+                    CityBuddy.MontroyalCity,
+                    CityBuddy.SerenityIslands,
+                    CityBuddy.PlayadelDesierto
+                };
+
+                if (validPlayfields.Contains(Playfield.ModelIdentity.Instance))
+                {
+                    if (shipentrance != null && CityBuddy._settings["Ship"].AsBool())
+                    {
+                        return new WaitForShipState();
+                    }
+                    else
+                    {
                         return new CityAttackState();
+                    }
                 }
 
                 if (Playfield.IsDungeon)
                 {
                     if (DynelManager.LocalPlayer.Room.Name == "AI_bossroom")
+                    {
                         return new BossRoomState();
+                    }
                     else
-                    return new PathState();
+                    {
+                        return new PathState();
+                    }
                 }
             }
 

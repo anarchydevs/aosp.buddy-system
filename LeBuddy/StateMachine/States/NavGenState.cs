@@ -68,6 +68,7 @@ namespace LeBuddy
         public void OnStateExit()
         {
             Chat.WriteLine("Exit NavGenState");
+            MovementController.Instance.Halt();
         }
 
         public void Tick()

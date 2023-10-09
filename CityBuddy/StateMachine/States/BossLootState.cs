@@ -14,9 +14,9 @@ namespace CityBuddy
 {
     public class BossLootState : IState
     {
-        private Dynel _downButton;
 
         private static Corpse _corpse;
+        private Dynel shipentrance;
 
         private Stopwatch _lootTimer;
 
@@ -27,6 +27,15 @@ namespace CityBuddy
 
         public IState GetNextState()
         {
+            shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
+
+            var validPlayfields = new[]
+                {
+                    CityBuddy.MontroyalCity,
+                    CityBuddy.SerenityIslands,
+                    CityBuddy.PlayadelDesierto
+                };
+
             if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
 
@@ -37,12 +46,13 @@ namespace CityBuddy
                     return new ButtonExitState();
                 }
 
-                if (Playfield.ModelIdentity.Instance == CityBuddy.MontroyalCity
-                        || Playfield.ModelIdentity.Instance == CityBuddy.SerenityIslands
-                        || Playfield.ModelIdentity.Instance == CityBuddy.PlayadelDesierto)
+                if (validPlayfields.Contains(Playfield.ModelIdentity.Instance))
                 {
-                    if (Team.Members.Count(c => c.Character == null) < 4)
-                    // Not running enough toons to trigger a ship
+                    if (CityBuddy._settings["Ship"].AsBool())
+                    {
+                        return new WaitForShipState();
+                    }
+                    else
                     {
                         if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
                         {
@@ -52,10 +62,6 @@ namespace CityBuddy
                         {
                             return new CityAttackState();
                         }
-                    }
-                    else
-                    {
-                        return new WaitForShipState();
                     }
                 }
             }
@@ -135,13 +141,10 @@ namespace CityBuddy
                             _lootTimer = null;
                         }
                     }
-
-                    
                 }
 
                 else //if (_corpse == null)
                 {
-
                     _initCorpse = true;
                     _atCorpse = true;
                 }

@@ -8,5 +8,6 @@
         Enter = 1004,
         SelectedMemberUpdate = 1005,
         ClearSelectedMember = 1006,
+        Ship =  1007,
     }
 }

@@ -2,29 +2,23 @@
 using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
-using SmokeLounge.AOtomation.Messaging.GameData;
-using System;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
-using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
-using SmokeLounge.AOtomation.Messaging.Messages;
+using System.Linq;
 
 namespace CityBuddy
 {
     public class CityControllerState : IState
     {
-
-        private static double _lastActionTime = 0;
-        private static double _lastCruUseTime;
+        private static Stopwatch _actionStopwatch = new Stopwatch();
+        private static Stopwatch _cruUseStopwatch = new Stopwatch();
 
         public IState GetNextState()
         {
             if (!CityBuddy._settings["Enable"].AsBool())
                 return new IdleState();
 
-            if (CityController.CloakState != CloakStatus.Unknown && CityController.Charge >= 0.80f
-                && !CityController.CanToggleCloak())
+            if ((CityController.CloakState != CloakStatus.Unknown && CityController.Charge >= 0.80f && !CityController.CanToggleCloak())
+                || (!CityController.CanToggleCloak() && CityBuddy.CTWindowIsOpen))
             {
                 return new CityAttackState();
             }
@@ -35,6 +29,7 @@ namespace CityBuddy
         public void OnStateEnter()
         {
             CityBuddy.CTWindowIsOpen = false;
+            _actionStopwatch.Start();
             Chat.WriteLine("Checking city controller.");
         }
 
@@ -46,27 +41,25 @@ namespace CityBuddy
 
         public void Tick()
         {
-            double currentTime = Time.NormalTime;
-            if (currentTime < _lastActionTime + 10) // 10 second delay
+            if (_actionStopwatch.Elapsed.TotalSeconds >= 1) // 1 second interval
             {
-                return;
-            }
+                Dynel citycontroller = DynelManager.AllDynels
+                    .FirstOrDefault(c => c.Name == "City Controller");
 
-            Dynel citycontroller = DynelManager.AllDynels
-                .FirstOrDefault(c => c.Name == "City Controller");
+                if (citycontroller != null)
+                {
+                    if (citycontroller.DistanceFrom(DynelManager.LocalPlayer) < 7f)
+                    {
+                        MovementController.Instance.Halt();
+                        ExecuteCityControllerActions(citycontroller);
+                    }
+                    else if (!MovementController.Instance.IsNavigating)
+                    {
+                        MovementController.Instance.SetDestination(citycontroller.Position);
+                    }
+                }
 
-            if (citycontroller != null)
-            {
-                if (citycontroller.DistanceFrom(DynelManager.LocalPlayer) < 5f)
-                {
-                    MovementController.Instance.Halt();
-                    ExecuteCityControllerActions(citycontroller);
-                    _lastActionTime = currentTime;
-                }
-                else if (!MovementController.Instance.IsNavigating)
-                {
-                    MovementController.Instance.SetDestination(citycontroller.Position);
-                }
+                _actionStopwatch.Restart();
             }
         }
 
@@ -78,24 +71,33 @@ namespace CityBuddy
 
             if (!CityBuddy.CTWindowIsOpen)
             {
-                Chat.WriteLine("Opening City Controller");
+                //Chat.WriteLine("Opening City Controller");
                 CityController.Use();
             }
             else if (CityBuddy.CTWindowIsOpen)
             {
+                //Chat.WriteLine("CT window is open");
+
                 if (CityController.CanToggleCloak())
                 {
+                    //Chat.WriteLine("Can toggle cloak");
+
+                    _cruUseStopwatch.Start();
+
                     if (CityController.CloakState == CloakStatus.Enabled)
                     {
                         if (CityController.Charge <= 0.75f)
                         {
-                            if (cru != null && Time.NormalTime > _lastCruUseTime + 5)
+                            // Add an additional check for `_lastCruUseTime`
+                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5)
                             {
                                 Chat.WriteLine("Using Controller Recompiler Unit");
                                 cru.UseOn(cc.Identity);
-                                _lastCruUseTime = Time.NormalTime;
-                            }
 
+                                // Reset the CRU stopwatch whenever you use a CRU
+                                _cruUseStopwatch.Restart();
+
+                            }
                         }
                         else
                         {
@@ -108,25 +110,26 @@ namespace CityBuddy
                     {
                         if (CityController.Charge <= 0.75f)
                         {
-                            if (cru != null && Time.NormalTime > _lastCruUseTime + 5)
+                            // Add an additional check for `_lastCruUseTime`
+                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5)
                             {
                                 Chat.WriteLine("Using Controller Recompiler Unit");
                                 cru.UseOn(cc.Identity);
-                                _lastCruUseTime = Time.NormalTime;
-                            }
 
+                                // Reset the CRU stopwatch whenever you use a CRU
+                                _cruUseStopwatch.Restart();
+
+                            }
                         }
                         else
                         {
                             Chat.WriteLine("Enabling Cloak");
                             CityController.ToggleCloak();
                         }
-                           
                     }
                 }
             }
         }
-        
 
         public static class ControllerRecompilerUnit
         {
