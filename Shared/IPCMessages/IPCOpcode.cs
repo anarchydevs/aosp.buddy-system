@@ -1,4 +1,4 @@
-﻿namespace Db1Buddy.IPCMessages
+﻿namespace Shared.IPCMessages
 {
     public enum IPCOpcode
     {
