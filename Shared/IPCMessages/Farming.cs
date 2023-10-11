@@ -1,7 +1,7 @@
 ﻿using AOSharp.Core.IPC;
 using SmokeLounge.AOtomation.Messaging.Serialization.MappingAttributes;
 
-namespace Db1Buddy.IPCMessages
+namespace Shared.IPCMessages
 {
     [AoContract((int)IPCOpcode.Farming)]
     public class FarmingStatusMessage : IPCMessage
