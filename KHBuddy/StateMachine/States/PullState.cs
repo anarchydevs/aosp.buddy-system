@@ -4,7 +4,6 @@ using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using KHBuddy.IPCMessages;
-using OSTBuddy;
 using System.Collections.Generic;
 using System.Linq;
 

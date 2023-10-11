@@ -97,8 +97,6 @@ namespace InfBuddy
                 _settings.AddVariable("Looting", false);
                 _settings.AddVariable("Leech", false);
 
-                //_settings["Toggle"] = false;
-
                 Chat.WriteLine("InfBuddy Loaded!");
                 Chat.WriteLine("/infbuddy for settings.");
             }

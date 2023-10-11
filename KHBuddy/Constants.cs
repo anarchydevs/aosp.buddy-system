@@ -1,7 +1,7 @@
 ﻿using AOSharp.Common.GameData;
 using System.Collections.Generic;
 
-namespace OSTBuddy
+namespace KHBuddy
 {
     public static class Constants
     {

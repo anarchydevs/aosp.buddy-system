@@ -85,14 +85,10 @@
     <Compile Include="Config.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="IPCMessages\EastandWestSelection.cs" />
-    <Compile Include="IPCMessages\WestSelection .cs" />
-    <Compile Include="IPCMessages\EastSelection.cs" />
-    <Compile Include="IPCMessages\BeachSelection.cs" />
     <Compile Include="IPCMessages\MoveEastMessage.cs" />
     <Compile Include="IPCMessages\MoveWestMessage.cs" />
-    <Compile Include="IPCMessages\StartModeMessage.cs" />
-    <Compile Include="IPCMessages\StopModeMessage.cs" />
+    <Compile Include="IPCMessages\SideSelectionsIPCMessage.cs" />
+    <Compile Include="IPCMessages\StartStopIPCMessage.cs" />
     <Compile Include="KHBuddy.cs" />
     <Compile Include="IPCMessages\IPCOpcode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

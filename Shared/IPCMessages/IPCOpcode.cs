@@ -6,7 +6,7 @@
         LeaderInfo = 1002,
         WaitAndReady = 1003,
         Farming = 1004,
-        ModeSelections = 1005,
+        //ModeSelections = 1005,
         SettingsUpdate = 1006,
         RangeInfo = 1007,
         Enter = 1008,
