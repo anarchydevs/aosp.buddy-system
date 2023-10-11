@@ -85,12 +85,7 @@
     <Compile Include="Config.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="IPCMessages\AttackRangeMessage.cs" />
-    <Compile Include="IPCMessages\ScanRangeMessage.cs" />
     <Compile Include="RoamBuddy.cs" />
-    <Compile Include="IPCMessages\IPCOpcode.cs" />
-    <Compile Include="IPCMessages\StopMessage.cs" />
-    <Compile Include="IPCMessages\StartMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsController.cs" />
     <Compile Include="StateMachine\IState.cs" />

@@ -1,22 +1,19 @@
 using AOSharp.Common.GameData;
 using AOSharp.Common.GameData.UI;
 using AOSharp.Core;
-using AOSharp.Core.Inventory;
 using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
-using CityBuddy.IPCMessages;
+using Shared.IPCMessages;
 using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
 using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using SmokeLounge.AOtomation.Messaging.GameData;
-using System.Diagnostics;
 
 namespace CityBuddy
 {
@@ -89,7 +86,7 @@ namespace CityBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.ClearSelectedMember, HandleClearSelectedMember);
                 IPCChannel.RegisterCallback((int)IPCOpcode.LeaderInfo, OnLeaderInfoMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.WaitAndReady, OnWaitAndReadyMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Ship, ShipMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Farming, ShipMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -187,10 +184,10 @@ namespace CityBuddy
 
         private void ShipMessage(int sender, IPCMessage msg)
         {
-            if (msg is ShipToggle shiptoggle)
+            if (msg is FarmingStatusMessage shiptoggle)
             {
 
-                if (shiptoggle.ShipOnOff)
+                if (shiptoggle.IsFarming)
                 {
                     _settings["Ship"] = true;
                     ShipEnabled();
@@ -372,12 +369,12 @@ namespace CityBuddy
 
                 if (!_settings["Ship"].AsBool() && ShipOnOff)
                 {
-                    IPCChannel.Broadcast(new ShipToggle { ShipOnOff = false });
+                    IPCChannel.Broadcast(new FarmingStatusMessage { IsFarming = false });
                     ShipDisabled();
                 }
                 if (_settings["Ship"].AsBool() && !ShipOnOff)
                 {
-                    IPCChannel.Broadcast(new ShipToggle { ShipOnOff = true });
+                    IPCChannel.Broadcast(new FarmingStatusMessage { IsFarming = true });
                     ShipEnabled();
                 }
 

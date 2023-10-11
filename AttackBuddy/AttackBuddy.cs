@@ -5,7 +5,7 @@ using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
-using AttackBuddy.IPCMessages;
+using Shared.IPCMessages;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -69,14 +69,11 @@ namespace AttackBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.RangeInfo, OnRangeInfoMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.LeaderInfo, OnLeaderInfoMessage);
 
-                //IPCChannel.RegisterCallback((int)IPCOpcode.AttackRange, OnAttackRangeMessage);
-                //IPCChannel.RegisterCallback((int)IPCOpcode.ScanRange, OnScanRangeMessage);
-
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
                 Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRangeChangedEvent += AttackRange_Changed;
                 Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRangeChangedEvent += ScanRange_Changed;
 
-                Chat.RegisterCommand("buddy", AttackBuddyCommand);
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 SettingsController.RegisterSettingsWindow("AttackBuddy", pluginDir + "\\UI\\AttackBuddySettingWindow.xml", _settings);
 
@@ -198,20 +195,6 @@ namespace AttackBuddy
                 }
             }
         }
-
-        //private void OnAttackRangeMessage(int sender, IPCMessage msg)
-        //{
-        //    AttackRangeMessage rangeMsg = (AttackRangeMessage)msg;
-
-        //    Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = rangeMsg.Range;
-        //}
-
-        //private void OnScanRangeMessage(int sender, IPCMessage msg)
-        //{
-        //    ScanRangeMessage rangeMsg = (ScanRangeMessage)msg;
-
-        //    Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = rangeMsg.Range;
-        //}
 
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
@@ -482,14 +465,13 @@ namespace AttackBuddy
             }
         }
 
-        private void AttackBuddyCommand(string command, string[] param, ChatWindow chatWindow)
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {
                 if (param.Length < 1)
                 {
-                    bool currentToggle = _settings["Enable"].AsBool();
-                    if (!currentToggle)
+                    if (!_settings["Enable"].AsBool())
                     {
                         Leader = DynelManager.LocalPlayer.Identity;
                         _settings["Enable"] = true;
