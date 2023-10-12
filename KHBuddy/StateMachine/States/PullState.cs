@@ -30,7 +30,7 @@ namespace KHBuddy
         public IState GetNextState()
         {
             List<SimpleChar> _hecks = DynelManager.NPCs
-                .Where(x => x.Name.Contains("Heckler")
+                .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
                     && x.DistanceFrom(DynelManager.LocalPlayer) <= 10f
                     && x.IsAlive && x.IsInLineOfSight)
                 .ToList();

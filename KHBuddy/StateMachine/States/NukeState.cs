@@ -108,7 +108,13 @@ namespace KHBuddy
                     && x.Position.DistanceFrom(position) < 8f)
                 .ToList();
 
-            return hecklerCorpses.Count >= 3;
+            List<SimpleChar> _hecks = DynelManager.NPCs
+                .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
+                    && x.DistanceFrom(DynelManager.LocalPlayer) <= 10f
+                    && x.IsAlive && x.IsInLineOfSight)
+                .ToList();
+
+            return hecklerCorpses.Count >= 3 && _hecks.Count <= 0;
         }
 
 
