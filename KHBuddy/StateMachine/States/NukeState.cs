@@ -43,102 +43,90 @@ namespace KHBuddy
 
         public IState GetNextState()
         {
-            //if (Time.NormalTime - KHBuddy._stateTimeOut > 1300f
-            if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
+            // Handle specific professions
+            if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician && !Team.IsInTeam)
             {
-                if (!Team.IsInTeam)
+                _settings["Toggle"] = false;
+                return new IdleState();
+            }
+
+            if (DynelManager.LocalPlayer.Profession != Profession.Enforcer)
+                return null;
+
+            SideSelection currentSelection = (SideSelection)_settings["SideSelection"].AsInt32();
+
+            for (int i = 0; i < sides.Length; i++)
+            {
+                if (sides[i] == currentSelection || (i > 0 && sides[3] == currentSelection))
                 {
-                    _settings["Toggle"] = false;
-                    //Chat.WriteLine("Turning off bot, Idle for too long.");
-                    return new IdleState();
+                    if (ShouldEnterPullState(positions[i]))
+                    {
+                        _init = true;
+                        _timer = Time.NormalTime;
+                        PullState._counterVec = 0;
+                        return new PullState();
+                    }
                 }
             }
 
-            if (DynelManager.LocalPlayer.Profession == Profession.Enforcer)
+            if (currentSelection == SideSelection.EastAndWest)
             {
-                for (int i = 0; i < sides.Length; i++)
-                {
-                    if (sides[i] == (SideSelection)_settings["SideSelection"].AsInt32() ||
-                        (i > 0 && sides[3] == (SideSelection)_settings["SideSelection"].AsInt32()))
-                    {
-                        var _hecksCorpsesAtPosBeach = DynelManager.Corpses
-                                .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
-                                    && x.DistanceFrom(DynelManager.LocalPlayer) <= 45f
-                                    && x.Position.DistanceFrom(positions[i]) < 8f)
-                                .ToList();
+                Vector3 currentPosition = _doingEast ? new Vector3(1115.9f, 1.6f, 1064.3f) : new Vector3(1043.2f, 1.6f, 1020.5f);
 
-                        if (_hecksAtPos.Count == 0 && _hecksCorpsesAtPosBeach.Count >= 3)
-                        {
-                            _init = true;
-                            _timer = Time.NormalTime;
-                            PullState._counterVec = 0;
-                            return new PullState();
-                        }
-                    }
-                }
-
-                if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
+                if (ShouldEnterPullState(currentPosition))
                 {
+                    _timer = Time.NormalTime;
+                    _init = true;
+
                     if (_doingEast)
                     {
-                        _hecksCorpsesAtPosEast = DynelManager.Corpses
-                            .Where(x => x.Name.Contains("Heckler") || x.Name.Contains("Voracious")
-                                && x.DistanceFrom(DynelManager.LocalPlayer) <= 45f
-                                && x.Position.DistanceFrom(new Vector3(1115.9f, 1.6f, 1064.3f)) < 8f)
-                            .ToList();
-
-                        if (_hecksAtPos.Count == 0 && _hecksCorpsesAtPosEast.Count >= 3)
-                        {
-                            _timer = Time.NormalTime;
-                            _init = true;
-                            _doingEast = false;
-                            _doingWest = true;
-                            IPCChannel.Broadcast(new MoveWestMessage());
-                            MovementController.Instance.SetPath(Constants.PathToWest);
-                            return new PullState();
-                        }
+                        _doingEast = false;
+                        _doingWest = true;
+                        IPCChannel.Broadcast(new MoveWestMessage());
+                        MovementController.Instance.SetPath(Constants.PathToWest);
                     }
-
-                    if (_doingWest)
+                    else if (_doingWest)
                     {
-                        _hecksCorpsesAtPosWest = DynelManager.Corpses
-                            .Where(x => x.Name.Contains("Heckler") || x.Name.Contains("Voracious")
-                                && x.DistanceFrom(DynelManager.LocalPlayer) <= 45f
-                                && x.Position.DistanceFrom(new Vector3(1043.2f, 1.6f, 1020.5f)) < 8f)
-                            .ToList();
-
-                        if (_hecksAtPos.Count == 0 && _hecksCorpsesAtPosWest.Count >= 3)
-                        {
-                            _timer = Time.NormalTime;
-                            _doingWest = false;
-                            _doingEast = true;
-                            IPCChannel.Broadcast(new MoveEastMessage());
-                            MovementController.Instance.SetPath(Constants.PathToEast);
-                            return new PullState();
-                        }
+                        _doingWest = false;
+                        _doingEast = true;
+                        IPCChannel.Broadcast(new MoveEastMessage());
+                        MovementController.Instance.SetPath(Constants.PathToEast);
                     }
+
+                    return new PullState();
                 }
             }
 
             return null;
         }
 
+        private bool ShouldEnterPullState(Vector3 position)
+        {
+            var hecklerCorpses = DynelManager.Corpses
+                .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
+                    && x.DistanceFrom(DynelManager.LocalPlayer) <= 45f
+                    && x.Position.DistanceFrom(position) < 8f)
+                .ToList();
+
+            return hecklerCorpses.Count >= 3;
+        }
+
+
         public void OnStateEnter()
         {
-
             if (_settings["Toggle"].AsBool()
                         && DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
             {
 
-                if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
+                if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32()
+                    || SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
                 {
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1090.2f, 28.1f, 1050.1f)) > 1f && !MovementController.Instance.IsNavigating)
                     {
                         MovementController.Instance.SetDestination(new Vector3(1090.2f, 28.1f, 1050.1f));
                     }
                 }
-                else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32()
-                    || SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
+                else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
                 {
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1065.4f, 26.2f, 1033.5f)) > 1f && !MovementController.Instance.IsNavigating)
                     {
@@ -147,12 +135,12 @@ namespace KHBuddy
                 }
             }
             //KHBuddy._stateTimeOut = Time.NormalTime;
-            Chat.WriteLine("NukeState::OnStateEnter");
+            //Chat.WriteLine("NukeState::OnStateEnter");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("NukeState::OnStateExit");
+            //Chat.WriteLine("NukeState::OnStateExit");
         }
 
         public void Tick()
@@ -209,13 +197,13 @@ namespace KHBuddy
                        && x.FightingTarget != null)
                    .ToList();
 
-                    Spell.Find(270786, out Spell mongobuff);
+                    Spell.Find(270786, out Spell mongoDemolish);
 
                     if (_hecksAtPos.Count >= 1)
                     {
-                        if (!Spell.HasPendingCast && mongobuff.IsReady && Time.NormalTime > _refreshMongoTimer + RefreshMongoTime)
+                        if (!Spell.HasPendingCast && mongoDemolish.IsReady && Time.NormalTime > _refreshMongoTimer + RefreshMongoTime)
                         {
-                            mongobuff.Cast();
+                            mongoDemolish.Cast();
                             _refreshMongoTimer = Time.NormalTime;
                         }
                     }

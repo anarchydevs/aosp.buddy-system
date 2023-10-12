@@ -40,7 +40,7 @@ namespace KHBuddy
 
         SideSelection currentSide;
 
-        public static bool _doingEast = false;
+        public static bool _doingEast = true;
         public static bool _doingWest = false;
         public static bool _started = false;
 
@@ -70,6 +70,7 @@ namespace KHBuddy
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Toggle", false);
+                _settings["Toggle"] = false; //to save
 
                 _settings.AddVariable("SideSelection", (int)SideSelection.East);
 
@@ -90,6 +91,11 @@ namespace KHBuddy
                     KHBuddy.previousErrorMessage = errorMessage;
                 }
             }
+        }
+
+        public override void Teardown()
+        {
+            SettingsController.CleanUp();
         }
 
         public static void IPCChannel_Changed(object s, int e)
@@ -118,7 +124,7 @@ namespace KHBuddy
             if (!(_stateMachine.CurrentState is IdleState))
                 _stateMachine.SetState(new IdleState());
 
-            NavMeshMovementController.Halt();
+            MovementController.Instance.Halt();
         }
 
         private void OnStartStopMessage(int sender, IPCMessage msg)
@@ -168,10 +174,7 @@ namespace KHBuddy
             }
         }
 
-        public override void Teardown()
-        {
-            SettingsController.CleanUp();
-        }
+       
 
         private void InfoView(object s, ButtonBase button)
         {
@@ -246,6 +249,18 @@ namespace KHBuddy
                     {
                         infoView.Tag = SettingsController.settingsWindow;
                         infoView.Clicked = InfoView;
+                    }
+
+                    if (!_settings["Toggle"].AsBool() && Toggle)
+                    {
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
+                    }
+                    if (_settings["Toggle"].AsBool() && !Toggle)
+                    {
+                        
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                        Start();
                     }
 
                     SideSelection newSide = (SideSelection)_settings["SideSelection"].AsInt32();
