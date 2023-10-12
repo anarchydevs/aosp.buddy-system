@@ -127,6 +127,25 @@ namespace KHBuddy
                 {
                     HandleMovementAndCasting(currentSelection);
                 }
+
+                bool sequenceComplete = HandleMovementAndCasting(currentSelection);
+
+                if (sequenceComplete)
+                {
+                    // Reset timer for the side that just completed
+                    switch (currentSelection)
+                    {
+                        case KHBuddy.SideSelection.Beach:
+                            _beachTimer = Time.NormalTime;
+                            break;
+                        case KHBuddy.SideSelection.East:
+                            _eastTimer = Time.NormalTime;
+                            break;
+                        case KHBuddy.SideSelection.West:
+                            _westTimer = Time.NormalTime;
+                            break;
+                    }
+                }
             }
         }
 
@@ -218,6 +237,12 @@ namespace KHBuddy
                 case KHBuddy.SideSelection.West:
                     _westTimer = Time.NormalTime;
                     break;
+            }
+
+            if (_counterVec >= vectorList.Count) // If the current sequence has completed
+            {
+                _counterVec = 0; // Reset counter for next sequence
+                return true;
             }
 
             return false;
