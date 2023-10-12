@@ -45,7 +45,6 @@ namespace KHBuddy
         public static bool _started = false;
 
         public static bool _init = false;
-        //public static bool NeedsKit = false;
 
         public static string previousErrorMessage = string.Empty;
 
@@ -66,6 +65,8 @@ namespace KHBuddy
                 IPCChannel.RegisterCallback((int)IPCOpcode.MoveWest, OnMoveWestMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
+
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 Game.OnUpdate += OnUpdate;
 
@@ -174,7 +175,7 @@ namespace KHBuddy
             }
         }
 
-       
+
 
         private void InfoView(object s, ButtonBase button)
         {
@@ -258,7 +259,7 @@ namespace KHBuddy
                     }
                     if (_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        
+
                         IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                         Start();
                     }
@@ -298,66 +299,31 @@ namespace KHBuddy
                 }
             }
         }
-
-        //public static void Selection()
-        //{
-        //    if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32() && !_beachToggled)
-        //    {
-        //        Beach = true;
-        //        East = false;
-        //        West = false;
-        //        EastandWest = false;
-
-        //        _beachToggled = true;
-        //        _eastToggled = false;
-        //        _westToggled = false;
-        //        _eastandWestToggled = false;
-
-        //        Chat.WriteLine("Beach selected");
-        //    }
-        //    if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32() && !_eastToggled)
-        //    {
-        //        Beach = false;
-        //        East = true;
-        //        West = false;
-        //        EastandWest = false;
-
-        //        _beachToggled = false;
-        //        _eastToggled = true;
-        //        _westToggled = false;
-        //        _eastandWestToggled = false;
-
-        //        Chat.WriteLine("East selected");
-        //    }
-        //    if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32() && !_westToggled)
-        //    {
-        //        Beach = false;
-        //        East = false;
-        //        West = true;
-        //        EastandWest = false;
-
-        //        _beachToggled = false;
-        //        _eastToggled = false;
-        //        _westToggled = true;
-        //        _eastandWestToggled = false;
-
-        //        Chat.WriteLine("West selected");
-        //    }
-        //    if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32() && !_eastandWestToggled)
-        //    {
-        //        Beach = false;
-        //        East = false;
-        //        West = false;
-        //        EastandWest = true;
-
-        //        _beachToggled = false;
-        //        _eastToggled = false;
-        //        _westToggled = false;
-        //        _eastandWestToggled = true;
-
-        //        Chat.WriteLine("East and West selected");
-        //    }
-        //}
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
+        {
+            try
+            {
+                if (param.Length < 1)
+                {
+                    if (!_settings["Toggle"].AsBool())
+                    {
+                        _settings["Toggle"] = true;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                        Start();
+                    }
+                    else
+                    {
+                        _settings["Toggle"] = false;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Chat.WriteLine(e.Message);
+            }
+        }
 
         public enum SideSelection
         {

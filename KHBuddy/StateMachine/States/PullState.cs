@@ -17,10 +17,13 @@ namespace KHBuddy
 
         private double _lastFollowTime = Time.NormalTime;
 
+        private double _eastTimer;
+        private double _westTimer;
+        private double _beachTimer;
+
         private Spell mongoSlam;
         private Spell mongoDemolish;
         private Spell mongo;
-
 
         public static IPCChannel IPCChannel { get; private set; }
 
@@ -97,9 +100,6 @@ namespace KHBuddy
                 Spell.Find(270786, out mongoDemolish);
                 Spell.Find(100198, out mongoSlam);
 
-                //if (DynelManager.LocalPlayer.Profession != Profession.Enforcer)
-                //    return;
-
                 SetMongoBasedOnHealth();
 
                 var currentSelection = (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32();
@@ -146,11 +146,32 @@ namespace KHBuddy
             }
         }
 
+        private bool ShouldStartSequence(KHBuddy.SideSelection selection)
+        {
+            double targetTimer = 0.0;
+
+            switch (selection)
+            {
+                case KHBuddy.SideSelection.Beach:
+                    targetTimer = _beachTimer;
+                    break;
+                case KHBuddy.SideSelection.East:
+                    targetTimer = _eastTimer;
+                    break;
+                case KHBuddy.SideSelection.West:
+                    targetTimer = _westTimer;
+                    break;
+                default:
+                    return false;
+            }
+
+            return !KHBuddy._init || Time.NormalTime > targetTimer + 580.0;
+        }
+
         private bool HandleMovementAndCasting(KHBuddy.SideSelection selection)
         {
-            if (!(Time.NormalTime > KHBuddy._timer + 580f || !KHBuddy._init))
+            if (!ShouldStartSequence(selection))
                 return false;
-
 
             if (MovementController.Instance.IsNavigating)
                 return false;
@@ -184,6 +205,19 @@ namespace KHBuddy
             else
             {
                 HandleCasting(vectorList, limit + 1);
+            }
+
+            switch (selection)
+            {
+                case KHBuddy.SideSelection.Beach:
+                    _beachTimer = Time.NormalTime;
+                    break;
+                case KHBuddy.SideSelection.East:
+                    _eastTimer = Time.NormalTime;
+                    break;
+                case KHBuddy.SideSelection.West:
+                    _westTimer = Time.NormalTime;
+                    break;
             }
 
             return false;
