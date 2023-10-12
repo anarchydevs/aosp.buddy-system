@@ -214,9 +214,6 @@ namespace KHBuddy
 
             int limit = GetLimitForSelection(selection);
 
-            if (_counterVec < 0 || _counterVec >= vectorList.Count)
-                return true; // Movement and casting for this side is complete
-
             if (_counterVec <= limit)
             {
                 MoveToNextDestination(vectorList);
@@ -239,10 +236,10 @@ namespace KHBuddy
                     break;
             }
 
-            if (_counterVec >= vectorList.Count) // If the current sequence has completed
+            if (_counterVec >= vectorList.Count)
             {
                 _counterVec = 0; // Reset counter for next sequence
-                return true;
+                return true; // Movement and casting for this side is complete
             }
 
             return false;
