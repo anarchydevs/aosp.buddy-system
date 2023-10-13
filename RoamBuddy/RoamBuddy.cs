@@ -5,7 +5,7 @@ using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
-using RoamBuddy.IPCMessages;
+using Shared.IPCMessages;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -62,10 +62,8 @@ namespace RoamBuddy
                 Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.AttackRange, OnAttackRangeMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.ScanRange, OnScanRangeMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.RangeInfo, OnRangeInfoMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
                 Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRangeChangedEvent += AttackRange_Changed;
@@ -83,8 +81,6 @@ namespace RoamBuddy
 
                 _settings.AddVariable("Toggle", false);
                 _settings.AddVariable("Looting", false);
-
-                _settings["Toggle"] = false;
 
                 Chat.WriteLine("RoamBuddy Loaded!");
                 Chat.WriteLine("/roambuddy for settings.");
@@ -122,7 +118,54 @@ namespace RoamBuddy
             ScanRange = e;
             Config.Save();
         }
+        private void Start()
+        {
+            Toggle = true;
 
+            Chat.WriteLine("RoamBuddy enabled.");
+
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
+        }
+
+        private void Stop()
+        {
+            Toggle = false;
+
+            Chat.WriteLine("RoamBuddy disabled.");
+
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
+
+        }
+
+        private void OnStartStopMessage(int sender, IPCMessage msg)
+        {
+            if (msg is StartStopIPCMessage startStopMessage)
+            {
+                if (startStopMessage.IsStarting)
+                {
+                    // Update the setting and start the process.
+                    _settings["Toggle"] = true;
+                    Start();
+                }
+                else
+                {
+                    // Update the setting and stop the process.
+                    _settings["Toggle"] = false;
+                    Stop();
+                }
+            }
+        }
+
+        private void OnRangeInfoMessage(int sender, IPCMessage msg)
+        {
+            if (msg is RangeInfoIPCMessage rangeInfoMessage)
+            {
+                Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = rangeInfoMessage.AttackRange;
+                Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = rangeInfoMessage.ScanRange;
+            }
+        }
         private void OnStartMessage(int sender, IPCMessage msg)
         {
             if (DynelManager.LocalPlayer.Identity == Leader)
@@ -137,59 +180,6 @@ namespace RoamBuddy
 
             if (!(_stateMachine.CurrentState is IdleState))
                 _stateMachine.SetState(new IdleState());
-        }
-
-        private void OnStopMessage(int sender, IPCMessage msg)
-        {
-            StopMessage stopMsg = (StopMessage)msg;
-
-            Toggle = false;
-
-            _settings["Toggle"] = false;
-
-            _stateMachine.SetState(new IdleState());
-
-
-            if (DynelManager.LocalPlayer.IsAttacking)
-                DynelManager.LocalPlayer.StopAttack();
-            if (MovementController.Instance.IsNavigating)
-                MovementController.Instance.Halt();
-        }
-
-        private void OnAttackRangeMessage(int sender, IPCMessage msg)
-        {
-            AttackRangeMessage rangeMsg = (AttackRangeMessage)msg;
-
-            Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = rangeMsg.Range;
-        }
-
-        private void OnScanRangeMessage(int sender, IPCMessage msg)
-        {
-            ScanRangeMessage rangeMsg = (ScanRangeMessage)msg;
-
-            Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = rangeMsg.Range;
-        }
-
-        private void Start()
-        {
-            Toggle = true;
-
-            if (!(_stateMachine.CurrentState is IdleState))
-                _stateMachine.SetState(new IdleState());
-        }
-
-        private void Stop()
-        {
-            Toggle = false;
-
-            _settings["Toggle"] = false;
-
-            _stateMachine.SetState(new IdleState());
-
-            if (DynelManager.LocalPlayer.IsAttacking)
-                DynelManager.LocalPlayer.StopAttack();
-            if (MovementController.Instance.IsNavigating)
-                MovementController.Instance.Halt();
         }
 
         private void HandleWaypointsViewClick(object s, ButtonBase button)
@@ -466,29 +456,55 @@ namespace RoamBuddy
                         Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                     }
                 }
-                if (attackRangeInput != null && !string.IsNullOrEmpty(attackRangeInput.Text))
+                //if (attackRangeInput != null && !string.IsNullOrEmpty(attackRangeInput.Text))
+                //{
+                //    if (int.TryParse(attackRangeInput.Text, out int attackRangeInputValue)
+                //        && Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange != attackRangeInputValue)
+                //    {
+                //        Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = attackRangeInputValue;
+                //        IPCChannel.Broadcast(new AttackRangeMessage()
+                //        {
+                //            Range = attackRangeInputValue
+                //        });
+                //    }
+                //}
+                //if (scanRangeInput != null && !string.IsNullOrEmpty(scanRangeInput.Text))
+                //{
+                //    if (int.TryParse(scanRangeInput.Text, out int scanRangeInputValue)
+                //        && Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange != scanRangeInputValue)
+                //    {
+                //        Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = scanRangeInputValue;
+                //        IPCChannel.Broadcast(new ScanRangeMessage()
+                //        {
+                //            Range = scanRangeInputValue
+                //        });
+                //    }
+                //}
+
+                bool attackRangeChanged = false;
+                bool scanRangeChanged = false;
+
+                if (int.TryParse(attackRangeInput.Text, out int attackRangeInputValue)
+                    && Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange != attackRangeInputValue)
                 {
-                    if (int.TryParse(attackRangeInput.Text, out int attackRangeInputValue)
-                        && Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange != attackRangeInputValue)
-                    {
-                        Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = attackRangeInputValue;
-                        IPCChannel.Broadcast(new AttackRangeMessage()
-                        {
-                            Range = attackRangeInputValue
-                        });
-                    }
+                    Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange = attackRangeInputValue;
+                    attackRangeChanged = true;
                 }
-                if (scanRangeInput != null && !string.IsNullOrEmpty(scanRangeInput.Text))
+
+                if (int.TryParse(scanRangeInput.Text, out int scanRangeInputValue)
+                    && Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange != scanRangeInputValue)
                 {
-                    if (int.TryParse(scanRangeInput.Text, out int scanRangeInputValue)
-                        && Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange != scanRangeInputValue)
+                    Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = scanRangeInputValue;
+                    scanRangeChanged = true;
+                }
+
+                if (attackRangeChanged || scanRangeChanged)
+                {
+                    IPCChannel.Broadcast(new RangeInfoIPCMessage()
                     {
-                        Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange = scanRangeInputValue;
-                        IPCChannel.Broadcast(new ScanRangeMessage()
-                        {
-                            Range = scanRangeInputValue
-                        });
-                    }
+                        AttackRange = Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange,
+                        ScanRange = Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange
+                    });
                 }
 
                 if (SettingsController.settingsWindow.FindView("RoamBuddyInfoView", out Button infoView))
@@ -502,23 +518,15 @@ namespace RoamBuddy
                     waypointView.Tag = SettingsController.settingsWindow;
                     waypointView.Clicked = HandleWaypointsViewClick;
                 }
-
-                if (_settings["Toggle"].AsBool() && !Toggle)
-                {
-                    IsLeader = true;
-                    Leader = DynelManager.LocalPlayer.Identity;
-
-                    if (DynelManager.LocalPlayer.Identity == Leader)
-                        IPCChannel.Broadcast(new StartMessage());
-
-                    Chat.WriteLine("RoamBuddy enabled.");
-                    Start();
-                }
                 if (!_settings["Toggle"].AsBool() && Toggle)
                 {
+                    IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
                     Stop();
-                    Chat.WriteLine("RoamBuddy disabled.");
-                    IPCChannel.Broadcast(new StopMessage());
+                }
+                if (_settings["Toggle"].AsBool() && !Toggle)
+                {
+                    IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                    Start();
                 }
             }
 
@@ -546,7 +554,7 @@ namespace RoamBuddy
                         Leader = DynelManager.LocalPlayer.Identity;
 
                         if (DynelManager.LocalPlayer.Identity == Leader)
-                            IPCChannel.Broadcast(new StartMessage());
+                            IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
 
                         _settings["Toggle"] = true;
                         Chat.WriteLine("RoamBuddy enabled.");
@@ -555,9 +563,10 @@ namespace RoamBuddy
                     }
                     else
                     {
-                        Stop();
+                        _settings["Toggle"] = false;
                         Chat.WriteLine("RoamBuddy disabled.");
-                        IPCChannel.Broadcast(new StopMessage());
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
                     }
                 }
 

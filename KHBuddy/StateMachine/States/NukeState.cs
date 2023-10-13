@@ -1,12 +1,13 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
+using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using KHBuddy.IPCMessages;
-using OSTBuddy;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static KHBuddy.KHBuddy;
 
 namespace KHBuddy
 {
@@ -23,110 +24,85 @@ namespace KHBuddy
         public static List<Corpse> _hecksCorpsesAtPosBeach;
         public static List<SimpleChar> _hecksAtPos;
 
-        Spell absorb = null;
+        public static List<Vector3> positions = new List<Vector3>
+        {
+            new Vector3(901.9f, 4.4f, 299.6f), //Beach
+            new Vector3(1043.2f, 1.6f, 1020.5f), //West
+            new Vector3(1115.9f, 1.6f, 1064.3f) //East
+        };
+
+        private SideSelection[] sides =
+        {
+            SideSelection.Beach,
+            SideSelection.West,
+            SideSelection.East,
+            SideSelection.EastAndWest
+        };
 
         public IState GetNextState()
         {
-            //if (Time.NormalTime - KHBuddy._stateTimeOut > 1300f
-                if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician && !Team.IsInTeam)
+            if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician && !Team.IsInTeam)
             {
-                KHBuddy._settings["Toggle"] = false;
-                //Chat.WriteLine("Turning off bot, Idle for too long.");
+                _settings["Toggle"] = false;
+
+                IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+
                 return new IdleState();
             }
 
-            if (KHBuddy.SideSelection.Beach == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32()
-                && DynelManager.LocalPlayer.Profession == Profession.Enforcer)
+            if (DynelManager.LocalPlayer.Profession == Profession.Enforcer)
             {
-                _hecksCorpsesAtPosBeach = DynelManager.Corpses
-                    .Where(x => x.Name.Contains("Heckler") || x.Name.Contains("Voracious")
-                        && x.DistanceFrom(DynelManager.LocalPlayer) <= 45f
-                        && x.Position.DistanceFrom(new Vector3(901.9f, 4.4f, 299.6f)) < 8f)
+                SideSelection currentSelection = (SideSelection)_settings["SideSelection"].AsInt32();
+
+                //Chat.WriteLine($"Current Selection: {currentSelection}");
+
+                List<SimpleChar> _hecks = DynelManager.NPCs
+                    .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
+                        && x.DistanceFrom(DynelManager.LocalPlayer) <= 20f
+                        && x.IsAlive && x.IsInLineOfSight)
+                    .OrderBy(x => x.DistanceFrom(DynelManager.LocalPlayer))
                     .ToList();
 
-                if (_hecksAtPos.Count == 0 && _hecksCorpsesAtPosBeach.Count >= 3)
+                if (_hecks.Count > 0) 
                 {
-                    KHBuddy._init = true;
-                    KHBuddy._timer = Time.NormalTime;
-                    PullState._counterVec = 0;
-                    return new PullState();
+                    return null;
                 }
-            }
 
-            if (KHBuddy.SideSelection.East == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32()
-                && DynelManager.LocalPlayer.Profession == Profession.Enforcer)
-            {
-                _hecksCorpsesAtPosEast = DynelManager.Corpses
-                    .Where(x => x.Name.Contains("Heckler") || x.Name.Contains("Voracious")
-                        && x.DistanceFrom(DynelManager.LocalPlayer) <= 45f
-                        && x.Position.DistanceFrom(new Vector3(1115.9f, 1.6f, 1064.3f)) < 8f)
-                    .ToList();
-
-                if (_hecksAtPos.Count == 0 && _hecksCorpsesAtPosEast.Count >= 3)
+                if (currentSelection == SideSelection.EastAndWest)
                 {
-                    KHBuddy._init = true;
-                    KHBuddy._timer = Time.NormalTime;
-                    PullState._counterVec = 0;
-                    return new PullState();
-                }
-            }
-
-            if (KHBuddy.SideSelection.West == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32()
-                && DynelManager.LocalPlayer.Profession == Profession.Enforcer)
-            {
-                _hecksCorpsesAtPosWest = DynelManager.Corpses
-                    .Where(x => x.Name.Contains("Heckler") || x.Name.Contains("Voracious")
-                        && x.DistanceFrom(DynelManager.LocalPlayer) <= 45f
-                        && x.Position.DistanceFrom(new Vector3(1043.2f, 1.6f, 1020.5f)) < 8f)
-                    .ToList();
-
-                if (_hecksAtPos.Count == 0 && _hecksCorpsesAtPosWest.Count >= 3)
-                {
-                    KHBuddy._init = true;
-                    KHBuddy._timer = Time.NormalTime;
-                    PullState._counterVec = 0;
-                    return new PullState();
-                }
-            }
-
-            if (KHBuddy.SideSelection.EastAndWest == (KHBuddy.SideSelection)KHBuddy._settings["SideSelection"].AsInt32()
-                && DynelManager.LocalPlayer.Profession == Profession.Enforcer)
-            {
-                if (KHBuddy._doingEast)
-                {
-                    _hecksCorpsesAtPosEast = DynelManager.Corpses
-                        .Where(x => x.Name.Contains("Heckler") || x.Name.Contains("Voracious")
-                            && x.DistanceFrom(DynelManager.LocalPlayer) <= 45f
-                            && x.Position.DistanceFrom(new Vector3(1115.9f, 1.6f, 1064.3f)) < 8f)
-                        .ToList();
-
-                    if (_hecksAtPos.Count == 0 && _hecksCorpsesAtPosEast.Count >= 3)
+                    if (_doingEast)
                     {
-                        KHBuddy._timer = Time.NormalTime;
-                        KHBuddy._init = true;
-                        KHBuddy._doingEast = false;
-                        KHBuddy._doingWest = true;
-                        KHBuddy.IPCChannel.Broadcast(new MoveWestMessage());
+                        _doingEast = false;
+                        _doingWest = true;
+                        IPCChannel.Broadcast(new MoveWestMessage());
                         MovementController.Instance.SetPath(Constants.PathToWest);
-                        return new PullState();
+                        //Chat.WriteLine("Nuke state, setting _doingWest true");
+
+                        // Reset the timer for East
+                        PullState.ResetTimer(KHBuddy.SideSelection.East);
                     }
+                    else if (_doingWest)
+                    {
+                        _doingWest = false;
+                        _doingEast = true;
+                        _init = true;
+                        IPCChannel.Broadcast(new MoveEastMessage());
+                        MovementController.Instance.SetPath(Constants.PathToEast);
+                        //Chat.WriteLine("Nuke state, setting _doingEast true");
+
+                        // Reset the timer for West
+                        PullState.ResetTimer(KHBuddy.SideSelection.West);
+                    }
+
+                    return new PullState();
                 }
 
-                if (KHBuddy._doingWest)
+                for (int i = 0; i < sides.Length; i++)
                 {
-                    _hecksCorpsesAtPosWest = DynelManager.Corpses
-                        .Where(x => x.Name.Contains("Heckler") || x.Name.Contains("Voracious")
-                            && x.DistanceFrom(DynelManager.LocalPlayer) <= 45f
-                            && x.Position.DistanceFrom(new Vector3(1043.2f, 1.6f, 1020.5f)) < 8f)
-                        .ToList();
-
-                    if (_hecksAtPos.Count == 0 && _hecksCorpsesAtPosWest.Count >= 3)
+                    if (sides[i] == currentSelection || (i > 0 && sides[3] == currentSelection))
                     {
-                        KHBuddy._timer = Time.NormalTime;
-                        KHBuddy._doingWest = false;
-                        KHBuddy._doingEast = true;
-                        KHBuddy.IPCChannel.Broadcast(new MoveEastMessage());
-                        MovementController.Instance.SetPath(Constants.PathToEast);
+                        _init = true;
+                        PullState.ResetTimer(currentSelection);
                         return new PullState();
                     }
                 }
@@ -135,15 +111,38 @@ namespace KHBuddy
             return null;
         }
 
+
         public void OnStateEnter()
         {
+            if (_settings["Toggle"].AsBool()
+                        && DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
+            {
+
+                if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32()
+                    || SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
+                {
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1090.2f, 28.1f, 1050.1f)) > 1f && !MovementController.Instance.IsNavigating)
+                    {
+                        MovementController.Instance.SetDestination(new Vector3(1090.2f, 28.1f, 1050.1f));
+                    }
+                }
+                else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
+                {
+                    if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1065.4f, 26.2f, 1033.5f)) > 1f && !MovementController.Instance.IsNavigating)
+                    {
+                        MovementController.Instance.SetDestination(new Vector3(1065.4f, 26.2f, 1033.5f));
+                    }
+                }
+            }
             //KHBuddy._stateTimeOut = Time.NormalTime;
-            Chat.WriteLine("NukeState::OnStateEnter");
+            //Chat.WriteLine("Nuke State");
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("NukeState::OnStateExit");
+
+
+            //Chat.WriteLine("NukeState::OnStateExit");
         }
 
         public void Tick()
@@ -152,15 +151,7 @@ namespace KHBuddy
             {
                 if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
                 {
-                    List<Vector3> positions = new List<Vector3>
-                {
-                    new Vector3(901.9f, 4.4f, 299.6f),
-                    new Vector3(1043.2f, 1.6f, 1020.5f),
-                    new Vector3(1115.9f, 1.6f, 1064.3f)
-                };
-
                     float[] distances = { 10f, 43f, 60f, 60f };
-                    var sides = new KHBuddy.SideSelection[] { KHBuddy.SideSelection.Beach, KHBuddy.SideSelection.West, KHBuddy.SideSelection.East, KHBuddy.SideSelection.EastAndWest };
 
                     for (int i = 0; i < sides.Length; i++)
                     {
@@ -175,10 +166,16 @@ namespace KHBuddy
                                     && x.Position.DistanceFrom(positions[i]) < 10f)
                                 .ToList();
 
-                            if (_hecksAtPos.Count >= 1 && DynelManager.LocalPlayer.FightingTarget == null && !KHBuddy.NeedsKit
+                            if (_hecksAtPos.Count >= 1 && DynelManager.LocalPlayer.FightingTarget == null //&& !KHBuddy.NeedsKit
                                 && (DynelManager.LocalPlayer.NanoPercent >= 70 || DynelManager.LocalPlayer.HealthPercent >= 70))
                             {
-                                DynelManager.LocalPlayer.Attack(_hecksAtPos.FirstOrDefault());
+                                if (DynelManager.LocalPlayer.FightingTarget == null
+                                   && !DynelManager.LocalPlayer.IsAttacking
+                                   && !DynelManager.LocalPlayer.IsAttackPending)
+                                {
+                                    DynelManager.LocalPlayer.Attack(_hecksAtPos.FirstOrDefault());
+                                }
+
                                 //KHBuddy._stateTimeOut = Time.NormalTime;
                             }
 
@@ -194,23 +191,38 @@ namespace KHBuddy
 
                 if (DynelManager.LocalPlayer.Profession == Profession.Enforcer)
                 {
+                    // Find hecks within 20 units
                     _hecksAtPos = DynelManager.NPCs
-                   .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
-                       && x.DistanceFrom(DynelManager.LocalPlayer) <= 10f
-                       && x.IsAlive && x.IsInLineOfSight
-                       && !x.IsMoving
-                       && x.FightingTarget != null)
-                   .ToList();
+                    .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
+                        && x.DistanceFrom(DynelManager.LocalPlayer) <= 20f
+                        && x.IsAlive && x.IsInLineOfSight
+                        && !x.IsMoving
+                        && x.FightingTarget != null)
+                    .ToList();
 
-                    Spell.Find(270786, out Spell mongobuff);
+                    // Cast Mongo Demolish if conditions are met
+                    Spell.Find(270786, out Spell mongoDemolish);
 
                     if (_hecksAtPos.Count >= 1)
                     {
-                        if (!Spell.HasPendingCast && mongobuff.IsReady && Time.NormalTime > _refreshMongoTimer + RefreshMongoTime)
+                        if (!Spell.HasPendingCast && mongoDemolish.IsReady && Time.NormalTime > _refreshMongoTimer + RefreshMongoTime)
                         {
-                            mongobuff.Cast();
+                            mongoDemolish.Cast();
                             _refreshMongoTimer = Time.NormalTime;
                         }
+                    }
+
+                    // Find hecks beyond 20 units but in line of sight
+                    List<SimpleChar> _distantHecks = DynelManager.NPCs
+                    .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
+                        && x.DistanceFrom(DynelManager.LocalPlayer) > 20f
+                        && x.IsAlive && x.IsInLineOfSight)
+                    .ToList();
+
+                    // Taunt distant hecks
+                    foreach (SimpleChar distantHeck in _distantHecks)
+                    {
+                        HandleTaunting(distantHeck);
                     }
                 }
             }
@@ -223,6 +235,25 @@ namespace KHBuddy
                     Chat.WriteLine(errorMessage);
                     Chat.WriteLine("Stack Trace: " + ex.StackTrace);
                     KHBuddy.previousErrorMessage = errorMessage;
+                }
+            }
+        }
+
+        public static void HandleTaunting(SimpleChar target)
+        {
+            Item item = null;
+
+            if (Inventory.Find(83920, out item) ||  // Aggression Enhancer
+                Inventory.Find(83919, out item) ||  // Aggression Multiplier
+                Inventory.Find(152029, out item) || // Aggression Enhancer (Jealousy Augmented)
+                Inventory.Find(152028, out item) || // Aggression Multiplier (Jealousy Augmented)
+                Inventory.Find(244655, out item) || // Scorpio's Aim of Anger
+                Inventory.Find(253186, out item) || // Codex of the Insulting Emerto (Low)
+                Inventory.Find(253187, out item))   // Codex of the Insulting Emerto (High)
+            {
+                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
+                {
+                    item.Use(target, true);
                 }
             }
         }

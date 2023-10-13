@@ -5,7 +5,7 @@ using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
-using Db1Buddy.IPCMessages;
+using Shared.IPCMessages;
 using System;
 using System.Diagnostics;
 
@@ -24,8 +24,6 @@ namespace Db1Buddy
 
         public static Vector3 _mikkelsenPos = Vector3.Zero;
         public static Vector3 _mikkelsenCorpsePos = Vector3.Zero;
-
-        private Stopwatch _kitTimer = new Stopwatch();
 
         public static bool Toggle = false;
         public static bool Farming = false;

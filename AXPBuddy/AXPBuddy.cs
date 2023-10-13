@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using AOSharp.Core;
 using AOSharp.Core.UI;
 using AOSharp.Core.Movement;
 using AOSharp.Core.IPC;
 using AOSharp.Pathfinding;
-using AXPBuddy.IPCMessages;
+using Shared.IPCMessages;
 using AOSharp.Common.GameData;
-using AOSharp.Core.Inventory;
 using AOSharp.Common.GameData.UI;
-using System.Security.Cryptography;
-using System.Threading;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 

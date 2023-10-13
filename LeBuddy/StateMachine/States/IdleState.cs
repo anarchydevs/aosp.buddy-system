@@ -1,11 +1,8 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
-using AOSharp.Core.IPC;
+﻿using AOSharp.Core;
 using AOSharp.Core.UI;
-using org.critterai.nav;
+using Shared.IPCMessages;
 using System;
 using System.Linq;
-using LeBuddy.IPCMessages;
 
 namespace LeBuddy
 {

@@ -1,9 +1,4 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
-using AOSharp.Core.UI;
-using CityBuddy.IPCMessages;
-using System;
-using System.Collections.Generic;
+﻿using AOSharp.Core;
 using System.Linq;
 
 namespace CityBuddy

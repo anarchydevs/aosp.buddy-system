@@ -6,9 +6,7 @@ using AOSharp.Pathfinding;
 using AOSharp.Core.IPC;
 using AOSharp.Common.GameData.UI;
 using AOSharp.Core.Movement;
-using DB2Buddy.IPCMessages;
-using AOSharp.Core.Inventory;
-using System.Linq;
+using Shared.IPCMessages;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
@@ -21,8 +19,6 @@ namespace DB2Buddy
         public static NavMeshMovementController NavMeshMovementController { get; private set; }
         public static IPCChannel IPCChannel { get; private set; }
         public static Config Config { get; private set; }
-
-        private Stopwatch _kitTimer = new Stopwatch();
 
         public static bool Toggle = false;
         public static bool Farming = false;
@@ -71,12 +67,9 @@ namespace DB2Buddy
 
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.Farming, OnFarmingStatusMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Enter, OnEnterMessage);
-
-                IPCChannel.RegisterCallback((int)IPCOpcode.Farming, FarmingMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.NoFarming, NoFarmingMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
@@ -120,12 +113,36 @@ namespace DB2Buddy
             Config.Save();
         }
 
-        private void farmingEnabled()
+        public static void Start()
         {
+            Toggle = true;
+
+            Chat.WriteLine("Db2Buddy enabled.");
+
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
+        }
+
+        private void Stop()
+        {
+            Toggle = false;
+
+            Chat.WriteLine("Db2Buddy disabled.");
+
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
+
+            NavMeshMovementController.Halt();
+        }
+
+        private void FarmingEnabled()
+        {
+            Chat.WriteLine("Farming Enabled.");
             Farming = true;
         }
-        private void farmingDisabled()
+        private void FarmingDisabled()
         {
+            Chat.WriteLine("Farming Disabled");
             Farming = false;
         }
 
@@ -138,42 +155,49 @@ namespace DB2Buddy
                 _stateMachine.SetState(new IdleState());
         }
 
-        private void OnStartMessage(int sender, IPCMessage msg)
+        private void OnStartStopMessage(int sender, IPCMessage msg)
         {
-            Toggle = true;
-
-            if (Leader == Identity.None
-                && DynelManager.LocalPlayer.Identity.Instance != sender)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
-
-            if (!(_stateMachine.CurrentState is IdleState))
-                _stateMachine.SetState(new IdleState());
-
-            _settings["Toggle"] = true;
+            if (msg is StartStopIPCMessage startStopMessage)
+            {
+                if (startStopMessage.IsStarting)
+                {
+                    if (Leader == Identity.None
+                     && DynelManager.LocalPlayer.Identity.Instance != sender)
+                    {
+                        Leader = new Identity(IdentityType.SimpleChar, sender);
+                    }
+                        
+                    // Update the setting and start the process.
+                    _settings["Toggle"] = true;
+                    Start();
+                }
+                else
+                {
+                    // Update the setting and stop the process.
+                    _settings["Toggle"] = false;
+                    Stop();
+                }
+            }
         }
 
-        private void OnStopMessage(int sender, IPCMessage msg)
+        private void OnFarmingStatusMessage(int sender, IPCMessage msg)
         {
-            Toggle = false;
+            if (msg is FarmingStatusMessage farmingStatusMessage)
+            {
 
-            if (!(_stateMachine.CurrentState is IdleState))
-                _stateMachine.SetState(new IdleState());
-
-            _settings["Toggle"] = false;
+                if (farmingStatusMessage.IsFarming)
+                {
+                    _settings["Farming"] = true;
+                    FarmingEnabled();
+                }
+                else
+                {
+                    _settings["Farming"] = false;
+                    FarmingDisabled();
+                }
+            }
         }
-
-        private void FarmingMessage(int sender, IPCMessage msg)
-        {
-            _settings["Farming"] = true;
-            farmingEnabled();
-        }
-
-        private void NoFarmingMessage(int sender, IPCMessage msg)
-        {
-            _settings["Farming"] = false;
-            farmingDisabled();
-        }
-
+       
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
             _infoWindow = Window.CreateFromXml("Info", PluginDir + "\\UI\\DB2BuddyInfoView.xml",
@@ -221,32 +245,25 @@ namespace DB2Buddy
 
                     if (!_settings["Toggle"].AsBool() && Toggle)
                     {
-                        IPCChannel.Broadcast(new StopMessage());
-                        Toggle = false;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
                     }
                     if (_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        IPCChannel.Broadcast(new StartMessage());
-                        if (Team.IsLeader)
-                        {
-                            IsLeader = true;
-                            Leader = DynelManager.LocalPlayer.Identity;
-                        }
-                        Toggle = true;
+
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                        Start();
                     }
 
-                    if (!_settings["Farming"].AsBool() && Farming) // Farming off
+                    if (!_settings["Farming"].AsBool() && Farming)// Farming is off
                     {
-                        IPCChannel.Broadcast(new NoFarmingMessage());
-                        Chat.WriteLine("Farming disabled");
-                        farmingDisabled();
+                        IPCChannel.Broadcast(new FarmingStatusMessage { IsFarming = false });
+                        FarmingDisabled();
                     }
-
-                    if (_settings["Farming"].AsBool() && !Farming) // farming on
+                    if (_settings["Farming"].AsBool() && !Farming) // Farming is on
                     {
-                        IPCChannel.Broadcast(new FarmingMessage());
-                        Chat.WriteLine("Farming enabled.");
-                        farmingEnabled();
+                        IPCChannel.Broadcast(new FarmingStatusMessage { IsFarming = true });
+                        FarmingEnabled();
                     }
                 }
             }
@@ -271,19 +288,14 @@ namespace DB2Buddy
                 {
                     if (!_settings["Toggle"].AsBool())
                     {
-                        _settings["Toggle"] = true;
-                        IPCChannel.Broadcast(new StartMessage());
-                        Toggle = true;
-                        IsLeader = true;
                         Leader = DynelManager.LocalPlayer.Identity;
-                        Chat.WriteLine("Bot enabled.");
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                        Start();
                     }
-                    else if (_settings["Toggle"].AsBool())
+                    else
                     {
-                        _settings["Toggle"] = false;
-                        IPCChannel.Broadcast(new StopMessage());
-                        Toggle = false;
-                        Chat.WriteLine("Bot disabled.");
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
                     }
                 }
             }

@@ -1,17 +1,13 @@
 ﻿using AOSharp.Core;
-using AOSharp.Core.Misc;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
-using AOSharp.Pathfinding;
 using AOSharp.Recast;
+using Shared.IPCMessages;
 using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using LeBuddy.IPCMessages;
 using AOSharp.Common.GameData;
 using org.critterai.nav;
 using org.critterai.nmgen;
-using AOSharp.Core.IPC;
 
 namespace LeBuddy
 {

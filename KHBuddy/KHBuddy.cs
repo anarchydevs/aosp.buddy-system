@@ -1,17 +1,13 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Common.GameData.UI;
 using AOSharp.Core;
-using AOSharp.Core.Inventory;
 using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
 using KHBuddy.IPCMessages;
 using System;
-using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
-using System.Linq;
 using System.Text.RegularExpressions;
 using Debug = AOSharp.Core.Debug;
 
@@ -27,13 +23,11 @@ namespace KHBuddy
         public static Identity Leader = Identity.None;
         public static bool IsLeader = false;
 
-        private Stopwatch _kitTimer = new Stopwatch();
-
         public static string PluginDirectory;
 
         public static Settings _settings = new Settings("KHBuddy");
 
-        public static double _timer = 0f;
+        //public static double _timer = 0f;
 
         public static DateTime RespawnTime;
         public static DateTime RespawnTimeEast;
@@ -42,22 +36,15 @@ namespace KHBuddy
 
         public static double _stateTimeOut = Time.NormalTime;
 
-        public static bool _doingEast = false;
+        public static bool Toggle = false;
+
+        SideSelection currentSide;
+
+        public static bool _doingEast = true;
         public static bool _doingWest = false;
         public static bool _started = false;
 
         public static bool _init = false;
-        public static bool NeedsKit = false;
-
-        public static bool Beach = false;
-        public static bool East = false;
-        public static bool West = false;
-        public static bool EastandWest = false;
-
-        public static bool _beachToggled = false;
-        public static bool _eastToggled = false;
-        public static bool _westToggled = false;
-        public static bool _eastandWestToggled = false;
 
         public static string previousErrorMessage = string.Empty;
 
@@ -71,26 +58,22 @@ namespace KHBuddy
                 Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\KHBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel));
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.StartMode, OnStartMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.StopMode, OnStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
+                IPCChannel.RegisterCallback((short)IPCOpcode.SideSelections, OnSideSelectionsMessage);
+
                 IPCChannel.RegisterCallback((int)IPCOpcode.MoveEast, OnMoveEastMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.MoveWest, OnMoveWestMessage);
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Beach, BeachMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.East, EastMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.West, WestMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.EastandWest, EastAndWestMessage);
-
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
+
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Toggle", false);
-
-                _settings["Toggle"] = false;
+                _settings["Toggle"] = false; //to save
 
                 _settings.AddVariable("SideSelection", (int)SideSelection.East);
-                _settings["SideSelection"] = (int)SideSelection.East;
 
                 SettingsController.RegisterSettingsWindow("KHBuddy", pluginDir + "\\UI\\KHBuddySettingWindow.xml", _settings);
 
@@ -111,6 +94,11 @@ namespace KHBuddy
             }
         }
 
+        public override void Teardown()
+        {
+            SettingsController.CleanUp();
+        }
+
         public static void IPCChannel_Changed(object s, int e)
         {
             IPCChannel.SetChannelId(Convert.ToByte(e));
@@ -118,31 +106,61 @@ namespace KHBuddy
             Config.Save();
         }
 
-        private void OnStartMessage(int sender, IPCMessage msg)
+        public void Start()
         {
-            if (Leader == Identity.None)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
+            Toggle = true;
 
-            if (DynelManager.LocalPlayer.Identity == Leader)
-                return;
+            Chat.WriteLine("KHBuddy enabled.");
 
-            StartModeMessage startMsg = (StartModeMessage)msg;
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
+        }
 
-            _settings["SideSelection"] = startMsg.Side;
+        public void Stop()
+        {
+            Toggle = false;
 
-            _settings["Toggle"] = true;
+            Chat.WriteLine("KHBuddy disabled.");
 
-            Start();
+            if (!(_stateMachine.CurrentState is IdleState))
+                _stateMachine.SetState(new IdleState());
+
+            MovementController.Instance.Halt();
+        }
+
+        private void OnStartStopMessage(int sender, IPCMessage msg)
+        {
+            if (msg is StartStopIPCMessage startStopMessage)
+            {
+                if (startStopMessage.IsStarting)
+                {
+                    // Update the setting and start the process.
+                    _settings["Toggle"] = true;
+                    Start();
+                }
+                else
+                {
+                    // Update the setting and stop the process.
+                    _settings["Toggle"] = false;
+                    Stop();
+                }
+            }
+        }
+
+        private void OnSideSelectionsMessage(int sender, IPCMessage msg)
+        {
+            if (msg is SideSelectionsIPCMessage sideSelectionsMessage)
+            {
+                currentSide = sideSelectionsMessage.Side;
+
+                _settings["SideSelection"] = (int)currentSide;
+
+                //Chat.WriteLine($"Received Mode: {currentMode}");
+            }
         }
 
         private void OnMoveEastMessage(int sender, IPCMessage msg)
         {
-            if (Leader == Identity.None)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
-
-            if (DynelManager.LocalPlayer.Identity == Leader)
-                return;
-
             if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1091.7f, 26.5f, 1051.4f)) > 1f && !MovementController.Instance.IsNavigating)
             {
                 MovementController.Instance.SetDestination(new Vector3(1091.7f, 26.5f, 1051.4f));
@@ -151,81 +169,13 @@ namespace KHBuddy
 
         private void OnMoveWestMessage(int sender, IPCMessage msg)
         {
-            if (Leader == Identity.None)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
-
-            if (DynelManager.LocalPlayer.Identity == Leader)
-                return;
-
             if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1064.4f, 25.6f, 1032.6f)) > 1f && !MovementController.Instance.IsNavigating)
             {
                 MovementController.Instance.SetDestination(new Vector3(1064.4f, 25.6f, 1032.6f));
             }
         }
 
-        private void OnStopMessage(int sender, IPCMessage msg)
-        {
-            if (Leader == Identity.None)
-                Leader = new Identity(IdentityType.SimpleChar, sender);
 
-            if (DynelManager.LocalPlayer.Identity == Leader)
-                return;
-
-            StopModeMessage stopMsg = (StopModeMessage)msg;
-
-            _started = false;
-
-            _settings["SideSelection"] = stopMsg.Side;
-
-            _settings["Toggle"] = false;
-
-            if (NavMeshMovementController != null)
-                NavMeshMovementController.Halt();
-        }
-
-        private void BeachMessage(int sender, IPCMessage msg)
-        {
-            _settings["SideSelection"] = (int)SideSelection.Beach;
-        }
-        private void EastMessage(int sender, IPCMessage msg)
-        {
-            _settings["SideSelection"] = (int)SideSelection.East;
-        }
-        private void WestMessage(int sender, IPCMessage msg)
-        {
-            _settings["SideSelection"] = (int)SideSelection.West;
-        }
-        private void EastAndWestMessage(int sender, IPCMessage msg)
-        {
-            _settings["SideSelection"] = (int)SideSelection.EastAndWest;
-        }
-
-        public override void Teardown()
-        {
-            SettingsController.CleanUp();
-        }
-
-        private void Start()
-        {
-            if (!_started)
-                _started = true;
-
-            if (DynelManager.LocalPlayer.Profession == Profession.Enforcer && !(_stateMachine.CurrentState is PullState))
-                _stateMachine.SetState(new PullState());
-
-            if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician && !(_stateMachine.CurrentState is NukeState))
-                _stateMachine.SetState(new NukeState());
-        }
-
-        private void Stop()
-        {
-            _started = false;
-
-            _stateMachine.SetState(new IdleState());
-
-            if (NavMeshMovementController != null)
-                NavMeshMovementController.Halt();
-        }
 
         private void InfoView(object s, ButtonBase button)
         {
@@ -241,12 +191,12 @@ namespace KHBuddy
             //GameTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Time.NormalTime);
             try
             {
-                if (Game.IsZoning)
+                if (Game.IsZoning || !_settings["Toggle"].AsBool() || Playfield.ModelIdentity.Instance != 4543)
                     return;
 
                 _stateMachine.Tick();
 
-                Selection();
+                //Selection();
 
                 Shared.Kits kitsInstance = new Shared.Kits();
 
@@ -302,143 +252,38 @@ namespace KHBuddy
                         infoView.Clicked = InfoView;
                     }
 
-                    if (!_settings["Toggle"].AsBool() && _started == true
-                        && DynelManager.LocalPlayer.Profession == Profession.Enforcer)
+                    if (!_settings["Toggle"].AsBool() && Toggle)
                     {
-                        if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32())
-                        {
-                            IPCChannel.Broadcast(new StopModeMessage()
-                            {
-                                Side = (int)SideSelection.Beach
-                            });
-                        }
-                        else if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
-                        {
-                            IPCChannel.Broadcast(new StopModeMessage()
-                            {
-                                Side = (int)SideSelection.East
-                            });
-
-                        }
-                        else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
-                        {
-                            IPCChannel.Broadcast(new StopModeMessage()
-                            {
-                                Side = (int)SideSelection.West
-                            });
-
-                        }
-                        else if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
-                        {
-                            IPCChannel.Broadcast(new StopModeMessage()
-                            {
-                                Side = (int)SideSelection.EastAndWest
-                            });
-
-                        }
-
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
                         Stop();
                     }
-
-                    if (_settings["Toggle"].AsBool() && _started == false
-                        && DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
+                    if (_settings["Toggle"].AsBool() && !Toggle)
                     {
-                        _started = true;
 
-                        if (Leader == Identity.None)
-                        {
-                            IsLeader = true;
-                            Leader = DynelManager.LocalPlayer.Identity;
-                        }
-
-                        if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
-                        {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1090.2f, 28.1f, 1050.1f)) > 1f && !MovementController.Instance.IsNavigating)
-                            {
-                                MovementController.Instance.SetDestination(new Vector3(1090.2f, 28.1f, 1050.1f));
-                            }
-                        }
-                        else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
-                        {
-                            if (DynelManager.LocalPlayer.Position.DistanceFrom(new Vector3(1065.4f, 26.2f, 1033.5f)) > 1f && !MovementController.Instance.IsNavigating)
-                            {
-                                MovementController.Instance.SetDestination(new Vector3(1065.4f, 26.2f, 1033.5f));
-                            }
-                        }
-
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                         Start();
                     }
 
-                    if (_settings["Toggle"].AsBool() && _started == false
-                        && DynelManager.LocalPlayer.Profession == Profession.Enforcer)
+                    SideSelection newSide = (SideSelection)_settings["SideSelection"].AsInt32();
+
+                    bool sideChanged = newSide != currentSide;
+
+                    if (sideChanged)
                     {
-                        _started = true;
-
-                        if (Leader == Identity.None)
+                        // Populate a SideSelectionsIPCMessage
+                        SideSelectionsIPCMessage sideSelectionsMessage = new SideSelectionsIPCMessage
                         {
-                            IsLeader = true;
-                            Leader = DynelManager.LocalPlayer.Identity;
-                        }
+                            Side = newSide
+                        };
 
-                        if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32())
+                        // Broadcast the message
+                        IPCChannel.Broadcast(sideSelectionsMessage);
+
+                        // Update the current settings
+                        if (sideChanged)
                         {
-                            IPCChannel.Broadcast(new StartModeMessage()
-                            {
-                                Side = (int)SideSelection.Beach
-                            });
+                            currentSide = newSide;
                         }
-                        else if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32())
-                        {
-                            IPCChannel.Broadcast(new StartModeMessage()
-                            {
-                                Side = (int)SideSelection.East
-                            });
-                            IPCChannel.Broadcast(new MoveEastMessage());
-                        }
-                        else if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32())
-                        {
-                            IPCChannel.Broadcast(new StartModeMessage()
-                            {
-                                Side = (int)SideSelection.West
-                            });
-                            IPCChannel.Broadcast(new MoveWestMessage());
-                        }
-                        else if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32())
-                        {
-                            IPCChannel.Broadcast(new StartModeMessage()
-                            {
-                                Side = (int)SideSelection.EastAndWest
-                            });
-                            IPCChannel.Broadcast(new MoveEastMessage());
-
-                            _doingEast = true;
-                        }
-
-                        Start();
-                    }
-
-                    if (Beach)
-                    {
-                        IPCChannel.Broadcast(new BeachSelection());
-                        Beach = false;
-                    }
-
-                    if (East)
-                    {
-                        IPCChannel.Broadcast(new EastSelection());
-                        East = false;
-                    }
-
-                    if (West)
-                    {
-                        IPCChannel.Broadcast(new WestSelection());
-                        West = false;
-                    }
-
-                    if (EastandWest)
-                    {
-                        IPCChannel.Broadcast(new EastandWestSelection());
-                        EastandWest = false;
                     }
                 }
             }
@@ -454,64 +299,29 @@ namespace KHBuddy
                 }
             }
         }
-
-        public static void Selection()
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
-            if (SideSelection.Beach == (SideSelection)_settings["SideSelection"].AsInt32() && !_beachToggled)
+            try
             {
-                Beach = true;
-                East = false;
-                West = false;
-                EastandWest = false;
-
-                _beachToggled = true;
-                _eastToggled = false;
-                _westToggled = false;
-                _eastandWestToggled = false;
-
-                Chat.WriteLine("Beach selected");
+                if (param.Length < 1)
+                {
+                    if (!_settings["Toggle"].AsBool())
+                    {
+                        _settings["Toggle"] = true;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                        Start();
+                    }
+                    else
+                    {
+                        _settings["Toggle"] = false;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
+                    }
+                }
             }
-            if (SideSelection.East == (SideSelection)_settings["SideSelection"].AsInt32() && !_eastToggled)
+            catch (Exception e)
             {
-                Beach = false;
-                East = true;
-                West = false;
-                EastandWest = false;
-
-                _beachToggled = false;
-                _eastToggled = true;
-                _westToggled = false;
-                _eastandWestToggled = false;
-
-                Chat.WriteLine("East selected");
-            }
-            if (SideSelection.West == (SideSelection)_settings["SideSelection"].AsInt32() && !_westToggled)
-            {
-                Beach = false;
-                East = false;
-                West = true;
-                EastandWest = false;
-
-                _beachToggled = false;
-                _eastToggled = false;
-                _westToggled = true;
-                _eastandWestToggled = false;
-
-                Chat.WriteLine("West selected");
-            }
-            if (SideSelection.EastAndWest == (SideSelection)_settings["SideSelection"].AsInt32() && !_eastandWestToggled)
-            {
-                Beach = false;
-                East = false;
-                West = false;
-                EastandWest = true;
-
-                _beachToggled = false;
-                _eastToggled = false;
-                _westToggled = false;
-                _eastandWestToggled = true;
-
-                Chat.WriteLine("East and West selected");
+                Chat.WriteLine(e.Message);
             }
         }
 

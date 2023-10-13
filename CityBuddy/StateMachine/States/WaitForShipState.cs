@@ -1,8 +1,6 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
-using AOSharp.Core.Movement;
+﻿using AOSharp.Core;
 using AOSharp.Core.UI;
-using CityBuddy.IPCMessages;
+using Shared.IPCMessages;
 using System;
 using System.Linq;
 
