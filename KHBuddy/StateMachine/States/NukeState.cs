@@ -68,29 +68,30 @@ namespace KHBuddy
                     return null;
                 }
 
-                _init = true;
-                //PullState._counterVec = 0;
-
                 if (currentSelection == SideSelection.EastAndWest)
                 {
-                    //_timer = Time.NormalTime;
-                    //_init = true;
-
                     if (_doingEast)
                     {
                         _doingEast = false;
                         _doingWest = true;
                         IPCChannel.Broadcast(new MoveWestMessage());
                         MovementController.Instance.SetPath(Constants.PathToWest);
-                        Chat.WriteLine("Nuke state, setting _doingWest true");
+                        //Chat.WriteLine("Nuke state, setting _doingWest true");
+
+                        // Reset the timer for East
+                        PullState.ResetTimer(KHBuddy.SideSelection.East);
                     }
                     else if (_doingWest)
                     {
                         _doingWest = false;
                         _doingEast = true;
+                        _init = true;
                         IPCChannel.Broadcast(new MoveEastMessage());
                         MovementController.Instance.SetPath(Constants.PathToEast);
-                        Chat.WriteLine("Nuke state, setting _doingEast true");
+                        //Chat.WriteLine("Nuke state, setting _doingEast true");
+
+                        // Reset the timer for West
+                        PullState.ResetTimer(KHBuddy.SideSelection.West);
                     }
 
                     return new PullState();
@@ -100,9 +101,8 @@ namespace KHBuddy
                 {
                     if (sides[i] == currentSelection || (i > 0 && sides[3] == currentSelection))
                     {
-                        //_init = true;
-                        //_timer = Time.NormalTime;
-                        //PullState._counterVec = 0;
+                        _init = true;
+                        PullState.ResetTimer(currentSelection);
                         return new PullState();
                     }
                 }
@@ -135,11 +135,13 @@ namespace KHBuddy
                 }
             }
             //KHBuddy._stateTimeOut = Time.NormalTime;
-            Chat.WriteLine("Nuke State");
+            //Chat.WriteLine("Nuke State");
         }
 
         public void OnStateExit()
         {
+
+
             //Chat.WriteLine("NukeState::OnStateExit");
         }
 

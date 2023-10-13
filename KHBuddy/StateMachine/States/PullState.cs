@@ -17,9 +17,10 @@ namespace KHBuddy
 
         private double _lastFollowTime = Time.NormalTime;
 
-        private double _eastTimer;
-        private double _westTimer;
-        private double _beachTimer;
+        private static double _beachTimer;
+        private static double _eastTimer;
+        private static double _westTimer;
+
 
         private Spell mongoSlam;
         private Spell mongoDemolish;
@@ -85,7 +86,7 @@ namespace KHBuddy
         public void OnStateEnter()
         {
             _lastFollowTime = Time.NormalTime;
-            Chat.WriteLine("Pull State");
+            //Chat.WriteLine("Pull State");
         }
 
         public void OnStateExit()
@@ -113,7 +114,7 @@ namespace KHBuddy
                             KHBuddy._doingEast = false;
                             KHBuddy._doingWest = true;
 
-                            Chat.WriteLine("Pull state, setting _doingWest true");
+                            //Chat.WriteLine("Pull state, setting _doingWest true");
                         }
                     }
                     else if (KHBuddy._doingWest)
@@ -122,7 +123,7 @@ namespace KHBuddy
                         {
                             KHBuddy._doingWest = false;
                             KHBuddy._doingEast = true; // Loop back to East
-                            Chat.WriteLine("Pull state, setting _doingEast true");
+                            //Chat.WriteLine("Pull state, setting _doingEast true");
                         }
                     }
                 }
@@ -204,25 +205,6 @@ namespace KHBuddy
                 MoveToNextDestination(vectorList);
                 
             }
-            else if (_counterVec >= vectorList.Count)
-            {
-                _counterVec = 0;
-
-                // Set the timer based on the current selection
-                switch (selection)
-                {
-                    case KHBuddy.SideSelection.Beach:
-                        _beachTimer = Time.NormalTime + 580.0;
-                        break;
-                    case KHBuddy.SideSelection.East:
-                        _eastTimer = Time.NormalTime + 580.0;
-                        break;
-                    case KHBuddy.SideSelection.West:
-                        _westTimer = Time.NormalTime + 580.0;
-                        break;
-                }
-                Chat.WriteLine($"Timer reset for {selection}");
-            }
             else
             {
                 HandleCasting(vectorList, limit + 1);
@@ -230,6 +212,27 @@ namespace KHBuddy
 
             return false;
         }
+
+        public static void ResetTimer(KHBuddy.SideSelection selection)
+        {
+            _counterVec = 0;
+
+            // Set the timer based on the current selection
+            switch (selection)
+            {
+                case KHBuddy.SideSelection.Beach:
+                    _beachTimer = Time.NormalTime + 580.0;
+                    break;
+                case KHBuddy.SideSelection.East:
+                    _eastTimer = Time.NormalTime + 580.0;
+                    break;
+                case KHBuddy.SideSelection.West:
+                    _westTimer = Time.NormalTime + 580.0;
+                    break;
+            }
+            //Chat.WriteLine($"Timer reset for {selection}");
+        }
+
 
         private int GetLimitForSelection(KHBuddy.SideSelection selection)
         {
