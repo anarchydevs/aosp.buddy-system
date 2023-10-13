@@ -39,16 +39,15 @@ namespace KHBuddy
 
             if (_hecks.Count >= 1)
             {
-
                 switch (currentSelection)
                 {
                     case KHBuddy.SideSelection.Beach:
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.KHBeachVectorList.Last()) < 3f)
+                        if (_counterVec == Constants.KHBeachVectorList.Count - 1)
                             return new NukeState();
                         break;
 
                     case KHBuddy.SideSelection.East:
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.KHEastVectorList.Last()) < 3f)
+                        if (_counterVec == Constants.KHEastVectorList.Count - 1)
                         {
                             KHBuddy.IPCChannel.Broadcast(new MoveEastMessage());
                             return new NukeState();
@@ -56,7 +55,7 @@ namespace KHBuddy
                         break;
 
                     case KHBuddy.SideSelection.West:
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.KHWestVectorList.Last()) < 3f)
+                        if (_counterVec == Constants.KHWestVectorList.Count - 1)
                         {
                             KHBuddy.IPCChannel.Broadcast(new MoveWestMessage());
                             return new NukeState();
@@ -64,15 +63,15 @@ namespace KHBuddy
                         break;
 
                     case KHBuddy.SideSelection.EastAndWest:
-                        if (KHBuddy._doingEast && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.KHEastVectorList.Last()) < 3f)
+                        if (KHBuddy._doingEast && _counterVec == Constants.KHEastVectorList.Count - 1)
                         {
                             //_counterVec = 0;
                             return new NukeState();
                         }
 
-                        if (KHBuddy._doingWest && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.KHWestVectorList.Last()) < 3f)
+                        if (KHBuddy._doingWest && _counterVec == Constants.KHWestVectorList.Count - 1)
                         {
-                           // _counterVec = 0;
+                            // _counterVec = 0;
                             return new NukeState();
                         }
                         break;
@@ -198,7 +197,14 @@ namespace KHBuddy
 
             int limit = GetLimitForSelection(selection);
 
-            if (_counterVec >= vectorList.Count)
+            //Chat.WriteLine($"VectorList Count: {vectorList.Count}, _counterVec: {_counterVec}, Limit: {limit}");
+
+            if (_counterVec <= limit)
+            {
+                MoveToNextDestination(vectorList);
+                
+            }
+            else if (_counterVec >= vectorList.Count)
             {
                 _counterVec = 0;
 
@@ -217,15 +223,10 @@ namespace KHBuddy
                 }
                 Chat.WriteLine($"Timer reset for {selection}");
             }
-            else if (_counterVec <= limit)
-            {
-                MoveToNextDestination(vectorList);
-            }
             else
             {
                 HandleCasting(vectorList, limit + 1);
             }
-
 
             return false;
         }
