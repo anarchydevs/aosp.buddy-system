@@ -39,6 +39,7 @@ namespace KHBuddy
 
             if (_hecks.Count >= 1)
             {
+
                 switch (currentSelection)
                 {
                     case KHBuddy.SideSelection.Beach:
@@ -65,13 +66,13 @@ namespace KHBuddy
                     case KHBuddy.SideSelection.EastAndWest:
                         if (KHBuddy._doingEast && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.KHEastVectorList.Last()) < 3f)
                         {
-                            _counterVec = 0;
+                            //_counterVec = 0;
                             return new NukeState();
                         }
 
                         if (KHBuddy._doingWest && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.KHWestVectorList.Last()) < 3f)
                         {
-                            _counterVec = 0;
+                           // _counterVec = 0;
                             return new NukeState();
                         }
                         break;
@@ -85,7 +86,7 @@ namespace KHBuddy
         public void OnStateEnter()
         {
             _lastFollowTime = Time.NormalTime;
-            //Chat.WriteLine("PullState::OnStateEnter");
+            Chat.WriteLine("Pull State");
         }
 
         public void OnStateExit()
@@ -112,6 +113,8 @@ namespace KHBuddy
                         {
                             KHBuddy._doingEast = false;
                             KHBuddy._doingWest = true;
+
+                            Chat.WriteLine("Pull state, setting _doingWest true");
                         }
                     }
                     else if (KHBuddy._doingWest)
@@ -120,31 +123,13 @@ namespace KHBuddy
                         {
                             KHBuddy._doingWest = false;
                             KHBuddy._doingEast = true; // Loop back to East
+                            Chat.WriteLine("Pull state, setting _doingEast true");
                         }
                     }
                 }
                 else
                 {
                     HandleMovementAndCasting(currentSelection);
-                }
-
-                bool sequenceComplete = HandleMovementAndCasting(currentSelection);
-
-                if (sequenceComplete)
-                {
-                    // Reset timer for the side that just completed
-                    switch (currentSelection)
-                    {
-                        case KHBuddy.SideSelection.Beach:
-                            _beachTimer = Time.NormalTime;
-                            break;
-                        case KHBuddy.SideSelection.East:
-                            _eastTimer = Time.NormalTime;
-                            break;
-                        case KHBuddy.SideSelection.West:
-                            _westTimer = Time.NormalTime;
-                            break;
-                    }
                 }
             }
         }
@@ -184,9 +169,8 @@ namespace KHBuddy
                     return false;
             }
 
-            return !KHBuddy._init || Time.NormalTime > targetTimer + 580.0;
+            return !KHBuddy._init || Time.NormalTime > targetTimer;
         }
-
         private bool HandleMovementAndCasting(KHBuddy.SideSelection selection)
         {
             if (!ShouldStartSequence(selection))
@@ -223,22 +207,27 @@ namespace KHBuddy
                 HandleCasting(vectorList, limit + 1);
             }
 
-            switch (selection)
-            {
-                case KHBuddy.SideSelection.Beach:
-                    _beachTimer = Time.NormalTime;
-                    break;
-                case KHBuddy.SideSelection.East:
-                    _eastTimer = Time.NormalTime;
-                    break;
-                case KHBuddy.SideSelection.West:
-                    _westTimer = Time.NormalTime;
-                    break;
-            }
-
             if (_counterVec >= vectorList.Count)
             {
                 _counterVec = 0; // Reset counter for next sequence
+                //Chat.WriteLine($"{selection} sequence complete");
+                // Reset timer here when the sequence is complete.
+                switch (selection)
+                {
+                    case KHBuddy.SideSelection.Beach:
+                        _beachTimer = Time.NormalTime + 580.0;
+                        //Chat.WriteLine($"Setting {_beachTimer} for Beach");
+                        break;
+                    case KHBuddy.SideSelection.East:
+                        _eastTimer = Time.NormalTime + 580.0;
+                        //Chat.WriteLine($"Setting {_eastTimer} for East");
+                        break;
+                    case KHBuddy.SideSelection.West:
+                        _westTimer = Time.NormalTime + 580.0;
+                        //Chat.WriteLine($"Setting {_westTimer} for West");
+                        break;
+                }
+                Chat.WriteLine($"Timer reset for {selection}");
                 return true; // Movement and casting for this side is complete
             }
 
@@ -277,6 +266,7 @@ namespace KHBuddy
             else if (_counterVec >= startIdx && CastedMongo && !mongoSlam.IsReady && !mongoDemolish.IsReady && Time.NormalTime - _lastFollowTime > 4.8)
             {
                 MoveToNextDestination(vectorList);
+                MovementController.Instance.SetMovement(MovementAction.JumpStart);
                 CastedMongo = false;
             }
         }

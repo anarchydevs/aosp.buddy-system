@@ -13,12 +13,12 @@ namespace KHBuddy
                 {
                     return new PullState();
                 }
-                    
+
                 if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
                 {
                     return new NukeState();
                 }
-                   
+
             }
 
             return null;

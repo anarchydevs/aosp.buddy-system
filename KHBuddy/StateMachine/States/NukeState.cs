@@ -1,5 +1,6 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
+using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using KHBuddy.IPCMessages;
@@ -31,7 +32,7 @@ namespace KHBuddy
             new Vector3(1115.9f, 1.6f, 1064.3f) //East
         };
 
-        private KHBuddy.SideSelection[] sides =
+        private SideSelection[] sides =
         {
             SideSelection.Beach,
             SideSelection.West,
@@ -39,44 +40,39 @@ namespace KHBuddy
             SideSelection.EastAndWest
         };
 
-        //Spell absorb = null;
-
         public IState GetNextState()
         {
-            // Handle specific professions
             if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician && !Team.IsInTeam)
             {
                 _settings["Toggle"] = false;
                 return new IdleState();
             }
 
-            if (DynelManager.LocalPlayer.Profession != Profession.Enforcer)
-                return null;
-
-            SideSelection currentSelection = (SideSelection)_settings["SideSelection"].AsInt32();
-
-            for (int i = 0; i < sides.Length; i++)
+            if (DynelManager.LocalPlayer.Profession == Profession.Enforcer)
             {
-                if (sides[i] == currentSelection || (i > 0 && sides[3] == currentSelection))
+                SideSelection currentSelection = (SideSelection)_settings["SideSelection"].AsInt32();
+
+                //Chat.WriteLine($"Current Selection: {currentSelection}");
+
+                List<SimpleChar> _hecks = DynelManager.NPCs
+                    .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
+                        && x.DistanceFrom(DynelManager.LocalPlayer) <= 20f
+                        && x.IsAlive && x.IsInLineOfSight)
+                    .OrderBy(x => x.DistanceFrom(DynelManager.LocalPlayer))
+                    .ToList();
+
+                if (_hecks.Count > 0) 
                 {
-                    if (ShouldEnterPullState(positions[i]))
-                    {
-                        _init = true;
-                        _timer = Time.NormalTime;
-                        PullState._counterVec = 0;
-                        return new PullState();
-                    }
+                    return null;
                 }
-            }
 
-            if (currentSelection == SideSelection.EastAndWest)
-            {
-                Vector3 currentPosition = _doingEast ? new Vector3(1115.9f, 1.6f, 1064.3f) : new Vector3(1043.2f, 1.6f, 1020.5f);
+                _init = true;
+                //PullState._counterVec = 0;
 
-                if (ShouldEnterPullState(currentPosition))
+                if (currentSelection == SideSelection.EastAndWest)
                 {
-                    _timer = Time.NormalTime;
-                    _init = true;
+                    //_timer = Time.NormalTime;
+                    //_init = true;
 
                     if (_doingEast)
                     {
@@ -84,6 +80,7 @@ namespace KHBuddy
                         _doingWest = true;
                         IPCChannel.Broadcast(new MoveWestMessage());
                         MovementController.Instance.SetPath(Constants.PathToWest);
+                        Chat.WriteLine("Nuke state, setting _doingWest true");
                     }
                     else if (_doingWest)
                     {
@@ -91,30 +88,25 @@ namespace KHBuddy
                         _doingEast = true;
                         IPCChannel.Broadcast(new MoveEastMessage());
                         MovementController.Instance.SetPath(Constants.PathToEast);
+                        Chat.WriteLine("Nuke state, setting _doingEast true");
                     }
 
                     return new PullState();
                 }
+
+                for (int i = 0; i < sides.Length; i++)
+                {
+                    if (sides[i] == currentSelection || (i > 0 && sides[3] == currentSelection))
+                    {
+                        //_init = true;
+                        //_timer = Time.NormalTime;
+                        //PullState._counterVec = 0;
+                        return new PullState();
+                    }
+                }
             }
 
             return null;
-        }
-
-        private bool ShouldEnterPullState(Vector3 position)
-        {
-            var hecklerCorpses = DynelManager.Corpses
-                .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
-                    && x.DistanceFrom(DynelManager.LocalPlayer) <= 45f
-                    && x.Position.DistanceFrom(position) < 8f)
-                .ToList();
-
-            List<SimpleChar> _hecks = DynelManager.NPCs
-                .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
-                    && x.DistanceFrom(DynelManager.LocalPlayer) <= 10f
-                    && x.IsAlive && x.IsInLineOfSight)
-                .ToList();
-
-            return hecklerCorpses.Count >= 3 && _hecks.Count <= 0;
         }
 
 
@@ -141,7 +133,7 @@ namespace KHBuddy
                 }
             }
             //KHBuddy._stateTimeOut = Time.NormalTime;
-            //Chat.WriteLine("NukeState::OnStateEnter");
+            Chat.WriteLine("Nuke State");
         }
 
         public void OnStateExit()
@@ -195,14 +187,16 @@ namespace KHBuddy
 
                 if (DynelManager.LocalPlayer.Profession == Profession.Enforcer)
                 {
+                    // Find hecks within 20 units
                     _hecksAtPos = DynelManager.NPCs
-                   .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
-                       && x.DistanceFrom(DynelManager.LocalPlayer) <= 20f
-                       && x.IsAlive && x.IsInLineOfSight
-                       && !x.IsMoving
-                       && x.FightingTarget != null)
-                   .ToList();
+                    .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
+                        && x.DistanceFrom(DynelManager.LocalPlayer) <= 20f
+                        && x.IsAlive && x.IsInLineOfSight
+                        && !x.IsMoving
+                        && x.FightingTarget != null)
+                    .ToList();
 
+                    // Cast Mongo Demolish if conditions are met
                     Spell.Find(270786, out Spell mongoDemolish);
 
                     if (_hecksAtPos.Count >= 1)
@@ -212,6 +206,19 @@ namespace KHBuddy
                             mongoDemolish.Cast();
                             _refreshMongoTimer = Time.NormalTime;
                         }
+                    }
+
+                    // Find hecks beyond 20 units but in line of sight
+                    List<SimpleChar> _distantHecks = DynelManager.NPCs
+                    .Where(x => (x.Name.Contains("Heckler") || x.Name.Contains("Voracious"))
+                        && x.DistanceFrom(DynelManager.LocalPlayer) > 20f
+                        && x.IsAlive && x.IsInLineOfSight)
+                    .ToList();
+
+                    // Taunt distant hecks
+                    foreach (SimpleChar distantHeck in _distantHecks)
+                    {
+                        HandleTaunting(distantHeck);
                     }
                 }
             }
@@ -224,6 +231,25 @@ namespace KHBuddy
                     Chat.WriteLine(errorMessage);
                     Chat.WriteLine("Stack Trace: " + ex.StackTrace);
                     KHBuddy.previousErrorMessage = errorMessage;
+                }
+            }
+        }
+
+        public static void HandleTaunting(SimpleChar target)
+        {
+            Item item = null;
+
+            if (Inventory.Find(83920, out item) ||  // Aggression Enhancer
+                Inventory.Find(83919, out item) ||  // Aggression Multiplier
+                Inventory.Find(152029, out item) || // Aggression Enhancer (Jealousy Augmented)
+                Inventory.Find(152028, out item) || // Aggression Multiplier (Jealousy Augmented)
+                Inventory.Find(244655, out item) || // Scorpio's Aim of Anger
+                Inventory.Find(253186, out item) || // Codex of the Insulting Emerto (Low)
+                Inventory.Find(253187, out item))   // Codex of the Insulting Emerto (High)
+            {
+                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
+                {
+                    item.Use(target, true);
                 }
             }
         }

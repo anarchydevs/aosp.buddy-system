@@ -27,7 +27,7 @@ namespace KHBuddy
 
         public static Settings _settings = new Settings("KHBuddy");
 
-        public static double _timer = 0f;
+        //public static double _timer = 0f;
 
         public static DateTime RespawnTime;
         public static DateTime RespawnTimeEast;
@@ -191,7 +191,7 @@ namespace KHBuddy
             //GameTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(Time.NormalTime);
             try
             {
-                if (Game.IsZoning)
+                if (Game.IsZoning || !_settings["Toggle"].AsBool() || Playfield.ModelIdentity.Instance != 4543)
                     return;
 
                 _stateMachine.Tick();
