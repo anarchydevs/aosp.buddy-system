@@ -106,7 +106,7 @@ namespace KHBuddy
             Config.Save();
         }
 
-        public static void Start()
+        public void Start()
         {
             Toggle = true;
 
@@ -116,7 +116,7 @@ namespace KHBuddy
                 _stateMachine.SetState(new IdleState());
         }
 
-        private void Stop()
+        public void Stop()
         {
             Toggle = false;
 

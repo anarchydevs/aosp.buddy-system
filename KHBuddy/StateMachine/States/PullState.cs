@@ -198,7 +198,26 @@ namespace KHBuddy
 
             int limit = GetLimitForSelection(selection);
 
-            if (_counterVec <= limit)
+            if (_counterVec >= vectorList.Count)
+            {
+                _counterVec = 0;
+
+                // Set the timer based on the current selection
+                switch (selection)
+                {
+                    case KHBuddy.SideSelection.Beach:
+                        _beachTimer = Time.NormalTime + 580.0;
+                        break;
+                    case KHBuddy.SideSelection.East:
+                        _eastTimer = Time.NormalTime + 580.0;
+                        break;
+                    case KHBuddy.SideSelection.West:
+                        _westTimer = Time.NormalTime + 580.0;
+                        break;
+                }
+                Chat.WriteLine($"Timer reset for {selection}");
+            }
+            else if (_counterVec <= limit)
             {
                 MoveToNextDestination(vectorList);
             }
@@ -207,29 +226,6 @@ namespace KHBuddy
                 HandleCasting(vectorList, limit + 1);
             }
 
-            if (_counterVec >= vectorList.Count)
-            {
-                _counterVec = 0; // Reset counter for next sequence
-                //Chat.WriteLine($"{selection} sequence complete");
-                // Reset timer here when the sequence is complete.
-                switch (selection)
-                {
-                    case KHBuddy.SideSelection.Beach:
-                        _beachTimer = Time.NormalTime + 580.0;
-                        //Chat.WriteLine($"Setting {_beachTimer} for Beach");
-                        break;
-                    case KHBuddy.SideSelection.East:
-                        _eastTimer = Time.NormalTime + 580.0;
-                        //Chat.WriteLine($"Setting {_eastTimer} for East");
-                        break;
-                    case KHBuddy.SideSelection.West:
-                        _westTimer = Time.NormalTime + 580.0;
-                        //Chat.WriteLine($"Setting {_westTimer} for West");
-                        break;
-                }
-                Chat.WriteLine($"Timer reset for {selection}");
-                return true; // Movement and casting for this side is complete
-            }
 
             return false;
         }
@@ -250,11 +246,15 @@ namespace KHBuddy
 
         private void MoveToNextDestination(List<Vector3> vectorList)
         {
-            _counterVec++;
-            MovementController.Instance.SetMovement(MovementAction.Update);
-            MovementController.Instance.SetDestination(vectorList[_counterVec]);
-            _lastFollowTime = Time.NormalTime;
+            if (_counterVec < vectorList.Count - 1)
+            {
+                _counterVec++;
+                MovementController.Instance.SetMovement(MovementAction.Update);
+                MovementController.Instance.SetDestination(vectorList[_counterVec]);
+                _lastFollowTime = Time.NormalTime;
+            }
         }
+
 
         private void HandleCasting(List<Vector3> vectorList, int startIdx)
         {

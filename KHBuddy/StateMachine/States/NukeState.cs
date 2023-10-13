@@ -7,7 +7,6 @@ using KHBuddy.IPCMessages;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using static AOSharp.Core.Battlestation;
 using static KHBuddy.KHBuddy;
 
 namespace KHBuddy
@@ -45,6 +44,9 @@ namespace KHBuddy
             if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician && !Team.IsInTeam)
             {
                 _settings["Toggle"] = false;
+
+                IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+
                 return new IdleState();
             }
 
