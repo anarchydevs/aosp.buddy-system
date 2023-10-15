@@ -5,7 +5,7 @@ using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
-using Shared.IPCMessages;
+using AttackBuddy.IPCMessages;
 using System;
 using System.Collections.Generic;
 using System.Data;

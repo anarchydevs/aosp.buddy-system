@@ -4,7 +4,7 @@ using AOSharp.Core.UI;
 using AOSharp.Recast;
 using System;
 using System.IO;
-using Shared.IPCMessages;
+using CityBuddy.IPCMessages;
 using AOSharp.Common.GameData;
 using org.critterai.nav;
 using org.critterai.nmgen;

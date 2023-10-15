@@ -2,7 +2,7 @@
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Recast;
-using Shared.IPCMessages;
+using LeBuddy.IPCMessages;
 using System;
 using System.IO;
 using AOSharp.Common.GameData;

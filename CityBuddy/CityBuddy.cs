@@ -5,7 +5,7 @@ using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
-using Shared.IPCMessages;
+using CityBuddy.IPCMessages;
 using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
 using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -100,6 +100,8 @@ namespace CityBuddy
                 _settings.AddVariable("Enable", false);
                 _settings.AddVariable("Ship", false);
                 _settings.AddVariable("Corpses", false);
+
+                _settings["Enable"] = false;
 
                 Chat.RegisterCommand("buddy", BuddyCommand);
 
@@ -288,9 +290,7 @@ namespace CityBuddy
 
             if (Leader == Identity.None)
             {
-
                 IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
-
             }
 
             if (DynelManager.LocalPlayer.Identity != Leader)
@@ -330,12 +330,17 @@ namespace CityBuddy
                 }
             }
 
-            
-            Shared.Kits kitsInstance = new Shared.Kits();
+            //if (_settings["Enable"].AsBool())
+            //{
+                _stateMachine.Tick();
 
-            kitsInstance.SitAndUseKit();
+                Shared.Kits kitsInstance = new Shared.Kits();
+
+                kitsInstance.SitAndUseKit();
+            //}
 
             #region UI
+
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {
                 SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
@@ -377,11 +382,9 @@ namespace CityBuddy
                     IPCChannel.Broadcast(new FarmingStatusMessage { IsFarming = true });
                     ShipEnabled();
                 }
-
             }
             #endregion
 
-            _stateMachine.Tick();
         }
 
         private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)

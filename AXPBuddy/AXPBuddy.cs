@@ -6,7 +6,7 @@ using AOSharp.Core.UI;
 using AOSharp.Core.Movement;
 using AOSharp.Core.IPC;
 using AOSharp.Pathfinding;
-using Shared.IPCMessages;
+using AXPBuddy.IPCMessages;
 using AOSharp.Common.GameData;
 using AOSharp.Common.GameData.UI;
 using System.Text.RegularExpressions;

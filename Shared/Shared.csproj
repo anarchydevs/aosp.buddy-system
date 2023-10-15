@@ -75,16 +75,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IPCMessages\ClearSelectedMemberMessage.cs" />
-    <Compile Include="IPCMessages\EnterMessage.cs" />
-    <Compile Include="IPCMessages\FarmingStatusMessage.cs" />
-    <Compile Include="IPCMessages\IPCOpcode.cs" />
-    <Compile Include="IPCMessages\LeaderInfoIPCMessage.cs" />
-    <Compile Include="IPCMessages\RangeInfoIPCMessage.cs" />
-    <Compile Include="IPCMessages\SelectedMemberUpdateMessage.cs" />
-    <Compile Include="IPCMessages\SettingsUpdate.cs" />
-    <Compile Include="IPCMessages\StartStopIPCMessage.cs" />
-    <Compile Include="IPCMessages\WaitAndReadyIPCMessage.cs" />
     <Compile Include="Kits.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Compile>

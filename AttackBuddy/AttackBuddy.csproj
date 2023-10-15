@@ -92,6 +92,10 @@
     <Compile Include="AttackBuddy.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="IPCMessages\IPCOpcode.cs" />
+    <Compile Include="IPCMessages\LeaderInfoIPCMessage.cs" />
+    <Compile Include="IPCMessages\RangeInfoIPCMessage.cs" />
+    <Compile Include="IPCMessages\StartStopIPCMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsController.cs" />
     <Compile Include="StateMachine\IState.cs" />

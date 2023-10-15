@@ -84,6 +84,13 @@
     <Compile Include="..\CommonParameters.cs">
       <Link>CommonParameters.cs</Link>
     </Compile>
+    <Compile Include="IPCMessages\ClearSelectedMemberMessage.cs" />
+    <Compile Include="IPCMessages\EnterMessage.cs" />
+    <Compile Include="IPCMessages\IPCOpcode.cs" />
+    <Compile Include="IPCMessages\LeaderInfoIPCMessage.cs" />
+    <Compile Include="IPCMessages\SelectedMemberUpdateMessage.cs" />
+    <Compile Include="IPCMessages\StartStopIPCMessage.cs" />
+    <Compile Include="IPCMessages\WaitAndReadyIPCMessage.cs" />
     <Compile Include="LeBuddy.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Constants.cs" />
