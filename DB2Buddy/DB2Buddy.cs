@@ -6,7 +6,7 @@ using AOSharp.Pathfinding;
 using AOSharp.Core.IPC;
 using AOSharp.Common.GameData.UI;
 using AOSharp.Core.Movement;
-using Shared.IPCMessages;
+using DB2Buddy.IPCMessages;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Diagnostics;

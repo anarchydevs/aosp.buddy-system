@@ -85,6 +85,12 @@
     <Compile Include="Config.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
+    <Compile Include="IPCMessages\EnterMessage.cs" />
+    <Compile Include="IPCMessages\FarmingStatusMessage.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
+    <Compile Include="IPCMessages\IPCOpcode.cs" />
+    <Compile Include="IPCMessages\StartStopIPCMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsController.cs" />
     <Compile Include="StateMachine\IState.cs">

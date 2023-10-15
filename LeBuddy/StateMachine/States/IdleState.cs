@@ -1,6 +1,6 @@
 ﻿using AOSharp.Core;
 using AOSharp.Core.UI;
-using Shared.IPCMessages;
+using LeBuddy.IPCMessages;
 using System;
 using System.Linq;
 

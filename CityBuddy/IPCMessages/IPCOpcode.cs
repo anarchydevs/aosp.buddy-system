@@ -5,9 +5,12 @@
         StartStop = 1001,
         LeaderInfo = 1002,
         WaitAndReady = 1003,
-        Enter = 1004,
-        SelectedMemberUpdate = 1005,
-        ClearSelectedMember = 1006,
-        Ship =  1007,
+        Farming = 1004,
+        //ModeSelections = 1005,
+        SettingsUpdate = 1006,
+        RangeInfo = 1007,
+        Enter = 1008,
+        SelectedMemberUpdate = 1009,
+        ClearSelectedMember = 1010,
     }
 }

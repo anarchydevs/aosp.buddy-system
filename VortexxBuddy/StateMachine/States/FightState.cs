@@ -8,7 +8,7 @@ using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
-using Shared.IPCMessages;
+using VortexxBuddy.IPCMessages;
 
 namespace VortexxBuddy
 {

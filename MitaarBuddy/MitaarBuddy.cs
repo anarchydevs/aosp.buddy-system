@@ -5,7 +5,7 @@ using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
-using Shared.IPCMessages;
+using MitaarBuddy.IPCMessages;
 using System;
 
 namespace MitaarBuddy

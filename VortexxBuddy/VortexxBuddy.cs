@@ -5,7 +5,7 @@ using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Pathfinding;
 using AOSharp.Core.UI;
-using Shared.IPCMessages;
+using VortexxBuddy.IPCMessages;
 using System;
 using System.Diagnostics;
 
