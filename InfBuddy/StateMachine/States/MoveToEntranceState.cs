@@ -34,15 +34,13 @@ namespace InfBuddy
                     {
                         if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
                         {
-                            if (Team.Members.Any(c => c.Character != null && c.IsLeader)
-                                || InfBuddy._settings["Merge"].AsBool())
-                            {
-                                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.QuestStarterPos) < 10f)
-                                    //&& Team.Members.Any(c => c.Character != null && c.IsLeader))
-                                    return new RoamState();
-                                else if (!InfBuddy.NavMeshMovementController.IsNavigating)
-                                    InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterPos);
-                            }
+
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.QuestStarterPos) < 10f)
+                                //&& Team.Members.Any(c => c.Character != null && c.IsLeader))
+                                return new RoamState();
+                            else if (!InfBuddy.NavMeshMovementController.IsNavigating)
+                                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterPos);
+
                         }
                         else
                             return new MoveToQuestStarterState();
@@ -52,20 +50,18 @@ namespace InfBuddy
                     {
                         if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
                         {
-                            if (Team.Members.Any(c => c.Character != null && c.IsLeader)
-                                || InfBuddy._settings["Merge"].AsBool())
-                            {
-                                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.QuestStarterPos) < 10f)
-                                    //&& Team.Members.Any(c => c.Character != null && c.IsLeader))
-                                    return new DefendSpiritState();
-                                else if (!InfBuddy.NavMeshMovementController.IsNavigating)
-                                    InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterPos);
-                            }
+
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.QuestStarterPos) < 10f)
+                                //&& Team.Members.Any(c => c.Character != null && c.IsLeader))
+                                return new DefendSpiritState();
+                            else if (!InfBuddy.NavMeshMovementController.IsNavigating)
+                                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterPos);
+
                         }
                         else
                             return new MoveToQuestStarterState();
                     }
-                        
+
                 }
             }
             return null;
