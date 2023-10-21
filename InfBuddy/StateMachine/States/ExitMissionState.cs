@@ -25,6 +25,7 @@ namespace InfBuddy
 
                else
                 {
+                    InfBuddy.DoubleReward = false;
                     return new ReformState();
                 }
             }
