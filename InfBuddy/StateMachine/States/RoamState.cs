@@ -39,7 +39,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("RoamState::OnStateEnter");
+            Chat.WriteLine("Roaming");
         }
 
         public void Tick()

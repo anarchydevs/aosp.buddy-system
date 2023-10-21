@@ -23,12 +23,11 @@ namespace InfBuddy
                     return new MoveToQuestGiverState();
                 }
 
-                if (InfBuddy._settings["DoubleReward"].AsBool() && InfBuddy.DoubleReward)
+               else
                 {
                     InfBuddy.DoubleReward = false;
+                    return new ReformState();
                 }
-                    
-                return new ReformState();
             }
 
             return null;
@@ -36,7 +35,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("ExitMissionState::OnStateEnter");
+            Chat.WriteLine("Exit Mission");
 
             int _time = 0;
 
