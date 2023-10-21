@@ -31,7 +31,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("LeechState::OnStateEnter");
+            Chat.WriteLine("Leech State");
 
             DynelManager.LocalPlayer.Position = Constants.LeechSpot;
             MovementController.Instance.SetMovement(MovementAction.Update);

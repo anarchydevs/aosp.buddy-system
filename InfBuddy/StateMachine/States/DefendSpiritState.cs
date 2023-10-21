@@ -79,7 +79,7 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("DefendSpiritState::OnStateEnter");
+            Chat.WriteLine("Defending");
             _mobStuckStartTime = Time.NormalTime;
         }
 
