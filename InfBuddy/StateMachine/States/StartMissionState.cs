@@ -23,9 +23,11 @@ namespace InfBuddy
             {
                 if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                     return new RoamState();
-
-                Constants.DefendPos = new Vector3(165.6f, 2.2f, 186.4f);
-                return new DefendSpiritState();
+                else
+                {
+                    Constants.DefendPos = new Vector3(165.6f, 2.2f, 186.4f);
+                    return new DefendSpiritState();
+                }
             }
 
             return null;

@@ -39,10 +39,12 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("ReformState::OnStateEnter");
+            Chat.WriteLine("Reforming");
 
             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.EntrancePos) > 1f)
                 DynelManager.LocalPlayer.Position = Constants.EntrancePos;
+
+            InfBuddy.DoubleReward = false;
 
             _reformStartedTime = Time.NormalTime;
 

@@ -1,5 +1,6 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Core;
+using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using System.Linq;
 
@@ -80,6 +81,8 @@ namespace InfBuddy
         public void OnStateExit()
         {
             //Chat.WriteLine("MoveToEntranceState::OnStateExit");
+
+            MovementController.Instance.Halt();
 
             _init = false;
         }
