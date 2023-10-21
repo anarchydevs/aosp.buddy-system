@@ -19,12 +19,17 @@ namespace InfBuddy
             //if (Extensions.CanExit(_missionsLoaded))
             //    return new ExitMissionState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId 
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
                 && !Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+            {
                 return new ExitMissionState();
-
+            }
+                
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
+            {
                 return new IdleState();
+            }
+                
 
             return null;
         }
