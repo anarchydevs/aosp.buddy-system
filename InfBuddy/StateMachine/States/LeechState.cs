@@ -16,20 +16,18 @@ namespace InfBuddy
             if (Extensions.HasDied())
                 return new DiedState();
 
-            //if (Extensions.CanExit(_missionsLoaded))
-            //    return new ExitMissionState();
+            bool missionExists = Mission.List.Exists(m => m.DisplayName.Contains("The Purification Ritual"));
 
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId
-                && !Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                return new ExitMissionState();
+                if (!missionExists)
+                {
+                    return new ExitMissionState();
+                }
             }
-                
+
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
-            {
                 return new IdleState();
-            }
-                
 
             return null;
         }
@@ -55,6 +53,7 @@ namespace InfBuddy
         public void Tick()
         {
             if (Game.IsZoning) { return; }
+
             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.TreeHidingSpot) > 1)
             {
                 InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.TreeHidingSpot);
