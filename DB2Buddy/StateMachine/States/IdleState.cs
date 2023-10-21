@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace DB2Buddy
 {
@@ -51,9 +50,6 @@ namespace DB2Buddy
 
             if (!DB2Buddy._settings["Toggle"].AsBool())
                 DB2Buddy.NavMeshMovementController.Halt();
-            
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return new SitState();
 
             if (DB2Buddy._settings["Toggle"].AsBool())
 

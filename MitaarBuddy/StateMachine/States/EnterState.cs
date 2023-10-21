@@ -5,8 +5,6 @@ using AOSharp.Pathfinding;
 using AOSharp.Common.GameData;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace MitaarBuddy
 {
@@ -15,23 +13,13 @@ namespace MitaarBuddy
         private const int MinWait = 3;
         private const int MaxWait = 5;
         private static double _time;
-        private CancellationTokenSource _cancellationToken = new CancellationTokenSource();
+        private double _nextMoveTime;
 
         public IState GetNextState()
         {
             if (Playfield.ModelIdentity.Instance == Constants.MitaarId)
             {
-                if (MitaarBuddy.DifficultySelection.Easy == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32())
-                    if (MitaarBuddy._died || (!MitaarBuddy._died && !Team.Members.Any(c => c.Character == null)))
-                        return new EasyState();
-
-                if (MitaarBuddy.DifficultySelection.Medium == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32())
-                    if (MitaarBuddy._died || (!MitaarBuddy._died && !Team.Members.Any(c => c.Character == null)))
-                        return new MediumState();
-
-                if (MitaarBuddy.DifficultySelection.Hardcore == (MitaarBuddy.DifficultySelection)MitaarBuddy._settings["DifficultySelection"].AsInt32())
-                    if (MitaarBuddy._died || (!MitaarBuddy._died && !Team.Members.Any(c => c.Character == null)))
-                        return new HardcoreState();
+                return new FightState();
             }
 
             if (Playfield.ModelIdentity.Instance == Constants.XanHubId
@@ -45,23 +33,22 @@ namespace MitaarBuddy
         {
             MitaarBuddy.SinuhCorpse = false;
             Chat.WriteLine("Entering Mitaar");
-
+            _nextMoveTime = Time.NormalTime + 2; // Initialize next movement time
         }
 
         public void OnStateExit()
         {
-            Chat.WriteLine("EnterSectorState::OnStateExit");
+            //Chat.WriteLine("EnterSectorState::OnStateExit");
 
-            _cancellationToken.Cancel();
         }
 
         public void Tick()
         {
             if (Game.IsZoning) { return; }
 
-            if (Team.IsInTeam && Time.NormalTime > _time + 2f)
+            if (Team.IsInTeam && Time.NormalTime > _nextMoveTime)
             {
-                _time = Time.NormalTime;
+                _nextMoveTime = Time.NormalTime + 2; // Schedule next movement in 2 seconds
 
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._entrance) < 20)
                 {

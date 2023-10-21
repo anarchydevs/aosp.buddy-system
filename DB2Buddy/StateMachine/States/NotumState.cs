@@ -10,7 +10,6 @@ using System.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace DB2Buddy
 {
@@ -20,6 +19,12 @@ namespace DB2Buddy
         private SimpleChar _mist;
         private SimpleChar _redTower;
         private SimpleChar _blueTower;
+
+        private double _timeToTagReset;
+        private double _timeForPositionUpdate;
+        private double _timeForTurn;
+        private bool _positionUpdated = false;
+        private bool _turned = false;
 
         private string previousErrorMessage = string.Empty;
 
@@ -117,27 +122,47 @@ namespace DB2Buddy
                 {
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) < 0.6)
                     {
-                        Task.Factory.StartNew(
-                                   async () =>
-                                   {
-                                       await Task.Delay(5000);
-                                       DB2Buddy._taggedNotum = false;
-                                   });
+                        if (_timeToTagReset <= 0)
+                        {
+                            _timeToTagReset = Time.NormalTime + 5; // Schedule tag reset in 5 seconds
+                        }
+                        else if (Time.NormalTime >= _timeToTagReset)
+                        {
+                            DB2Buddy._taggedNotum = false;
+                            _timeToTagReset = 0;
+                        }
                     }
 
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(_mist.Position) > 0.5)
                     {
-                        Task.Factory.StartNew(
-                                   async () =>
-                                   {
-                                       await Task.Delay(1000);
-                                       DynelManager.LocalPlayer.Position = _mist.Position;
-                                       await Task.Delay(1000);
-                                       MovementController.Instance.SetMovement(MovementAction.TurnRightStart);
-                                       MovementController.Instance.SetMovement(MovementAction.TurnRightStop);
-                                       await Task.Delay(1000);
-                                       MovementController.Instance.SetMovement(MovementAction.Update);
-                                   });
+                        if (_timeForPositionUpdate <= 0)
+                        {
+                            _timeForPositionUpdate = Time.NormalTime + 1; // Schedule position update in 1 second
+                            _timeForTurn = _timeForPositionUpdate + 1; // Schedule turn in 1 second after position update
+                        }
+
+                        if (_timeForPositionUpdate > 0 && Time.NormalTime >= _timeForPositionUpdate)
+                        {
+                            DynelManager.LocalPlayer.Position = _mist.Position;
+                            _positionUpdated = true;
+                            _timeForPositionUpdate = 0;
+                        }
+
+                        if (_positionUpdated && _timeForTurn > 0 && Time.NormalTime >= _timeForTurn)
+                        {
+                            MovementController.Instance.SetMovement(MovementAction.TurnRightStart);
+                            MovementController.Instance.SetMovement(MovementAction.TurnRightStop);
+                            MovementController.Instance.SetMovement(MovementAction.Update);
+                            _turned = true;
+                            _timeForTurn = 0;
+                        }
+
+                        // Reset the flags for the next round of actions
+                        if (_positionUpdated && _turned)
+                        {
+                            _positionUpdated = false;
+                            _turned = false;
+                        }
                     }
                 }
 

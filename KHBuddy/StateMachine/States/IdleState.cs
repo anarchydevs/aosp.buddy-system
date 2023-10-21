@@ -1,9 +1,26 @@
-﻿namespace KHBuddy
+﻿using AOSharp.Common.GameData;
+using AOSharp.Core;
+
+namespace KHBuddy
 {
     public class IdleState : IState
     {
         public IState GetNextState()
         {
+            if (KHBuddy._settings["Toggle"].AsBool())
+            {
+                if (DynelManager.LocalPlayer.Profession == Profession.Enforcer)
+                {
+                    return new PullState();
+                }
+
+                if (DynelManager.LocalPlayer.Profession == Profession.NanoTechnician)
+                {
+                    return new NukeState();
+                }
+
+            }
+
             return null;
         }
 

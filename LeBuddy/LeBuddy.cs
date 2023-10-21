@@ -1,21 +1,16 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Common.GameData.UI;
 using AOSharp.Core;
-using AOSharp.Core.Inventory;
 using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using AOSharp.Pathfinding;
 using LeBuddy.IPCMessages;
-using org.critterai.nav;
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Diagnostics;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using static LeBuddy.NavGenState;
 
 namespace LeBuddy
 {
@@ -33,6 +28,12 @@ namespace LeBuddy
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
         public static Vector3 _leaderPos = Vector3.Zero;
+
+        public static bool Ready = true;
+        private Dictionary<Identity, bool> teamReadiness = new Dictionary<Identity, bool>();
+        private bool? lastSentIsReadyState = null;
+
+        private Stopwatch _kitTimer = new Stopwatch();
 
         public static Door _exitDoor;
 
@@ -60,11 +61,12 @@ namespace LeBuddy
 
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel));
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.Enter, EnterMessage);
                 IPCChannel.RegisterCallback((int)IPCOpcode.SelectedMemberUpdate, HandleSelectedMemberUpdate);
                 IPCChannel.RegisterCallback((int)IPCOpcode.ClearSelectedMember, HandleClearSelectedMember);
+                IPCChannel.RegisterCallback((int)IPCOpcode.LeaderInfo, OnLeaderInfoMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.WaitAndReady, OnWaitAndReadyMessage);
 
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
@@ -73,13 +75,11 @@ namespace LeBuddy
 
                 _stateMachine = new StateMachine(new IdleState());
 
-                Chat.RegisterCommand("buddy", LeCommand);
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Enable", false);
-
-                _settings.AddVariable("Leader", false);
 
                 _settings.AddVariable("DifficultySelection", (int)DifficultySelection.Hard);
 
@@ -114,14 +114,10 @@ namespace LeBuddy
 
             infoWindow.Show(true);
         }
+
         private void Start()
         {
             Enable = true;
-
-            if (_settings["Leader"].AsBool())
-            {
-                Leader = DynelManager.LocalPlayer.Identity;
-            }
 
             Chat.WriteLine("LeBuddy enabled.");
 
@@ -141,29 +137,31 @@ namespace LeBuddy
             NavMeshMovementController.Halt();
         }
 
-        private void OnStartMessage(int sender, IPCMessage msg)
+        private void OnStartStopMessage(int sender, IPCMessage msg)
         {
-            if (Leader == Identity.None && DynelManager.LocalPlayer.Identity.Instance != sender)
+            if (msg is StartStopIPCMessage startStopMessage)
             {
-                Leader = _settings["Leader"].AsBool() ? DynelManager.LocalPlayer.Identity : new Identity(IdentityType.SimpleChar, sender);
+                if (startStopMessage.IsStarting)
+                {
+                    Leader = new Identity(IdentityType.SimpleChar, sender);
+                    // Update the setting and start the process.
+                    _settings["Enable"] = true;
+                    Start();
+                }
+                else
+                {
+                    // Update the setting and stop the process.
+                    _settings["Enable"] = false;
+                    Stop();
+                }
             }
-
-            _settings["Enable"] = true;
-            Start();
-        }
-
-
-        private void OnStopMessage(int sender, IPCMessage msg)
-        {
-            _settings["Enable"] = false;
-            Stop();
         }
 
         private void EnterMessage(int sender, IPCMessage msg)
         {
             if (!(_stateMachine.CurrentState is EnterState))
             {
-                Chat.WriteLine("enter");
+                Chat.WriteLine("Enter");
                 _stateMachine.SetState(new EnterState());
             }
         }
@@ -182,13 +180,105 @@ namespace LeBuddy
             IdleState.selectedMember = null;
         }
 
+        private void OnLeaderInfoMessage(int sender, IPCMessage msg)
+        {
+            if (msg is LeaderInfoIPCMessage leaderInfoMessage)
+            {
+                if (leaderInfoMessage.IsRequest)
+                {
+                    if (Leader != Identity.None)
+                    {
+                        IPCChannel.Broadcast(new LeaderInfoIPCMessage() { LeaderIdentity = Leader, IsRequest = false });
+                    }
+                }
+                else
+                {
+                    Leader = leaderInfoMessage.LeaderIdentity;
+                }
+            }
+        }
+        private void OnWaitAndReadyMessage(int sender, IPCMessage msg)
+        {
+
+            if (msg is WaitAndReadyIPCMessage waitAndReadyMessage)
+            {
+                Identity senderIdentity = waitAndReadyMessage.PlayerIdentity; // Get the Identity from the IPCMessage
+
+                teamReadiness[senderIdentity] = waitAndReadyMessage.IsReady;
+
+                //Chat.WriteLine($"IPC received. Sender: {senderIdentity}, IsReady: {waitAndReadyMessage.IsReady}"); // Debugging line added
+
+                bool allReady = true;
+
+                // Check team members against the readiness dictionary
+                foreach (var teamMember in Team.Members)
+                {
+                    if (teamReadiness.ContainsKey(teamMember.Identity) && !teamReadiness[teamMember.Identity])
+                    {
+                        allReady = false;
+                        break;
+                    }
+                }
+
+                if (Leader == DynelManager.LocalPlayer.Identity)
+                {
+                    Ready = allReady;
+
+                }
+            }
+        }
+
         private void OnUpdate(object s, float deltaTime)
         {
             if (Game.IsZoning) { return; }
 
             _stateMachine.Tick();
 
-                ListenerSit();
+            Shared.Kits kitsInstance = new Shared.Kits();
+
+            kitsInstance.SitAndUseKit();
+
+            if (Leader == Identity.None)
+            {
+                IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
+            }
+
+            if (DynelManager.LocalPlayer.Identity != Leader)
+            {
+                var localPlayer = DynelManager.LocalPlayer;
+                bool currentIsReadyState = true;
+
+                // Check if Nano or Health is below 66% and not in combat
+                if (!Shared.Kits.InCombat())
+                {
+                    if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66
+                        || !Spell.List.Any(spell => spell.IsReady))
+                    {
+                        currentIsReadyState = false;
+                    }
+                }
+
+                // Check if Nano and Health are above 66%
+                else if (!Spell.HasPendingCast && localPlayer.NanoPercent > 70
+                    && localPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady))
+                {
+                    currentIsReadyState = true;
+                }
+
+                // Only send a message if the state has changed.
+                if (currentIsReadyState != lastSentIsReadyState)
+                {
+                    Identity localPlayerIdentity = DynelManager.LocalPlayer.Identity;
+                    //Chat.WriteLine($"Broadcasting IPC. Local player identity: {localPlayerIdentity}"); // Debugging line added
+
+                    IPCChannel.Broadcast(new WaitAndReadyIPCMessage
+                    {
+                        IsReady = currentIsReadyState,
+                        PlayerIdentity = localPlayerIdentity
+                    });
+                    lastSentIsReadyState = currentIsReadyState; // Update the last sent state
+                }
+            }
 
             if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
             {
@@ -211,92 +301,40 @@ namespace LeBuddy
 
                 if (!_settings["Enable"].AsBool() && Enable)
                 {
-                    IPCChannel.Broadcast(new StopMessage());
+                    IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
                     Stop();
                 }
                 if (_settings["Enable"].AsBool() && !Enable)
                 {
-                    IPCChannel.Broadcast(new StartMessage());
+                    
+                    IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                     Start();
                 }
             }
         }
 
-        private bool CanUseSitKit()
-        {
-            if (Inventory.Find(297274, out Item premSitKit))
-                if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
-                                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
-
-            if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
-                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
-            {
-                List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
-
-                if (!sitKits.Any()) { return false; }
-
-                foreach (Item sitKit in sitKits.OrderBy(x => x.QualityLevel))
-                {
-                    int skillReq = (sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f));
-
-                    if (DynelManager.LocalPlayer.GetStat(Stat.FirstAid) >= skillReq || DynelManager.LocalPlayer.GetStat(Stat.Treatment) >= skillReq)
-                        return true;
-                }
-            }
-
-            return false;
-        }
-
-        private void ListenerSit()
-        {
-            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
-
-            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-
-            if (kit == null || spell == null)
-            {
-                return;
-            }
-
-            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
-            {
-                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
-                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
-                {
-                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
-                    {
-                        NavMeshMovementController.SetMovement(MovementAction.SwitchToSit);
-                    }
-                }
-            }
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit && DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
-            {
-                NavMeshMovementController.SetMovement(MovementAction.LeaveSit);
-                
-            }
-        }
-
-        public void LeCommand(string command, string[] param, ChatWindow chatWindow)
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Enable"].AsBool())
+                    bool currentToggle = _settings["Enable"].AsBool();
+                    if (!currentToggle)
                     {
+                        Leader = DynelManager.LocalPlayer.Identity;
                         _settings["Enable"] = true;
-                        IPCChannel.Broadcast(new StartMessage());
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                         Start();
-                        Chat.WriteLine("Enabled.");
                     }
                     else
                     {
                         _settings["Enable"] = false;
-                        IPCChannel.Broadcast(new StopMessage());
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
                         Stop();
-                        Chat.WriteLine("Disabled.");
                     }
                 }
+                Config.Save();
             }
             catch (Exception e)
             {

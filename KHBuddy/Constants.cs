@@ -1,7 +1,7 @@
 ﻿using AOSharp.Common.GameData;
 using System.Collections.Generic;
 
-namespace OSTBuddy
+namespace KHBuddy
 {
     public static class Constants
     {
@@ -60,8 +60,6 @@ namespace OSTBuddy
             new Vector3(911.5f, 1.6f, 254.1f),
             new Vector3(905.3f, 2.6f, 269.4f),
             new Vector3(903.0f, 4.3f, 284.3f),
-            new Vector3(901.9f, 4.4f, 299.6f),
-            new Vector3(901.9f, 4.4f, 299.6f),
             new Vector3(901.9f, 4.4f, 299.6f)
         };
 
@@ -150,7 +148,6 @@ namespace OSTBuddy
             new Vector3(1184.1f, 1.6f, 1088.6f),
             new Vector3(1159.4f, 1.6f, 1083.6f),
             new Vector3(1122.0f, 1.6f, 1069.1f),
-            new Vector3(1115.9f, 1.6f, 1064.3f),
             new Vector3(1115.9f, 1.6f, 1064.3f)
         };
 
@@ -221,7 +218,6 @@ namespace OSTBuddy
             new Vector3(1052.5f, 1.6f, 965.6f),
             new Vector3(1043.6f, 1.6f, 986.2f),
             new Vector3(1043.2f, 1.6f, 1011.8f),
-            new Vector3(1041.2f, 1.6f, 1016.1f),
             new Vector3(1041.2f, 1.6f, 1016.1f)
         };
 

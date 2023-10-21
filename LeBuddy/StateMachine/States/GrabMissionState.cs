@@ -3,7 +3,6 @@ using AOSharp.Core;
 using AOSharp.Core.UI;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using static LeBuddy.LeBuddy;
 
 namespace LeBuddy
@@ -11,6 +10,7 @@ namespace LeBuddy
     public class GrabMissionState : IState
     {
         private static bool _init = false;
+        private double _timeToOpenDialog = 0;
 
         public IState GetNextState()
         {
@@ -39,7 +39,7 @@ namespace LeBuddy
             NpcDialog.AnswerListChanged += NpcDialog_AnswerListChanged;
 
             Chat.WriteLine("GrabMissionState");
-            NavGenState.DeleteNavMesh();
+            //NavGenState.DeleteNavMesh();
         }
 
         public void OnStateExit()
@@ -64,27 +64,24 @@ namespace LeBuddy
                 NavMeshMovementController.SetNavMeshDestination(Constants._unicornRecruiter);
             }
 
-            if (_recruiter != null && Extensions.IsAtUnicornRecruiter()
-                && !_init)
+            if (_recruiter != null && Extensions.IsAtUnicornRecruiter() && !_init)
             {
                 _init = true;
-
-                Task.Factory.StartNew(
-                    async () =>
-                    {
-                        NpcDialog.Open(_recruiter);
-                        await Task.Delay(1000);
-                        _init = false;
-                    });
+                _timeToOpenDialog = Time.NormalTime + 1; // Schedule dialog open in 1 second
             }
 
-            if (Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!")
-                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._reformArea) > 5))
+            if (_timeToOpenDialog > 0 && Time.NormalTime >= _timeToOpenDialog)
+            {
+                NpcDialog.Open(_recruiter);
+                _timeToOpenDialog = 0;
+                _init = false;
+            }
+
+            if (Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!"))
+                && DynelManager.LocalPlayer.Position.DistanceFrom(Constants._reformArea) > 5)
             {
                 NavMeshMovementController.SetNavMeshDestination(Constants._reformArea);
             }
-                
-
         }
 
         private void NpcDialog_AnswerListChanged(object s, Dictionary<int, string> options)

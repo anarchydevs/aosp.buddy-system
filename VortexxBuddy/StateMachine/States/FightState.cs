@@ -6,20 +6,9 @@ using AOSharp.Pathfinding;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
 using System.Linq;
-using System.Threading;
-using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages;
-using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.ChatMessages;
-using AOSharp.Core.Inventory;
-using static VortexxBuddy.ImmunityState;
-using System.Timers;
-using System.Text.RegularExpressions;
-using System.Security.Cryptography;
-using System.Runtime.InteropServices;
-using AOSharp.Core.IPC;
 using VortexxBuddy.IPCMessages;
-using System;
 
 namespace VortexxBuddy
 {

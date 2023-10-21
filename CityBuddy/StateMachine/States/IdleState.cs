@@ -1,20 +1,49 @@
 ﻿using AOSharp.Core;
+using System.Linq;
 
 namespace CityBuddy
 {
     public class IdleState : IState
     {
+        private Dynel shipentrance;
+
         public IState GetNextState()
         {
-            if (CityBuddy._settings["Toggle"].AsBool()
-                && CityBuddy.Toggle)
-            {
-                CityBuddy.ParkPos = DynelManager.LocalPlayer.Position;
 
-                if (Team.IsLeader)
-                    return new ToggleState();
-                else
-                    return new AttackState();
+            shipentrance = DynelManager.AllDynels.Where(c => c.Name == "Door").FirstOrDefault();
+
+            if (CityBuddy._settings["Enable"].AsBool())
+            {
+                var validPlayfields = new[]
+                {
+                    CityBuddy.MontroyalCity,
+                    CityBuddy.SerenityIslands,
+                    CityBuddy.PlayadelDesierto
+                };
+
+                if (validPlayfields.Contains(Playfield.ModelIdentity.Instance))
+                {
+                    if (shipentrance != null && CityBuddy._settings["Ship"].AsBool())
+                    {
+                        return new WaitForShipState();
+                    }
+                    else
+                    {
+                        return new CityAttackState();
+                    }
+                }
+
+                if (Playfield.IsDungeon)
+                {
+                    if (DynelManager.LocalPlayer.Room.Name == "AI_bossroom")
+                    {
+                        return new BossRoomState();
+                    }
+                    else
+                    {
+                        return new PathState();
+                    }
+                }
             }
 
             return null;
@@ -22,16 +51,17 @@ namespace CityBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("IdleState::OnStateEnter");
+            //Chat.WriteLine("Idle state");
         }
 
         public void OnStateExit()
         {
-            //Chat.WriteLine("IdleState::OnStateExit");
+            //Chat.WriteLine("Exit Idle state");
         }
 
         public void Tick()
         {
+            
         }
     }
 }

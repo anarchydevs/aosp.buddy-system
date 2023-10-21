@@ -25,6 +25,5 @@ namespace LeBuddy
 
 
         public const int UnicornOutpost = 4364;
-        public const int Ship = 101181;
     }
 }

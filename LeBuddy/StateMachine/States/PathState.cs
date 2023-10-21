@@ -246,7 +246,7 @@ namespace LeBuddy
         {
             LockedDoors();
 
-            if (Team.Members.Any(c => c.Character == null))
+            if (Team.Members.Any(c => c.Character == null) || !LeBuddy.Ready)
                 return;
 
             if (_corpse != null)
@@ -383,9 +383,10 @@ namespace LeBuddy
             {
                 var teamMemberPositions = Team.Members.Select(member => DynelManager.GetDynel(member.Identity)?.Position);
 
-                if (teamMemberPositions.All(position => position != null
-                && DynelManager.LocalPlayer.Position.DistanceFrom((Vector3)position) < 5f)
-                && _bossButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 5f)
+                //if (teamMemberPositions.All(position => position != null
+                //&& DynelManager.LocalPlayer.Position.DistanceFrom((Vector3)position) < 5f)
+                //&& 
+                if (_bossButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 5f)
                 {
                     if (Time.NormalTime > _buttonTimer + 3.0)
                     {
@@ -420,9 +421,10 @@ namespace LeBuddy
             {
                 var teamMemberPositions = Team.Members.Select(member => DynelManager.GetDynel(member.Identity)?.Position);
 
-                if (teamMemberPositions.All(position => position != null
-                    && DynelManager.LocalPlayer.Position.DistanceFrom((Vector3)position) < 5f)
-                    && _upButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 5f)
+                //if (teamMemberPositions.All(position => position != null
+                //    && DynelManager.LocalPlayer.Position.DistanceFrom((Vector3)position) < 5f)
+                //    && 
+                    if (_upButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 5f)
                 {
                     if (Time.NormalTime > _buttonTimer + 3.0)
                     {

@@ -1,7 +1,6 @@
 ﻿using AOSharp.Common.GameData;
 using AOSharp.Common.GameData.UI;
 using AOSharp.Core;
-using AOSharp.Core.Inventory;
 using AOSharp.Core.IPC;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
@@ -10,7 +9,6 @@ using InfBuddy.IPCMessages;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -25,30 +23,15 @@ namespace InfBuddy
 
         public static Config Config { get; private set; }
 
-        private Stopwatch _kitTimer = new Stopwatch();
-        private Stopwatch _sitTimer = new Stopwatch();
-
-        private static string InfBuddyFaction;
-        private static string InfBuddyDifficulty;
-
         public static bool Toggle = false;
-        public static bool Easy = false;
-        public static bool Medium = false;
-        public static bool Hard = false;
-        public static bool Neutral = false;
-        public static bool Clan = false;
-        public static bool Omni = false;
-        public static bool Normal = false;
-        public static bool Roam = false;
 
-        public static bool _easyToggled = false;
-        public static bool _mediumToggled = false;
-        public static bool _hardToggled = false;
-        public static bool _clanToggled = false;
-        public static bool _omniToggled = false;
-        public static bool _neutralToggled = false;
-        public static bool _normalToggled = false;
-        public static bool _roamToggled = false;
+        public static bool Ready = true;
+        private Dictionary<Identity, bool> teamReadiness = new Dictionary<Identity, bool>();
+        private bool? lastSentIsReadyState = null;
+
+        ModeSelection currentMode;
+        FactionSelection currentFaction;
+        DifficultySelection currentDifficulty;
 
         public static SimpleChar _leader;
         public static Identity Leader = Identity.None;
@@ -56,6 +39,7 @@ namespace InfBuddy
         public static bool DoubleReward = false;
 
         public static double _stateTimeOut;
+        private static double _uiDelay;
 
         private string previousErrorMessage = string.Empty;
 
@@ -85,29 +69,21 @@ namespace InfBuddy
                 MovementController.Set(NavMeshMovementController);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel));
 
-                IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Stop, OnStopMessage);
-
-                IPCChannel.RegisterCallback((int)IPCOpcode.Easy, EasyMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Medium, MediumMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Hard, HardMessage);
-
-                IPCChannel.RegisterCallback((int)IPCOpcode.Neutral, NeutralMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Clan, ClanMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Omni, OmniMessage);
-
-                IPCChannel.RegisterCallback((int)IPCOpcode.Normal, NormalMessage);
-                IPCChannel.RegisterCallback((int)IPCOpcode.Roam, RoamMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
+                IPCChannel.RegisterCallback((short)IPCOpcode.ModeSelections, OnModeSelectionsMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.LeaderInfo, OnLeaderInfoMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.WaitAndReady, OnWaitAndReadyMessage);
 
                 Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannelChangedEvent += IPCChannel_Changed;
 
-                Chat.RegisterCommand("buddy", InfBuddyCommand);
+                Chat.RegisterCommand("buddy", BuddyCommand);
 
                 SettingsController.RegisterSettingsWindow("InfBuddy", pluginDir + "\\UI\\InfBuddySettingWindow.xml", _settings);
 
                 _stateMachine = new StateMachine(new IdleState());
 
                 NpcDialog.AnswerListChanged += NpcDialog_AnswerListChanged;
+                Team.TeamRequest += OnTeamRequest;
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("ModeSelection", (int)ModeSelection.Normal);
@@ -120,12 +96,6 @@ namespace InfBuddy
                 _settings.AddVariable("Merge", false);
                 _settings.AddVariable("Looting", false);
                 _settings.AddVariable("Leech", false);
-
-                _settings["Toggle"] = false;
-
-                _settings["ModeSelection"] = (int)ModeSelection.Normal;
-                _settings["FactionSelection"] = (int)FactionSelection.Clan;
-                _settings["DifficultySelection"] = (int)DifficultySelection.Hard;
 
                 Chat.WriteLine("InfBuddy Loaded!");
                 Chat.WriteLine("/infbuddy for settings.");
@@ -185,306 +155,234 @@ namespace InfBuddy
             NavMeshMovementController.Halt();
         }
 
-        private void OnStartMessage(int sender, IPCMessage msg)
+        private void OnStartStopMessage(int sender, IPCMessage msg)
         {
-            if (!_settings["Merge"].AsBool())
-                Leader = new Identity(IdentityType.SimpleChar, sender);
+            if (msg is StartStopIPCMessage startStopMessage)
+            {
+                if (startStopMessage.IsStarting)
+                {
+                    // Only set the Leader if "Merge" is not checked.
+                    if (!_settings["Merge"].AsBool())
+                    {
+                        Leader = new Identity(IdentityType.SimpleChar, sender);
+                    }
 
-            _settings["Toggle"] = true;
-            Start();
+                    // Update the setting and start the process.
+                    _settings["Toggle"] = true;
+                    Start();
+                }
+                else
+                {
+                    // Update the setting and stop the process.
+                    _settings["Toggle"] = false;
+                    Stop();
+                }
+            }
         }
 
-        private void OnStopMessage(int sender, IPCMessage msg)
+        private void OnModeSelectionsMessage(int sender, IPCMessage msg)
         {
-            _settings["Toggle"] = false;
-            Stop();
-        }
+            if (msg is ModeSelectionsIPCMessage modeSelectionsMessage)
+            {
+                currentMode = modeSelectionsMessage.Mode;
+                currentFaction = modeSelectionsMessage.Faction;
+                currentDifficulty = modeSelectionsMessage.Difficulty;
 
-        private void SetSettings(string settingName, int value)
+                _settings["ModeSelection"] = (int)currentMode;
+                _settings["FactionSelection"] = (int)currentFaction;
+                _settings["DifficultySelection"] = (int)currentDifficulty;
+
+                //Chat.WriteLine($"Received Mode: {currentMode}, Faction: {currentFaction}, Difficulty: {currentDifficulty}");
+            }
+        }
+        private void OnLeaderInfoMessage(int sender, IPCMessage msg)
         {
-            _settings[settingName] = value;
+            if (msg is LeaderInfoIPCMessage leaderInfoMessage)
+            {
+                if (leaderInfoMessage.IsRequest)
+                {
+                    if (Leader != Identity.None)
+                    {
+                        IPCChannel.Broadcast(new LeaderInfoIPCMessage() { LeaderIdentity = Leader, IsRequest = false });
+                    }
+                }
+                else
+                {
+                    Leader = leaderInfoMessage.LeaderIdentity;
+                }
+            }
         }
-
-        private void EasyMessage(int sender, IPCMessage msg)
+        private void OnWaitAndReadyMessage(int sender, IPCMessage msg)
         {
-            _settings["DifficultySelection"] = (int)DifficultySelection.Easy;
-        }
 
-        private void MediumMessage(int sender, IPCMessage msg)
-        {
-            _settings["DifficultySelection"] = (int)DifficultySelection.Medium;
-        }
+            if (msg is WaitAndReadyIPCMessage waitAndReadyMessage)
+            {
+                Identity senderIdentity = waitAndReadyMessage.PlayerIdentity; // Get the Identity from the IPCMessage
 
-        private void HardMessage(int sender, IPCMessage msg)
-        {
-            _settings["DifficultySelection"] = (int)DifficultySelection.Hard;
+                teamReadiness[senderIdentity] = waitAndReadyMessage.IsReady;
 
-        }
+                //Chat.WriteLine($"IPC received. Sender: {senderIdentity}, IsReady: {waitAndReadyMessage.IsReady}"); // Debugging line added
 
-        private void NeutralMessage(int sender, IPCMessage msg)
-        {
-            _settings["FactionSelection"] = (int)FactionSelection.Neutral;
-        }
+                bool allReady = true;
 
-        private void ClanMessage(int sender, IPCMessage msg)
-        {
-            _settings["FactionSelection"] = (int)FactionSelection.Clan;
-        }
+                // Check team members against the readiness dictionary
+                foreach (var teamMember in Team.Members)
+                {
+                    if (teamReadiness.ContainsKey(teamMember.Identity) && !teamReadiness[teamMember.Identity])
+                    {
+                        allReady = false;
+                        break;
+                    }
+                }
 
-        private void OmniMessage(int sender, IPCMessage msg)
-        {
-            _settings["FactionSelection"] = (int)FactionSelection.Omni;
-        }
+                if (Leader == DynelManager.LocalPlayer.Identity)
+                {
+                    Ready = allReady;
 
-        private void NormalMessage(int sender, IPCMessage msg)
-        {
-            _settings["ModeSelection"] = (int)ModeSelection.Normal;
+                }
+            }
         }
-        private void RoamMessage(int sender, IPCMessage msg)
-        {
-            _settings["ModeSelection"] = (int)ModeSelection.Roam;
-        }
-
         private void OnUpdate(object s, float deltaTime)
         {
             if (Game.IsZoning) { return; }
 
             _stateMachine.Tick();
 
-            Selections();
+            Shared.Kits kitsInstance = new Shared.Kits();
 
-            SitAndUseKit();
+            kitsInstance.SitAndUseKit();
 
             if (Leader == Identity.None)
             {
-                SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
+                if (_settings["Merge"].AsBool())
+                {
+                    SimpleChar teamLeader = Team.Members.FirstOrDefault(member => member.IsLeader)?.Character;
 
-                Leader = teamLeader?.Identity ?? Identity.None;
+                    Leader = teamLeader?.Identity ?? Identity.None;
+                }
+                else
+                {
+                    IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
+                }
             }
 
-            if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
+            if (DynelManager.LocalPlayer.Identity != Leader)
             {
-                SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
+                var localPlayer = DynelManager.LocalPlayer;
+                bool currentIsReadyState = true;
 
-                if (channelInput != null)
+                // Check if Nano or Health is below 66% and not in combat
+                if (!Shared.Kits.InCombat())
                 {
-                    if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
+                    if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66
+                        || !Spell.List.Any(spell => spell.IsReady))
                     {
-                        Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
+                        currentIsReadyState = false;
                     }
                 }
 
-                if (SettingsController.settingsWindow.FindView("InfBuddyInfoView", out Button infoView))
+                // Check if Nano and Health are above 66%
+                else if (!Spell.HasPendingCast && localPlayer.NanoPercent > 70
+                    && localPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady))
                 {
-                    infoView.Tag = SettingsController.settingsWindow;
-                    infoView.Clicked = InfoView;
+                    currentIsReadyState = true;
                 }
 
-                if (!_settings["Toggle"].AsBool() && Toggle)
+                // Only send a message if the state has changed.
+                if (currentIsReadyState != lastSentIsReadyState)
                 {
-                    IPCChannel.Broadcast(new StopMessage());
-                    Stop();
-                }
-                if (_settings["Toggle"].AsBool() && !Toggle)
-                {
-                    if (!_settings["Merge"].AsBool())
-                        Leader = DynelManager.LocalPlayer.Identity;
+                    Identity localPlayerIdentity = DynelManager.LocalPlayer.Identity;
+                    //Chat.WriteLine($"Broadcasting IPC. Local player identity: {localPlayerIdentity}"); // Debugging line added
 
-                    IPCChannel.Broadcast(new StartMessage());
-                    Start();
-                }
-
-                if (Easy)
-                {
-                    IPCChannel.Broadcast(new EasyMessage());
-                    Easy = false;
-                }
-
-                if (Medium)
-                {
-                    IPCChannel.Broadcast(new MediumMessage());
-                    Medium = false;
-                }
-
-                if (Hard)
-                {
-                    IPCChannel.Broadcast(new HardMessage());
-                    Hard = false;
-                }
-
-                if (Neutral)
-                {
-                    IPCChannel.Broadcast(new NeutralMessage());
-                    Neutral = false;
-                }
-                if (Clan)
-                {
-                    IPCChannel.Broadcast(new ClanMessage());
-                    Clan = false;
-                }
-                if (Omni)
-                {
-                    IPCChannel.Broadcast(new OmniMessage());
-                    Omni = false;
-                }
-                if (Normal)
-                {
-                    IPCChannel.Broadcast(new NormalMessage());
-                    Normal = false;
-                }
-                if (Roam)
-                {
-                    IPCChannel.Broadcast(new RoamMessage());
-                    Roam = false;
-                }
-            }
-        }
-
-        public static void Selections()
-        {
-            switch ((DifficultySelection)_settings["DifficultySelection"].AsInt32())
-            {
-                case DifficultySelection.Easy:
-                    Easy = true;
-                    Medium = false;
-                    Hard = false;
-                    _easyToggled = true;
-                    _mediumToggled = false;
-                    _hardToggled = false;
-                    break;
-                case DifficultySelection.Medium:
-                    Easy = false;
-                    Medium = true;
-                    Hard = false;
-                    _easyToggled = false;
-                    _mediumToggled = true;
-                    _hardToggled = false;
-                    break;
-                case DifficultySelection.Hard:
-                    Easy = false;
-                    Medium = false;
-                    Hard = true;
-                    _easyToggled = false;
-                    _mediumToggled = false;
-                    _hardToggled = true;
-                    break;
-            }
-            switch ((FactionSelection)_settings["FactionSelection"].AsInt32())
-            {
-                case FactionSelection.Neutral:
-                    Neutral = true;
-                    Clan = false;
-                    Omni = false;
-                    _neutralToggled = true;
-                    _clanToggled = false;
-                    _omniToggled = false;
-                    break;
-                case FactionSelection.Clan:
-                    Neutral = false;
-                    Clan = true;
-                    Omni = false;
-                    _neutralToggled = false;
-                    _clanToggled = true;
-                    _omniToggled = false;
-                    break;
-                case FactionSelection.Omni:
-                    Neutral = false;
-                    Clan = false;
-                    Omni = true;
-                    _neutralToggled = false;
-                    _clanToggled = false;
-                    _omniToggled = true;
-                    break;
-            }
-            switch ((ModeSelection)_settings["ModeSelection"].AsInt32())
-            {
-                case ModeSelection.Normal:
-                    Normal = true;
-                    Roam = false;
-                    _normalToggled = true;
-                    _roamToggled = false;
-                    break;
-                case ModeSelection.Roam:
-                    Normal = false;
-                    Roam = true;
-                    _normalToggled = false;
-                    _roamToggled = true;
-                    break;
-            }
-        }
-
-        private void SitAndUseKit()
-        {
-            Spell spell = Spell.List.FirstOrDefault(x => x.IsReady);
-
-            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-
-            if (kit == null || spell == null)
-            {
-                return;
-            }
-
-            if (!DynelManager.LocalPlayer.Buffs.Contains(280488) && CanUseSitKit())
-            {
-                if (!DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) &&
-                    DynelManager.LocalPlayer.MovementState != MovementState.Sit)
-                {
-                    if (DynelManager.LocalPlayer.NanoPercent < 66 || DynelManager.LocalPlayer.HealthPercent < 66)
+                    IPCChannel.Broadcast(new WaitAndReadyIPCMessage
                     {
-                        // Switch to sitting
-                        MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
-                    }
+                        IsReady = currentIsReadyState,
+                        PlayerIdentity = localPlayerIdentity
+                    });
+                    lastSentIsReadyState = currentIsReadyState; // Update the last sent state
                 }
             }
 
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-           && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            #region UI
+
+            if (Time.NormalTime > _uiDelay + 1.0)
             {
-                
-                if (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000)
+                if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
                 {
-                    if (DynelManager.LocalPlayer.NanoPercent < 90 || DynelManager.LocalPlayer.HealthPercent < 90)
+                    SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
+
+                    if (channelInput != null)
                     {
-                        kit.Use(DynelManager.LocalPlayer, true);
-
-                        _kitTimer.Restart();
+                        if (int.TryParse(channelInput.Text, out int channelValue)
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
+                        {
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
+                        }
                     }
+
+                    if (SettingsController.settingsWindow.FindView("InfBuddyInfoView", out Button infoView))
+                    {
+                        infoView.Tag = SettingsController.settingsWindow;
+                        infoView.Clicked = InfoView;
+                    }
+
+                    if (!_settings["Toggle"].AsBool() && Toggle)
+                    {
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
+                    }
+                    if (_settings["Toggle"].AsBool() && !Toggle)
+                    {
+                        if (!_settings["Merge"].AsBool())
+                            Leader = DynelManager.LocalPlayer.Identity;
+
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                        Start();
+                    }
+
+                    ModeSelection newMode = (ModeSelection)_settings["ModeSelection"].AsInt32();
+                    FactionSelection newFaction = (FactionSelection)_settings["FactionSelection"].AsInt32();
+                    DifficultySelection newDifficulty = (DifficultySelection)_settings["DifficultySelection"].AsInt32();
+
+                    bool modeChanged = newMode != currentMode;
+                    bool factionChanged = newFaction != currentFaction;
+                    bool difficultyChanged = newDifficulty != currentDifficulty;
+
+                    if (modeChanged || factionChanged || difficultyChanged)
+                    {
+                        // Populate a ModeSelectionsIPCMessage
+                        ModeSelectionsIPCMessage modeSelectionsMessage = new ModeSelectionsIPCMessage
+                        {
+                            Mode = newMode,
+                            Faction = newFaction,
+                            Difficulty = newDifficulty
+                        };
+
+                        // Broadcast the message
+                        IPCChannel.Broadcast(modeSelectionsMessage);
+
+                        // Update the current settings
+                        if (modeChanged)
+                        {
+                            currentMode = newMode;
+                        }
+
+                        if (factionChanged)
+                        {
+                            currentFaction = newFaction;
+                        }
+
+                        if (difficultyChanged)
+                        {
+                            currentDifficulty = newDifficulty;
+                        }
+                    }
+                    _uiDelay = Time.NormalTime;
                 }
+
+                #endregion
+
             }
-
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit
-            && (DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Treatment) || !_sitTimer.IsRunning 
-            || _sitTimer.ElapsedMilliseconds >= 10000))
-            {
-                MovementController.Instance.SetMovement(MovementAction.LeaveSit);
-                _sitTimer.Restart();
-            }
-        }
-
-        private bool CanUseSitKit()
-        {
-            if (Inventory.Find(297274, out Item premSitKit))
-                if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
-                                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning) { return true; }
-
-            if (DynelManager.LocalPlayer.Health > 0 && !Extensions.InCombat()
-                    && !DynelManager.LocalPlayer.IsMoving && !Game.IsZoning)
-            {
-                List<Item> sitKits = Inventory.FindAll("Health and Nano Recharger").Where(c => c.Id != 297274).ToList();
-
-                if (!sitKits.Any()) { return false; }
-
-                foreach (Item sitKit in sitKits.OrderBy(x => x.QualityLevel))
-                {
-                    int skillReq = (sitKit.QualityLevel > 200 ? (sitKit.QualityLevel % 200 * 3) + 1501 : (int)(sitKit.QualityLevel * 7.5f));
-
-                    if (DynelManager.LocalPlayer.GetStat(Stat.FirstAid) >= skillReq || DynelManager.LocalPlayer.GetStat(Stat.Treatment) >= skillReq)
-                        return true;
-                }
-            }
-
-            return false;
         }
 
         private void NpcDialog_AnswerListChanged(object s, Dictionary<int, string> options)
@@ -519,22 +417,29 @@ namespace InfBuddy
             }
         }
 
-        private void InfBuddyCommand(string command, string[] param, ChatWindow chatWindow)
+        private void OnTeamRequest(object sender, TeamRequestEventArgs e)
+        {
+            // Set the leader to the sender of the team request
+            Leader = e.Requester;
+        }
+
+        private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)
         {
             try
             {
                 if (param.Length < 1)
                 {
-                    if (!_settings["Toggle"].AsBool() && !Toggle)
+                    if (!_settings["Toggle"].AsBool())
                     {
                         Leader = DynelManager.LocalPlayer.Identity;
-
-                        IPCChannel.Broadcast(new StartMessage());
+                        _settings["Toggle"] = true;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                         Start();
                     }
                     else
                     {
-                        IPCChannel.Broadcast(new StopMessage());
+                        _settings["Toggle"] = false;
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
                         Stop();
                     }
                 }
@@ -548,15 +453,20 @@ namespace InfBuddy
 
         public enum ModeSelection
         {
-            Normal, Roam, Leech
+            Normal,
+            Roam
         }
         public enum FactionSelection
         {
-            Neutral, Clan, Omni
+            Neutral, 
+            Clan, 
+            Omni
         }
         public enum DifficultySelection
         {
-            Easy, Medium, Hard
+            Easy, 
+            Medium, 
+            Hard
         }
 
         public static class RelevantItems

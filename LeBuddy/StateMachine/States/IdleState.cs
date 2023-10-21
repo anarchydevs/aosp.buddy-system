@@ -1,11 +1,8 @@
-﻿using AOSharp.Common.GameData;
-using AOSharp.Core;
-using AOSharp.Core.IPC;
+﻿using AOSharp.Core;
 using AOSharp.Core.UI;
-using org.critterai.nav;
+using LeBuddy.IPCMessages;
 using System;
 using System.Linq;
-using LeBuddy.IPCMessages;
 
 namespace LeBuddy
 {
@@ -69,9 +66,6 @@ namespace LeBuddy
                     
                 }
             }
-
-            if (DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return new SitState();
 
             return null;
         }
