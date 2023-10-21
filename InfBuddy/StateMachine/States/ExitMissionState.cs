@@ -23,9 +23,11 @@ namespace InfBuddy
                     return new MoveToQuestGiverState();
                 }
 
-                if (InfBuddy.DoubleReward)
+                if (InfBuddy._settings["DoubleReward"].AsBool() && InfBuddy.DoubleReward)
+                {
                     InfBuddy.DoubleReward = false;
-
+                }
+                    
                 return new ReformState();
             }
 

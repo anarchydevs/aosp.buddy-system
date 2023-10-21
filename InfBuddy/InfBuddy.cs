@@ -91,6 +91,7 @@ namespace InfBuddy
                 _settings.AddVariable("DifficultySelection", (int)DifficultySelection.Hard);
 
                 _settings.AddVariable("Toggle", false);
+                _settings["Toggle"] = false;
 
                 _settings.AddVariable("DoubleReward", false);
                 _settings.AddVariable("Merge", false);
