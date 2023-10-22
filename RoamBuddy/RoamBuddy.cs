@@ -51,6 +51,9 @@ namespace RoamBuddy
 
         public static Settings _settings;
 
+        private static string PluginBasePath = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), CommonParameters.BasePath, CommonParameters.AppPath, "RoamBuddy");
+        private static string PlayerPreferencesPath = System.IO.Path.Combine(PluginBasePath, DynelManager.LocalPlayer.Name, "Config.json");
+        private static string WaypointsExportPath = System.IO.Path.Combine(PluginBasePath, "Exports");
 
         public override void Run(string pluginDir)
         {
@@ -59,7 +62,7 @@ namespace RoamBuddy
                 _settings = new Settings("RoamBuddy");
                 PluginDir = pluginDir;
 
-                Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\{DynelManager.LocalPlayer.Name}\\Config.json");
+                Config = Config.Load(PlayerPreferencesPath);
                 IPCChannel = new IPCChannel(Convert.ToByte(Config.IPCChannel));
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.Start, OnStartMessage);
@@ -94,7 +97,7 @@ namespace RoamBuddy
             }
             catch (Exception e)
             {
-                Chat.WriteLine(e.Message);
+                Chat.WriteLine(e.ToString());
             }
         }
 
@@ -237,37 +240,11 @@ namespace RoamBuddy
 
                 if (nameInput != null && !string.IsNullOrEmpty(nameInput.Text))
                 {
-                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
-                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
-
-                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy"))
-                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy");
-
-                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports"))
-                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports");
-
-                    string _exportPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\AOSharp\RoamBuddy\Exports\{nameInput.Text}.txt";
-
-                    if (!File.Exists(_exportPath))
-                    {
-                        // Create the file.
-                        using (FileStream fs = File.Create(_exportPath))
-                        {
-                            foreach (Vector3 vector in _waypoints)
-                            {
-                                string vectorstring = vector.ToString();
-                                string vectorstring2 = vectorstring.Substring(1, vectorstring.Length - 2);
-
-                                Byte[] info =
-                                        new UTF8Encoding(true).GetBytes($"{vectorstring2}-");
-
-                                fs.Write(info, 0, info.Length);
-                            }
-                        }
-                    }
+                    SaveWaypoints(nameInput.Text);
                 }
             }
         }
+
         private void HandleLoadListViewClick(object s, ButtonBase button)
         {
             var window = SettingsController.FindValidWindow(_windows);
@@ -278,51 +255,7 @@ namespace RoamBuddy
 
                 if (nameInput != null && !string.IsNullOrEmpty(nameInput.Text))
                 {
-                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
-                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
-
-                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy"))
-                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy");
-
-                    if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports"))
-                        Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports");
-
-                    string _loadPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\AOSharp\RoamBuddy\Exports\{nameInput.Text}.txt";
-
-                    if (!File.Exists(_loadPath))
-                    {
-                        Chat.WriteLine($"No such file.");
-                        return;
-                    }
-
-                    using (StreamReader sr = File.OpenText(_loadPath))
-                    {
-                        string[] _stringAsArray = sr.ReadLine().Split('-');
-
-                        foreach (string _string in _stringAsArray)
-                        {
-                            if (_string.Length > 1)
-                            {
-                                float x, y, z;
-
-                                string[] _stringAsArraySplit = _string.Split(',');
-                                if (_string.Contains('.'))
-                                {
-                                    x = float.Parse(_stringAsArraySplit[0], CultureInfo.InvariantCulture.NumberFormat);
-                                    y = float.Parse(_stringAsArraySplit[1], CultureInfo.InvariantCulture.NumberFormat);
-                                    z = float.Parse(_stringAsArraySplit[2], CultureInfo.InvariantCulture.NumberFormat);
-                                }
-                                else
-                                {
-                                    x = float.Parse($"{_stringAsArraySplit[0]}.{_stringAsArraySplit[1]}", CultureInfo.InvariantCulture.NumberFormat);
-                                    y = float.Parse($"{_stringAsArraySplit[2]}.{_stringAsArraySplit[3]}", CultureInfo.InvariantCulture.NumberFormat);
-                                    z = float.Parse($"{_stringAsArraySplit[4]}.{_stringAsArraySplit[5]}", CultureInfo.InvariantCulture.NumberFormat);
-                                }
-
-                                _waypoints.Add(new Vector3(x, y, z));
-                            }
-                        }
-                    }
+                    LoadWaypoints(nameInput.Text);
                 }
             }
         }
@@ -340,6 +273,46 @@ namespace RoamBuddy
         protected void RegisterSettingsWindow(string settingsName, string xmlName)
         {
             SettingsController.RegisterSettingsWindow(settingsName, PluginDir + "\\UI\\" + xmlName, _settings);
+        }
+
+        private void LoadWaypoints(string name)
+        {
+            string waypointFilePath = System.IO.Path.Combine(WaypointsExportPath, $"{name}.txt");
+
+            if (!File.Exists(waypointFilePath))
+            {
+                Chat.WriteLine($"No such file.");
+                return;
+            }
+
+            foreach (string line in File.ReadAllLines(waypointFilePath))
+            {
+                string[] axis = line.Split(',');
+                _waypoints.Add(new Vector3(
+                    float.Parse(axis[0]),
+                    float.Parse(axis[1]),
+                    float.Parse(axis[2]))
+                );
+            }
+        }
+
+        private void SaveWaypoints(string name)
+        {
+            if (!Directory.Exists(WaypointsExportPath))
+            {
+                Directory.CreateDirectory(WaypointsExportPath);
+            }
+
+            string waypointFilePath = System.IO.Path.Combine(WaypointsExportPath, $"{name}.txt");
+
+            if (File.Exists(waypointFilePath))
+            {
+                Chat.WriteLine("A waypoint list already exists with this name");
+                return;
+            }
+
+            string fileContent = string.Join("\n", _waypoints.Select(waypoint => $"{waypoint.X},{waypoint.Y},{waypoint.Z}"));
+            File.WriteAllText(waypointFilePath, fileContent);
         }
 
         private void Scanning()
@@ -585,83 +558,11 @@ namespace RoamBuddy
                         }
                         break;
                     case "load":
-                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
-                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
-
-                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy"))
-                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy");
-
-                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports"))
-                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports");
-
-                        string _loadPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\AOSharp\RoamBuddy\Exports\{param[1]}.txt";
-
-                        if (!File.Exists(_loadPath))
-                        {
-                            Chat.WriteLine($"No such file.");
-                            return;
-                        }
-
-                        using (StreamReader sr = File.OpenText(_loadPath))
-                        {
-                            string[] _stringAsArray = sr.ReadLine().Split('-');
-
-                            foreach (string _string in _stringAsArray)
-                            {
-                                if (_string.Length > 1)
-                                {
-                                    float x, y, z;
-
-                                    string[] _stringAsArraySplit = _string.Split(',');
-                                    if (_string.Contains('.'))
-                                    {
-                                        x = float.Parse(_stringAsArraySplit[0], CultureInfo.InvariantCulture.NumberFormat);
-                                        y = float.Parse(_stringAsArraySplit[1], CultureInfo.InvariantCulture.NumberFormat);
-                                        z = float.Parse(_stringAsArraySplit[2], CultureInfo.InvariantCulture.NumberFormat);
-                                    }
-                                    else
-                                    {
-                                        x = float.Parse($"{_stringAsArraySplit[0]}.{_stringAsArraySplit[1]}", CultureInfo.InvariantCulture.NumberFormat);
-                                        y = float.Parse($"{_stringAsArraySplit[2]}.{_stringAsArraySplit[3]}", CultureInfo.InvariantCulture.NumberFormat);
-                                        z = float.Parse($"{_stringAsArraySplit[4]}.{_stringAsArraySplit[5]}", CultureInfo.InvariantCulture.NumberFormat);
-                                    }
-
-                                    _waypoints.Add(new Vector3(x, y, z));
-                                }
-                            }
-                        }
-
+                        LoadWaypoints(param[1]);
                         break;
 
                     case "export":
-                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp"))
-                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\AOSharp");
-
-                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy"))
-                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy");
-
-                        if (!Directory.Exists($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports"))
-                            Directory.CreateDirectory($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\RoamBuddy\\Exports");
-
-                        string _exportPath = $@"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\AOSharp\RoamBuddy\Exports\{param[1]}.txt";
-
-                        if (!File.Exists(_exportPath))
-                        {
-                            // Create the file.
-                            using (FileStream fs = File.Create(_exportPath))
-                            {
-                                foreach (Vector3 vector in _waypoints)
-                                {
-                                    string vectorstring = vector.ToString();
-                                    string vectorstring2 = vectorstring.Substring(1, vectorstring.Length - 2);
-
-                                    Byte[] info =
-                                            new UTF8Encoding(true).GetBytes($"{vectorstring2}-");
-
-                                    fs.Write(info, 0, info.Length);
-                                }
-                            }
-                        }
+                        SaveWaypoints(param[1]);
                         break;
 
                     case "addpos":
