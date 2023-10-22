@@ -19,6 +19,7 @@ namespace InfBuddy
         public static Vector3 QuestStarterPos = new Vector3(181.5f, 1, 160.5f);
         public static Vector3 LeechSpot = new Vector3(156.8f, 1.0f, 101.1f);
         public static Vector3 LeechMissionExit = new Vector3(161.2f, 2.7f, 104.2f);
+        public static Vector3 TreeHidingSpot = new Vector3(122.2, 2.5, 108.9);
 
         public const int InfernoId = 4605;
         public const int OmniPandeGId = 4697;

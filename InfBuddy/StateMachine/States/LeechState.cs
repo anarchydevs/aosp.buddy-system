@@ -16,12 +16,15 @@ namespace InfBuddy
             if (Extensions.HasDied())
                 return new DiedState();
 
-            //if (Extensions.CanExit(_missionsLoaded))
-            //    return new ExitMissionState();
+            bool missionExists = Mission.List.Exists(m => m.DisplayName.Contains("The Purification Ritual"));
 
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId 
-                && !Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-                return new ExitMissionState();
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
+            {
+                if (!missionExists)
+                {
+                    return new ExitMissionState();
+                }
+            }
 
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
                 return new IdleState();
@@ -33,10 +36,10 @@ namespace InfBuddy
         {
             Chat.WriteLine("Leech State");
 
-            DynelManager.LocalPlayer.Position = Constants.LeechSpot;
-            MovementController.Instance.SetMovement(MovementAction.Update);
-            MovementController.Instance.SetMovement(MovementAction.JumpStart);
-            MovementController.Instance.SetMovement(MovementAction.Update);
+            //DynelManager.LocalPlayer.Position = Constants.LeechSpot;
+            //MovementController.Instance.SetMovement(MovementAction.Update);
+            //MovementController.Instance.SetMovement(MovementAction.JumpStart);
+            //MovementController.Instance.SetMovement(MovementAction.Update);
         }
 
         public void OnStateExit()
@@ -44,12 +47,17 @@ namespace InfBuddy
             //Chat.WriteLine("LeechState::OnStateExit");
 
             //_missionsLoaded = false;
-            DynelManager.LocalPlayer.Position = new Vector3(160.4f, 2.6f, 103.0f);
+            //DynelManager.LocalPlayer.Position = new Vector3(160.4f, 2.6f, 103.0f);
         }
 
         public void Tick()
         {
             if (Game.IsZoning) { return; }
+
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.TreeHidingSpot) > 1)
+            {
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.TreeHidingSpot);
+            }
 
             //if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
             //    _missionsLoaded = true;

@@ -79,7 +79,8 @@ namespace InfBuddy
 
                 if (InfBuddy._settings["Leech"].AsBool())
                 {
-                    DynelManager.LocalPlayer.Position = Constants.LeechMissionExit;
+                    //DynelManager.LocalPlayer.Position = Constants.LeechMissionExit;
+                    InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.LeechMissionExit);
                     InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitFinalPos);
                 }
                 else

@@ -35,34 +35,42 @@ namespace InfBuddy
                     {
                         if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
                         {
-
                             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.QuestStarterPos) < 10f)
+                            {
                                 //&& Team.Members.Any(c => c.Character != null && c.IsLeader))
                                 return new RoamState();
+                            }
                             else if (!InfBuddy.NavMeshMovementController.IsNavigating)
+                            {
                                 InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterPos);
-
+                            }
                         }
                         else
+                        {
                             return new MoveToQuestStarterState();
+                        }
                     }
 
                     if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                     {
                         if (DynelManager.LocalPlayer.Identity != InfBuddy.Leader)
                         {
-
                             if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.QuestStarterPos) < 10f)
+                            {
                                 //&& Team.Members.Any(c => c.Character != null && c.IsLeader))
                                 return new DefendSpiritState();
+                            }
                             else if (!InfBuddy.NavMeshMovementController.IsNavigating)
+                            {
                                 InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.QuestStarterPos);
+                            }
 
                         }
                         else
+                        {
                             return new MoveToQuestStarterState();
+                        }
                     }
-
                 }
             }
             return null;
