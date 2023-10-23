@@ -144,8 +144,8 @@ namespace LeBuddy
                 .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                 .FirstOrDefault();
 
-                if (Team.Members.Any(c => c.Character != null))
-                {
+                //if (Team.Members.Any(c => c.Character != null))
+                //{
                     switch (GetVoidSelection())
                     {
                         case VoidType.BiologicalMetamorphoses:
@@ -164,7 +164,7 @@ namespace LeBuddy
                             HandleOtherVoid();
                             break;
                     }
-                }
+                //}
 
                 if (_corpse != null && _allMobs == null)
                 {
