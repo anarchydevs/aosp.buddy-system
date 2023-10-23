@@ -6,14 +6,14 @@ using System.Linq;
 
 namespace InfBuddy
 {
-    public class RoamState : PositionHolder, IState
+    public class RoamState : IState //PositionHolder, IState
     {
         private static Corpse _corpse;
 
-        public RoamState() : base(Constants.DefendPos, 2f, 1)
-        {
+        //public RoamState() : base(Constants.DefendPos, 2f, 1)
+        //{
 
-        }
+        //}
 
         public IState GetNextState()
         {
@@ -28,11 +28,19 @@ namespace InfBuddy
             if (Extensions.HasDied())
                 return new DiedState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId && !Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-                return new ExitMissionState();
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
+            {
+                if (!Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+                {
+                    return new ExitMissionState();
+
+                }
+            }
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
+            {
                 return new IdleState();
+            }
 
             return null;
         }
