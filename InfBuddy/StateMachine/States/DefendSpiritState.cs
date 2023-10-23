@@ -33,6 +33,8 @@ namespace InfBuddy
         {
             if (Game.IsZoning) { return null; }
 
+            bool missionExists = Mission.List.Exists(m => m.DisplayName.Contains("The Purification Ritual"));
+
             _corpse = DynelManager.Corpses
                 .Where(c => c.Name.Contains("Remains of "))
                 .FirstOrDefault();
@@ -52,8 +54,15 @@ namespace InfBuddy
                     return new ExitMissionState();
                 }
 
-                if (Extensions.IsClear() || Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+                if (Extensions.IsClear() || !missionExists)
+                {
                     return new ExitMissionState();
+                }
+
+                if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                {
+                    return new RoamState();
+                }
 
                 if (InfBuddy._settings["Looting"].AsBool()
                     && _corpse != null
@@ -72,59 +81,14 @@ namespace InfBuddy
             Chat.WriteLine("Defending");
 
             _mobStuckStartTime = Time.NormalTime;
+
+            if (DynelManager.LocalPlayer.Position.Distance2DFrom(Constants.DefendPos) > 5)
+            {
+                HoldPosition();
+            }
         }
 
-        public void OnStateExit()
-        {
-            //_missionsLoaded = false;
-        }
-
-        //private void HandleCharmScan()
-        //{
-        //    _charmMob = DynelManager.NPCs
-        //        .Where(c => c.Buffs.Contains(NanoLine.CharmOther) || c.Buffs.Contains(NanoLine.Charm_Short))
-        //        .FirstOrDefault();
-
-        //    if (_charmMob != null)
-        //    {
-        //        if (!_charmMobs.Contains(_charmMob.Identity))
-        //            _charmMobs.Add(_charmMob.Identity);
-
-        //        if (Time.NormalTime > _charmMobAttacking + 8
-        //            && _charmMobAttacked == true)
-        //        {
-        //            _charmMobAttacked = false;
-        //            _charmMobs.Remove(_charmMob.Identity);
-        //            _target = _charmMob;
-        //            //Chat.WriteLine($"Found target: {_target.Name}.");
-        //        }
-
-        //        if (_charmMob.FightingTarget != null && _charmMob.IsAttacking
-        //            && _charmMobs.Contains(_charmMob.Identity)
-        //            && Team.Members.Select(c => c.Identity).Any(x => _charmMob.FightingTarget.Identity == x)
-        //            && _charmMobAttacked == false)
-        //        {
-        //            _charmMobAttacking = Time.NormalTime;
-        //            _charmMobAttacked = true;
-        //        }
-        //    }
-        //}
-
-        //private void HandleScan()
-        //{
-           
-
-        //    if (mob != null)
-        //    {
-        //        _target = mob;
-        //        //Chat.WriteLine($"Found target: {_target.Name}");
-
-        //    }
-
-        //    else if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
-        //            && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
-        //        HoldPosition();
-        //}
+        public void OnStateExit() {}
 
         public void Tick()
         {
@@ -140,44 +104,32 @@ namespace InfBuddy
             }
 
             _target = DynelManager.NPCs
-                   .Where(c => c.Health > 0)
-                   .OrderBy(c => c.HealthPercent)
-                   .ThenBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
-                   .FirstOrDefault(c => !InfBuddy._namesToIgnore.Contains(c.Name));
+            .Where(c => c.Health > 0 && !InfBuddy._namesToIgnore.Contains(c.Name))
+            .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
+            .FirstOrDefault();
 
-            LineOfSightLogic();
+            if (_target != null)
+            {
+                float distanceToTarget = _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position);
 
-            if (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 20f
-                && !DynelManager.LocalPlayer.IsAttackPending
-                && !DynelManager.LocalPlayer.IsAttacking/* && _target.Name != "Guardian Spirit of Purification"*/)
-                DynelManager.LocalPlayer.Attack(_target);
+                if (distanceToTarget < 20f
+                    && !DynelManager.LocalPlayer.IsAttackPending
+                    && !DynelManager.LocalPlayer.IsAttacking)
+                {
+                    DynelManager.LocalPlayer.Attack(_target);
+                }
 
-            //if (_primevalSpinetooth != null
-            //    && DynelManager.LocalPlayer.FightingTarget == null
-            //    && !DynelManager.LocalPlayer.IsAttackPending)
-            //    DynelManager.LocalPlayer.Attack(_primevalSpinetooth);
-
-            if (!_target.IsMoving && _target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 20f)
-                InfBuddy.NavMeshMovementController.SetNavMeshDestination((Vector3)_target?.Position);
-
-            if (_target?.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 20f
-               && !DynelManager.LocalPlayer.IsAttackPending
-               && !DynelManager.LocalPlayer.IsAttacking/* && _target.Name != "Guardian Spirit of Purification"*/)
-                DynelManager.LocalPlayer.Attack(_target);
-
+                if (!_target.IsMoving && distanceToTarget > 20f
+                     && _target.Name.Contains("Primeval Spinetooth"))
+                {
+                    InfBuddy.NavMeshMovementController.SetNavMeshDestination(_target.Position);
+                }
+            }
             else if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
                     && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
+            {
                 HoldPosition();
-
-            //if (!_missionsLoaded && Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-            //    _missionsLoaded = true;
-
-            //if (DynelManager.LocalPlayer.Profession == Profession.Trader || DynelManager.LocalPlayer.Profession == Profession.Bureaucrat)
-            //    HandleCharmScan();
-
-            //HandleScan();
-
-
+            }
         }
         public void LineOfSightLogic()
         {

@@ -17,6 +17,8 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            bool missionExists = Mission.List.Exists(m => m.DisplayName.Contains("The Purification Ritual"));
+
             _corpse = DynelManager.Corpses
                 .Where(c => c.Name.Contains("Remains of "))
                 .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
@@ -30,10 +32,14 @@ namespace InfBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                if (!Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+                if (!missionExists)
                 {
                     return new ExitMissionState();
+                }
 
+                if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                {
+                    return new DefendSpiritState();
                 }
             }
 
@@ -47,6 +53,11 @@ namespace InfBuddy
 
         public void OnStateEnter()
         {
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.RoamPos) > 5)
+            {
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.RoamPos);
+            }
+
             Chat.WriteLine("Roaming");
         }
 
@@ -143,9 +154,6 @@ namespace InfBuddy
                 }
             }
         }
-        public void OnStateExit()
-        {
-            //Chat.WriteLine("RoamState::OnStateExit");
-        }
+        public void OnStateExit() {}
     }
 }

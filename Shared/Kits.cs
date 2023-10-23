@@ -18,7 +18,8 @@ namespace Shared
             var localPlayer = DynelManager.LocalPlayer;
 
             // Check if we should sit and use the kit.
-            if ((localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66) && !InCombat() && !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && CanUseSitKit())
+            if ((localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66) && !InCombat() 
+                && !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && CanUseSitKit() && !localPlayer.IsFalling)
             {
                 // Sit if not already sitting.
                 if (localPlayer.MovementState != MovementState.Sit)
