@@ -47,10 +47,22 @@ namespace LeBuddy
                 if (_exitDevice != null && _corpse == null && _allMobs == null)
                 {
                     if (_nanovoider == null)
+                    {
                         return new DeviceExitState();
-
-                    if (_nanovoider != null)
+                    }
+                    else
+                    {
                         return new ButtonExitState();
+                    }
+                }
+            }
+            else
+            {
+                if (_exitDevice != null && _corpse == null && _allMobs == null)
+                {
+                    foreach (Mission mission in Mission.List)
+                        if (mission.DisplayName.Contains("Infiltrate the alien ships!"))
+                            mission.Delete();
                 }
             }
             return null;
