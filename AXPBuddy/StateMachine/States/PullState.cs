@@ -199,8 +199,10 @@ namespace AXPBuddy
 
             Item item = null;
 
-            if (Inventory.Find(83920, out item) ||  // Aggression Enhancer
-                Inventory.Find(83919, out item) ||  // Aggression Multiplier
+            if (Inventory.Find(83920, out item)  ||  // Aggression Enhancer
+                Inventory.Find(83919, out item)  ||  // Aggression Multiplier
+                Inventory.Find(151692, out item) ||  // Modified Aggression Enhancer (low)
+                Inventory.Find(151693, out item) ||  // Modified Aggression Enhancer (High)
                 Inventory.Find(152029, out item) || // Aggression Enhancer (Jealousy Augmented)
                 Inventory.Find(152028, out item) || // Aggression Multiplier (Jealousy Augmented)
                 Inventory.Find(244655, out item) || // Scorpio's Aim of Anger
