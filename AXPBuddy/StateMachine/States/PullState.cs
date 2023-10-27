@@ -126,7 +126,7 @@ namespace AXPBuddy
                         .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                         .FirstOrDefault();
 
-                    if (Team.Members.Any(c => c.Character != null))
+                    if (!Team.Members.Any(c => c.Character == null))
                     {
                         if (mob != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 10f)
                         {
