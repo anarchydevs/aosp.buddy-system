@@ -33,10 +33,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AOSharp.Common">
-      <HintPath>..\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Common.dll</HintPath>
+      <HintPath>..\..\aosp.handlers-managers\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Core">
-      <HintPath>..\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Core.dll</HintPath>
+      <HintPath>..\..\aosp.handlers-managers\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Recast">
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\AOSharp.Recast.dll</HintPath>
