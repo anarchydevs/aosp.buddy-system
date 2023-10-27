@@ -47,9 +47,9 @@ namespace InfBuddy
             _scheduledExecutionTime = Time.NormalTime + _time;
             _init = false;
 
-            foreach (Mission mission in Mission.List)
-                if (mission.DisplayName.Contains("The Purification"))
-                    mission.Delete();
+            //foreach (Mission mission in Mission.List)
+            //    if (mission.DisplayName.Contains("The Purification"))
+            //        mission.Delete();
         }
 
         public void OnStateExit()
@@ -79,7 +79,8 @@ namespace InfBuddy
 
                 if (InfBuddy._settings["Leech"].AsBool())
                 {
-                    DynelManager.LocalPlayer.Position = Constants.LeechMissionExit;
+                    //DynelManager.LocalPlayer.Position = Constants.LeechMissionExit;
+                    InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.LeechMissionExit);
                     InfBuddy.NavMeshMovementController.AppendDestination(Constants.ExitFinalPos);
                 }
                 else

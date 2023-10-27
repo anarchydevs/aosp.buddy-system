@@ -41,6 +41,8 @@ namespace InfBuddy
                     randomWait = 1;
 
                 _scheduledExecutionTime = Time.NormalTime + randomWait;
+
+                Chat.WriteLine(" Moving to Yutto");
             }
         }
 

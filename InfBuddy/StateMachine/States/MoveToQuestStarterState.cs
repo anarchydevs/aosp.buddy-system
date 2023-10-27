@@ -15,12 +15,13 @@ namespace InfBuddy
 
             if (!InfBuddy.NavMeshMovementController.IsNavigating && Extensions.IsAtStarterPos())
             {
-                if (DynelManager.LocalPlayer.Identity == InfBuddy.Leader)
+                //if (DynelManager.LocalPlayer.Identity == InfBuddy.Leader)
+
                     return new StartMissionState();
 
-                Constants.DefendPos = new Vector3(165.6f, 2.2f, 186.4f);
-                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.DefendPos);
-                return new DefendSpiritState();
+                //Constants.DefendPos = new Vector3(165.6f, 2.2f, 186.4f);
+                //InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.DefendPos);
+                //return new DefendSpiritState();
             }
 
             return null;

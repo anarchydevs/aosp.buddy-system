@@ -47,10 +47,22 @@ namespace LeBuddy
                 if (_exitDevice != null && _corpse == null && _allMobs == null)
                 {
                     if (_nanovoider == null)
+                    {
                         return new DeviceExitState();
-
-                    if (_nanovoider != null)
+                    }
+                    else
+                    {
                         return new ButtonExitState();
+                    }
+                }
+            }
+            else
+            {
+                if (_exitDevice != null && _corpse == null && _allMobs == null)
+                {
+                    foreach (Mission mission in Mission.List)
+                        if (mission.DisplayName.Contains("Infiltrate the alien ships!"))
+                            mission.Delete();
                 }
             }
             return null;
@@ -144,8 +156,8 @@ namespace LeBuddy
                 .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                 .FirstOrDefault();
 
-                if (Team.Members.Any(c => c.Character != null))
-                {
+                //if (Team.Members.Any(c => c.Character != null))
+                //{
                     switch (GetVoidSelection())
                     {
                         case VoidType.BiologicalMetamorphoses:
@@ -164,7 +176,7 @@ namespace LeBuddy
                             HandleOtherVoid();
                             break;
                     }
-                }
+                //}
 
                 if (_corpse != null && _allMobs == null)
                 {

@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime;
 using System.Text.RegularExpressions;
 
 namespace LeBuddy
@@ -80,6 +81,7 @@ namespace LeBuddy
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Enable", false);
+                _settings.AddVariable("Looting", false);
 
                 _settings.AddVariable("DifficultySelection", (int)DifficultySelection.Hard);
 

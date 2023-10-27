@@ -23,7 +23,10 @@ namespace LeBuddy
         private static double _buttonTimer;
         bool isPathing = false;
         public static Vector3 _bossButtonLocation = Vector3.Zero;
-        public static Dictionary<Identity, Tuple<Vector3, int>> _mobLocation = new Dictionary<Identity, Tuple<Vector3, int>>();
+
+        public static Dictionary<Identity, Tuple<Vector3, Room>> _mobLocation = new Dictionary<Identity, Tuple<Vector3, Room>>();
+
+
         public static List<Vector3> _upButtonLocations = new List<Vector3>();
 
         Dictionary<Vector3, Tuple<string, string>> allDoors = new Dictionary<Vector3, Tuple<string, string>>();
@@ -37,12 +40,17 @@ namespace LeBuddy
             if (Game.IsZoning) { return null; }
 
             if (!LeBuddy._settings["Enable"].AsBool() || !Playfield.IsDungeon)
+            {
                 return new IdleState();
+            }
 
             if (LeBuddy._settings["Enable"].AsBool())
             {
                 if (DynelManager.LocalPlayer.Room.Name == "Mothership_bossroom")
+                {
                     return new BossRoomState();
+                }
+                    
             }
 
             return null;
@@ -136,7 +144,22 @@ namespace LeBuddy
                     }
                 }
 
-                if (DynelManager.LocalPlayer.Identity == LeBuddy.Leader)
+                if (DynelManager.LocalPlayer.Identity != LeBuddy.Leader)
+                {
+                    LeBuddy._leader = GetLeaderCharacter();
+
+                    if (LeBuddy._leader != null)
+                    {
+
+                        PathToLeader();
+                    }
+                    else
+                    {
+                        HandleButtonUsage();
+                    }
+                        
+                }
+                else
                 {
                     foreach (Door door in Playfield.Doors)
                     {
@@ -192,18 +215,6 @@ namespace LeBuddy
 
                     PathToDestination();
                 }
-                    
-
-                if (DynelManager.LocalPlayer.Identity != LeBuddy.Leader)
-                {
-                    LeBuddy._leader = GetLeaderCharacter();
-
-                    if (LeBuddy._leader != null)
-                        PathToLeader();
-
-                   else
-                        HandleButtonUsage();
-                }
             }
             catch (Exception ex)
             {
@@ -247,20 +258,26 @@ namespace LeBuddy
             LockedDoors();
 
             if (Team.Members.Any(c => c.Character == null) || !LeBuddy.Ready)
+            {
                 return;
+            }
 
-            if (_corpse != null)
+            if (_corpse != null && LeBuddy._settings["Looting"].AsBool())
             {
                 if (DynelManager.LocalPlayer.Position.DistanceFrom(_corpse.Position) > 2)
                 {
                     LeBuddy.NavMeshMovementController.SetNavMeshDestination(_corpse.Position);
                 }
             }
-            else if (_allMobs != null && _corpse == null)
+            else if (_allMobs != null)
+            {
                 HandleTargetMovement();
+            }
 
-            else if (_allMobs == null && _corpse == null && Extensions.CanProceed())
+            else if (_allMobs == null && Extensions.CanProceed())
+            {
                 HandleDestinationMovement();
+            }
         }
 
         private SimpleChar GetLeaderCharacter()
@@ -272,14 +289,17 @@ namespace LeBuddy
 
         private void PathToLeader()
         {
-            LeBuddy._leaderPos = (Vector3)LeBuddy._leader?.Position;
+            if (LeBuddy._leader != null)
+            {
+                LeBuddy._leaderPos = (Vector3)LeBuddy._leader?.Position;
 
-            if (LeBuddy._leaderPos == Vector3.Zero
-                || DynelManager.LocalPlayer.Position.DistanceFrom(LeBuddy._leaderPos) <= 1.6f
-                || DynelManager.LocalPlayer.MovementState == MovementState.Sit)
-                return;
+                if (LeBuddy._leaderPos == Vector3.Zero
+                    || DynelManager.LocalPlayer.Position.DistanceFrom(LeBuddy._leaderPos) <= 1.6f
+                    || DynelManager.LocalPlayer.MovementState == MovementState.Sit)
+                    return;
 
-            LeBuddy.NavMeshMovementController.SetNavMeshDestination(LeBuddy._leaderPos);
+                LeBuddy.NavMeshMovementController.SetNavMeshDestination(LeBuddy._leaderPos);
+            }
         }
 
         private void HandleButtonUsage()
@@ -321,215 +341,225 @@ namespace LeBuddy
         {
             foreach (Room room in Playfield.Rooms)
             {
-                if (!_mobLocation.ContainsKey(_allMobs.Identity))
+                if (IsPointInRoom(_allMobs.Position, room))
                 {
-                    _mobLocation[_allMobs.Identity] = new Tuple<Vector3, int>(_allMobs.Position, room.Floor);
-
+                    if (!_mobLocation.ContainsKey(_allMobs.Identity))
+                    {
+                        _mobLocation[_allMobs.Identity] = new Tuple<Vector3, Room>(_allMobs.Position, room);
+                        //Chat.WriteLine($"Mob added: Identity = {_allMobs.Identity}, Position = {_allMobs.Position}, Room = {room.Name}");
+                    }
+                    break;
                 }
             }
 
-            if (_allMobs.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f)
+            if (_allMobs.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 2f || !_allMobs.IsInLineOfSight)
             {
                 LeBuddy.NavMeshMovementController.SetNavMeshDestination(_allMobs.Position);
             }
-
-            
         }
+
         private void HandleDestinationMovement()
         {
-            if (_mobLocation.Count > 0)
+            if (!Team.Members.Any(c => c.Character == null))
             {
-                foreach (var pair in _mobLocation)
+                if (_mobLocation.Count > 0)
                 {
-                    bool floorExists = false;
-
-                    foreach (Room room in Playfield.Rooms)
+                    foreach (var pair in _mobLocation)
                     {
-                        if (room.Floor == pair.Value.Item2)
+                        Room roomContainingMob = null;
+
+                        foreach (Room room in Playfield.Rooms)
                         {
-                            floorExists = true;
+                            if (IsPointInRoom(pair.Value.Item1, room))
+                            {
+                                roomContainingMob = room;
+                                break;
+                            }
+                        }
+
+                        if (roomContainingMob != null && DynelManager.LocalPlayer.Position.DistanceFrom(pair.Value.Item1) > 5)
+                        {
+                            LeBuddy.NavMeshMovementController.SetNavMeshDestination(pair.Value.Item1);
                             break;
                         }
                     }
 
-                    if (floorExists && DynelManager.LocalPlayer.Position.DistanceFrom(pair.Value.Item1) > 5)
+                    if (_allMobs == null)
+                    {
+                        var keysToRemove = new List<Identity>();
+
+                        foreach (var pair in _mobLocation)
+                        {
+                            if (pair.Value.Item1.Distance2DFrom(DynelManager.LocalPlayer.Position) < 60f)
+                            {
+                                keysToRemove.Add(pair.Key);
+                            }
+                        }
+
+                        foreach (var key in keysToRemove)
+                        {
+                            var removedValue = _mobLocation[key];
+                            _mobLocation.Remove(key);
+                            //Chat.WriteLine($"Mob removed: Identity = {key}, Position = {removedValue.Item1}, Room = {removedValue.Item2.Name}");
+                        }
+                    }
+                }
+
+                else if (_bossButton != null)
+                {
+                    var teamMemberPositions = Team.Members.Select(member => DynelManager.GetDynel(member.Identity)?.Position);
+
+                    //if (teamMemberPositions.All(position => position != null
+                    //&& DynelManager.LocalPlayer.Position.DistanceFrom((Vector3)position) < 5f)
+                    //&&
+                    if (_bossButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 5f)
+                    {
+                        if (Time.NormalTime > _buttonTimer + 3.0)
+                        {
+                            _buttonTimer = Time.NormalTime;
+
+                            Vector3 localPlayerPositionBeforeButtonUse = DynelManager.LocalPlayer.Position;
+
+                            _bossButton.Use();
+
+                            Vector3 localPlayerPositionAfterButtonUse = DynelManager.LocalPlayer.Position;
+
+                            if (localPlayerPositionAfterButtonUse.DistanceFrom(localPlayerPositionBeforeButtonUse) > 0.01f)
+                            {
+                                allDoors.Clear();
+                                visitedRoomNames.Clear();
+                                unvisitedDoors.Clear();
+                                _upButtonLocations.Clear();
+                                _mobLocation.Clear();
+                            }
+                        }
+                    }
+
+                    else if (_bossButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
                         //&& !LeBuddy.NavMeshMovementController.IsNavigating)
                     {
-                        LeBuddy.NavMeshMovementController.SetNavMeshDestination(pair.Value.Item1);
-                        //Chat.WriteLine($" Pathing to Mob at {pair.Value.Item1}.");
-                        break;
+                        //Chat.WriteLine($" Pathing to Boss Button.");
+                        LeBuddy.NavMeshMovementController.SetNavMeshDestination(_bossButton.Position);
                     }
                 }
 
-                if (_allMobs == null)
+                else if (_upButton != null)
                 {
-                    var keysToRemove = new List<Identity>();
+                    var teamMemberPositions = Team.Members.Select(member => DynelManager.GetDynel(member.Identity)?.Position);
 
-                    foreach (var pair in _mobLocation)
-                    {
-                        if (pair.Value.Item1.Distance2DFrom(DynelManager.LocalPlayer.Position) < 60f)
-                        {
-                            keysToRemove.Add(pair.Key);
-                        }
-                    }
-
-                    foreach (var key in keysToRemove)
-                    {
-                        _mobLocation.Remove(key);
-                    }
-                }
-            }
-            else if (_bossButton != null)
-            {
-                var teamMemberPositions = Team.Members.Select(member => DynelManager.GetDynel(member.Identity)?.Position);
-
-                //if (teamMemberPositions.All(position => position != null
-                //&& DynelManager.LocalPlayer.Position.DistanceFrom((Vector3)position) < 5f)
-                //&& 
-                if (_bossButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 5f)
-                {
-                    if (Time.NormalTime > _buttonTimer + 3.0)
-                    {
-                        _buttonTimer = Time.NormalTime;
-
-                        Vector3 localPlayerPositionBeforeButtonUse = DynelManager.LocalPlayer.Position;
-
-                        _bossButton.Use();
-
-                        Vector3 localPlayerPositionAfterButtonUse = DynelManager.LocalPlayer.Position;
-
-                        if (localPlayerPositionAfterButtonUse.DistanceFrom(localPlayerPositionBeforeButtonUse) > 0.01f)
-                        {
-                            allDoors.Clear();
-                            visitedRoomNames.Clear();
-                            unvisitedDoors.Clear();
-                            _upButtonLocations.Clear();
-                            _mobLocation.Clear();
-                        }
-                    }
-                }
-
-                else if (_bossButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f
-                    && !LeBuddy.NavMeshMovementController.IsNavigating)
-                {
-                    //Chat.WriteLine($" Pathing to Boss Button.");
-                    LeBuddy.NavMeshMovementController.SetNavMeshDestination(_bossButton.Position);
-                }
-            }
-
-            else if (_upButton != null)
-            {
-                var teamMemberPositions = Team.Members.Select(member => DynelManager.GetDynel(member.Identity)?.Position);
-
-                //if (teamMemberPositions.All(position => position != null
-                //    && DynelManager.LocalPlayer.Position.DistanceFrom((Vector3)position) < 5f)
-                //    && 
                     if (_upButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 5f)
-                {
-                    if (Time.NormalTime > _buttonTimer + 3.0)
                     {
-                        _buttonTimer = Time.NormalTime;
-
-                        Vector3 localPlayerPositionBeforeButtonUse = DynelManager.LocalPlayer.Position;
-
-                        _upButton.Use();
-
-                        Vector3 localPlayerPositionAfterButtonUse = DynelManager.LocalPlayer.Position;
-
-                        if (localPlayerPositionAfterButtonUse.DistanceFrom(localPlayerPositionBeforeButtonUse) > 0.01f)
+                        if (Time.NormalTime > _buttonTimer + 3.0)
                         {
-                            allDoors.Clear();
-                            visitedRoomNames.Clear();
-                            unvisitedDoors.Clear();
-                            _upButtonLocations.Clear();
-                            _mobLocation.Clear();
-                        }
-                    }
-                }
-                else if (_upButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f
-                    && !LeBuddy.NavMeshMovementController.IsNavigating)
-                {
-                    //Chat.WriteLine($" Pathing to Up Button.");
-                    LeBuddy.NavMeshMovementController.SetNavMeshDestination(_upButton.Position);
-                }
-            }
+                            _buttonTimer = Time.NormalTime;
 
-            else
-            {
-                 if (_bossButton == null && _bossButtonLocation != Vector3.Zero && !LeBuddy.NavMeshMovementController.IsNavigating)
-                {
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(_bossButtonLocation) > 2)
-                        LeBuddy.NavMeshMovementController.SetNavMeshDestination(_bossButtonLocation);
-                    //Chat.WriteLine($" Pathing to saved Boss Button at {_bossButtonLocation}.");
-                }
+                            Vector3 localPlayerPositionBeforeButtonUse = DynelManager.LocalPlayer.Position;
 
-                else if (_upButton == null && _upButtonLocations.Count > 0 && !LeBuddy.NavMeshMovementController.IsNavigating)
-                {
-                    Vector3 lastLocation = _upButtonLocations[_upButtonLocations.Count - 1];
+                            _upButton.Use();
 
-                    if (DynelManager.LocalPlayer.Position.DistanceFrom(lastLocation) > 2)
-                    {
-                        LeBuddy.NavMeshMovementController.SetNavMeshDestination(lastLocation);
-                        //Chat.WriteLine($"Pathing to saved Up Button at {lastLocation}.");
-                    }
+                            Vector3 localPlayerPositionAfterButtonUse = DynelManager.LocalPlayer.Position;
 
-                    for (int i = _upButtonLocations.Count - 1; i >= 0; i--)
-                    {
-                        if (_upButtonLocations[i].Distance2DFrom(DynelManager.LocalPlayer.Position) < 60f)
-                        {
-                            _upButtonLocations.RemoveAt(i);
-                        }
-                    }
-                }
-               
-                 else 
-                while (unvisitedDoors.Count > 0 && !LeBuddy.NavMeshMovementController.IsNavigating)
-                {
-                    Vector3 lastUnvisitedDoorPosition = unvisitedDoors.Keys.FirstOrDefault();
-                    float distanceToDoor = 0;
-
-                    if (lastUnvisitedDoorPosition != null)
-                    {
-                        distanceToDoor = DynelManager.LocalPlayer.Position.Distance2DFrom(lastUnvisitedDoorPosition);
-
-                        if (distanceToDoor > 5)
-                        {
-                            LeBuddy.NavMeshMovementController.SetNavMeshDestination(lastUnvisitedDoorPosition);
-                            //Chat.WriteLine($"Lost, Pathing to door at {lastUnvisitedDoorPosition}.");
-                        }
-                        else if (distanceToDoor <= 10)
-                        {
-                            var nextDoor = unvisitedDoors.Keys.Skip(1).FirstOrDefault();
-                            if (nextDoor != null)
+                            if (localPlayerPositionAfterButtonUse.DistanceFrom(localPlayerPositionBeforeButtonUse) > 0.01f)
                             {
-                                LeBuddy.NavMeshMovementController.SetNavMeshDestination(nextDoor);
-                                //Chat.WriteLine($"Switching to the next door at {nextDoor}.");
+                                allDoors.Clear();
+                                visitedRoomNames.Clear();
+                                unvisitedDoors.Clear();
+                                _upButtonLocations.Clear();
+                                _mobLocation.Clear();
                             }
-                            else
+                        }
+                    }
+                    else if (_upButton.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
+                        //&& !LeBuddy.NavMeshMovementController.IsNavigating)
+                    {
+                        //Chat.WriteLine($" Pathing to Up Button.");
+                        LeBuddy.NavMeshMovementController.SetNavMeshDestination(_upButton.Position);
+                    }
+                }
+
+                else
+                {
+                    if (_bossButton == null && _bossButtonLocation != Vector3.Zero && !LeBuddy.NavMeshMovementController.IsNavigating)
+                    {
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(_bossButtonLocation) > 2)
+                        {
+                            LeBuddy.NavMeshMovementController.SetNavMeshDestination(_bossButtonLocation);
+                            //Chat.WriteLine($" Pathing to saved Boss Button at {_bossButtonLocation}.");
+                        }
+                    }
+
+                    else if (_upButton == null && _upButtonLocations.Count > 0 && !LeBuddy.NavMeshMovementController.IsNavigating)
+                    {
+                        Vector3 lastLocation = _upButtonLocations[_upButtonLocations.Count - 1];
+
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(lastLocation) > 2)
+                        {
+                            LeBuddy.NavMeshMovementController.SetNavMeshDestination(lastLocation);
+                            //Chat.WriteLine($"Pathing to saved Up Button at {lastLocation}.");
+                        }
+
+                        for (int i = _upButtonLocations.Count - 1; i >= 0; i--)
+                        {
+                            if (_upButtonLocations[i].Distance2DFrom(DynelManager.LocalPlayer.Position) < 60f)
+                            {
+                                _upButtonLocations.RemoveAt(i);
+                            }
+                        }
+                    }
+
+                    else
+                        while (unvisitedDoors.Count > 0 && !LeBuddy.NavMeshMovementController.IsNavigating)
+                        {
+                            Vector3 lastUnvisitedDoorPosition = unvisitedDoors.Keys.FirstOrDefault();
+                            float distanceToDoor = 0;
+
+                            if (lastUnvisitedDoorPosition != null)
+                            {
+                                distanceToDoor = DynelManager.LocalPlayer.Position.Distance2DFrom(lastUnvisitedDoorPosition);
+
+                                if (distanceToDoor > 5)
+                                {
+                                    LeBuddy.NavMeshMovementController.SetNavMeshDestination(lastUnvisitedDoorPosition);
+                                    //Chat.WriteLine($"Lost, Pathing to door at {lastUnvisitedDoorPosition}.");
+                                }
+                                else if (distanceToDoor <= 10)
+                                {
+                                    var nextDoor = unvisitedDoors.Keys.Skip(1).FirstOrDefault();
+                                    if (nextDoor != null)
+                                    {
+                                        LeBuddy.NavMeshMovementController.SetNavMeshDestination(nextDoor);
+                                        //Chat.WriteLine($"Switching to the next door at {nextDoor}.");
+                                    }
+                                    else
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (distanceToDoor <= 60)
+                            {
+                                Door _door = Playfield.Doors.FirstOrDefault(door => door.Position == lastUnvisitedDoorPosition);
+
+                                if (_door == null)
+                                {
+                                    unvisitedDoors.Remove(lastUnvisitedDoorPosition);
+                                    //Chat.WriteLine($"Door at {lastUnvisitedDoorPosition} does not exist, removing from the list.");
+                                }
+                            }
+
+                            if (_allMobs != null || _upButton != null || _bossButton != null)
                             {
                                 break;
                             }
                         }
-                    }
-
-                    if (distanceToDoor <= 60)
-                    {
-                        Door _door = Playfield.Doors.FirstOrDefault(door => door.Position == lastUnvisitedDoorPosition);
-
-                        if (_door == null)
-                        {
-                            unvisitedDoors.Remove(lastUnvisitedDoorPosition);
-                            //Chat.WriteLine($"Door at {lastUnvisitedDoorPosition} does not exist, removing from the list.");
-                        }
-                    }
-
-                    if (_allMobs != null || _upButton != null || _bossButton != null)
-                    {
-                        break;
-                    }
                 }
-
             }
+        }
+        private bool IsPointInRoom(Vector3 point, Room room)
+        {
+            Rect roomRect = room.Rect;
+            return point.X >= roomRect.MinX && point.X <= roomRect.MaxX && point.Y >= roomRect.MinY && point.Y <= roomRect.MaxY;
         }
         private void LockedDoors()
         {

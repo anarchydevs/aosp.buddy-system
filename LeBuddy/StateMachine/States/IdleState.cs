@@ -1,4 +1,5 @@
-﻿using AOSharp.Core;
+﻿using AOSharp.Common.Unmanaged.Imports;
+using AOSharp.Core;
 using AOSharp.Core.UI;
 using LeBuddy.IPCMessages;
 using System;
@@ -17,18 +18,19 @@ namespace LeBuddy
         {
             if (LeBuddy._settings["Enable"].AsBool())
             {
+                bool missionExists = Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!"));
 
                 if (Playfield.ModelIdentity.Instance == Constants.UnicornOutpost)
                 {
 
-                    if (!Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!"))
+                    if (!missionExists
                         && DynelManager.LocalPlayer.Identity == LeBuddy.Leader
                         && !Team.Members.Any(c => c.Character == null)
                         && Extensions.CanProceed())
                         return new GrabMissionState();
 
                     if (Team.IsInTeam && selectedMember == null && DynelManager.LocalPlayer.Identity == LeBuddy.Leader
-                     && Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!"))
+                     && missionExists
                      && !Team.Members.Any(c => c.Character == null))
                     {
                         int randomIndex = rand.Next(Team.Members.Count);
@@ -41,14 +43,14 @@ namespace LeBuddy
                         }
                     }
 
-                    if (selectedMember != null && Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!")
-                       && DynelManager.LocalPlayer.Identity == selectedMember.Identity))
+                    if (selectedMember != null && missionExists
+                       && DynelManager.LocalPlayer.Identity == selectedMember.Identity)
                     {
                         return new EnterState();
                     }
 
                     if (Team.Members.Count(c => c.Character == null) > 1
-                        && Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!")))
+                        && missionExists)
                     {
                         return new EnterState();
                     }
@@ -56,14 +58,18 @@ namespace LeBuddy
 
                 if (Playfield.IsDungeon)
                 {
-                    if (Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!")))
+                    if (DynelManager.LocalPlayer.Room.Name == "Mothership_bossroom")
                     {
-                        if (DynelManager.LocalPlayer.Room.Name == "Mothership_bossroom")
-                            return new BossRoomState();
-                        else
-                            return new PathState();
+                        return new BossRoomState();
                     }
-                    
+                    else if (missionExists)
+                    {
+                        return new PathState();
+                    }
+                    else
+                    {
+                        return new ButtonExitState();
+                    }
                 }
             }
 

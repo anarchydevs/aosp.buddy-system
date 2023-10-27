@@ -6,17 +6,19 @@ using System.Linq;
 
 namespace InfBuddy
 {
-    public class RoamState : PositionHolder, IState
+    public class RoamState : IState //PositionHolder, IState
     {
         private static Corpse _corpse;
 
-        public RoamState() : base(Constants.DefendPos, 2f, 1)
-        {
+        //public RoamState() : base(Constants.DefendPos, 2f, 1)
+        //{
 
-        }
+        //}
 
         public IState GetNextState()
         {
+            bool missionExists = Mission.List.Exists(m => m.DisplayName.Contains("The Purification Ritual"));
+
             _corpse = DynelManager.Corpses
                 .Where(c => c.Name.Contains("Remains of "))
                 .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
@@ -28,17 +30,34 @@ namespace InfBuddy
             if (Extensions.HasDied())
                 return new DiedState();
 
-            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId && !Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
-                return new ExitMissionState();
+            if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
+            {
+                if (!missionExists)
+                {
+                    return new ExitMissionState();
+                }
+
+                if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                {
+                    return new DefendSpiritState();
+                }
+            }
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
+            {
                 return new IdleState();
+            }
 
             return null;
         }
 
         public void OnStateEnter()
         {
+            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.RoamPos) > 5)
+            {
+                InfBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.RoamPos);
+            }
+
             Chat.WriteLine("Roaming");
         }
 
@@ -114,11 +133,11 @@ namespace InfBuddy
                 {
                     if (mob != null)
                     {
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) > 9 || !mob.IsInLineOfSight)
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) > 5 || !mob.IsInLineOfSight)
                         {
                             InfBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
                         }
-                        if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) < 9 && mob.IsInLineOfSight)
+                        if (DynelManager.LocalPlayer.Position.DistanceFrom(mob.Position) < 2 && mob.IsInLineOfSight)
                         {
                             InfBuddy.NavMeshMovementController.Halt();
                         }
@@ -135,9 +154,6 @@ namespace InfBuddy
                 }
             }
         }
-        public void OnStateExit()
-        {
-            //Chat.WriteLine("RoamState::OnStateExit");
-        }
+        public void OnStateExit() {}
     }
 }
