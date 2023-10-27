@@ -26,6 +26,11 @@ namespace AXPBuddy
                     return new IdleState();
             }
 
+            if (AXPBuddy.ModeSelection.Pull == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+            {
+                return new PullState();
+            }
+
             return null;
         }
 
