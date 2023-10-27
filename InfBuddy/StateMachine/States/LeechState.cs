@@ -24,6 +24,11 @@ namespace InfBuddy
                 {
                     return new ExitMissionState();
                 }
+
+                if (!InfBuddy._settings["Leech"].AsBool())
+                {
+                    return new IdleState();
+                }
             }
 
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId)

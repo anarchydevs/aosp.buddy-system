@@ -32,6 +32,11 @@ namespace AXPBuddy
                     return new IdleState();
             }
 
+            if (AXPBuddy.ModeSelection.Path == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+            {
+                return new PathState();
+            }
+
             return null;
         }
 
@@ -121,7 +126,7 @@ namespace AXPBuddy
                         .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                         .FirstOrDefault();
 
-                    if (Team.Members.Any(c => c.Character != null))
+                    if (!Team.Members.Any(c => c.Character == null))
                     {
                         if (mob != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 10f)
                         {
@@ -199,8 +204,10 @@ namespace AXPBuddy
 
             Item item = null;
 
-            if (Inventory.Find(83920, out item) ||  // Aggression Enhancer
-                Inventory.Find(83919, out item) ||  // Aggression Multiplier
+            if (Inventory.Find(83920, out item)  ||  // Aggression Enhancer
+                Inventory.Find(83919, out item)  ||  // Aggression Multiplier
+                Inventory.Find(151692, out item) ||  // Modified Aggression Enhancer (low)
+                Inventory.Find(151693, out item) ||  // Modified Aggression Enhancer (High)
                 Inventory.Find(152029, out item) || // Aggression Enhancer (Jealousy Augmented)
                 Inventory.Find(152028, out item) || // Aggression Multiplier (Jealousy Augmented)
                 Inventory.Find(244655, out item) || // Scorpio's Aim of Anger

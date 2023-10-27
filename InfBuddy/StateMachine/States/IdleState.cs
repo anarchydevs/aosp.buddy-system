@@ -14,6 +14,8 @@ namespace InfBuddy
 
         public IState GetNextState()
         {
+            bool missionExists = Mission.List.Exists(m => m.DisplayName.Contains("The Purification Ritual"));
+
             _corpse = DynelManager.Corpses
                 .Where(c => c.Name.Contains("Remains of "))
                 .FirstOrDefault();
@@ -28,12 +30,11 @@ namespace InfBuddy
                     return new ReformState();
                 }
 
-                if (!Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+                if (!missionExists)
                 {
                     return new MoveToQuestGiverState();
                 }
-
-                if (Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+                else
                 {
                     return new MoveToEntranceState();
                 }
@@ -41,7 +42,7 @@ namespace InfBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                if (Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+                if (missionExists)
                 {
                     if (InfBuddy._settings["Leech"].AsBool())
                     {
@@ -50,23 +51,20 @@ namespace InfBuddy
                     else
                     {
                         if (DynelManager.NPCs.Any(c => c.Name == Constants.QuestStarterName))
-                        return new MoveToQuestStarterState();
+                            return new MoveToQuestStarterState();
 
                         if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                         {
-                            Constants.DefendPos = new Vector3(165.6f, 2.2f, 186.4f);
                             return new DefendSpiritState();
                         }
-
-                        if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
+                        else
                         {
-                            //Constants.RoamPos = new Vector3(184.5f, 1.0f, 242.9f);
                             return new RoamState();
                         }
                     }
                 }
 
-                if (!Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")) || Extensions.IsClear())
+                if (!missionExists || Extensions.IsClear())
                     return new ExitMissionState();
 
                 if (InfBuddy._settings["Looting"].AsBool()
@@ -78,7 +76,7 @@ namespace InfBuddy
             if (Playfield.ModelIdentity.Instance == Constants.ClanPandeGId || Playfield.ModelIdentity.Instance == Constants.OmniPandeGId)
                 return new DiedState();
 
-            
+
             return null;
         }
 

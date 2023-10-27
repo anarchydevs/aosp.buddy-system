@@ -26,6 +26,11 @@ namespace AXPBuddy
                     return new IdleState();
             }
 
+            if (AXPBuddy.ModeSelection.Pull == (AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
+            {
+                return new PullState();
+            }
+
             return null;
         }
 
@@ -125,7 +130,7 @@ namespace AXPBuddy
                             DynelManager.LocalPlayer.Attack(mob);
                         }
                     }
-                    else if (Team.Members.Any(c => c.Character != null) && !Spell.HasPendingCast && DynelManager.LocalPlayer.NanoPercent > 70
+                    else if (!Team.Members.Any(c => c.Character == null) && !Spell.HasPendingCast && DynelManager.LocalPlayer.NanoPercent > 70
                     && DynelManager.LocalPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady) && AXPBuddy.Ready)
                     {
                         if (mob != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 10f)

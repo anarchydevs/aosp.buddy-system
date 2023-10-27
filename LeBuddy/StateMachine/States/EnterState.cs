@@ -24,29 +24,32 @@ namespace LeBuddy
 
         public IState GetNextState()
         {
-            
-                if (!LeBuddy._settings["Enable"].AsBool())
+
+            if (!LeBuddy._settings["Enable"].AsBool())
                 //|| !Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!")))
-                    return new IdleState();
+                return new IdleState();
 
 
-                if (Playfield.IsDungeon || Playfield.ModelIdentity.Instance != Constants.UnicornOutpost)
+            if (Playfield.IsDungeon || Playfield.ModelIdentity.Instance != Constants.UnicornOutpost)
+            {
+                if (IdleState.selectedMember != null)
                 {
-                    if (IdleState.selectedMember != null)
+                    if (DynelManager.LocalPlayer.Identity == IdleState.selectedMember.Identity)
                     {
-                        if (DynelManager.LocalPlayer.Identity == IdleState.selectedMember.Identity)
-                        {
-                            if (!NavGenSuccessful)
-                                return new NavGenState();
-                            if (NavGenSuccessful && !Team.Members.Any(c => c.Character == null))
-                                return new PathState();
-                        }
+                        if (!NavGenSuccessful)
+                            return new NavGenState();
+                        if (NavGenSuccessful && !Team.Members.Any(c => c.Character == null))
+                            return new PathState();
                     }
-
-                    if (DynelManager.LocalPlayer.Identity != IdleState.selectedMember.Identity
-                        && Team.Members.Any(c => c.Character != null))
-                        return new PathState();
                 }
+
+                if (DynelManager.LocalPlayer.Identity != IdleState.selectedMember.Identity
+                    && !Team.Members.Any(c => c.Character == null))
+                {
+                    return new PathState();
+                }
+            }
+
 
             return null;
         }
@@ -113,7 +116,7 @@ namespace LeBuddy
 
                 var npcMsg = (VicinityMessage)msg;
 
-                string[] triggerMsg = new string[1] { "Playshifting failed: The server was unable to start the mission building."};
+                string[] triggerMsg = new string[1] { "Playshifting failed: The server was unable to start the mission building." };
 
                 if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))
                 {
@@ -127,6 +130,6 @@ namespace LeBuddy
                 }
             };
         }
-       
+
     }
 }

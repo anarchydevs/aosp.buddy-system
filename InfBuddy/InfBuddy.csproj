@@ -103,7 +103,6 @@
     <Compile Include="StateMachine\States\ExitMissionState.cs" />
     <Compile Include="StateMachine\States\PositionHolder.cs" />
     <Compile Include="StateMachine\StateMachine.cs" />
-    <Compile Include="StateMachine\States\FightState.cs" />
     <Compile Include="StateMachine\States\DefendSpiritState.cs" />
     <Compile Include="StateMachine\States\ReformState.cs" />
     <Compile Include="StateMachine\States\MoveToQuestStarterState.cs" />

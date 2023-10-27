@@ -47,9 +47,9 @@ namespace InfBuddy
             _scheduledExecutionTime = Time.NormalTime + _time;
             _init = false;
 
-            foreach (Mission mission in Mission.List)
-                if (mission.DisplayName.Contains("The Purification"))
-                    mission.Delete();
+            //foreach (Mission mission in Mission.List)
+            //    if (mission.DisplayName.Contains("The Purification"))
+            //        mission.Delete();
         }
 
         public void OnStateExit()
