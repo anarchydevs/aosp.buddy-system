@@ -4,6 +4,7 @@ using AOSharp.Core.Inventory;
 using AOSharp.Core.UI;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -291,24 +292,37 @@ namespace LeBuddy
 
         private void HandleTimeandSpaceVoid()
         {
-            if (_attackMobs != null)
+
+            if (Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!")))
             {
-                if (DynelManager.LocalPlayer.FightingTarget == null
-                    && !DynelManager.LocalPlayer.IsAttacking
-                    && !DynelManager.LocalPlayer.IsAttackPending)
-                {
-                    DynelManager.LocalPlayer.Attack(_attackMobs);
-                }
+                foreach (Mission mission in Mission.List)
+                    if (mission.DisplayName.Contains("Infiltrate the alien ships!"))
+                        mission.Delete();
             }
             else
             {
-                if (DynelManager.LocalPlayer.FightingTarget == null
-                    && !DynelManager.LocalPlayer.IsAttacking
-                    && !DynelManager.LocalPlayer.IsAttackPending)
-                {
-                    DynelManager.LocalPlayer.Attack(_masterofTimeandSpace);
-                }
+                LeBuddy._stateMachine.SetState(new ButtonExitState());
             }
+
+
+            //if (_attackMobs != null)
+            //{
+            //    if (DynelManager.LocalPlayer.FightingTarget == null
+            //        && !DynelManager.LocalPlayer.IsAttacking
+            //        && !DynelManager.LocalPlayer.IsAttackPending)
+            //    {
+            //        DynelManager.LocalPlayer.Attack(_attackMobs);
+            //    }
+            //}
+            //else
+            //{
+            //    if (DynelManager.LocalPlayer.FightingTarget == null
+            //        && !DynelManager.LocalPlayer.IsAttacking
+            //        && !DynelManager.LocalPlayer.IsAttackPending)
+            //    {
+            //        DynelManager.LocalPlayer.Attack(_masterofTimeandSpace);
+            //    }
+            //}
         }
 
         private void HandlePsyModVoid()

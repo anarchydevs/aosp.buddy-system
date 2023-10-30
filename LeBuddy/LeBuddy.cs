@@ -10,7 +10,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Runtime;
 using System.Text.RegularExpressions;
 
 namespace LeBuddy
@@ -18,7 +17,7 @@ namespace LeBuddy
 
     public class LeBuddy : AOPluginEntry
     {
-        private StateMachine _stateMachine;
+        public static StateMachine _stateMachine;
         public static NavMeshMovementController NavMeshMovementController { get; set; }
         public static IPCChannel IPCChannel { get; set; }
 
@@ -90,9 +89,16 @@ namespace LeBuddy
                 Chat.WriteLine("LeBuddy Loaded!");
                 Chat.WriteLine("/le for settings.");
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
 
@@ -145,7 +151,7 @@ namespace LeBuddy
             {
                 if (startStopMessage.IsStarting)
                 {
-                    Leader = new Identity(IdentityType.SimpleChar, sender);
+                    //Leader = new Identity(IdentityType.SimpleChar, sender);
                     // Update the setting and start the process.
                     _settings["Enable"] = true;
                     Start();
@@ -188,7 +194,7 @@ namespace LeBuddy
             {
                 if (leaderInfoMessage.IsRequest)
                 {
-                    if (Leader != Identity.None)
+                    if (Team.IsLeader)
                     {
                         IPCChannel.Broadcast(new LeaderInfoIPCMessage() { LeaderIdentity = Leader, IsRequest = false });
                     }
@@ -232,85 +238,104 @@ namespace LeBuddy
 
         private void OnUpdate(object s, float deltaTime)
         {
-            if (Game.IsZoning) { return; }
-
-            _stateMachine.Tick();
-
-            Shared.Kits kitsInstance = new Shared.Kits();
-
-            kitsInstance.SitAndUseKit();
-
-            if (Leader == Identity.None)
+            try
             {
-                IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
-            }
+                if (Game.IsZoning) { return; }
 
-            if (DynelManager.LocalPlayer.Identity != Leader)
-            {
-                var localPlayer = DynelManager.LocalPlayer;
-                bool currentIsReadyState = true;
+                _stateMachine.Tick();
 
-                // Check if Nano or Health is below 66% and not in combat
-                if (!Shared.Kits.InCombat())
+                Shared.Kits kitsInstance = new Shared.Kits();
+
+                kitsInstance.SitAndUseKit();
+
+                if (Team.IsLeader && Leader == Identity.None)
                 {
-                    if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66
-                        || !Spell.List.Any(spell => spell.IsReady))
+                    Leader = DynelManager.LocalPlayer.Identity;
+                }
+
+                if (Leader == Identity.None)
+                {
+                    IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
+                }
+
+                if (DynelManager.LocalPlayer.Identity != Leader)
+                {
+                    var localPlayer = DynelManager.LocalPlayer;
+                    bool currentIsReadyState = true;
+
+                    // Check if Nano or Health is below 66% and not in combat
+                    if (!Shared.Kits.InCombat())
                     {
-                        currentIsReadyState = false;
+                        if (Spell.HasPendingCast || localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66
+                            || !Spell.List.Any(spell => spell.IsReady))
+                        {
+                            currentIsReadyState = false;
+                        }
+                    }
+
+                    // Check if Nano and Health are above 66%
+                    else if (!Spell.HasPendingCast && localPlayer.NanoPercent > 70
+                        && localPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady))
+                    {
+                        currentIsReadyState = true;
+                    }
+
+                    // Only send a message if the state has changed.
+                    if (currentIsReadyState != lastSentIsReadyState)
+                    {
+                        Identity localPlayerIdentity = DynelManager.LocalPlayer.Identity;
+                        //Chat.WriteLine($"Broadcasting IPC. Local player identity: {localPlayerIdentity}"); // Debugging line added
+
+                        IPCChannel.Broadcast(new WaitAndReadyIPCMessage
+                        {
+                            IsReady = currentIsReadyState,
+                            PlayerIdentity = localPlayerIdentity
+                        });
+                        lastSentIsReadyState = currentIsReadyState; // Update the last sent state
                     }
                 }
 
-                // Check if Nano and Health are above 66%
-                else if (!Spell.HasPendingCast && localPlayer.NanoPercent > 70
-                    && localPlayer.HealthPercent > 70 && Spell.List.Any(spell => spell.IsReady))
+                if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
                 {
-                    currentIsReadyState = true;
-                }
+                    SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
 
-                // Only send a message if the state has changed.
-                if (currentIsReadyState != lastSentIsReadyState)
-                {
-                    Identity localPlayerIdentity = DynelManager.LocalPlayer.Identity;
-                    //Chat.WriteLine($"Broadcasting IPC. Local player identity: {localPlayerIdentity}"); // Debugging line added
-
-                    IPCChannel.Broadcast(new WaitAndReadyIPCMessage
+                    if (channelInput != null)
                     {
-                        IsReady = currentIsReadyState,
-                        PlayerIdentity = localPlayerIdentity
-                    });
-                    lastSentIsReadyState = currentIsReadyState; // Update the last sent state
-                }
-            }
+                        if (int.TryParse(channelInput.Text, out int channelValue)
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
+                        {
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
+                        }
+                    }
 
-            if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
-            {
-                SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
-
-                if (channelInput != null)
-                {
-                    if (int.TryParse(channelInput.Text, out int channelValue)
-                        && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
+                    if (SettingsController.settingsWindow.FindView("LeBuddyInfoView", out Button infoView))
                     {
-                        Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
+                        infoView.Tag = SettingsController.settingsWindow;
+                        infoView.Clicked = InfoView;
+                    }
+
+                    if (!_settings["Enable"].AsBool() && Enable)
+                    {
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
+                        Stop();
+                    }
+                    if (_settings["Enable"].AsBool() && !Enable)
+                    {
+
+                        IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
+                        Start();
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
 
-                if (SettingsController.settingsWindow.FindView("LeBuddyInfoView", out Button infoView))
+                if (errorMessage != previousErrorMessage)
                 {
-                    infoView.Tag = SettingsController.settingsWindow;
-                    infoView.Clicked = InfoView;
-                }
-
-                if (!_settings["Enable"].AsBool() && Enable)
-                {
-                    IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = false });
-                    Stop();
-                }
-                if (_settings["Enable"].AsBool() && !Enable)
-                {
-                    
-                    IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
-                    Start();
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
                 }
             }
         }
@@ -324,7 +349,7 @@ namespace LeBuddy
                     bool currentToggle = _settings["Enable"].AsBool();
                     if (!currentToggle)
                     {
-                        Leader = DynelManager.LocalPlayer.Identity;
+                        //Leader = DynelManager.LocalPlayer.Identity;
                         _settings["Enable"] = true;
                         IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                         Start();
@@ -338,9 +363,16 @@ namespace LeBuddy
                 }
                 Config.Save();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Chat.WriteLine(e.Message);
+                var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
+
+                if (errorMessage != previousErrorMessage)
+                {
+                    Chat.WriteLine(errorMessage);
+                    Chat.WriteLine("Stack Trace: " + ex.StackTrace);
+                    previousErrorMessage = errorMessage;
+                }
             }
         }
 
@@ -351,7 +383,7 @@ namespace LeBuddy
 
         public static class RelevantNanos
         {
-        
+
         }
         public static class RelevantItems
         {

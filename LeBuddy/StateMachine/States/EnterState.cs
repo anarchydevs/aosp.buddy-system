@@ -37,9 +37,16 @@ namespace LeBuddy
                     if (DynelManager.LocalPlayer.Identity == IdleState.selectedMember.Identity)
                     {
                         if (!NavGenSuccessful)
+                        {
                             return new NavGenState();
-                        if (NavGenSuccessful && !Team.Members.Any(c => c.Character == null))
-                            return new PathState();
+                        }
+                        else
+                        {
+                            if (!Team.Members.Any(c => c.Character == null))
+                            {
+                                return new PathState();
+                            }
+                        }
                     }
                 }
 
@@ -62,6 +69,8 @@ namespace LeBuddy
         public void OnStateExit()
         {
             Chat.WriteLine("Exit EnterState");
+
+            MovementController.Instance.Halt();
 
             LeBuddy._exitDoor = Playfield.Doors
            .OrderBy(c => c.DistanceFrom(DynelManager.LocalPlayer))
@@ -111,7 +120,7 @@ namespace LeBuddy
         {
             Network.ChatMessageReceived += (s, msg) =>
             {
-                if (msg.PacketType != ChatMessageType.VicinityMessage)
+                if (msg.PacketType != ChatMessageType.ServerSalt)
                     return;
 
                 var npcMsg = (VicinityMessage)msg;
