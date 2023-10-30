@@ -72,6 +72,8 @@ namespace MitaarBuddy
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Enable", false);
+                _settings["Enable"] = false;
+
                 _settings.AddVariable("Farming", false);
                 _settings.AddVariable("Leader", false);
 

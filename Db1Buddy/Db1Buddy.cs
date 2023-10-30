@@ -67,6 +67,7 @@ namespace Db1Buddy
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Toggle", false);
+                _settings["Toggle"] = false;
                 _settings.AddVariable("Farming", false);
 
                 Chat.WriteLine("Db1Buddy Loaded!");

@@ -79,6 +79,8 @@ namespace VortexxBuddy
                 Game.OnUpdate += OnUpdate;
 
                 _settings.AddVariable("Toggle", false);
+                _settings["Toggle"] = false;
+
                 _settings.AddVariable("Farming", false);
                 _settings.AddVariable("Leader", false);
                 _settings.AddVariable("Immunity", false);

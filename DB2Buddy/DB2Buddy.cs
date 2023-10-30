@@ -84,7 +84,6 @@ namespace DB2Buddy
                 _settings.AddVariable("Farming", false);
 
                 _settings["Toggle"] = false;
-                _settings["Farming"] = false;
 
                 Chat.RegisterCommand("buddy", BuddyCommand);
 
