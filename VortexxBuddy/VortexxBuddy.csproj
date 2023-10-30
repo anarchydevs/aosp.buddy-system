@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,7 +27,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DefineConstants>
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -36,10 +36,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AOSharp.Common, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Common.dll</HintPath>
+      <HintPath>..\packages\AOSharpSDK.1.0.49\lib\net48\AOSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Core.dll</HintPath>
+      <HintPath>..\packages\AOSharpSDK.1.0.49\lib\net48\AOSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Recast, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\AOSharp.Recast.dll</HintPath>
@@ -86,36 +86,20 @@
     <Compile Include="Constants.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IPCMessages\EnterMessage.cs" />
-    <Compile Include="IPCMessages\FarmingStatusMessage.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
+    <Compile Include="IPCMessages\FarmingStatusMessage.cs" />
     <Compile Include="IPCMessages\IPCOpcode.cs" />
     <Compile Include="IPCMessages\StartStopIPCMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsController.cs" />
-    <Compile Include="StateMachine\IState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="StateMachine\StateMachine.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
+    <Compile Include="StateMachine\IState.cs" />
+    <Compile Include="StateMachine\StateMachine.cs" />
     <Compile Include="StateMachine\States\DiedState.cs" />
     <Compile Include="StateMachine\States\ImmunityState.cs" />
-    <Compile Include="StateMachine\States\FarmingState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="StateMachine\States\EnterState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="StateMachine\States\IdleState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="StateMachine\States\FightState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
-    <Compile Include="StateMachine\States\ReformState.cs">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Compile>
+    <Compile Include="StateMachine\States\FarmingState.cs" />
+    <Compile Include="StateMachine\States\EnterState.cs" />
+    <Compile Include="StateMachine\States\IdleState.cs" />
+    <Compile Include="StateMachine\States\FightState.cs" />
+    <Compile Include="StateMachine\States\ReformState.cs" />
     <Compile Include="VortexxBuddy.cs" />
   </ItemGroup>
   <ItemGroup>

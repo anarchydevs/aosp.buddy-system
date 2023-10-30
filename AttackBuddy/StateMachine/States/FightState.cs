@@ -2,6 +2,7 @@
 using AOSharp.Core;
 using AOSharp.Core.Inventory;
 using AOSharp.Core.UI;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,6 @@ namespace AttackBuddy
 
         private double _fightStartTime;
         public static float _tetherDistance;
-
-        public static int _aggToolCounter = 0;
-
 
         public static List<int> _ignoreTargetIdentity = new List<int>();
 
@@ -33,7 +31,6 @@ namespace AttackBuddy
             if (AttackBuddy._settings["Enable"].AsBool())
             {
                 if (Extensions.IsNull(_target))
-                //|| (Time.NormalTime > _fightStartTime + _fightTimeout && _target?.MaxHealth <= 999999))
                 {
                     _target = null;
                     return new ScanState();
@@ -154,28 +151,9 @@ namespace AttackBuddy
             {
                 if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > AttackBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
                 {
-                    HandleTaunting(_target);
+                    TauntingTools.HandleTaunting(_target);
                 }
             }
         }
-        public static void HandleTaunting(SimpleChar _target)
-        {
-            Item item = null;
-
-            if (Inventory.Find(83920, out item) || // Aggression Enhancer 
-                Inventory.Find(83919, out item) || // Aggression Multiplier
-                Inventory.Find(152029, out item) || // Aggression Enhancer (Jealousy Augmented) 
-                Inventory.Find(152028, out item) || // Aggression Multiplier (Jealousy Augmented) 
-                Inventory.Find(244655, out item) || // Scorpio's Aim of Anger
-                Inventory.Find(253186, out item) || // Codex of the Insulting Emerto (Low)
-                Inventory.Find(253187, out item))   // Codex of the Insulting Emerto (High)
-            {
-                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                {
-                    item.Use(_target, true);
-                }
-            }
-        }
-
     }
 }

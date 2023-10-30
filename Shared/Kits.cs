@@ -18,7 +18,7 @@ namespace Shared
             var localPlayer = DynelManager.LocalPlayer;
 
             // Check if we should sit and use the kit.
-            if ((localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66) && !InCombat() 
+            if ((localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66) && !InCombat() && Spell.List.Any(spell => spell.IsReady) && !Spell.HasPendingCast
                 && !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && CanUseSitKit() && !localPlayer.IsFalling)
             {
                 // Sit if not already sitting.
@@ -100,6 +100,11 @@ namespace Shared
                     || localPlayer.GetStat(Stat.NumFightingOpponents) > 0
                     || Team.IsInCombat()
                     || localPlayer.FightingTarget != null;
+        }
+
+        public static bool Casting()
+        {
+            return !Spell.List.Any(spell => spell.IsReady) && Spell.HasPendingCast;
         }
     }
     public static class RelevantItems

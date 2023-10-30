@@ -90,9 +90,23 @@ namespace LeBuddy
 
         public void Tick()
         {
-            if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._reclaim) < 5)
+
+            if (LeBuddy._settings["Enable"].AsBool())
             {
-                LeBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._reformArea);
+                if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants._reclaim) < 5)
+                {
+                    if (Mission.List.Exists(x => x.DisplayName.Contains("Infiltrate the alien ships!")))
+                    {
+                        foreach (Mission mission in Mission.List)
+                            if (mission.DisplayName.Contains("Infiltrate the alien ships!"))
+                                mission.Delete();
+                    }
+                    else
+                    {
+                        LeBuddy.NavMeshMovementController.SetNavMeshDestination(Constants._reformArea);
+                    }
+                    
+                }
             }
         }
     }

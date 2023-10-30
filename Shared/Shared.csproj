@@ -17,7 +17,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\bin\Release\</OutputPath>
     <DefineConstants>
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -33,10 +33,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AOSharp.Common">
-      <HintPath>..\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Common.dll</HintPath>
+      <HintPath>..\..\aosp.handlers-managers\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Core">
-      <HintPath>..\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Core.dll</HintPath>
+      <HintPath>..\..\aosp.handlers-managers\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Recast">
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\AOSharp.Recast.dll</HintPath>
