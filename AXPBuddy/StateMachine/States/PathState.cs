@@ -120,7 +120,7 @@ namespace AXPBuddy
                         .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                         .FirstOrDefault();
 
-                    if (mob != null && mob.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 8
+                    if (mob != null && mob.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 10
                                 && mob.IsInLineOfSight)
                     {
                         if (DynelManager.LocalPlayer.FightingTarget == null
@@ -135,7 +135,8 @@ namespace AXPBuddy
                     {
                         if (mob != null && DynelManager.LocalPlayer.Position.DistanceFrom(Constants.S13GoalPos) > 10f)
                         {
-                            if (mob.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 8)
+                            if (mob.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5
+                                ||!mob.IsInLineOfSight)
                             {
                                 AXPBuddy.NavMeshMovementController.SetNavMeshDestination(mob.Position);
                             }
