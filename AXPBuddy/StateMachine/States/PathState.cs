@@ -107,7 +107,7 @@ namespace AXPBuddy
                         }
 
                         if (DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted()
-                            && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 2.4f)
+                            && DynelManager.LocalPlayer.Position.DistanceFrom(AXPBuddy._leaderPos) > 5f)
                         {
                             AXPBuddy.NavMeshMovementController.SetNavMeshDestination(AXPBuddy._leaderPos);
                         }
