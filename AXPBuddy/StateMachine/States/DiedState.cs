@@ -70,6 +70,7 @@ namespace AXPBuddy
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.UnicornLever) > 6)
                     {
                         AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.Bridge);
+                        AXPBuddy.NavMeshMovementController.AppendNavMeshDestination(Constants.BridgeTurn);
                         AXPBuddy.NavMeshMovementController.AppendNavMeshDestination(Constants.UnicornLever);
                     }
 
