@@ -9,7 +9,7 @@ namespace AXPBuddy
     {
         public IState GetNextState()
         {
-            if (Playfield.ModelId == PlayfieldId.Sector13 && Team.Members.Any(c => c.Character != null))
+            if (Playfield.ModelId == PlayfieldId.Sector13 && !Team.Members.Any(c => c.Character == null))
             {
                 switch ((AXPBuddy.ModeSelection)AXPBuddy._settings["ModeSelection"].AsInt32())
                 {
@@ -69,7 +69,9 @@ namespace AXPBuddy
                 {
                     if (DynelManager.LocalPlayer.Position.DistanceFrom(Constants.UnicornLever) > 6)
                     {
-                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.UnicornLever);
+                        AXPBuddy.NavMeshMovementController.SetNavMeshDestination(Constants.Bridge);
+                        AXPBuddy.NavMeshMovementController.AppendNavMeshDestination(Constants.BridgeTurn);
+                        AXPBuddy.NavMeshMovementController.AppendNavMeshDestination(Constants.UnicornLever);
                     }
 
                     else if (Lever != null)

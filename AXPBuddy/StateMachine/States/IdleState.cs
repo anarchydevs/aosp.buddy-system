@@ -57,7 +57,9 @@ namespace AXPBuddy
                 }
 
                 if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
+                {
                     return new DiedState();
+                }   
             }
 
 
