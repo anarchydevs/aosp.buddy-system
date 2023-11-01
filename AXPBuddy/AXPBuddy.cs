@@ -156,10 +156,10 @@ namespace AXPBuddy
                 if (startStopMessage.IsStarting)
                 {
                     // Only set the Leader if "Merge" is not checked.
-                    if (!_settings["Merge"].AsBool())
-                    {
-                        Leader = new Identity(IdentityType.SimpleChar, sender);
-                    }
+                    //if (!_settings["Merge"].AsBool())
+                    //{
+                    //    Leader = new Identity(IdentityType.SimpleChar, sender);
+                    //}
 
                     // Update the setting and start the process.
                     _settings["Toggle"] = true;
@@ -180,7 +180,7 @@ namespace AXPBuddy
             {
                 if (leaderInfoMessage.IsRequest)
                 {
-                    if (Leader != Identity.None)
+                    if (Team.IsLeader)
                     {
                         IPCChannel.Broadcast(new LeaderInfoIPCMessage() { LeaderIdentity = Leader, IsRequest = false });
                     }
@@ -191,6 +191,7 @@ namespace AXPBuddy
                 }
             }
         }
+
         private void OnWaitAndReadyMessage(int sender, IPCMessage msg)
         {
 
@@ -240,6 +241,11 @@ namespace AXPBuddy
                 Shared.Kits kitsInstance = new Shared.Kits();
 
                 kitsInstance.SitAndUseKit();
+
+                if (Team.IsLeader && Leader == Identity.None)
+                {
+                    Leader = DynelManager.LocalPlayer.Identity;
+                }
 
                 if (Leader == Identity.None)
                 {
@@ -357,7 +363,7 @@ namespace AXPBuddy
                     bool currentToggle = _settings["Toggle"].AsBool();
                     if (!currentToggle)
                     {
-                        Leader = DynelManager.LocalPlayer.Identity;
+                        //Leader = DynelManager.LocalPlayer.Identity;
                         _settings["Toggle"] = true;
                         IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                         Start();

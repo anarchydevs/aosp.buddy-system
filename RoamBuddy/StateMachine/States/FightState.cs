@@ -3,6 +3,7 @@ using AOSharp.Core;
 using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
+using Shared;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -157,67 +158,7 @@ namespace RoamBuddy
                 {
                     if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > RoamBuddy.Config.CharSettings[DynelManager.LocalPlayer.Name].AttackRange)
                     {
-                        if (_aggToolCounter >= 5)
-                        {
-                            //_ignoreTargetIdentity.Add(_target.Identity.Instance);
-                            MovementController.Instance.SetDestination(_target.Position);
-                        }
-                        else if (Inventory.Find(83920, out Item aggroTool)) //Aggression Enhancer 
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                aggroTool.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(83919, out Item aggroMultiTool)) //Aggression Multiplier
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                aggroMultiTool.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(152029, out Item JealousyTool)) //Aggression Enhancer (Jealousy Augmented) 
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                JealousyTool.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(152028, out Item JealousyMultiTool)) //Aggression Multiplier (Jealousy Augmented) 
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                JealousyMultiTool.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(244655, out Item scorpioTool)) //Scorpio's Aim of Anger
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                scorpioTool.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(253186, out Item EmertoLow))//Codex of the Insulting Emerto
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                EmertoLow.Use(_target, true);
-                                return;
-                            }
-                        }
-                        else if (Inventory.Find(253187, out Item EmertoHigh))//Codex of the Insulting Emerto
-                        {
-                            if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                            {
-                                EmertoHigh.Use(_target, true);
-                                return;
-                            }
-                        }
+                        TauntingTools.HandleTaunting(_target);
                     }
                 }
             }

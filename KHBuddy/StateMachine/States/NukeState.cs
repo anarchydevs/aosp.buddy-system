@@ -4,6 +4,7 @@ using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using AOSharp.Core.UI;
 using KHBuddy.IPCMessages;
+using Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -222,7 +223,7 @@ namespace KHBuddy
                     // Taunt distant hecks
                     foreach (SimpleChar distantHeck in _distantHecks)
                     {
-                        HandleTaunting(distantHeck);
+                        TauntingTools.HandleTaunting(distantHeck);
                     }
                 }
             }
@@ -235,25 +236,6 @@ namespace KHBuddy
                     Chat.WriteLine(errorMessage);
                     Chat.WriteLine("Stack Trace: " + ex.StackTrace);
                     KHBuddy.previousErrorMessage = errorMessage;
-                }
-            }
-        }
-
-        public static void HandleTaunting(SimpleChar target)
-        {
-            Item item = null;
-
-            if (Inventory.Find(83920, out item) ||  // Aggression Enhancer
-                Inventory.Find(83919, out item) ||  // Aggression Multiplier
-                Inventory.Find(152029, out item) || // Aggression Enhancer (Jealousy Augmented)
-                Inventory.Find(152028, out item) || // Aggression Multiplier (Jealousy Augmented)
-                Inventory.Find(244655, out item) || // Scorpio's Aim of Anger
-                Inventory.Find(253186, out item) || // Codex of the Insulting Emerto (Low)
-                Inventory.Find(253187, out item))   // Codex of the Insulting Emerto (High)
-            {
-                if (!Item.HasPendingUse && !DynelManager.LocalPlayer.Cooldowns.ContainsKey(Stat.Psychology))
-                {
-                    item.Use(target, true);
                 }
             }
         }

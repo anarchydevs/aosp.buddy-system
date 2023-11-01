@@ -28,6 +28,7 @@ namespace LeBuddy
                     if (Playfield.IsDungeon)
                     {
                         LeBuddy.IPCChannel.Broadcast(new EnterMessage());
+                        EnterState.NavGenSuccessful = true;
                         MovementController.Instance.SetMovement(MovementAction.BackwardStart);
                     }
 
