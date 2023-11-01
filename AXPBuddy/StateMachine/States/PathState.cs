@@ -15,8 +15,10 @@ namespace AXPBuddy
 
         public IState GetNextState()
         {
-            if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
+            if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId || DynelManager.LocalPlayer.Position.DistanceFrom(Constants.MarkerpPoll) < 5)
+            {
                 return new DiedState();
+            }
 
             if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
             {

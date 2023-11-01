@@ -21,8 +21,11 @@ namespace AXPBuddy
             if (Game.IsZoning || Time.NormalTime < AXPBuddy._lastZonedTime + 2f)
                 return null;
 
-            if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId)
+            if (Playfield.ModelIdentity.Instance == Constants.UnicornHubId || DynelManager.LocalPlayer.Position.DistanceFrom(Constants.MarkerpPoll) < 5)
+            {
                 return new DiedState();
+            }
+                
 
             if (Playfield.ModelIdentity.Instance == Constants.APFHubId)
             {
