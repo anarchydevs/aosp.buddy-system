@@ -1,4 +1,4 @@
-﻿using AOSharp.Common.GameData;
+using AOSharp.Common.GameData;
 using AOSharp.Core;
 using AOSharp.Core.UI;
 using System.Collections.Generic;
@@ -44,15 +44,15 @@ namespace InfBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                if (Extensions.IsNull(_target)
-                    && Time.NormalTime > _mobStuckStartTime + MobStuckTimeout)
-                {
-                    foreach (Mission mission in Mission.List)
-                        if (mission.DisplayName.Contains("The Purification"))
-                            mission.Delete();
+                //if (Extensions.IsNull(_target)
+                   // && Time.NormalTime > _mobStuckStartTime + MobStuckTimeout)
+                //{
+                   // foreach (Mission mission in Mission.List)
+                   //     if (mission.DisplayName.Contains("The Purification"))
+                   //         mission.Delete();
 
-                    return new ExitMissionState();
-                }
+                   // return new ExitMissionState();
+                //}
 
                 if (Extensions.IsClear() || !missionExists)
                 {
