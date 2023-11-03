@@ -34,7 +34,14 @@ namespace InfBuddy
             {
                 if (!missionExists)
                 {
-                    return new ExitMissionState();
+                    if (InfBuddy._settings["Looting"].AsBool() && _corpse != null)
+                    {
+                        return new LootingState();
+                    }
+                    else
+                    {
+                        return new ExitMissionState();
+                    }
                 }
 
                 if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
