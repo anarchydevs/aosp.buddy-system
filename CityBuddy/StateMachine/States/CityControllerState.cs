@@ -11,6 +11,7 @@ namespace CityBuddy
     {
         private static Stopwatch _actionStopwatch = new Stopwatch();
         private static Stopwatch _cruUseStopwatch = new Stopwatch();
+        private static float _lastChargeBeforeCruUse = 0f;
 
         public IState GetNextState()
         {
@@ -84,46 +85,27 @@ namespace CityBuddy
 
                     _cruUseStopwatch.Start();
 
-                    if (CityController.CloakState == CloakStatus.Enabled)
+                    if (CityController.CloakState != CloakStatus.Unknown)
                     {
                         if (CityController.Charge <= 0.75f)
                         {
                             // Add an additional check for `_lastCruUseTime`
-                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5)
+                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5 &&
+                                    CityController.Charge < 0.75f && CityController.Charge > _lastChargeBeforeCruUse)
                             {
-                                Chat.WriteLine("Using Controller Recompiler Unit");
+                                Chat.WriteLine($"Using Controller Recompiler Unit. Previous charge: {_lastChargeBeforeCruUse:F2}, Current charge: {CityController.Charge:F2}");
+
                                 cru.UseOn(cc.Identity);
+
+                                // Store the charge value when the CRU is used
+                                _lastChargeBeforeCruUse = CityController.Charge;
 
                                 // Reset the CRU stopwatch whenever you use a CRU
                                 _cruUseStopwatch.Restart();
-
                             }
                         }
                         else
                         {
-                            Chat.WriteLine("Disabling Cloak");
-                            CityController.ToggleCloak();
-                        }
-                    }
-
-                    if (CityController.CloakState == CloakStatus.Disabled)
-                    {
-                        if (CityController.Charge <= 0.75f)
-                        {
-                            // Add an additional check for `_lastCruUseTime`
-                            if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5)
-                            {
-                                Chat.WriteLine("Using Controller Recompiler Unit");
-                                cru.UseOn(cc.Identity);
-
-                                // Reset the CRU stopwatch whenever you use a CRU
-                                _cruUseStopwatch.Restart();
-
-                            }
-                        }
-                        else
-                        {
-                            Chat.WriteLine("Enabling Cloak");
                             CityController.ToggleCloak();
                         }
                     }

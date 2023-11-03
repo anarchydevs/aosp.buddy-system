@@ -69,7 +69,7 @@ namespace CityBuddy
         {
             MoveToStart();
 
-            //Chat.WriteLine("City state");
+            Chat.WriteLine("City state");
         }
 
         public void OnStateExit()
