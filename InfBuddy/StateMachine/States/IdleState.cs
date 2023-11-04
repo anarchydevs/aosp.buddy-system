@@ -64,13 +64,17 @@ namespace InfBuddy
                     }
                 }
 
-                if (!missionExists || Extensions.IsClear())
-                    return new ExitMissionState();
-
-                if (InfBuddy._settings["Looting"].AsBool()
-                    && _corpse != null
-                    && Extensions.IsNull(_target))
-                    return new LootingState();
+                if (Extensions.IsClear() || !missionExists)
+                {
+                    if (InfBuddy._settings["Looting"].AsBool() && _corpse != null)
+                    {
+                        return new LootingState();
+                    }
+                    else
+                    {
+                        return new ExitMissionState();
+                    }
+                }    
             }
 
             if (Playfield.ModelIdentity.Instance == Constants.ClanPandeGId || Playfield.ModelIdentity.Instance == Constants.OmniPandeGId)
