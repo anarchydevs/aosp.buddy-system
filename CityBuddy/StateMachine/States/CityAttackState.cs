@@ -155,7 +155,7 @@ namespace CityBuddy
             MovementController.Instance.SetDestination(CityBuddy._leaderPos);
         }
 
-        private void MoveToStart()
+        public static void MoveToStart()
         {
             Dictionary<int, Vector3> destinationByPlayfield = new Dictionary<int, Vector3>
             {

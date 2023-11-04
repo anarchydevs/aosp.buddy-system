@@ -459,7 +459,7 @@ namespace CityBuddy
                 if (!seenValues.Contains(cityInfo.Unknown1))
                 {
                     seenValues.Add(cityInfo.Unknown1);
-                    Chat.WriteLine($"Unknown1: {cityInfo.Unknown1}"); // Example output: "Unknown2: 2"
+                    Chat.WriteLine($"Unknown1: {cityInfo.Unknown1}");
                 }
 
                 if (!seenValues.Contains(cityInfo.Unknown2))

@@ -11,7 +11,7 @@ namespace CityBuddy
     {
         private static Stopwatch _actionStopwatch = new Stopwatch();
         private static Stopwatch _cruUseStopwatch = new Stopwatch();
-        private static float _lastChargeBeforeCruUse = 0f;
+        private float? _lastChargeBeforeCruUse = null;
 
         public IState GetNextState()
         {
@@ -30,6 +30,7 @@ namespace CityBuddy
         public void OnStateEnter()
         {
             CityBuddy.CTWindowIsOpen = false;
+            _lastChargeBeforeCruUse = null;
             _actionStopwatch.Start();
             Chat.WriteLine("Checking city controller.");
         }
@@ -37,6 +38,7 @@ namespace CityBuddy
         public void OnStateExit()
         {
             CityBuddy.CTWindowIsOpen = false;
+            _lastChargeBeforeCruUse = null;
             //Chat.WriteLine("Exiting city controller state.");
         }
 
@@ -91,16 +93,14 @@ namespace CityBuddy
                         {
                             // Add an additional check for `_lastCruUseTime`
                             if (cru != null && _cruUseStopwatch.Elapsed.TotalSeconds > 5 &&
-                                    CityController.Charge < 0.75f && CityController.Charge > _lastChargeBeforeCruUse)
+                                (_lastChargeBeforeCruUse == null || (CityController.Charge > _lastChargeBeforeCruUse.Value)))
                             {
-                                Chat.WriteLine($"Using Controller Recompiler Unit. Previous charge: {_lastChargeBeforeCruUse:F2}, Current charge: {CityController.Charge:F2}");
+                                // Save the current charge before using the CRU.
+                                _lastChargeBeforeCruUse = CityController.Charge;
 
                                 cru.UseOn(cc.Identity);
 
-                                // Store the charge value when the CRU is used
-                                _lastChargeBeforeCruUse = CityController.Charge;
-
-                                // Reset the CRU stopwatch whenever you use a CRU
+                                // Reset the CRU stopwatch whenever you use a CRU.
                                 _cruUseStopwatch.Restart();
                             }
                         }
