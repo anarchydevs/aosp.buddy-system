@@ -107,7 +107,7 @@ namespace CityBuddy
 
                 Game.OnUpdate += OnUpdate;
                 Network.ChatMessageReceived += CityAttackStatus;
-
+                Network.N3MessageReceived += Network_N3MessageReceived;
                 Network.N3MessageReceived += CTWindowIsOpenBool;
 
             }
@@ -170,7 +170,7 @@ namespace CityBuddy
             {
                 if (startStopMessage.IsStarting)
                 {
-                    Leader = new Identity(IdentityType.SimpleChar, sender);
+                    //Leader = new Identity(IdentityType.SimpleChar, sender);
                     // Update the setting and start the process.
                     _settings["Enable"] = true;
                     Start();
@@ -230,7 +230,7 @@ namespace CityBuddy
             {
                 if (leaderInfoMessage.IsRequest)
                 {
-                    if (Leader != Identity.None)
+                    if (Team.IsLeader)
                     {
                         IPCChannel.Broadcast(new LeaderInfoIPCMessage() { LeaderIdentity = Leader, IsRequest = false });
                     }
@@ -288,9 +288,22 @@ namespace CityBuddy
             if (Game.IsZoning)
                 return;
 
+            _stateMachine.Tick();
+
+            Shared.Kits kitsInstance = new Shared.Kits();
+
+            kitsInstance.SitAndUseKit();
+
             if (Leader == Identity.None)
             {
-                IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
+                if (Team.IsLeader)
+                {
+                    Leader = DynelManager.LocalPlayer.Identity;
+                }
+                else
+                {
+                    IPCChannel.Broadcast(new LeaderInfoIPCMessage() { IsRequest = true });
+                }
             }
 
             if (DynelManager.LocalPlayer.Identity != Leader)
@@ -329,15 +342,6 @@ namespace CityBuddy
                     lastSentIsReadyState = currentIsReadyState; // Update the last sent state
                 }
             }
-
-            //if (_settings["Enable"].AsBool())
-            //{
-                _stateMachine.Tick();
-
-                Shared.Kits kitsInstance = new Shared.Kits();
-
-                kitsInstance.SitAndUseKit();
-            //}
 
             #region UI
 
@@ -396,7 +400,7 @@ namespace CityBuddy
                     bool currentToggle = _settings["Enable"].AsBool();
                     if (!currentToggle)
                     {
-                        Leader = DynelManager.LocalPlayer.Identity;
+                        //Leader = DynelManager.LocalPlayer.Identity;
                         _settings["Enable"] = true;
                         IPCChannel.Broadcast(new StartStopIPCMessage() { IsStarting = true });
                         Start();
@@ -451,6 +455,12 @@ namespace CityBuddy
             if (sigMsg.Action == AOSignalAction.CityInfo)
             {
                 var cityInfo = (CityInfo)(sigMsg.TransportSignalMessage);
+
+                if (!seenValues.Contains(cityInfo.Unknown1))
+                {
+                    seenValues.Add(cityInfo.Unknown1);
+                    Chat.WriteLine($"Unknown1: {cityInfo.Unknown1}");
+                }
 
                 if (!seenValues.Contains(cityInfo.Unknown2))
                 {
