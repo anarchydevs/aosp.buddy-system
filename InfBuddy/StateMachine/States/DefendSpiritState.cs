@@ -44,15 +44,6 @@ namespace InfBuddy
 
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-                //if (Extensions.IsNull(_target)
-                //    && Time.NormalTime > _mobStuckStartTime + MobStuckTimeout)
-                //{
-                //    foreach (Mission mission in Mission.List)
-                //        if (mission.DisplayName.Contains("The Purification"))
-                //            mission.Delete();
-
-                //    return new ExitMissionState();
-                //}
 
                 if (InfBuddy._settings["Looting"].AsBool()
                    && _corpse != null
