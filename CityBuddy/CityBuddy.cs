@@ -66,7 +66,9 @@ namespace CityBuddy
 
         public static string previousErrorMessage = string.Empty;
 
-        List<int> seenValues = new List<int>();
+        private HashSet<int> seenValues = new HashSet<int>();
+        private HashSet<Identity> seenIdentities = new HashSet<Identity>();
+        private HashSet<string> seenOrgNames = new HashSet<string>();
 
         public override void Run(string pluginDir)
         {
@@ -107,7 +109,7 @@ namespace CityBuddy
 
                 Game.OnUpdate += OnUpdate;
                 Network.ChatMessageReceived += CityAttackStatus;
-                Network.N3MessageReceived += Network_N3MessageReceived;
+                //Network.N3MessageReceived += Network_N3MessageReceived;
                 Network.N3MessageReceived += CTWindowIsOpenBool;
 
             }
@@ -456,12 +458,6 @@ namespace CityBuddy
             {
                 var cityInfo = (CityInfo)(sigMsg.TransportSignalMessage);
 
-                if (!seenValues.Contains(cityInfo.Unknown1))
-                {
-                    seenValues.Add(cityInfo.Unknown1);
-                    Chat.WriteLine($"Unknown1: {cityInfo.Unknown1}");
-                }
-
                 if (!seenValues.Contains(cityInfo.Unknown2))
                 {
                     seenValues.Add(cityInfo.Unknown2);
@@ -471,7 +467,19 @@ namespace CityBuddy
                 if (!seenValues.Contains(cityInfo.Unknown3))
                 {
                     seenValues.Add(cityInfo.Unknown3);
-                    Chat.WriteLine($"Unknown3: {cityInfo.Unknown3}"); // Example output: "Unknown3: 3"
+                    Chat.WriteLine($"Unknown3: {cityInfo.Unknown3}"); // Example output: "Unknown3: 3" // 1 when a msg comes through
+                }
+
+                if (cityInfo.UnknownIdentity1 != null && !seenIdentities.Contains(cityInfo.UnknownIdentity1))//(50201:C000)
+                    {
+                        seenIdentities.Add(cityInfo.UnknownIdentity1);
+                    Chat.WriteLine($"UnknownIdentity1: {cityInfo.UnknownIdentity1}");
+                }
+
+                if (cityInfo.UnknownIdentity2 != null && !seenIdentities.Contains(cityInfo.UnknownIdentity2))//(51102:138A)
+                {
+                    seenIdentities.Add(cityInfo.UnknownIdentity2);
+                    Chat.WriteLine($"UnknownIdentity2: {cityInfo.UnknownIdentity2}");
                 }
             }
         }
