@@ -1,4 +1,5 @@
 ﻿using AOSharp.Core;
+using AOSharp.Core.UI;
 using System.Linq;
 
 namespace CityBuddy
@@ -51,7 +52,7 @@ namespace CityBuddy
 
         public void OnStateEnter()
         {
-            //Chat.WriteLine("Idle state");
+            Chat.WriteLine("Idle state");
         }
 
         public void OnStateExit()

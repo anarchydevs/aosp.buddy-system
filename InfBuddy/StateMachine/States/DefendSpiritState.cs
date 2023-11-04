@@ -45,18 +45,30 @@ namespace InfBuddy
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
                 //if (Extensions.IsNull(_target)
-                   // && Time.NormalTime > _mobStuckStartTime + MobStuckTimeout)
+                //    && Time.NormalTime > _mobStuckStartTime + MobStuckTimeout)
                 //{
-                   // foreach (Mission mission in Mission.List)
-                   //     if (mission.DisplayName.Contains("The Purification"))
-                   //         mission.Delete();
+                //    foreach (Mission mission in Mission.List)
+                //        if (mission.DisplayName.Contains("The Purification"))
+                //            mission.Delete();
 
-                   // return new ExitMissionState();
+                //    return new ExitMissionState();
                 //}
+
+                if (InfBuddy._settings["Looting"].AsBool()
+                   && _corpse != null
+                   && Extensions.IsNull(_target))
+                    return new LootingState();
 
                 if (Extensions.IsClear() || !missionExists)
                 {
-                    return new ExitMissionState();
+                    if (InfBuddy._settings["Looting"].AsBool()  && _corpse != null)
+                    {
+                        return new LootingState();
+                    }
+                    else
+                    {
+                        return new ExitMissionState();
+                    }
                 }
 
                 if (InfBuddy.ModeSelection.Roam == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
@@ -64,10 +76,7 @@ namespace InfBuddy
                     return new RoamState();
                 }
 
-                if (InfBuddy._settings["Looting"].AsBool()
-                    && _corpse != null
-                    && Extensions.IsNull(_target))
-                    return new LootingState();
+               
             }
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)

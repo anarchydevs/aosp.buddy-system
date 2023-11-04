@@ -122,7 +122,7 @@ namespace CityBuddy
                     }
                 }
 
-                if (Team.Members.Any(c => c.Character != null))
+                if (!Team.Members.Any(c => c.Character == null))
                 {
                     if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
                     {
@@ -152,6 +152,13 @@ namespace CityBuddy
                             if (_boss.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
                             {
                                 CityBuddy.NavMeshMovementController.SetNavMeshDestination(_boss.Position);
+                            }
+                        }
+                        else
+                        {
+                            if (DynelManager.LocalPlayer.Position.DistanceFrom(DynelManager.LocalPlayer.Room.Position) > 5)
+                            {
+                                CityBuddy.NavMeshMovementController.SetNavMeshDestination(DynelManager.LocalPlayer.Room.Position);
                             }
                         }
                     }  

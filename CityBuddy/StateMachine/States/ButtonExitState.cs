@@ -59,6 +59,9 @@ namespace CityBuddy
             PathState._bossButtonLocation = Vector3.Zero;
             _exitDoorLocation = Vector3.Zero;
             //Chat.WriteLine("Exit ButtonExitState");
+
+            CityAttackState.MoveToStart();
+
         }
 
         public void Tick()
