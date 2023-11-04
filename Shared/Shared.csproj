@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -33,10 +33,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="AOSharp.Common">
-      <HintPath>..\..\aosp.handlers-managers\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Common.dll</HintPath>
+      <HintPath>..\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Core">
-      <HintPath>..\..\aosp.handlers-managers\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Core.dll</HintPath>
+      <HintPath>..\packages\AOSharpSDK.1.0.48\lib\net48\AOSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="AOSharp.Recast">
       <HintPath>..\packages\AOSharpSDK.Nav.1.0.5\lib\net48\AOSharp.Recast.dll</HintPath>
