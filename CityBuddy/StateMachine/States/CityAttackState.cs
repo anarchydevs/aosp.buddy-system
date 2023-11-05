@@ -90,23 +90,25 @@ namespace CityBuddy
                  .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                  .FirstOrDefault();
 
-            if (_target != null)
-            {
-                if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 10f)
-                {
-                    if (DynelManager.LocalPlayer.FightingTarget == null
-                        && !DynelManager.LocalPlayer.IsAttacking
-                        && !DynelManager.LocalPlayer.IsAttackPending
-                        && _target.IsInLineOfSight)
-                    {
-                        DynelManager.LocalPlayer.Attack(_target);
-                    }
-                }
-            }
 
             if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
             {
-                if (_target != null && _atStart)
+
+                if (_target != null)
+                {
+                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 10f)
+                    {
+                        if (DynelManager.LocalPlayer.FightingTarget == null
+                            && !DynelManager.LocalPlayer.IsAttacking
+                            && !DynelManager.LocalPlayer.IsAttackPending
+                            && _target.IsInLineOfSight)
+                        {
+                            DynelManager.LocalPlayer.Attack(_target);
+                        }
+                    }
+                }
+
+                else if (_target != null && _atStart)
                 {
                     if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
                     {
@@ -132,7 +134,26 @@ namespace CityBuddy
             {
                 CityBuddy._leader = GetLeaderCharacter();
 
-                if (CityBuddy._leader != null)
+                if (CityBuddy._leader?.FightingTarget != null || CityBuddy._leader?.IsAttacking == true)
+                {
+                    SimpleChar targetMob = DynelManager.NPCs
+                        .Where(c => c.Health > 0
+                            && c.Identity == (Identity)CityBuddy._leader?.FightingTarget?.Identity)
+                        .FirstOrDefault();
+
+                    if (targetMob != null)
+                    {
+                        if (DynelManager.LocalPlayer.FightingTarget == null
+                           && !DynelManager.LocalPlayer.IsAttacking
+                           && !DynelManager.LocalPlayer.IsAttackPending
+                           && targetMob.IsInLineOfSight)
+                        {
+                            DynelManager.LocalPlayer.Attack(targetMob);
+                        }
+                    }
+                }
+
+                else if (CityBuddy._leader != null)
                     PathToLeader();
             }
         }
