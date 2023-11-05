@@ -13,7 +13,9 @@ namespace InfBuddy
             if (Game.IsZoning) { return null; }
 
             if (Extensions.HasDied())
+            {
                 return new DiedState();
+            }
 
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
             {
@@ -23,7 +25,7 @@ namespace InfBuddy
                     return new MoveToQuestGiverState();
                 }
 
-               else
+                else
                 {
                     InfBuddy.DoubleReward = false;
                     return new ReformState();
