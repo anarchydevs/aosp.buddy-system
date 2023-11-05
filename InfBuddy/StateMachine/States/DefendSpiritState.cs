@@ -121,6 +121,11 @@ namespace InfBuddy
                 {
                     InfBuddy.NavMeshMovementController.SetNavMeshDestination(_target.Position);
                 }
+
+                else if (distanceToTarget > 20 && _target.IsInLineOfSight)
+                {
+                    Shared.TauntingTools.HandleTaunting(_target);
+                }
             }
             
             if (DynelManager.LocalPlayer.HealthPercent > 65 || DynelManager.LocalPlayer.NanoPercent > 65
