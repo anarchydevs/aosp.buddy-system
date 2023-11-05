@@ -123,7 +123,7 @@ namespace InfBuddy
                 }
             }
             
-            else if (DynelManager.LocalPlayer.HealthPercent > 65 || DynelManager.LocalPlayer.NanoPercent > 65
+            if (DynelManager.LocalPlayer.HealthPercent > 65 || DynelManager.LocalPlayer.NanoPercent > 65
                     || DynelManager.LocalPlayer.MovementState != MovementState.Sit || !Extensions.Rooted()
                     || DynelManager.LocalPlayer.Position.Distance2DFrom(Constants.DefendPos) > 5)
             {
