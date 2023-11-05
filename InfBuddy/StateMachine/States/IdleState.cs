@@ -23,6 +23,11 @@ namespace InfBuddy
             if (!InfBuddy.Toggle)
                 return null;
 
+            if (Extensions.HasDied())
+            {
+                return new DiedState();
+            }
+
             if (Playfield.ModelIdentity.Instance == Constants.InfernoId)
             {
                 if (!Team.IsInTeam)
@@ -51,8 +56,10 @@ namespace InfBuddy
                     else
                     {
                         if (DynelManager.NPCs.Any(c => c.Name == Constants.QuestStarterName))
+                        {
                             return new MoveToQuestStarterState();
-
+                        }
+                            
                         if (InfBuddy.ModeSelection.Normal == (InfBuddy.ModeSelection)InfBuddy._settings["ModeSelection"].AsInt32())
                         {
                             return new DefendSpiritState();
@@ -76,10 +83,6 @@ namespace InfBuddy
                     }
                 }    
             }
-
-            if (Playfield.ModelIdentity.Instance == Constants.ClanPandeGId || Playfield.ModelIdentity.Instance == Constants.OmniPandeGId)
-                return new DiedState();
-
 
             return null;
         }

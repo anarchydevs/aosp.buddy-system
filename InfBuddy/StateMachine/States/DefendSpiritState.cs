@@ -40,15 +40,17 @@ namespace InfBuddy
                 .FirstOrDefault();
 
             if (Extensions.HasDied())
+            {
                 return new DiedState();
-
+            }
+                
             if (Playfield.ModelIdentity.Instance == Constants.NewInfMissionId)
             {
-
-                if (InfBuddy._settings["Looting"].AsBool()
-                   && _corpse != null
+                if (InfBuddy._settings["Looting"].AsBool() && _corpse != null
                    && Extensions.IsNull(_target))
+                {
                     return new LootingState();
+                }
 
                 if (Extensions.IsClear() || !missionExists)
                 {
@@ -66,12 +68,12 @@ namespace InfBuddy
                 {
                     return new RoamState();
                 }
-
-               
             }
 
             if (Playfield.ModelIdentity.Instance != Constants.NewInfMissionId)
+            {
                 return new IdleState();
+            }
 
             return null;
         }
@@ -81,11 +83,6 @@ namespace InfBuddy
             Chat.WriteLine("Defending");
 
             _mobStuckStartTime = Time.NormalTime;
-
-            if (DynelManager.LocalPlayer.Position.Distance2DFrom(Constants.DefendPos) > 5)
-            {
-                HoldPosition();
-            }
         }
 
         public void OnStateExit() {}
@@ -125,8 +122,10 @@ namespace InfBuddy
                     InfBuddy.NavMeshMovementController.SetNavMeshDestination(_target.Position);
                 }
             }
-            else if (DynelManager.LocalPlayer.HealthPercent > 65 && DynelManager.LocalPlayer.NanoPercent > 65
-                    && DynelManager.LocalPlayer.MovementState != MovementState.Sit && !Extensions.Rooted())
+            
+            else if (DynelManager.LocalPlayer.HealthPercent > 65 || DynelManager.LocalPlayer.NanoPercent > 65
+                    || DynelManager.LocalPlayer.MovementState != MovementState.Sit || !Extensions.Rooted()
+                    || DynelManager.LocalPlayer.Position.Distance2DFrom(Constants.DefendPos) > 5)
             {
                 HoldPosition();
             }

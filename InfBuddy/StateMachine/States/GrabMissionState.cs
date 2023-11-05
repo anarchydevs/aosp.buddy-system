@@ -15,10 +15,14 @@ namespace InfBuddy
             if (Game.IsZoning) { return null; }
 
             if (Extensions.HasDied())
+            {
                 return new DiedState();
+            }
 
             if (Mission.List.Exists(x => x.DisplayName.Contains("The Purification Ri")))
+            {
                 return new MoveToEntranceState();
+            }
 
             return null;
         }
