@@ -63,16 +63,11 @@ namespace Shared
 
         public void UseKit()
         {
-
             Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
 
             if (kit != null && !Item.HasPendingUse)
             {
-                Chat.WriteLine("Using Kit");
-                //kit.UseOn(DynelManager.LocalPlayer.Identity);
-
                 kit.Use(DynelManager.LocalPlayer, true);
-                // Restart the timer after using the kit.
             }
 
         }
