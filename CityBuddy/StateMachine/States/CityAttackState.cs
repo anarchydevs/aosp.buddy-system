@@ -108,7 +108,7 @@ namespace CityBuddy
                     }
                 }
 
-                else if (_target != null && _atStart)
+                if (_target != null && _atStart)
                 {
                     if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
                     {
