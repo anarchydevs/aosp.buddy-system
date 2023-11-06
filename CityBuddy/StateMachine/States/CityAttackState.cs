@@ -118,10 +118,13 @@ namespace CityBuddy
             }
             else
             {
-
                 if (_target != null)
                 {
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 10f)
+                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
+                    {
+                        MovementController.Instance.SetDestination(_target.Position);
+                    }
+                    else
                     {
                         if (DynelManager.LocalPlayer.FightingTarget == null
                             && !DynelManager.LocalPlayer.IsAttacking
@@ -130,14 +133,6 @@ namespace CityBuddy
                         {
                             DynelManager.LocalPlayer.Attack(_target);
                         }
-                    }
-                }
-
-                if (_target != null && _atStart)
-                {
-                    if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
-                    {
-                        MovementController.Instance.SetDestination(_target.Position);
                     }
                 }
                 else if (_corpse != null && _target == null && CityBuddy._settings["Corpses"].AsBool())
