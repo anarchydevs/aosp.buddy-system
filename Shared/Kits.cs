@@ -26,7 +26,7 @@ namespace Shared
                 {
                     MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
                 }
-                else if (localPlayer.MovementState == MovementState.Sit)
+                else
                 {
                     // Use the kit.
                     _kitTimer.Restart();
@@ -34,7 +34,8 @@ namespace Shared
                 }
             }
             // Check if we should stand.
-            else if ((localPlayer.NanoPercent >= 90 && localPlayer.HealthPercent >= 90) || InCombat() || localPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            if ((localPlayer.NanoPercent >= 90 && localPlayer.HealthPercent >= 90) || InCombat() || localPlayer.Cooldowns.ContainsKey(Stat.Treatment)
+               || !Spell.List.Any(spell => spell.IsReady) || Spell.HasPendingCast)
             {
                 // Stand up if sitting.
                 if (localPlayer.MovementState == MovementState.Sit)
@@ -68,7 +69,9 @@ namespace Shared
                 Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
                 if (kit != null)
                 {
-                    kit.Use(DynelManager.LocalPlayer, true);
+                    kit.UseOn(DynelManager.LocalPlayer.Identity);
+
+                    //kit.Use(DynelManager.LocalPlayer, true);
                     // Restart the timer after using the kit.
                     _kitTimer.Restart();
                 }
