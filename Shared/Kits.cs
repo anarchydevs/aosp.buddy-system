@@ -6,6 +6,7 @@ using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using System.Collections.Generic;
 using System.Security.Policy;
+using AOSharp.Core.UI;
 
 namespace Shared
 {
@@ -29,7 +30,6 @@ namespace Shared
                 else
                 {
                     // Use the kit.
-                    _kitTimer.Restart();
                     UseKit();
                 }
             }
@@ -63,19 +63,18 @@ namespace Shared
 
         public void UseKit()
         {
-            // Check if the timer has been running for at least 2 seconds.
-            if (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000)
-            {
-                Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-                if (kit != null)
-                {
-                    kit.UseOn(DynelManager.LocalPlayer.Identity);
 
-                    //kit.Use(DynelManager.LocalPlayer, true);
-                    // Restart the timer after using the kit.
-                    _kitTimer.Restart();
-                }
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+
+            if (kit != null && !Item.HasPendingUse)
+            {
+                Chat.WriteLine("Using Kit");
+                //kit.UseOn(DynelManager.LocalPlayer.Identity);
+
+                kit.Use(DynelManager.LocalPlayer, true);
+                // Restart the timer after using the kit.
             }
+
         }
 
         public bool MeetsSkillRequirement(Item sitKit)
