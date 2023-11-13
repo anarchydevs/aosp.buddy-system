@@ -6,6 +6,7 @@ using AOSharp.Core.Inventory;
 using AOSharp.Core.Movement;
 using System.Collections.Generic;
 using System.Security.Policy;
+using AOSharp.Core.UI;
 
 namespace Shared
 {
@@ -26,15 +27,15 @@ namespace Shared
                 {
                     MovementController.Instance.SetMovement(MovementAction.SwitchToSit);
                 }
-                else if (localPlayer.MovementState == MovementState.Sit)
+                else
                 {
                     // Use the kit.
-                    _kitTimer.Restart();
                     UseKit();
                 }
             }
             // Check if we should stand.
-            else if ((localPlayer.NanoPercent >= 90 && localPlayer.HealthPercent >= 90) || InCombat() || localPlayer.Cooldowns.ContainsKey(Stat.Treatment))
+            if ((localPlayer.NanoPercent >= 90 && localPlayer.HealthPercent >= 90) || InCombat() || localPlayer.Cooldowns.ContainsKey(Stat.Treatment)
+               || !Spell.List.Any(spell => spell.IsReady) || Spell.HasPendingCast)
             {
                 // Stand up if sitting.
                 if (localPlayer.MovementState == MovementState.Sit)
@@ -62,17 +63,13 @@ namespace Shared
 
         public void UseKit()
         {
-            // Check if the timer has been running for at least 2 seconds.
-            if (!_kitTimer.IsRunning || _kitTimer.ElapsedMilliseconds >= 2000)
+            Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
+
+            if (kit != null && !Item.HasPendingUse)
             {
-                Item kit = Inventory.Items.FirstOrDefault(x => RelevantItems.Kits.Contains(x.Id));
-                if (kit != null)
-                {
-                    kit.Use(DynelManager.LocalPlayer, true);
-                    // Restart the timer after using the kit.
-                    _kitTimer.Restart();
-                }
+                kit.Use(DynelManager.LocalPlayer, true);
             }
+
         }
 
         public bool MeetsSkillRequirement(Item sitKit)

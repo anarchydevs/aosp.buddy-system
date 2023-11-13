@@ -26,14 +26,20 @@ namespace InfBuddy
             if (Game.IsZoning) { return null; }
 
             if (Extensions.HasDied())
+            {
                 return new DiedState();
-
+            }
+                
             if (Team.IsInTeam && Extensions.TimedOut(_reformStartedTime, ReformTimeout + InviteDelay))
+            {
                 return new MoveToQuestGiverState();
-
+            }
+                
             if (_phase == ReformPhase.Completed && Team.Members.Where(c => c.Character != null).ToList().Count == _teamCache.Count())
+            {
                 return new MoveToQuestGiverState();
-
+            }
+                
             return null;
         }
 

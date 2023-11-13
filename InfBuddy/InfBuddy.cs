@@ -41,7 +41,7 @@ namespace InfBuddy
         public static double _stateTimeOut;
         private static double _uiDelay;
 
-        private string previousErrorMessage = string.Empty;
+        public static string previousErrorMessage = string.Empty;
 
         public static List<string> _namesToIgnore = new List<string>
         {
@@ -477,7 +477,7 @@ namespace InfBuddy
             };
         }
 
-        public int GetLineNumber(Exception ex)
+        public static int GetLineNumber(Exception ex)
         {
             var lineNumber = 0;
 

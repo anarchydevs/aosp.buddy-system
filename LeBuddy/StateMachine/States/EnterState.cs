@@ -125,6 +125,8 @@ namespace LeBuddy
 
                 var npcMsg = (VicinityMessage)msg;
 
+                //Playshifting failed: The server was unable to start the mission building.
+
                 string[] triggerMsg = new string[1] { "Playshifting failed: The server was unable to start the mission building." };
 
                 if (triggerMsg.Any(x => npcMsg.Text.Contains(x)))

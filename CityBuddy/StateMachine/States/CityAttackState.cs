@@ -90,27 +90,49 @@ namespace CityBuddy
                  .OrderBy(c => c.Position.DistanceFrom(DynelManager.LocalPlayer.Position))
                  .FirstOrDefault();
 
-            if (_target != null)
+            if (DynelManager.LocalPlayer.Identity != CityBuddy.Leader)
             {
-                if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) < 10f)
+                CityBuddy._leader = GetLeaderCharacter();
+
+                if (CityBuddy._leader?.FightingTarget != null || CityBuddy._leader?.IsAttacking == true)
                 {
-                    if (DynelManager.LocalPlayer.FightingTarget == null
-                        && !DynelManager.LocalPlayer.IsAttacking
-                        && !DynelManager.LocalPlayer.IsAttackPending
-                        && _target.IsInLineOfSight)
+                    SimpleChar targetMob = DynelManager.NPCs
+                        .Where(c => c.Health > 0
+                            && c.Identity == (Identity)CityBuddy._leader?.FightingTarget?.Identity)
+                        .FirstOrDefault();
+
+                    if (targetMob != null)
                     {
-                        DynelManager.LocalPlayer.Attack(_target);
+                        if (DynelManager.LocalPlayer.FightingTarget == null
+                           && !DynelManager.LocalPlayer.IsAttacking
+                           && !DynelManager.LocalPlayer.IsAttackPending
+                           && targetMob.IsInLineOfSight)
+                        {
+                            DynelManager.LocalPlayer.Attack(targetMob);
+                        }
                     }
                 }
-            }
 
-            if (DynelManager.LocalPlayer.Identity == CityBuddy.Leader)
+                else if (CityBuddy._leader != null)
+                    PathToLeader();
+            }
+            else
             {
-                if (_target != null && _atStart)
+                if (_target != null)
                 {
                     if (_target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) > 5f)
                     {
                         MovementController.Instance.SetDestination(_target.Position);
+                    }
+                    else
+                    {
+                        if (DynelManager.LocalPlayer.FightingTarget == null
+                            && !DynelManager.LocalPlayer.IsAttacking
+                            && !DynelManager.LocalPlayer.IsAttackPending
+                            && _target.IsInLineOfSight)
+                        {
+                            DynelManager.LocalPlayer.Attack(_target);
+                        }
                     }
                 }
                 else if (_corpse != null && _target == null && CityBuddy._settings["Corpses"].AsBool())
@@ -126,14 +148,6 @@ namespace CityBuddy
                     MoveToStart();
                     UpdateAtStartStatus();
                 }
-            }
-
-            if (DynelManager.LocalPlayer.Identity != CityBuddy.Leader)
-            {
-                CityBuddy._leader = GetLeaderCharacter();
-
-                if (CityBuddy._leader != null)
-                    PathToLeader();
             }
         }
         private SimpleChar GetLeaderCharacter()
