@@ -155,19 +155,11 @@ namespace AXPBuddy
             {
                 if (startStopMessage.IsStarting)
                 {
-                    // Only set the Leader if "Merge" is not checked.
-                    //if (!_settings["Merge"].AsBool())
-                    //{
-                    //    Leader = new Identity(IdentityType.SimpleChar, sender);
-                    //}
-
-                    // Update the setting and start the process.
                     _settings["Toggle"] = true;
                     Start();
                 }
                 else
                 {
-                    // Update the setting and stop the process.
                     _settings["Toggle"] = false;
                     Stop();
                 }
