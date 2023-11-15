@@ -18,7 +18,7 @@ namespace Shared
         {
             var localPlayer = DynelManager.LocalPlayer;
 
-            // Check if we should sit and use the kit.
+            // Check if we should sit and use the kit..
             if ((localPlayer.NanoPercent < 66 || localPlayer.HealthPercent < 66) && !InCombat() && Spell.List.Any(spell => spell.IsReady) && !Spell.HasPendingCast
                 && !localPlayer.Cooldowns.ContainsKey(Stat.Treatment) && CanUseSitKit() && !localPlayer.IsFalling)
             {
