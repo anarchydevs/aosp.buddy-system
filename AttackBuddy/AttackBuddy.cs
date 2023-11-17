@@ -273,6 +273,10 @@ namespace AttackBuddy
                     ScanningInstance6123();
                     break;
 
+                case 1934:
+                    ScanningInstance1934();
+                    break;
+
                 case 6015:
                     ScanningInstance6015();
                     break;
@@ -695,6 +699,62 @@ namespace AttackBuddy
             }
         }
 
+        private void ScanningInstance1934()//Inner Sanctum
+        {
+            {
+                _bossMob = DynelManager.NPCs
+                   .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                       && !Constants._ignores.Contains(c.Name)
+                       && c.Health > 0 && c.IsInLineOfSight
+                       && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607))
+                   .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                   .OrderByDescending(c => c.Name == "Hezak the Immortal")
+                   .OrderByDescending(c => c.Name == "Inobak the Gelid")
+                   .OrderByDescending(c => c.Name == "Dominus Jiannu")
+                   .OrderByDescending(c => c.Name == "Dominus Facut the Bloodless")
+                   .OrderByDescending(c => c.Name == "Dominus Ummoh the Pedagogue")
+                   .OrderByDescending(c => c.Name == "Jeuru the Defiler")
+                   .OrderByDescending(c => c.Name == "Iskop the Idolator")
+                   .ToList();
+
+                _switchMob = DynelManager.NPCs
+                   .Where(c => c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                                   && !Constants._ignores.Contains(c.Name)
+                                   && c.Health > 0 && c.IsInLineOfSight
+                                   && Extensions.IsFightingAny(c)
+                                   && (c.Name == "Devoted Fanatic"
+                                   || c.Name == "Hallowed Acolyte"
+                                   || c.Name == "Fanatic"
+                                   || c.Name == "Turbulent Windcaller"
+                                   || c.Name == "Ruinous Reverend"
+                                   || c.Name == "Eternal Guardian"
+                                   || c.Name == "Defensive Drone"
+                                   || c.Name == "Confounding Bloated Carcass"))
+                               .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                               .OrderBy(c => c.HealthPercent)
+                               .OrderByDescending(c => c.Name == "Hallowed Acolyte")
+                               .OrderByDescending(c => c.Name == "Confounding Bloated Carcass")
+                               .OrderByDescending(c => c.Name == "Devoted Fanatic")
+                               .ToList();
+
+                _mob = DynelManager.Characters
+                    .Where(c => !c.IsPlayer && c.DistanceFrom(Extensions.GetLeader(Leader)) <= ScanRange
+                                    && !Constants._ignores.Contains(c.Name) && c.Health > 0
+                                    && c.IsInLineOfSight && Extensions.IsFightingAny(c)
+                                    && !c.IsPet)
+                                .OrderBy(c => c.Position.DistanceFrom(Extensions.GetLeader(Leader).Position))
+                                .OrderBy(c => c.HealthPercent)
+                                .OrderByDescending(c => c.Name == "Faithful Cultist")
+                                .OrderByDescending(c => c.Name == "Ruinous Reverend")
+                                .OrderByDescending(c => c.Name == "Hallowed Acolyte")
+                                .OrderByDescending(c => c.Name == "Turbulent Windcaller")
+                                .OrderByDescending(c => c.Name == "Seraphic Exarch")
+                                .OrderByDescending(c => c.Name == "Cultist Silencer")
+                                .OrderByDescending(c => c.Name == "Devoted Fanatic")
+                                .ToList();
+            }
+        }
+
         private void ScanningInstance4389()//IPande/Pande
         {
             _bossMob = DynelManager.NPCs
@@ -756,6 +816,7 @@ namespace AttackBuddy
                   || c.Name == "The Sacrifice"
                   || c.Name == "Drone Harvester - Jaax'Sinuh"
                   || c.Name == "Support Sentry - Ilari'Uri"
+                  || c.Name == "Fanatic"
                   || c.Name == "Alien Coccoon"
                   || c.Name == "Alien Cocoon"
                   || c.Name == "Stasis Containment Field"))
