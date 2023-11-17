@@ -32,12 +32,16 @@ namespace PetHunt
 
         public static bool Enable = false;
 
+        public static List<SimpleChar> _mob = new List<SimpleChar>();
+        public static List<SimpleChar> _bossMob = new List<SimpleChar>();
+        public static List<SimpleChar> _switchMob = new List<SimpleChar>();
 
         public override void Run(string pluginDir)
         {
             try
             {
                 _settings = new Settings("PetHunt");
+
                 PluginDir = pluginDir;
 
                 Config = Config.Load($"{Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)}\\{CommonParameters.BasePath}\\{CommonParameters.AppPath}\\PetHunt\\{DynelManager.LocalPlayer.Name}\\Config.json");
@@ -147,12 +151,23 @@ namespace PetHunt
         {
             try
             {
+                if (Game.IsZoning)
+                {
+                    Enable = false;
+                    _settings["Enable"] = false;
 
+                    return;
+                }
 
+                if (_settings["Enable"].AsBool()) 
+                {
+                    ScanningDefault();
+                    _stateMachine.Tick();
+                }
 
                 #region UI
 
-                    var window = SettingsController.FindValidWindow(_windows);
+                var window = SettingsController.FindValidWindow(_windows);
 
                     if (window != null && window.IsValid)
                     {
@@ -210,6 +225,7 @@ namespace PetHunt
                     }
 
                     #endregion
+
                 }
             catch (Exception ex)
             {
@@ -222,6 +238,71 @@ namespace PetHunt
                     previousErrorMessage = errorMessage;
                 }
             }
+        }
+
+        private void ScanningDefault()
+        {
+            var localPlayer = DynelManager.LocalPlayer;
+            var player = DynelManager.Players;
+
+            var pets = DynelManager.LocalPlayer.Pets;
+
+            _bossMob = DynelManager.NPCs
+                       .Where(c => c.DistanceFrom(localPlayer) <= HuntRange
+                           && !Ignores._ignores.Contains(c.Name) && !c.IsPlayer
+                           && c.Health > 0 && !c.IsPet
+                           && !c.Buffs.Contains(253953) && !c.Buffs.Contains(205607)
+                           && c.MaxHealth >= 1000000)
+                       .OrderBy(c => c.Position.DistanceFrom(localPlayer.Position))
+                       .OrderByDescending(c => c.Name == "Field Support  - Cha'Khaz")
+                       .OrderByDescending(c => c.Name == "Ground Chief Aune")
+
+
+                       .ToList();
+
+            _switchMob = DynelManager.NPCs
+               .Where(c => c.DistanceFrom(localPlayer) <= HuntRange
+                   && !Ignores._ignores.Contains(c.Name) && !c.IsPlayer
+                   && c.Name != "Zix" && !c.Name.Contains("sapling")
+                   && c.Health > 0 && c.MaxHealth < 1000000 && !c.IsPet
+                   && (c.Name == "Hand of the Colonel"
+                  || c.Name == "Hacker'Uri"
+                  || c.Name == "The Sacrifice"
+                  || c.Name == "Drone Harvester - Jaax'Sinuh"
+                  || c.Name == "Support Sentry - Ilari'Uri"
+                  || c.Name == "Alien Coccoon"
+                  || c.Name == "Alien Cocoon"
+                  || c.Name == "Stasis Containment Field"))
+               .OrderBy(c => c.Position.DistanceFrom(localPlayer.Position))
+               .OrderBy(c => c.HealthPercent)
+               .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
+               .OrderByDescending(c => c.Name == "Lost Thought")
+               .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
+               .OrderByDescending(c => c.Name == "Alien Cocoon")
+               .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
+               .ToList();
+
+            _mob = DynelManager.Characters
+                .Where(c => c.DistanceFrom(localPlayer) <= HuntRange
+                    && !Ignores._ignores.Contains(c.Name) && !c.IsPlayer
+                    && c.Name != "Zix" && !c.Name.Contains("sapling") && c.Health > 0
+                    && c.MaxHealth < 1000000 && !c.IsPet
+                    && (!c.IsPet || c.Name == "Drop Trooper - Ilari'Ra"))
+                .OrderBy(c => c.Position.DistanceFrom(localPlayer.Position))
+                .OrderBy(c => c.HealthPercent)
+                .OrderByDescending(c => c.Name == "Drone Harvester - Jaax'Sinuh")
+                .OrderByDescending(c => c.Name == "Support Sentry - Ilari'Uri")
+                .OrderByDescending(c => c.Name == "Alien Cocoon")
+                .OrderByDescending(c => c.Name == "Alien Coccoon" && c.MaxHealth < 40001)
+                .OrderByDescending(c => c.Name == "Masked Operator")
+                .OrderByDescending(c => c.Name == "Masked Technician")
+                .OrderByDescending(c => c.Name == "Masked Engineer")
+                .OrderByDescending(c => c.Name == "Masked Superior Commando")
+                .OrderByDescending(c => c.Name == "The Sacrifice")
+                .OrderByDescending(c => c.Name == "Hacker'Uri")
+                .OrderByDescending(c => c.Name == "Hand of the Colonel")
+                .OrderByDescending(c => c.Name == "Ground Chief Aune")
+                .ToList();
         }
 
         private void BuddyCommand(string command, string[] param, ChatWindow chatWindow)

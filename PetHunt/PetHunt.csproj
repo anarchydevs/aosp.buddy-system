@@ -62,7 +62,9 @@
     <Compile Include="SettingsController.cs" />
     <Compile Include="StateMachine\IState.cs" />
     <Compile Include="StateMachine\StateMachine.cs" />
+    <Compile Include="StateMachine\States\PetAttackState.cs" />
     <Compile Include="StateMachine\States\IdleState.cs" />
+    <Compile Include="StateMachine\States\ScanState.cs" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

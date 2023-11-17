@@ -78,8 +78,6 @@ namespace PetHunt
 
                             if (huntRangeInput != null)
                                 huntRangeInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange}";
-                            if (scanRangeInput != null)
-                                scanRangeInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].ScanRange}";
                         }
                     }
                     catch (Exception ex)
