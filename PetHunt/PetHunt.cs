@@ -32,6 +32,8 @@ namespace PetHunt
 
         public static bool Enable = false;
 
+        private static double _uiDelay;
+
         public static List<SimpleChar> _mob = new List<SimpleChar>();
         public static List<SimpleChar> _bossMob = new List<SimpleChar>();
         public static List<SimpleChar> _switchMob = new List<SimpleChar>();
@@ -52,6 +54,7 @@ namespace PetHunt
                 Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRangeChangedEvent += HuntRange_Changed;
 
                 IPCChannel.RegisterCallback((int)IPCOpcode.StartStop, OnStartStopMessage);
+                IPCChannel.RegisterCallback((int)IPCOpcode.RangeInfo, OnRangeInfoMessage);
 
                 Chat.RegisterCommand("buddy", BuddyCommand);
 
@@ -139,6 +142,14 @@ namespace PetHunt
             }
         }
 
+        private void OnRangeInfoMessage(int sender, IPCMessage msg)
+        {
+            if (msg is RangeInfoIPCMessage rangeInfoMessage)
+            {
+                Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange = rangeInfoMessage.HuntRange;
+            }
+        }
+
         private void HandleInfoViewClick(object s, ButtonBase button)
         {
             _infoWindow = Window.CreateFromXml("Info", PluginDir + "\\UI\\PetHuntInfoView.xml",
@@ -169,7 +180,9 @@ namespace PetHunt
 
                 #region UI
 
-                var window = SettingsController.FindValidWindow(_windows);
+                if (Time.AONormalTime > _uiDelay + 1.0)
+                {
+                    var window = SettingsController.FindValidWindow(_windows);
 
                     if (window != null && window.IsValid)
                     {
@@ -190,24 +203,24 @@ namespace PetHunt
                         }
                     }
 
-                    //bool huntRangeChanged = false;
+                    bool huntRangeChanged = false;
 
-                    if (channelInput != null)
+                    if (huntRangeInput != null)
                     {
                         if (int.TryParse(huntRangeInput.Text, out int huntRangeInputValue)
                             && Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange != huntRangeInputValue)
                         {
                             Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange = huntRangeInputValue;
-                            //  huntRangeChanged = true;
+                             huntRangeChanged = true;
                         }
                     }
-                    //if (huntRangeChanged)
-                    //{
-                        //IPCChannel.Broadcast(new RangeInfoIPCMessage()
-                        //{
-                        //    HuntRange = Config.CharSettings[DynelManager.LocalPlayer.Name].huntRange,
-                        //});
-                    //}
+                    if (huntRangeChanged)
+                    {
+                        IPCChannel.Broadcast(new RangeInfoIPCMessage()
+                        {
+                            HuntRange = Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange,
+                        }) ;
+                    }
 
                     if (SettingsController.settingsWindow.FindView("PetHuntInfoView", out Button infoView))
                         {
@@ -226,10 +239,12 @@ namespace PetHunt
                             Start();
                         }
                     }
-
-                    #endregion
-
+                    _uiDelay = Time.AONormalTime;
                 }
+
+                #endregion
+
+            }
             catch (Exception ex)
             {
                 var errorMessage = "An error occurred on line " + GetLineNumber(ex) + ": " + ex.Message;
