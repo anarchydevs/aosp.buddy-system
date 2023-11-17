@@ -71,7 +71,6 @@ namespace PetHunt
 
                             settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
                             settingsWindow.FindView("HuntRangeBox", out TextInputView huntRangeInput);
-                            settingsWindow.FindView("ScanRangeBox", out TextInputView scanRangeInput);
 
                             if (channelInput != null)
                                 channelInput.Text = $"{Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel}";

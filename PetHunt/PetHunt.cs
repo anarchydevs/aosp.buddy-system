@@ -67,6 +67,8 @@ namespace PetHunt
                 Chat.WriteLine("PetHunt Loaded!");
                 Chat.WriteLine("/pethunt for settings.");
 
+                HuntRange = Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange;
+
             }
             catch (Exception ex)
             {
@@ -174,39 +176,40 @@ namespace PetHunt
                         
                     }
 
-                    if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
+                if (SettingsController.settingsWindow != null && SettingsController.settingsWindow.IsValid)
+                {
+                    SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
+                    SettingsController.settingsWindow.FindView("HuntRangeBox", out TextInputView huntRangeInput);
+
+                    if (channelInput != null)
                     {
-                        SettingsController.settingsWindow.FindView("ChannelBox", out TextInputView channelInput);
-                        SettingsController.settingsWindow.FindView("HuntRangeBox", out TextInputView huntRangeInput);
-
-                        if (channelInput != null)
+                        if (int.TryParse(channelInput.Text, out int channelValue)
+                            && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
                         {
-                            if (int.TryParse(channelInput.Text, out int channelValue)
-                                && Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel != channelValue)
-                            {
-                                Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
-                            }
+                            Config.CharSettings[DynelManager.LocalPlayer.Name].IPCChannel = channelValue;
                         }
+                    }
 
-                        bool huntRangeChanged = false;
+                    //bool huntRangeChanged = false;
 
+                    if (channelInput != null)
+                    {
                         if (int.TryParse(huntRangeInput.Text, out int huntRangeInputValue)
                             && Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange != huntRangeInputValue)
                         {
                             Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange = huntRangeInputValue;
-                            huntRangeChanged = true;
+                            //  huntRangeChanged = true;
                         }
+                    }
+                    //if (huntRangeChanged)
+                    //{
+                        //IPCChannel.Broadcast(new RangeInfoIPCMessage()
+                        //{
+                        //    HuntRange = Config.CharSettings[DynelManager.LocalPlayer.Name].huntRange,
+                        //});
+                    //}
 
-                        if (huntRangeChanged)
-                        {
-                            //IPCChannel.Broadcast(new RangeInfoIPCMessage()
-                            //{
-                            //    AttackRange = Config.CharSettings[DynelManager.LocalPlayer.Name].huntRange,
-                            //});
-                        }
-
-
-                        if (SettingsController.settingsWindow.FindView("PetHuntInfoView", out Button infoView))
+                    if (SettingsController.settingsWindow.FindView("PetHuntInfoView", out Button infoView))
                         {
                             infoView.Tag = SettingsController.settingsWindow;
                             infoView.Clicked = HandleInfoViewClick;

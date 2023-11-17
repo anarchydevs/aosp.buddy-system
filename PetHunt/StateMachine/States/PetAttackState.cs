@@ -14,7 +14,8 @@ namespace PetHunt
         public const double _fightTimeout = 45f;
 
         private double _fightStartTime;
-        public static float _tetherDistance;
+
+        private double attackStarted;
 
         public static List<int> _ignoreTargetIdentity = new List<int>();
 
@@ -55,65 +56,48 @@ namespace PetHunt
         public void Tick()
         {
             if (_target == null)
+            {
+
                 return;
+            }
+                
+
             List<SimpleChar> switchList = null;
 
             bool validTargetConditions =
                 !_target.Buffs.Contains(253953) &&
                 !_target.Buffs.Contains(NanoLine.ShovelBuffs) &&
                 !_target.Buffs.Contains(302745) &&
-                !_target.IsPlayer &&
-                _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) <= PetHunt.Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange;
+                !_target.IsPlayer && !_target.IsPet && 
+                _target.Position.DistanceFrom(DynelManager.LocalPlayer.Position) 
+                <= PetHunt.Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange;
 
-            bool isPetAttacking = DynelManager.LocalPlayer.Pets.Any(pet =>
-                pet.Character.IsAttacking);
+            bool isPetAttacking = DynelManager.LocalPlayer.Pets.Any(pet => pet.Character.IsAttacking);
 
             bool isPetEngaged = DynelManager.LocalPlayer.Pets.Any(pet => pet.Character.FightingTarget != null);
 
+            bool isPetAttackPending = DynelManager.LocalPlayer.Pets.Any(pet => pet.Character.IsPathing);
+            bool isAttackPet = DynelManager.LocalPlayer.Pets.Any(pet => pet.Type == PetType.Attack || pet.Type == PetType.Support);
 
-            if (!isPetAttacking && !isPetEngaged  && validTargetConditions)
+
+            if (Time.AONormalTime > attackStarted + 1)
             {
-                DynelManager.LocalPlayer.Pets.Attack(_target.Identity);
-                _fightStartTime = Time.NormalTime;
-            }
-
-
-            if (PetHunt._switchMob.Count >= 1)
-                switchList = PetHunt._switchMob;
-            else if (PetHunt._mob.Count >= 1)
-                switchList = PetHunt._mob;
-
-            if (switchList != null && isPetEngaged && isPetAttacking)
-            {
-                SimpleChar switchTarget = switchList.FirstOrDefault();
-                if (switchTarget != null && switchTarget.Health > 0)
+                if (isAttackPet)
                 {
-                    _target = switchTarget;
-                    DynelManager.LocalPlayer.Pets.Attack(_target.Identity);
-                    //Chat.WriteLine($"Switching to _target {_target.Name}.");
-                    _fightStartTime = Time.NormalTime;
-                }
-            }
-            else if (PetHunt._switchMob.Count >= 1 && _target.Name != PetHunt._switchMob.FirstOrDefault().Name)
-            {
-                if (isPetEngaged && isPetAttacking)
-                {
-                    SimpleChar switchTarget = PetHunt._switchMob.FirstOrDefault();
-                    if (switchTarget != null && switchTarget.Health > 0)
+                    if (!isPetAttacking && !isPetEngaged && !isPetAttackPending && validTargetConditions)
                     {
-                        _target = switchTarget;
                         DynelManager.LocalPlayer.Pets.Attack(_target.Identity);
-                        //Chat.WriteLine($"Switching to _target {_target.Name}.");
                         _fightStartTime = Time.NormalTime;
+                        Chat.WriteLine($"Sent pet(s) to attack {_target.Name}");
                     }
                 }
+                attackStarted = Time.AONormalTime;
             }
         }
 
-
         public void OnStateExit()
         {
-            
+            DynelManager.LocalPlayer.Pets.Follow();
         }
 
         public static bool IsNull(SimpleChar _target)

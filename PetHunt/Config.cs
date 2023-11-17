@@ -16,7 +16,7 @@ namespace PetHunt
         [JsonIgnore]
         public int IPCChannel => CharSettings != null && CharSettings.ContainsKey(DynelManager.LocalPlayer.Name) ? CharSettings[DynelManager.LocalPlayer.Name].IPCChannel : 33;
         [JsonIgnore]
-        public int HuntRange => CharSettings != null && CharSettings.ContainsKey(DynelManager.LocalPlayer.Name) ? CharSettings[DynelManager.LocalPlayer.Name].HuntRange : 10;
+        public int HuntRange => CharSettings != null && CharSettings.ContainsKey(DynelManager.LocalPlayer.Name) ? CharSettings[DynelManager.LocalPlayer.Name].HuntRange : 60;
 
         public static Config Load(string path)
         {
@@ -80,7 +80,7 @@ namespace PetHunt
         }
 
         public event EventHandler<int> HuntRangeChangedEvent;
-        private int _huntRange = 10;
+        private int _huntRange = 60;
 
         public int HuntRange
         {
