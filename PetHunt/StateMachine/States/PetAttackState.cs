@@ -47,7 +47,7 @@ namespace PetHunt
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Hunting");
+            //Chat.WriteLine("Hunting");
 
             _fightStartTime = Time.NormalTime;
         }
@@ -84,7 +84,7 @@ namespace PetHunt
                     {
                         DynelManager.LocalPlayer.Pets.Attack(_target.Identity);
                         _fightStartTime = Time.NormalTime;
-                        Chat.WriteLine($"Sent pet(s) to attack {_target.Name}");
+                        //Chat.WriteLine($"Sent pet(s) to attack {_target.Name}");
                     }
                 }
                 attackStarted = Time.AONormalTime;

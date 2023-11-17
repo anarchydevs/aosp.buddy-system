@@ -30,9 +30,8 @@ namespace PetHunt
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Scanning");
+            //Chat.WriteLine("Scanning");
         }
-
 
         public void Tick()
         {
@@ -41,14 +40,14 @@ namespace PetHunt
                 if (PetHunt._mob.FirstOrDefault().Health == 0) { return; }
 
                 _target = PetHunt._mob.FirstOrDefault();
-                Chat.WriteLine($"Found _target: {_target.Name}.");
+                //Chat.WriteLine($"Found _target: {_target.Name}.");
             }
             else if (PetHunt._bossMob.Count >= 1)
             {
                 if (PetHunt._bossMob.FirstOrDefault().Health == 0) { return; }
 
                 _target = PetHunt._bossMob.FirstOrDefault();
-                Chat.WriteLine($"Found _target: {_target.Name}.");
+                //Chat.WriteLine($"Found _target: {_target.Name}.");
             }
         }
 

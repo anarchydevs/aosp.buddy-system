@@ -16,7 +16,7 @@ namespace PetHunt
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Idle");
+            //Chat.WriteLine("Idle");
         }
 
         public void OnStateExit()
