@@ -47,11 +47,10 @@ namespace PetHunt
 
         public void OnStateEnter()
         {
-            Chat.WriteLine("Attacking");
+            Chat.WriteLine("Hunting");
 
             _fightStartTime = Time.NormalTime;
         }
-
 
         public void Tick()
         {
@@ -60,7 +59,6 @@ namespace PetHunt
 
                 return;
             }
-                
 
             List<SimpleChar> switchList = null;
 
@@ -73,9 +71,7 @@ namespace PetHunt
                 <= PetHunt.Config.CharSettings[DynelManager.LocalPlayer.Name].HuntRange;
 
             bool isPetAttacking = DynelManager.LocalPlayer.Pets.Any(pet => pet.Character.IsAttacking);
-
             bool isPetEngaged = DynelManager.LocalPlayer.Pets.Any(pet => pet.Character.FightingTarget != null);
-
             bool isPetAttackPending = DynelManager.LocalPlayer.Pets.Any(pet => pet.Character.IsPathing);
             bool isAttackPet = DynelManager.LocalPlayer.Pets.Any(pet => pet.Type == PetType.Attack || pet.Type == PetType.Support);
 
@@ -106,6 +102,5 @@ namespace PetHunt
                 || _target?.IsValid == false
                 || _target?.Health == 0;
         }
-
     }
 }
